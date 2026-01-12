@@ -1,11 +1,14 @@
 package io.github.smithjustinn.screens
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,8 +20,10 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
@@ -29,6 +34,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -51,15 +58,18 @@ import io.github.smithjustinn.di.LocalAppGraph
 import io.github.smithjustinn.domain.models.DifficultyLevel
 import io.github.smithjustinn.domain.models.Rank
 import io.github.smithjustinn.domain.models.Suit
+import io.github.smithjustinn.domain.repositories.GameStateRepository
 import io.github.smithjustinn.platform.JavaSerializable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import memory_match.sharedui.generated.resources.Res
 import memory_match.sharedui.generated.resources.app_name
 import memory_match.sharedui.generated.resources.how_many_pairs
 import memory_match.sharedui.generated.resources.pairs_format
+import memory_match.sharedui.generated.resources.resume_game
 import memory_match.sharedui.generated.resources.select_difficulty
 import memory_match.sharedui.generated.resources.start
 import org.jetbrains.compose.resources.stringResource
@@ -69,7 +79,9 @@ import org.jetbrains.compose.resources.stringResource
  */
 data class DifficultyState(
     val difficulties: List<DifficultyLevel> = DifficultyLevel.defaultLevels,
-    val selectedDifficulty: DifficultyLevel = DifficultyLevel.defaultLevels[1]
+    val selectedDifficulty: DifficultyLevel = DifficultyLevel.defaultLevels[1],
+    val hasSavedGame: Boolean = false,
+    val savedGamePairCount: Int = 0
 )
 
 /**
@@ -78,10 +90,14 @@ data class DifficultyState(
 sealed class DifficultyIntent {
     data class SelectDifficulty(val level: DifficultyLevel) : DifficultyIntent()
     data class StartGame(val pairs: Int) : DifficultyIntent()
+    data object CheckSavedGame : DifficultyIntent()
+    data object ResumeGame : DifficultyIntent()
 }
 
 @Inject
-class DifficultyScreenModel : ScreenModel {
+class DifficultyScreenModel(
+    private val gameStateRepository: GameStateRepository
+) : ScreenModel {
     private val _state = MutableStateFlow(DifficultyState())
     val state: StateFlow<DifficultyState> = _state.asStateFlow()
 
@@ -92,6 +108,22 @@ class DifficultyScreenModel : ScreenModel {
             }
             is DifficultyIntent.StartGame -> {
                 onNavigate(intent.pairs)
+            }
+            is DifficultyIntent.CheckSavedGame -> {
+                screenModelScope.launch {
+                    val savedGame = gameStateRepository.getSavedGameState()
+                    _state.update { 
+                        it.copy(
+                            hasSavedGame = savedGame != null && !savedGame.first.isGameWon,
+                            savedGamePairCount = savedGame?.first?.pairCount ?: 0
+                        ) 
+                    }
+                }
+            }
+            is DifficultyIntent.ResumeGame -> {
+                if (_state.value.hasSavedGame) {
+                    onNavigate(_state.value.savedGamePairCount)
+                }
             }
         }
     }
@@ -105,6 +137,10 @@ class DifficultyScreen : Screen, JavaSerializable {
         val screenModel = rememberScreenModel { graph.difficultyScreenModel }
         val state by screenModel.state.collectAsState()
         val navigator = LocalNavigator.currentOrThrow
+
+        LaunchedEffect(Unit) {
+            screenModel.handleIntent(DifficultyIntent.CheckSavedGame)
+        }
 
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -138,6 +174,11 @@ class DifficultyScreen : Screen, JavaSerializable {
                     },
                     onStartGame = {
                         screenModel.handleIntent(DifficultyIntent.StartGame(state.selectedDifficulty.pairs)) { pairs ->
+                            navigator.push(GameScreen(pairs))
+                        }
+                    },
+                    onResumeGame = {
+                        screenModel.handleIntent(DifficultyIntent.ResumeGame) { pairs ->
                             navigator.push(GameScreen(pairs))
                         }
                     }
@@ -228,6 +269,7 @@ private fun DifficultySelectionSection(
     state: DifficultyState,
     onDifficultySelected: (DifficultyLevel) -> Unit,
     onStartGame: () -> Unit,
+    onResumeGame: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -256,7 +298,7 @@ private fun DifficultySelectionSection(
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                 modifier = Modifier
-                    .menuAnchor()
+                    .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true)
                     .fillMaxWidth()
             )
 
@@ -301,6 +343,30 @@ private fun DifficultySelectionSection(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
+        }
+
+        AnimatedVisibility(
+            visible = state.hasSavedGame,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Button(
+                onClick = onResumeGame,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = MaterialTheme.shapes.medium,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            ) {
+                Text(
+                    text = stringResource(Res.string.resume_game),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 }
