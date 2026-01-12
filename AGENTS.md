@@ -2,19 +2,19 @@
 
 ## 1. Project Overview
 - **Type:** Kotlin Multiplatform (KMP) Mobile Application.
-- **Targets:** Android (Jetpack Compose), iOS (Compose Multiplatform / SwiftUI via UIKitInterop).
+- **Targets:** Android (Jetpack Compose), iOS (Compose Multiplatform / SwiftUI via UIKitInterop), JVM (Desktop).
 - **Core Stack:**
   - **UI:** Compose Multiplatform (shared UI).
   - **Language:** Kotlin 2.x (Use K2 compiler features).
-  - **DI:** Koin (or Metro/Manual DI if specified).
+  - **DI:** Metro.
   - **Async:** Kotlin Coroutines & Flow.
   - **Network:** Ktor Client.
-  - **Persistence:** Room (KMP) or SQLDelight.
-  - **Navigation:** Jetpack Navigation for Compose (KMP).
+  - **Persistence:** Room (KMP).
+  - **Navigation:** Voyager for Compose (KMP).
 
 ## 2. Architectural Principles
 - **Clean Architecture:** Strictly separate `data`, `domain`, and `ui` (presentation) layers.
-- **Unidirectional Data Flow (UDF):** Use MVI or MVVM patterns. UI observes `StateFlow` from ViewModels.
+- **Unidirectional Data Flow (UDF):** Use MVI or MVVM patterns. UI observes `StateFlow` from ScreenModels.
 - **Single Source of Truth:** The UI should never modify state directly; it must send `Intents` or `Events` to the ViewModel.
 - **Platform Agnostic:** 99% of code should live in `commonMain`.
   - **Avoid** logic in `androidMain` or `iosMain` unless strictly necessary (e.g., Camera, Bluetooth, FileSystem).
