@@ -1,5 +1,6 @@
 package io.github.smithjustinn.data.repositories
 
+import co.touchlab.kermit.Logger
 import dev.zacsweers.metro.Inject
 import io.github.smithjustinn.data.local.GameStateDao
 import io.github.smithjustinn.data.local.GameStateEntity
@@ -10,11 +11,16 @@ import kotlinx.serialization.json.Json
 @Inject
 class GameStateRepositoryImpl(
     private val dao: GameStateDao,
-    private val json: Json
+    private val json: Json,
+    private val logger: Logger
 ) : GameStateRepository {
     override suspend fun saveGameState(gameState: MemoryGameState, elapsedTimeSeconds: Long) {
-        val jsonString = json.encodeToString(gameState)
-        dao.saveGameState(GameStateEntity(gameStateJson = jsonString, elapsedTimeSeconds = elapsedTimeSeconds))
+        try {
+            val jsonString = json.encodeToString(gameState)
+            dao.saveGameState(GameStateEntity(gameStateJson = jsonString, elapsedTimeSeconds = elapsedTimeSeconds))
+        } catch (e: Exception) {
+            logger.e(e) { "Failed to save game state" }
+        }
     }
 
     override suspend fun getSavedGameState(): Pair<MemoryGameState, Long>? {
@@ -22,12 +28,17 @@ class GameStateRepositoryImpl(
         return try {
             val gameState = json.decodeFromString<MemoryGameState>(entity.gameStateJson)
             gameState to entity.elapsedTimeSeconds
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            logger.e(e) { "Failed to decode saved game state" }
             null
         }
     }
 
     override suspend fun clearSavedGameState() {
-        dao.clearSavedGameState()
+        try {
+            dao.clearSavedGameState()
+        } catch (e: Exception) {
+            logger.e(e) { "Failed to clear saved game state" }
+        }
     }
 }

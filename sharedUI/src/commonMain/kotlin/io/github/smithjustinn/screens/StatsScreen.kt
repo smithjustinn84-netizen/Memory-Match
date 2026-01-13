@@ -14,9 +14,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import co.touchlab.kermit.Logger
 import dev.zacsweers.metro.Inject
 import io.github.smithjustinn.components.AppIcons
 import io.github.smithjustinn.di.LocalAppGraph
@@ -35,7 +37,8 @@ data class StatsState(
 
 @Inject
 class StatsScreenModel(
-    private val leaderboardRepository: LeaderboardRepository
+    private val leaderboardRepository: LeaderboardRepository,
+    private val logger: Logger
 ) : ScreenModel {
     private val _state = MutableStateFlow(StatsState())
     val state: StateFlow<StatsState> = _state.asStateFlow()
@@ -54,7 +57,9 @@ class StatsScreenModel(
             StatsState(difficultyLeaderboards = pairs.toList())
         }.onEach { newState ->
             _state.update { newState }
-        }.launchIn(kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main))
+        }.catch { e ->
+            logger.e(e) { "Error loading leaderboards" }
+        }.launchIn(screenModelScope)
     }
 }
 

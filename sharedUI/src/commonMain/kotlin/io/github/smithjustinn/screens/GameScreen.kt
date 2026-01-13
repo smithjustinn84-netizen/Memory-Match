@@ -47,6 +47,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import co.touchlab.kermit.Logger
 import dev.zacsweers.metro.Inject
 import io.github.smithjustinn.components.AppIcons
 import io.github.smithjustinn.components.BouncingCardsOverlay
@@ -138,7 +139,8 @@ class GameScreenModel(
     private val saveGameResultUseCase: SaveGameResultUseCase,
     private val getSavedGameUseCase: GetSavedGameUseCase,
     private val saveGameStateUseCase: SaveGameStateUseCase,
-    private val clearSavedGameUseCase: ClearSavedGameUseCase
+    private val clearSavedGameUseCase: ClearSavedGameUseCase,
+    private val logger: Logger
 ) : ScreenModel {
     private val _state = MutableStateFlow(GameUIState())
     val state: StateFlow<GameUIState> = _state.asStateFlow()
@@ -159,30 +161,34 @@ class GameScreenModel(
 
     private fun startGame(pairCount: Int) {
         screenModelScope.launch {
-            val savedGame = getSavedGameUseCase()
-            if (savedGame != null && savedGame.first.pairCount == pairCount && !savedGame.first.isGameWon) {
-                _state.update {
-                    it.copy(
-                        game = savedGame.first,
-                        elapsedTimeSeconds = savedGame.second,
-                        showComboExplosion = false,
-                        isNewHighScore = false
-                    )
+            try {
+                val savedGame = getSavedGameUseCase()
+                if (savedGame != null && savedGame.first.pairCount == pairCount && !savedGame.first.isGameWon) {
+                    _state.update {
+                        it.copy(
+                            game = savedGame.first,
+                            elapsedTimeSeconds = savedGame.second,
+                            showComboExplosion = false,
+                            isNewHighScore = false
+                        )
+                    }
+                } else {
+                    val initialGameState = startNewGameUseCase(pairCount)
+                    _state.update {
+                        it.copy(
+                            game = initialGameState,
+                            elapsedTimeSeconds = 0,
+                            showComboExplosion = false,
+                            isNewHighScore = false
+                        )
+                    }
                 }
-            } else {
-                val initialGameState = startNewGameUseCase(pairCount)
-                _state.update {
-                    it.copy(
-                        game = initialGameState,
-                        elapsedTimeSeconds = 0,
-                        showComboExplosion = false,
-                        isNewHighScore = false
-                    )
-                }
-            }
 
-            observeStats(pairCount)
-            startTimer()
+                observeStats(pairCount)
+                startTimer()
+            } catch (e: Exception) {
+                logger.e(e) { "Error starting game" }
+            }
         }
     }
 
@@ -214,16 +220,20 @@ class GameScreenModel(
     }
 
     private fun flipCard(cardId: Int) {
-        val (newState, event) = flipCardUseCase(_state.value.game, cardId)
+        try {
+            val (newState, event) = flipCardUseCase(_state.value.game, cardId)
 
-        _state.update { it.copy(game = newState) }
-        saveGame()
+            _state.update { it.copy(game = newState) }
+            saveGame()
 
-        when (event) {
-            GameDomainEvent.MatchSuccess -> handleMatchSuccess(newState)
-            GameDomainEvent.MatchFailure -> handleMatchFailure()
-            GameDomainEvent.GameWon -> handleGameWon(newState)
-            null -> {}
+            when (event) {
+                GameDomainEvent.MatchSuccess -> handleMatchSuccess(newState)
+                GameDomainEvent.MatchFailure -> handleMatchFailure()
+                GameDomainEvent.GameWon -> handleGameWon(newState)
+                null -> {}
+            }
+        } catch (e: Exception) {
+            logger.e(e) { "Error flipping card: $cardId" }
         }
     }
 

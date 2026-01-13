@@ -1,5 +1,6 @@
 package io.github.smithjustinn.domain.usecases
 
+import co.touchlab.kermit.Logger
 import dev.zacsweers.metro.Inject
 import io.github.smithjustinn.domain.models.GameStats
 import io.github.smithjustinn.domain.models.LeaderboardEntry
@@ -15,28 +16,33 @@ import kotlin.time.Clock
 @Inject
 class SaveGameResultUseCase(
     private val gameStatsRepository: GameStatsRepository,
-    private val leaderboardRepository: LeaderboardRepository
+    private val leaderboardRepository: LeaderboardRepository,
+    private val logger: Logger
 ) {
     suspend operator fun invoke(pairCount: Int, score: Int, timeSeconds: Long, moves: Int) {
-        val currentStats = gameStatsRepository.getStatsForDifficulty(pairCount).firstOrNull()
-        
-        val newBestScore = if (currentStats == null || score > currentStats.bestScore) score else currentStats.bestScore
-        val newBestTime = if (currentStats == null || currentStats.bestTimeSeconds == 0L || timeSeconds < currentStats.bestTimeSeconds) {
-            timeSeconds
-        } else {
-            currentStats.bestTimeSeconds
-        }
-        
-        gameStatsRepository.updateStats(GameStats(pairCount, newBestScore, newBestTime))
-        
-        leaderboardRepository.addEntry(
-            LeaderboardEntry(
-                pairCount = pairCount,
-                score = score,
-                timeSeconds = timeSeconds,
-                moves = moves,
-                timestamp = Clock.System.now()
+        try {
+            val currentStats = gameStatsRepository.getStatsForDifficulty(pairCount).firstOrNull()
+            
+            val newBestScore = if (currentStats == null || score > currentStats.bestScore) score else currentStats.bestScore
+            val newBestTime = if (currentStats == null || currentStats.bestTimeSeconds == 0L || timeSeconds < currentStats.bestTimeSeconds) {
+                timeSeconds
+            } else {
+                currentStats.bestTimeSeconds
+            }
+            
+            gameStatsRepository.updateStats(GameStats(pairCount, newBestScore, newBestTime))
+            
+            leaderboardRepository.addEntry(
+                LeaderboardEntry(
+                    pairCount = pairCount,
+                    score = score,
+                    timeSeconds = timeSeconds,
+                    moves = moves,
+                    timestamp = Clock.System.now()
+                )
             )
-        )
+        } catch (e: Exception) {
+            logger.e(e) { "Failed to save game result via use case" }
+        }
     }
 }

@@ -51,6 +51,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import co.touchlab.kermit.Logger
 import dev.zacsweers.metro.Inject
 import io.github.smithjustinn.components.AppIcons
 import io.github.smithjustinn.components.PlayingCard
@@ -96,7 +97,8 @@ sealed class DifficultyIntent {
 
 @Inject
 class DifficultyScreenModel(
-    private val gameStateRepository: GameStateRepository
+    private val gameStateRepository: GameStateRepository,
+    private val logger: Logger
 ) : ScreenModel {
     private val _state = MutableStateFlow(DifficultyState())
     val state: StateFlow<DifficultyState> = _state.asStateFlow()
@@ -111,12 +113,16 @@ class DifficultyScreenModel(
             }
             is DifficultyIntent.CheckSavedGame -> {
                 screenModelScope.launch {
-                    val savedGame = gameStateRepository.getSavedGameState()
-                    _state.update { 
-                        it.copy(
-                            hasSavedGame = savedGame != null && !savedGame.first.isGameWon,
-                            savedGamePairCount = savedGame?.first?.pairCount ?: 0
-                        ) 
+                    try {
+                        val savedGame = gameStateRepository.getSavedGameState()
+                        _state.update { 
+                            it.copy(
+                                hasSavedGame = savedGame != null && !savedGame.first.isGameWon,
+                                savedGamePairCount = savedGame?.first?.pairCount ?: 0
+                            ) 
+                        }
+                    } catch (e: Exception) {
+                        logger.e(e) { "Error checking for saved game" }
                     }
                 }
             }
