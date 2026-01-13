@@ -16,9 +16,9 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import io.github.smithjustinn.components.BouncingCardsOverlay
-import io.github.smithjustinn.components.ConfettiEffect
-import io.github.smithjustinn.components.ExplosionEffect
+import io.github.smithjustinn.components.game.BouncingCardsOverlay
+import io.github.smithjustinn.components.game.ConfettiEffect
+import io.github.smithjustinn.components.game.ExplosionEffect
 import io.github.smithjustinn.components.game.ExitGameDialog
 import io.github.smithjustinn.components.game.GameGrid
 import io.github.smithjustinn.components.game.GameTopBar

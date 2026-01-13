@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.smithjustinn.components.AppIcons
+import io.github.smithjustinn.components.common.AppIcons
 import io.github.smithjustinn.utils.formatTime
 import memory_match.sharedui.generated.resources.Res
 import memory_match.sharedui.generated.resources.app_name

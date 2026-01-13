@@ -3,7 +3,7 @@ package io.github.smithjustinn.androidApp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import io.github.smithjustinn.components.PlayingCard
+import io.github.smithjustinn.components.game.PlayingCard
 import io.github.smithjustinn.domain.models.Rank
 import io.github.smithjustinn.domain.models.Suit
 

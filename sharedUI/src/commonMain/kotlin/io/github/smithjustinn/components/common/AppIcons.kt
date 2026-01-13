@@ -1,4 +1,4 @@
-package io.github.smithjustinn.components
+package io.github.smithjustinn.components.common
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor

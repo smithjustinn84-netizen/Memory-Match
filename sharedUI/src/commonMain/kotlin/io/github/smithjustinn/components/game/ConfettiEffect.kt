@@ -1,4 +1,4 @@
-package io.github.smithjustinn.components
+package io.github.smithjustinn.components.game
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
