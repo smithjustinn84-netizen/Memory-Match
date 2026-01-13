@@ -67,9 +67,7 @@ data class GameScreen(
                     onBackClick = {
                         navigator.pop()
                     },
-                    onPeekClick = if (!state.game.isGameWon && state.isPeekFeatureEnabled) {
-                        { screenModel.handleIntent(GameIntent.PeekCards) }
-                    } else null
+                    isPeeking = state.isPeeking
                 )
             }
         ) { paddingValues ->

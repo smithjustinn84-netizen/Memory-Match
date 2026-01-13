@@ -39,7 +39,7 @@ fun GameTopBar(
     bestTime: Long,
     combo: Int,
     onBackClick: () -> Unit,
-    onPeekClick: (() -> Unit)? = null
+    isPeeking: Boolean = false
 ) {
     TopAppBar(
         title = {
@@ -93,10 +93,13 @@ fun GameTopBar(
                     fontWeight = FontWeight.Bold
                 )
             }
-            if (onPeekClick != null) {
-                IconButton(onClick = onPeekClick) {
-                    Icon(AppIcons.Visibility, contentDescription = stringResource(Res.string.peek_cards))
-                }
+            if (isPeeking) {
+                Icon(
+                    imageVector = AppIcons.Visibility,
+                    contentDescription = stringResource(Res.string.peek_cards),
+                    modifier = Modifier.padding(end = 16.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
             }
         },
         navigationIcon = {

@@ -48,7 +48,6 @@ sealed class GameIntent {
     data class StartGame(val pairCount: Int, val forceNewGame: Boolean = false) : GameIntent()
     data class FlipCard(val cardId: Int) : GameIntent()
     data object SaveGame : GameIntent()
-    data object PeekCards : GameIntent()
 }
 
 @Inject
@@ -88,7 +87,6 @@ class GameScreenModel(
             is GameIntent.StartGame -> startGame(intent.pairCount, intent.forceNewGame)
             is GameIntent.FlipCard -> flipCard(intent.cardId)
             is GameIntent.SaveGame -> saveGame()
-            is GameIntent.PeekCards -> peekCards()
         }
     }
 
