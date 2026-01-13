@@ -24,6 +24,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -116,7 +117,10 @@ class GameScreenModel(
                             isPeeking = false
                         )
                     }
-                    if (_state.value.isPeekFeatureEnabled) {
+                    
+                    // Wait for the settings to be loaded if they haven't been yet
+                    val isPeekEnabled = settingsRepository.isPeekEnabled.first()
+                    if (isPeekEnabled) {
                         peekCards()
                     } else {
                         startTimer()
@@ -131,8 +135,6 @@ class GameScreenModel(
     }
 
     private fun peekCards() {
-        if (!_state.value.isPeekFeatureEnabled) return
-
         peekJob?.cancel()
         peekJob = screenModelScope.launch {
             stopTimer()
