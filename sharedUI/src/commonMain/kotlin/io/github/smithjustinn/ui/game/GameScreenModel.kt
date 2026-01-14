@@ -152,8 +152,15 @@ class GameScreenModel(
     }
 
     private fun calculateInitialTime(pairCount: Int): Long {
-        // Example: 5 seconds per pair
-        return (pairCount * 5).toLong()
+        return when (pairCount) {
+            6 -> 60L  // Toddler
+            8 -> 50L  // Casual
+            10 -> 45L // Master
+            12 -> 40L // Shark
+            14 -> 35L // Grandmaster
+            16 -> 30L // Elephant
+            else -> (pairCount * 4).toLong()
+        }
     }
 
     private fun peekCards(mode: GameMode) {
