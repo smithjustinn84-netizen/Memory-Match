@@ -46,10 +46,16 @@ class DifficultyScreen : Screen, JavaSerializable {
                 TopAppBar(
                     title = {},
                     actions = {
-                        IconButton(onClick = { navigator.push(SettingsScreen()) }) {
+                        IconButton(onClick = { 
+                            graph.audioService.playClick()
+                            navigator.push(SettingsScreen()) 
+                        }) {
                             Icon(AppIcons.Settings, contentDescription = stringResource(Res.string.settings))
                         }
-                        IconButton(onClick = { navigator.push(StatsScreen()) }) {
+                        IconButton(onClick = { 
+                            graph.audioService.playClick()
+                            navigator.push(StatsScreen()) 
+                        }) {
                             Icon(AppIcons.Info, contentDescription = stringResource(Res.string.stats))
                         }
                     }
@@ -71,20 +77,27 @@ class DifficultyScreen : Screen, JavaSerializable {
                 DifficultySelectionSection(
                     state = state,
                     onDifficultySelected = { level ->
+                        graph.audioService.playClick()
                         screenModel.handleIntent(DifficultyIntent.SelectDifficulty(level))
                     },
                     onModeSelected = { mode ->
+                        graph.audioService.playClick()
                         screenModel.handleIntent(DifficultyIntent.SelectMode(mode))
                     },
                     onStartGame = {
+                        graph.audioService.playClick()
                         screenModel.handleIntent(DifficultyIntent.StartGame(state.selectedDifficulty.pairs, state.selectedMode)) { pairs, mode ->
                             navigator.push(GameScreen(pairs, forceNewGame = true, mode = mode))
                         }
                     },
                     onResumeGame = {
+                        graph.audioService.playClick()
                         screenModel.handleIntent(DifficultyIntent.ResumeGame) { pairs, mode ->
                             navigator.push(GameScreen(pairs, forceNewGame = false, mode = mode))
                         }
+                    },
+                    onExpandChange = {
+                        graph.audioService.playClick()
                     }
                 )
             }
@@ -175,6 +188,7 @@ private fun DifficultySelectionSection(
     onModeSelected: (GameMode) -> Unit,
     onStartGame: () -> Unit,
     onResumeGame: () -> Unit,
+    onExpandChange: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -192,7 +206,10 @@ private fun DifficultySelectionSection(
 
         ExposedDropdownMenuBox(
             expanded = expanded,
-            onExpandedChange = { expanded = !expanded },
+            onExpandedChange = { 
+                expanded = !expanded 
+                onExpandChange()
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             OutlinedTextField(

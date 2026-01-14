@@ -19,4 +19,8 @@ class JvmAudioServiceImpl : AudioService {
     override fun playWin() {
         // TODO: Implement JVM audio playback
     }
+
+    override fun playClick() {
+        // TODO: Implement JVM audio playback
+    }
 }

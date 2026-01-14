@@ -3,6 +3,7 @@ package io.github.smithjustinn.services
 import android.content.Context
 import android.media.MediaPlayer
 import dev.zacsweers.metro.Inject
+import io.github.smithjustinn.R
 
 @Inject
 class AndroidAudioServiceImpl(
@@ -21,22 +22,22 @@ class AndroidAudioServiceImpl(
     }
 
     override fun playFlip() {
-        val resId = context.resources.getIdentifier("flip", "raw", context.packageName)
-        if (resId != 0) playSound(resId)
+        playSound(R.raw.flip)
     }
 
     override fun playMatch() {
-        val resId = context.resources.getIdentifier("match", "raw", context.packageName)
-        if (resId != 0) playSound(resId)
+        playSound(R.raw.match)
     }
 
     override fun playMismatch() {
-        val resId = context.resources.getIdentifier("mismatch", "raw", context.packageName)
-        if (resId != 0) playSound(resId)
+        playSound(R.raw.mismatch)
     }
 
     override fun playWin() {
-        val resId = context.resources.getIdentifier("win", "raw", context.packageName)
-        if (resId != 0) playSound(resId)
+        playSound(R.raw.win)
+    }
+
+    override fun playClick() {
+        playSound(R.raw.click)
     }
 }

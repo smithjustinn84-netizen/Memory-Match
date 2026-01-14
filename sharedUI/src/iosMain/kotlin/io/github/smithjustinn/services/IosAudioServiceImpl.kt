@@ -19,4 +19,8 @@ class IosAudioServiceImpl : AudioService {
     override fun playWin() {
         // TODO: Implement iOS audio playback
     }
+
+    override fun playClick() {
+        // TODO: Implement iOS audio playback
+    }
 }
