@@ -48,7 +48,7 @@ interface IosAppGraph : AppGraph {
     override val hapticsService: HapticsService
     override val gameStatsRepository: GameStatsRepository
     override val leaderboardRepository: LeaderboardRepository
-    override val gameStateRepository: GameStatsRepository
+    override val gameStateRepository: GameStateRepository
     override val settingsRepository: SettingsRepository
     override val startNewGameUseCase: StartNewGameUseCase
     override val flipCardUseCase: FlipCardUseCase
@@ -75,7 +75,8 @@ interface IosAppGraph : AppGraph {
             AppDatabase.MIGRATION_2_3,
             AppDatabase.MIGRATION_3_4,
             AppDatabase.MIGRATION_4_5,
-            AppDatabase.MIGRATION_5_6
+            AppDatabase.MIGRATION_5_6,
+            AppDatabase.MIGRATION_6_7
         )
         .build()
     }

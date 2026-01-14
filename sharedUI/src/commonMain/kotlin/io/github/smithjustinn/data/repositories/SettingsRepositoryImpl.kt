@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
@@ -28,7 +29,34 @@ class SettingsRepositoryImpl(
             initialValue = true
         )
 
+    override val isHiddenBoardEnabled: StateFlow<Boolean> = dao.getSettings()
+        .map { it?.isHiddenBoardEnabled ?: false }
+        .stateIn(
+            scope = scope,
+            started = SharingStarted.Eagerly,
+            initialValue = false
+        )
+
+    override val movesBeforeShuffle: StateFlow<Int> = dao.getSettings()
+        .map { it?.movesBeforeShuffle ?: 5 }
+        .stateIn(
+            scope = scope,
+            started = SharingStarted.Eagerly,
+            initialValue = 5
+        )
+
     override suspend fun setPeekEnabled(enabled: Boolean) {
-        dao.saveSettings(SettingsEntity(isPeekEnabled = enabled))
+        val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
+        dao.saveSettings(current.copy(isPeekEnabled = enabled))
+    }
+
+    override suspend fun setHiddenBoardEnabled(enabled: Boolean) {
+        val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
+        dao.saveSettings(current.copy(isHiddenBoardEnabled = enabled))
+    }
+
+    override suspend fun setMovesBeforeShuffle(moves: Int) {
+        val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
+        dao.saveSettings(current.copy(movesBeforeShuffle = moves))
     }
 }

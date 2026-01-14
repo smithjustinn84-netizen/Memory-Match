@@ -2,14 +2,17 @@ package io.github.smithjustinn.ui.settings
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -28,6 +31,7 @@ import io.github.smithjustinn.di.LocalAppGraph
 import memory_match.sharedui.generated.resources.Res
 import memory_match.sharedui.generated.resources.back_content_description
 import org.jetbrains.compose.resources.stringResource
+import kotlin.math.roundToInt
 
 class SettingsScreen : Screen {
 
@@ -60,27 +64,70 @@ class SettingsScreen : Screen {
                     .padding(padding)
                     .padding(16.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
+                // Memory Peek Setting
+                SettingsToggle(
+                    title = "Enable Memory Peek",
+                    description = "Show cards briefly at the start of the game",
+                    checked = state.isPeekEnabled,
+                    onCheckedChange = { screenModel.togglePeekEnabled(it) }
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Hidden Board Setting
+                SettingsToggle(
+                    title = "Hidden Board",
+                    description = "Cards shuffle after a number of moves without a match",
+                    checked = state.isHiddenBoardEnabled,
+                    onCheckedChange = { screenModel.toggleHiddenBoardEnabled(it) }
+                )
+
+                if (state.isHiddenBoardEnabled) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Column(modifier = Modifier.padding(horizontal = 8.dp)) {
                         Text(
-                            text = "Enable Memory Peek",
-                            style = MaterialTheme.typography.bodyLarge
+                            text = "Moves before shuffle: ${state.movesBeforeShuffle}",
+                            style = MaterialTheme.typography.bodyMedium
                         )
-                        Text(
-                            text = "Show cards briefly at the start of the game",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        Slider(
+                            value = state.movesBeforeShuffle.toFloat(),
+                            onValueChange = { screenModel.setMovesBeforeShuffle(it.roundToInt()) },
+                            valueRange = 3f..15f,
+                            steps = 11
                         )
                     }
-                    Switch(
-                        checked = state.isPeekEnabled,
-                        onCheckedChange = { screenModel.togglePeekEnabled(it) }
-                    )
                 }
             }
+        }
+    }
+
+    @Composable
+    private fun SettingsToggle(
+        title: String,
+        description: String,
+        checked: Boolean,
+        onCheckedChange: (Boolean) -> Unit,
+        modifier: Modifier = Modifier
+    ) {
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Switch(
+                checked = checked,
+                onCheckedChange = onCheckedChange
+            )
         }
     }
 }
