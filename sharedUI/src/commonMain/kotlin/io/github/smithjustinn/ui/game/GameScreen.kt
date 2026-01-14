@@ -73,7 +73,8 @@ data class GameScreen(
                     mode = mode,
                     maxTime = state.maxTimeSeconds,
                     showTimeGain = state.showTimeGain,
-                    timeGainAmount = state.timeGainAmount
+                    timeGainAmount = state.timeGainAmount,
+                    isMegaBonus = state.isMegaBonus
                 )
             }
         ) { paddingValues ->

@@ -43,7 +43,8 @@ data class GameUIState(
     val isPeeking: Boolean = false,
     val isPeekFeatureEnabled: Boolean = true,
     val showTimeGain: Boolean = false,
-    val timeGainAmount: Int = 0
+    val timeGainAmount: Int = 0,
+    val isMegaBonus: Boolean = false
 )
 
 /**
@@ -234,12 +235,17 @@ class GameScreenModel(
         clearCommentAfterDelay()
         
         if (newState.mode == GameMode.TIME_ATTACK) {
-            val timeGain = 5 // 5 seconds per match
+            val baseTimeGain = 5
+            val comboBonus = (newState.comboMultiplier - 1) * 2
+            val totalTimeGain = baseTimeGain + comboBonus
+            val isMega = newState.comboMultiplier >= 3
+
             _state.update { 
                 it.copy(
-                    elapsedTimeSeconds = it.elapsedTimeSeconds + timeGain,
+                    elapsedTimeSeconds = it.elapsedTimeSeconds + totalTimeGain,
                     showTimeGain = true,
-                    timeGainAmount = timeGain
+                    timeGainAmount = totalTimeGain,
+                    isMegaBonus = isMega
                 )
             }
             triggerTimeGainFeedback()

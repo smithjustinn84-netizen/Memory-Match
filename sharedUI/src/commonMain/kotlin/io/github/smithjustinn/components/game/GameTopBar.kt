@@ -61,7 +61,8 @@ fun GameTopBar(
     mode: GameMode = GameMode.STANDARD,
     maxTime: Long = 0,
     showTimeGain: Boolean = false,
-    timeGainAmount: Int = 0
+    timeGainAmount: Int = 0,
+    isMegaBonus: Boolean = false
 ) {
     val isTimeAttack = mode == GameMode.TIME_ATTACK
     val isLowTime = isTimeAttack && time <= 10
@@ -69,6 +70,7 @@ fun GameTopBar(
 
     val timerColor by animateColorAsState(
         targetValue = when {
+            showTimeGain && isMegaBonus -> Color(0xFFFFD700) // Gold for Mega Bonus
             showTimeGain -> Color(0xFF4CAF50) // Success Green
             isLowTime -> MaterialTheme.colorScheme.error
             else -> MaterialTheme.colorScheme.secondary
@@ -128,7 +130,7 @@ fun GameTopBar(
                                 Text(
                                     text = "+${timeGainAmount}s",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = Color(0xFF4CAF50),
+                                    color = if (isMegaBonus) Color(0xFFFFD700) else Color(0xFF4CAF50),
                                     fontWeight = FontWeight.Bold,
                                     modifier = Modifier.padding(start = 4.dp)
                                 )
@@ -148,11 +150,22 @@ fun GameTopBar(
             },
             actions = {
                 if (combo > 1) {
+                    val comboScale by infiniteTransition.animateFloat(
+                        initialValue = 1f,
+                        targetValue = if (isTimeAttack && combo >= 3) 1.3f else 1f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(400, easing = LinearEasing),
+                            repeatMode = RepeatMode.Reverse
+                        )
+                    )
+
                     Text(
                         text = stringResource(Res.string.combo_format, combo),
-                        modifier = Modifier.padding(end = 16.dp),
+                        modifier = Modifier
+                            .padding(end = 16.dp)
+                            .scale(comboScale),
                         style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = if (isTimeAttack && combo >= 3) Color(0xFFFFD700) else MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
                     )
                 }
