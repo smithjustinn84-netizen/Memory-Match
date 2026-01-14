@@ -119,7 +119,8 @@ data class GameScreen(
                         elapsedTimeSeconds = state.elapsedTimeSeconds,
                         scoreBreakdown = state.game.scoreBreakdown,
                         onPlayAgain = { screenModel.handleIntent(GameIntent.StartGame(pairCount, forceNewGame = true, mode = mode)) },
-                        modifier = Modifier.align(Alignment.Center)
+                        modifier = Modifier.align(Alignment.Center),
+                        mode = mode
                     )
                 }
             }
