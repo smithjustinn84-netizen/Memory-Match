@@ -17,6 +17,7 @@ class MemoryGameLogicTest {
 
         assertEquals(pairCount * 2, state.cards.size)
         assertEquals(pairCount, state.pairCount)
+        assertEquals(GameMode.STANDARD, state.mode)
         
         // Verify we have pairs
         val groups = state.cards.groupBy { it.suit to it.rank }
@@ -24,6 +25,14 @@ class MemoryGameLogicTest {
         groups.forEach { (_, cards) ->
             assertEquals(2, cards.size)
         }
+    }
+
+    @Test
+    fun `createInitialState with Time Attack mode`() {
+        val pairCount = 4
+        val state = MemoryGameLogic.createInitialState(pairCount, mode = GameMode.TIME_ATTACK)
+
+        assertEquals(GameMode.TIME_ATTACK, state.mode)
     }
 
     @Test
@@ -116,12 +125,24 @@ class MemoryGameLogicTest {
         
         assertEquals(GameDomainEvent.GameWon, event)
         assertTrue(state2.isGameWon)
+        assertTrue(state2.isGameOver)
     }
 
     @Test
-    fun `applyFinalBonuses should calculate score correctly`() {
+    fun `flipCard should do nothing if game is over`() {
+        val state = MemoryGameLogic.createInitialState(1).copy(isGameOver = true)
+        val cardId = state.cards[0].id
+        
+        val (newState, event) = MemoryGameLogic.flipCard(state, cardId)
+        
+        assertEquals(state, newState)
+        assertNull(event)
+    }
+
+    @Test
+    fun `applyFinalBonuses should calculate score correctly for Standard mode`() {
         val pairCount = 2
-        var state = MemoryGameLogic.createInitialState(pairCount)
+        var state = MemoryGameLogic.createInitialState(pairCount, mode = GameMode.STANDARD)
         
         // Manually set the state to win with some stats
         state = state.copy(
@@ -130,12 +151,32 @@ class MemoryGameLogicTest {
             score = 40 // 2 matches * 20 points
         )
         
-        val finalState = MemoryGameLogic.applyFinalBonuses(state, 10) // 10 seconds
+        val finalState = MemoryGameLogic.applyFinalBonuses(state, 10) // 10 seconds elapsed
         
         assertTrue(finalState.score > state.score)
         assertNotNull(finalState.scoreBreakdown)
         assertEquals(40, finalState.scoreBreakdown.matchPoints)
         assertTrue(finalState.scoreBreakdown.timeBonus >= 0)
+        assertTrue(finalState.scoreBreakdown.moveBonus > 0)
+        assertEquals(finalState.score, finalState.scoreBreakdown.totalScore)
+    }
+
+    @Test
+    fun `applyFinalBonuses should calculate score correctly for Time Attack mode`() {
+        val pairCount = 2
+        var state = MemoryGameLogic.createInitialState(pairCount, mode = GameMode.TIME_ATTACK)
+        
+        state = state.copy(
+            isGameWon = true,
+            moves = 2,
+            score = 40
+        )
+        
+        val remainingTime = 15L
+        val finalState = MemoryGameLogic.applyFinalBonuses(state, remainingTime)
+        
+        assertEquals(40, finalState.scoreBreakdown.matchPoints)
+        assertEquals((remainingTime * 10).toInt(), finalState.scoreBreakdown.timeBonus)
         assertTrue(finalState.scoreBreakdown.moveBonus > 0)
         assertEquals(finalState.score, finalState.scoreBreakdown.totalScore)
     }

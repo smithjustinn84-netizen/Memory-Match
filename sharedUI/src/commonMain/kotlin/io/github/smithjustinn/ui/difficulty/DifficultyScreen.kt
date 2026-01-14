@@ -17,6 +17,7 @@ import io.github.smithjustinn.components.common.AppIcons
 import io.github.smithjustinn.components.game.PlayingCard
 import io.github.smithjustinn.di.LocalAppGraph
 import io.github.smithjustinn.domain.models.DifficultyLevel
+import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.Rank
 import io.github.smithjustinn.domain.models.Suit
 import io.github.smithjustinn.platform.JavaSerializable
@@ -72,14 +73,17 @@ class DifficultyScreen : Screen, JavaSerializable {
                     onDifficultySelected = { level ->
                         screenModel.handleIntent(DifficultyIntent.SelectDifficulty(level))
                     },
+                    onModeSelected = { mode ->
+                        screenModel.handleIntent(DifficultyIntent.SelectMode(mode))
+                    },
                     onStartGame = {
-                        screenModel.handleIntent(DifficultyIntent.StartGame(state.selectedDifficulty.pairs)) { pairs ->
-                            navigator.push(GameScreen(pairs, forceNewGame = true))
+                        screenModel.handleIntent(DifficultyIntent.StartGame(state.selectedDifficulty.pairs, state.selectedMode)) { pairs, mode ->
+                            navigator.push(GameScreen(pairs, forceNewGame = true, mode = mode))
                         }
                     },
                     onResumeGame = {
-                        screenModel.handleIntent(DifficultyIntent.ResumeGame) { pairs ->
-                            navigator.push(GameScreen(pairs, forceNewGame = false))
+                        screenModel.handleIntent(DifficultyIntent.ResumeGame) { pairs, mode ->
+                            navigator.push(GameScreen(pairs, forceNewGame = false, mode = mode))
                         }
                     }
                 )
@@ -168,6 +172,7 @@ private fun CardPreview(
 private fun DifficultySelectionSection(
     state: DifficultyState,
     onDifficultySelected: (DifficultyLevel) -> Unit,
+    onModeSelected: (GameMode) -> Unit,
     onStartGame: () -> Unit,
     onResumeGame: () -> Unit,
     modifier: Modifier = Modifier
@@ -228,6 +233,23 @@ private fun DifficultySelectionSection(
                         contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
                     )
                 }
+            }
+        }
+
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+            SegmentedButton(
+                selected = state.selectedMode == GameMode.STANDARD,
+                onClick = { onModeSelected(GameMode.STANDARD) },
+                shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2)
+            ) {
+                Text("Standard")
+            }
+            SegmentedButton(
+                selected = state.selectedMode == GameMode.TIME_ATTACK,
+                onClick = { onModeSelected(GameMode.TIME_ATTACK) },
+                shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2)
+            ) {
+                Text("Time Attack")
             }
         }
 

@@ -23,6 +23,7 @@
     <string name="final_score">Final Score: %1$d</string>
     <string name="time_label">Time: %1$s</string>
     <string name="moves_label">Moves: %1$d</string>
+    <string name="game_over">Game Over</string>
 
     <string name="difficulty_toddler">Toddler Mode</string>
     <string name="difficulty_casual">Casual Player</string>

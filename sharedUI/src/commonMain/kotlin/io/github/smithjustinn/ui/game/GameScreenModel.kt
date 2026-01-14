@@ -5,6 +5,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import co.touchlab.kermit.Logger
 import dev.zacsweers.metro.Inject
 import io.github.smithjustinn.domain.models.GameDomainEvent
+import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
 import io.github.smithjustinn.domain.repositories.SettingsRepository
 import io.github.smithjustinn.domain.usecases.CalculateFinalScoreUseCase
@@ -46,7 +47,11 @@ data class GameUIState(
  * Sealed class representing user intents for the game screen.
  */
 sealed class GameIntent {
-    data class StartGame(val pairCount: Int, val forceNewGame: Boolean = false) : GameIntent()
+    data class StartGame(
+        val pairCount: Int,
+        val forceNewGame: Boolean = false,
+        val mode: GameMode = GameMode.STANDARD
+    ) : GameIntent()
     data class FlipCard(val cardId: Int) : GameIntent()
     data object SaveGame : GameIntent()
 }
@@ -85,17 +90,17 @@ class GameScreenModel(
 
     fun handleIntent(intent: GameIntent) {
         when (intent) {
-            is GameIntent.StartGame -> startGame(intent.pairCount, intent.forceNewGame)
+            is GameIntent.StartGame -> startGame(intent.pairCount, intent.forceNewGame, intent.mode)
             is GameIntent.FlipCard -> flipCard(intent.cardId)
             is GameIntent.SaveGame -> saveGame()
         }
     }
 
-    private fun startGame(pairCount: Int, forceNewGame: Boolean) {
+    private fun startGame(pairCount: Int, forceNewGame: Boolean, mode: GameMode) {
         screenModelScope.launch {
             try {
                 val savedGame = if (forceNewGame) null else getSavedGameUseCase()
-                if (savedGame != null && savedGame.first.pairCount == pairCount && !savedGame.first.isGameWon) {
+                if (savedGame != null && savedGame.first.pairCount == pairCount && !savedGame.first.isGameOver && savedGame.first.mode == mode) {
                     _state.update {
                         it.copy(
                             game = savedGame.first,
@@ -105,13 +110,15 @@ class GameScreenModel(
                             isPeeking = false
                         )
                     }
-                    startTimer()
+                    startTimer(mode)
                 } else {
-                    val initialGameState = startNewGameUseCase(pairCount)
+                    val initialGameState = startNewGameUseCase(pairCount, mode = mode)
+                    val initialTime = if (mode == GameMode.TIME_ATTACK) calculateInitialTime(pairCount) else 0L
+                    
                     _state.update {
                         it.copy(
                             game = initialGameState,
-                            elapsedTimeSeconds = 0,
+                            elapsedTimeSeconds = initialTime,
                             showComboExplosion = false,
                             isNewHighScore = false,
                             isPeeking = false
@@ -121,9 +128,9 @@ class GameScreenModel(
                     // Wait for the settings to be loaded if they haven't been yet
                     val isPeekEnabled = settingsRepository.isPeekEnabled.first()
                     if (isPeekEnabled) {
-                        peekCards()
+                        peekCards(mode)
                     } else {
-                        startTimer()
+                        startTimer(mode)
                     }
                 }
 
@@ -134,14 +141,19 @@ class GameScreenModel(
         }
     }
 
-    private fun peekCards() {
+    private fun calculateInitialTime(pairCount: Int): Long {
+        // Example: 5 seconds per pair
+        return (pairCount * 5).toLong()
+    }
+
+    private fun peekCards(mode: GameMode) {
         peekJob?.cancel()
         peekJob = screenModelScope.launch {
             stopTimer()
             _state.update { it.copy(isPeeking = true) }
             delay(3000) // Peek for 3 seconds
             _state.update { it.copy(isPeeking = false) }
-            startTimer()
+            startTimer(mode)
         }
     }
 
@@ -157,12 +169,27 @@ class GameScreenModel(
         }
     }
 
-    private fun startTimer() {
+    private fun startTimer(mode: GameMode) {
         timerJob?.cancel()
         timerJob = screenModelScope.launch(Dispatchers.IO) {
             while (true) {
                 delay(1000)
-                _state.update { it.copy(elapsedTimeSeconds = it.elapsedTimeSeconds + 1) }
+                if (mode == GameMode.TIME_ATTACK) {
+                    var shouldStop = false
+                    _state.update { 
+                        val newTime = (it.elapsedTimeSeconds - 1).coerceAtLeast(0)
+                        if (newTime == 0L && !it.game.isGameOver) {
+                            shouldStop = true
+                        }
+                        it.copy(elapsedTimeSeconds = newTime)
+                    }
+                    if (shouldStop) {
+                        handleGameOver()
+                        break
+                    }
+                } else {
+                    _state.update { it.copy(elapsedTimeSeconds = it.elapsedTimeSeconds + 1) }
+                }
             }
         }
     }
@@ -173,7 +200,7 @@ class GameScreenModel(
     }
 
     private fun flipCard(cardId: Int) {
-        if (_state.value.isPeeking) return
+        if (_state.value.isPeeking || _state.value.game.isGameOver) return
 
         try {
             val (newState, event) = flipCardUseCase(_state.value.game, cardId)
@@ -185,6 +212,7 @@ class GameScreenModel(
                 GameDomainEvent.MatchSuccess -> handleMatchSuccess(newState)
                 GameDomainEvent.MatchFailure -> handleMatchFailure()
                 GameDomainEvent.GameWon -> handleGameWon(newState)
+                GameDomainEvent.GameOver -> handleGameOver()
                 null -> {}
             }
         } catch (e: Exception) {
@@ -228,6 +256,14 @@ class GameScreenModel(
         }
     }
 
+    private fun handleGameOver() {
+        stopTimer()
+        _state.update { it.copy(game = it.game.copy(isGameOver = true)) }
+        screenModelScope.launch {
+            clearSavedGameUseCase()
+        }
+    }
+
     private fun triggerComboExplosion() {
         explosionJob?.cancel()
         explosionJob = screenModelScope.launch {
@@ -253,7 +289,7 @@ class GameScreenModel(
 
     private fun saveGame() {
         val currentState = _state.value
-        if (!currentState.game.isGameWon) {
+        if (!currentState.game.isGameOver) {
             screenModelScope.launch {
                 saveGameStateUseCase(currentState.game, currentState.elapsedTimeSeconds)
             }

@@ -5,6 +5,15 @@ import kotlinx.serialization.Transient
 import org.jetbrains.compose.resources.StringResource
 
 /**
+ * Defines the available game modes.
+ */
+@Serializable
+enum class GameMode {
+    STANDARD,
+    TIME_ATTACK
+}
+
+/**
  * Configuration for game scoring and bonuses.
  */
 @Serializable
@@ -40,12 +49,14 @@ data class MemoryGameState(
     val cards: List<CardState> = emptyList(),
     val pairCount: Int = 8,
     val isGameWon: Boolean = false,
+    val isGameOver: Boolean = false,
     val moves: Int = 0,
     val score: Int = 0,
     val comboMultiplier: Int = 1,
     @Transient val matchComment: MatchComment? = null,
     val config: ScoringConfig = ScoringConfig(),
-    val scoreBreakdown: ScoreBreakdown = ScoreBreakdown()
+    val scoreBreakdown: ScoreBreakdown = ScoreBreakdown(),
+    val mode: GameMode = GameMode.STANDARD
 )
 
 /**
@@ -55,4 +66,5 @@ sealed class GameDomainEvent {
     data object MatchSuccess : GameDomainEvent()
     data object MatchFailure : GameDomainEvent()
     data object GameWon : GameDomainEvent()
+    data object GameOver : GameDomainEvent()
 }

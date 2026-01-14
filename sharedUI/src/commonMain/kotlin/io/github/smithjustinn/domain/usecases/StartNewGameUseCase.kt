@@ -2,6 +2,7 @@ package io.github.smithjustinn.domain.usecases
 
 import dev.zacsweers.metro.Inject
 import io.github.smithjustinn.domain.MemoryGameLogic
+import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
 import io.github.smithjustinn.domain.models.ScoringConfig
 
@@ -10,7 +11,11 @@ import io.github.smithjustinn.domain.models.ScoringConfig
  */
 @Inject
 class StartNewGameUseCase {
-    operator fun invoke(pairCount: Int, config: ScoringConfig = ScoringConfig()): MemoryGameState {
-        return MemoryGameLogic.createInitialState(pairCount, config)
+    operator fun invoke(
+        pairCount: Int,
+        config: ScoringConfig = ScoringConfig(),
+        mode: GameMode = GameMode.STANDARD
+    ): MemoryGameState {
+        return MemoryGameLogic.createInitialState(pairCount, config, mode)
     }
 }

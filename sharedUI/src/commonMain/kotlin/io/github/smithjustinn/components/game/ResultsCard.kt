@@ -23,6 +23,7 @@ import io.github.smithjustinn.utils.formatTime
 import memory_match.sharedui.generated.resources.Res
 import memory_match.sharedui.generated.resources.final_score
 import memory_match.sharedui.generated.resources.game_complete
+import memory_match.sharedui.generated.resources.game_over
 import memory_match.sharedui.generated.resources.moves_label
 import memory_match.sharedui.generated.resources.play_again
 import memory_match.sharedui.generated.resources.score_breakdown_title
@@ -34,6 +35,7 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ResultsCard(
+    isWon: Boolean,
     score: Int,
     moves: Int,
     elapsedTimeSeconds: Long,
@@ -54,10 +56,10 @@ fun ResultsCard(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = stringResource(Res.string.game_complete),
+                text = stringResource(if (isWon) Res.string.game_complete else Res.string.game_over),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                color = if (isWon) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
             )
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {

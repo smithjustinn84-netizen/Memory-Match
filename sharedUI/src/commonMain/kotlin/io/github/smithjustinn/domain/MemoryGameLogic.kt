@@ -8,7 +8,11 @@ import memory_match.sharedui.generated.resources.*
  */
 object MemoryGameLogic {
 
-    fun createInitialState(pairCount: Int, config: ScoringConfig = ScoringConfig()): MemoryGameState {
+    fun createInitialState(
+        pairCount: Int,
+        config: ScoringConfig = ScoringConfig(),
+        mode: GameMode = GameMode.STANDARD
+    ): MemoryGameState {
         val allPossibleCards = Suit.entries.flatMap { suit ->
             Rank.entries.map { rank -> suit to rank }
         }.shuffled()
@@ -27,11 +31,14 @@ object MemoryGameLogic {
         return MemoryGameState(
             cards = gameCards,
             pairCount = pairCount,
-            config = config
+            config = config,
+            mode = mode
         )
     }
 
     fun flipCard(state: MemoryGameState, cardId: Int): Pair<MemoryGameState, GameDomainEvent?> {
+        if (state.isGameOver) return state to null
+        
         val cardToFlip = state.cards.find { it.id == cardId } ?: return state to null
 
         if (cardToFlip.isFaceUp || cardToFlip.isMatched) return state to null
@@ -84,6 +91,7 @@ object MemoryGameLogic {
         val newState = state.copy(
             cards = newCards,
             isGameWon = isWon,
+            isGameOver = isWon,
             moves = moves,
             score = state.score + pointsEarned,
             comboMultiplier = state.comboMultiplier + 1,
@@ -126,13 +134,15 @@ object MemoryGameLogic {
         val config = state.config
         
         // Time Bonus: Small impact
-        val timeBonus = (state.pairCount * config.timeBonusPerPair - (elapsedTimeSeconds * config.timePenaltyPerSecond))
-            .coerceAtLeast(0).toInt()
+        val timeBonus = if (state.mode == GameMode.TIME_ATTACK) {
+            // In Time Attack, remaining time is the bonus
+            (elapsedTimeSeconds * 10).toInt() // Example: 10 points per remaining second
+        } else {
+            (state.pairCount * config.timeBonusPerPair - (elapsedTimeSeconds * config.timePenaltyPerSecond))
+                .coerceAtLeast(0).toInt()
+        }
         
         // Move Efficiency Bonus: Dominant factor
-        // Formula: (Perfect Moves / Actual Moves) * Multiplier
-        // Perfect moves = pairCount (since each match takes 1 move in this logic, where 1 move = 2 flips)
-        // Note: In our logic, 'moves' increments on every pair of flips.
         val moveEfficiency = state.pairCount.toDouble() / state.moves.toDouble()
         val moveBonus = (moveEfficiency * config.moveBonusMultiplier).toInt()
         

@@ -25,13 +25,15 @@ import io.github.smithjustinn.components.game.MatchCommentSnackbar
 import io.github.smithjustinn.components.game.NewHighScoreSnackbar
 import io.github.smithjustinn.components.game.ResultsCard
 import io.github.smithjustinn.di.LocalAppGraph
+import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.platform.CommonTransient
 import io.github.smithjustinn.platform.JavaSerializable
 import io.github.smithjustinn.utils.BackPressScreen
 
 data class GameScreen(
     val pairCount: Int,
-    val forceNewGame: Boolean = false
+    val forceNewGame: Boolean = false,
+    val mode: GameMode = GameMode.STANDARD
 ) : Screen, BackPressScreen, JavaSerializable {
 
     @CommonTransient
@@ -51,8 +53,8 @@ data class GameScreen(
         val state by screenModel.state.collectAsState()
         val navigator = LocalNavigator.currentOrThrow
 
-        LaunchedEffect(pairCount, forceNewGame) {
-            screenModel.handleIntent(GameIntent.StartGame(pairCount, forceNewGame))
+        LaunchedEffect(pairCount, forceNewGame, mode) {
+            screenModel.handleIntent(GameIntent.StartGame(pairCount, forceNewGame, mode))
         }
 
         Scaffold(
@@ -92,24 +94,27 @@ data class GameScreen(
                     )
                 }
 
-                if (state.game.isGameWon) {
-                    BouncingCardsOverlay(state.game.cards)
-                    ConfettiEffect()
+                if (state.game.isGameOver) {
+                    if (state.game.isGameWon) {
+                        BouncingCardsOverlay(state.game.cards)
+                        ConfettiEffect()
 
-                    if (state.isNewHighScore) {
-                        NewHighScoreSnackbar(
-                            modifier = Modifier
-                                .align(Alignment.TopCenter)
-                                .padding(top = 16.dp, start = 16.dp, end = 16.dp)
-                        )
+                        if (state.isNewHighScore) {
+                            NewHighScoreSnackbar(
+                                modifier = Modifier
+                                    .align(Alignment.TopCenter)
+                                    .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                            )
+                        }
                     }
 
                     ResultsCard(
+                        isWon = state.game.isGameWon,
                         score = state.game.score,
                         moves = state.game.moves,
                         elapsedTimeSeconds = state.elapsedTimeSeconds,
                         scoreBreakdown = state.game.scoreBreakdown,
-                        onPlayAgain = { screenModel.handleIntent(GameIntent.StartGame(pairCount, forceNewGame = true)) },
+                        onPlayAgain = { screenModel.handleIntent(GameIntent.StartGame(pairCount, forceNewGame = true, mode = mode)) },
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }

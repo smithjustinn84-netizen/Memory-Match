@@ -5,6 +5,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import co.touchlab.kermit.Logger
 import dev.zacsweers.metro.Inject
 import io.github.smithjustinn.domain.models.DifficultyLevel
+import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.repositories.GameStateRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +20,9 @@ data class DifficultyState(
     val difficulties: List<DifficultyLevel> = DifficultyLevel.defaultLevels,
     val selectedDifficulty: DifficultyLevel = DifficultyLevel.defaultLevels[1],
     val hasSavedGame: Boolean = false,
-    val savedGamePairCount: Int = 0
+    val savedGamePairCount: Int = 0,
+    val savedGameMode: GameMode = GameMode.STANDARD,
+    val selectedMode: GameMode = GameMode.STANDARD
 )
 
 /**
@@ -27,7 +30,8 @@ data class DifficultyState(
  */
 sealed class DifficultyIntent {
     data class SelectDifficulty(val level: DifficultyLevel) : DifficultyIntent()
-    data class StartGame(val pairs: Int) : DifficultyIntent()
+    data class SelectMode(val mode: GameMode) : DifficultyIntent()
+    data class StartGame(val pairs: Int, val mode: GameMode) : DifficultyIntent()
     data object CheckSavedGame : DifficultyIntent()
     data object ResumeGame : DifficultyIntent()
 }
@@ -40,13 +44,16 @@ class DifficultyScreenModel(
     private val _state = MutableStateFlow(DifficultyState())
     val state: StateFlow<DifficultyState> = _state.asStateFlow()
 
-    fun handleIntent(intent: DifficultyIntent, onNavigate: (Int) -> Unit = {}) {
+    fun handleIntent(intent: DifficultyIntent, onNavigate: (Int, GameMode) -> Unit = { _, _ -> }) {
         when (intent) {
             is DifficultyIntent.SelectDifficulty -> {
                 _state.update { it.copy(selectedDifficulty = intent.level) }
             }
+            is DifficultyIntent.SelectMode -> {
+                _state.update { it.copy(selectedMode = intent.mode) }
+            }
             is DifficultyIntent.StartGame -> {
-                onNavigate(intent.pairs)
+                onNavigate(intent.pairs, intent.mode)
             }
             is DifficultyIntent.CheckSavedGame -> {
                 screenModelScope.launch {
@@ -54,8 +61,9 @@ class DifficultyScreenModel(
                         val savedGame = gameStateRepository.getSavedGameState()
                         _state.update { 
                             it.copy(
-                                hasSavedGame = savedGame != null && !savedGame.first.isGameWon,
-                                savedGamePairCount = savedGame?.first?.pairCount ?: 0
+                                hasSavedGame = savedGame != null && !savedGame.first.isGameOver,
+                                savedGamePairCount = savedGame?.first?.pairCount ?: 0,
+                                savedGameMode = savedGame?.first?.mode ?: GameMode.STANDARD
                             ) 
                         }
                     } catch (e: Exception) {
@@ -65,7 +73,7 @@ class DifficultyScreenModel(
             }
             is DifficultyIntent.ResumeGame -> {
                 if (_state.value.hasSavedGame) {
-                    onNavigate(_state.value.savedGamePairCount)
+                    onNavigate(_state.value.savedGamePairCount, _state.value.savedGameMode)
                 }
             }
         }
