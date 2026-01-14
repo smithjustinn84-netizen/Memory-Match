@@ -8,6 +8,8 @@ import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.createGraph
 import io.github.smithjustinn.services.HapticsService
 import io.github.smithjustinn.services.IosHapticsServiceImpl
+import io.github.smithjustinn.services.AudioService
+import io.github.smithjustinn.services.IosAudioServiceImpl
 import io.github.smithjustinn.data.local.AppDatabase
 import io.github.smithjustinn.data.local.AppDatabaseConstructor
 import io.github.smithjustinn.data.local.GameStatsDao
@@ -47,6 +49,7 @@ interface IosAppGraph : AppGraph {
     override val statsScreenModel: StatsScreenModel
     override val settingsScreenModel: SettingsScreenModel
     override val hapticsService: HapticsService
+    override val audioService: AudioService
     override val gameStatsRepository: GameStatsRepository
     override val leaderboardRepository: LeaderboardRepository
     override val gameStateRepository: GameStateRepository
@@ -62,6 +65,9 @@ interface IosAppGraph : AppGraph {
 
     @Provides
     fun provideHapticsService(impl: IosHapticsServiceImpl): HapticsService = impl
+
+    @Provides
+    fun provideAudioService(impl: IosAudioServiceImpl): AudioService = impl
 
     @Provides
     fun provideDatabase(): AppDatabase {

@@ -52,6 +52,11 @@ object MemoryGameLogic {
             }
         )
 
+        val activeCards = newState.cards.filter { it.isFaceUp && !it.isMatched }
+        if (activeCards.size == 1) {
+            return newState to GameDomainEvent.CardFlipped
+        }
+
         return checkForMatch(newState)
     }
 

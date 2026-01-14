@@ -7,6 +7,7 @@ import io.github.smithjustinn.ui.game.GameScreenModel
 import io.github.smithjustinn.ui.stats.StatsScreenModel
 import io.github.smithjustinn.ui.settings.SettingsScreenModel
 import io.github.smithjustinn.services.HapticsService
+import io.github.smithjustinn.services.AudioService
 import io.github.smithjustinn.domain.repositories.GameStatsRepository
 import io.github.smithjustinn.domain.repositories.LeaderboardRepository
 import io.github.smithjustinn.domain.repositories.GameStateRepository
@@ -27,6 +28,7 @@ interface AppGraph {
     val statsScreenModel: StatsScreenModel
     val settingsScreenModel: SettingsScreenModel
     val hapticsService: HapticsService
+    val audioService: AudioService
     val gameStatsRepository: GameStatsRepository
     val leaderboardRepository: LeaderboardRepository
     val gameStateRepository: GameStateRepository

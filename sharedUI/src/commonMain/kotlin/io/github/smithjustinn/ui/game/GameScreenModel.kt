@@ -19,6 +19,7 @@ import io.github.smithjustinn.domain.usecases.SaveGameStateUseCase
 import io.github.smithjustinn.domain.usecases.StartNewGameUseCase
 import io.github.smithjustinn.domain.usecases.ShuffleBoardUseCase
 import io.github.smithjustinn.services.HapticsService
+import io.github.smithjustinn.services.AudioService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
@@ -68,6 +69,7 @@ sealed class GameIntent {
 @Inject
 class GameScreenModel(
     private val hapticsService: HapticsService,
+    private val audioService: AudioService,
     private val startNewGameUseCase: StartNewGameUseCase,
     private val flipCardUseCase: FlipCardUseCase,
     private val resetErrorCardsUseCase: ResetErrorCardsUseCase,
@@ -187,6 +189,7 @@ class GameScreenModel(
             _state.update { it.copy(isPeeking = true) }
             delay(3000) // Peek for 3 seconds
             _state.update { it.copy(isPeeking = false) }
+            audioService.playFlip() // Play flip sound when cards hide after peek
             startTimer(mode)
         }
     }
@@ -243,6 +246,7 @@ class GameScreenModel(
             saveGame()
 
             when (event) {
+                GameDomainEvent.CardFlipped -> audioService.playFlip()
                 GameDomainEvent.MatchSuccess -> handleMatchSuccess(newState)
                 GameDomainEvent.MatchFailure -> handleMatchFailure(newState)
                 GameDomainEvent.GameWon -> handleGameWon(newState)
@@ -256,6 +260,7 @@ class GameScreenModel(
 
     private fun handleMatchSuccess(newState: MemoryGameState) {
         hapticsService.vibrateMatch()
+        audioService.playMatch()
         clearCommentAfterDelay()
         
         if (newState.mode == GameMode.TIME_ATTACK) {
@@ -290,12 +295,14 @@ class GameScreenModel(
 
     private fun handleMatchFailure(newState: MemoryGameState) {
         hapticsService.vibrateMismatch()
+        audioService.playMismatch()
         
         val isHiddenBoard = _state.value.isHiddenBoardEnabled
         val threshold = _state.value.movesBeforeShuffle
         
         screenModelScope.launch {
             delay(1000)
+            audioService.playFlip() // Play flip sound when cards hide after mismatch
             val resetState = resetErrorCardsUseCase(newState)
             
             if (isHiddenBoard && resetState.movesSinceLastMatch >= threshold) {
@@ -336,6 +343,7 @@ class GameScreenModel(
 
     private fun handleGameWon(newState: MemoryGameState) {
         hapticsService.vibrateMatch()
+        audioService.playWin()
         stopTimer()
 
         val gameWithBonuses = calculateFinalScoreUseCase(newState, _state.value.elapsedTimeSeconds)
