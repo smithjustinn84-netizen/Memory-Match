@@ -71,7 +71,9 @@ data class GameScreen(
                     },
                     isPeeking = state.isPeeking,
                     mode = mode,
-                    maxTime = state.maxTimeSeconds
+                    maxTime = state.maxTimeSeconds,
+                    showTimeGain = state.showTimeGain,
+                    timeGainAmount = state.timeGainAmount
                 )
             }
         ) { paddingValues ->

@@ -41,7 +41,9 @@ data class GameUIState(
     val showComboExplosion: Boolean = false,
     val isNewHighScore: Boolean = false,
     val isPeeking: Boolean = false,
-    val isPeekFeatureEnabled: Boolean = true
+    val isPeekFeatureEnabled: Boolean = true,
+    val showTimeGain: Boolean = false,
+    val timeGainAmount: Int = 0
 )
 
 /**
@@ -80,6 +82,7 @@ class GameScreenModel(
     private var statsJob: Job? = null
     private var explosionJob: Job? = null
     private var peekJob: Job? = null
+    private var timeGainJob: Job? = null
 
     init {
         screenModelScope.launch {
@@ -110,7 +113,8 @@ class GameScreenModel(
                             maxTimeSeconds = initialTime,
                             showComboExplosion = false,
                             isNewHighScore = false,
-                            isPeeking = false
+                            isPeeking = false,
+                            showTimeGain = false
                         )
                     }
                     startTimer(mode)
@@ -125,7 +129,8 @@ class GameScreenModel(
                             maxTimeSeconds = initialTime,
                             showComboExplosion = false,
                             isNewHighScore = false,
-                            isPeeking = false
+                            isPeeking = false,
+                            showTimeGain = false
                         )
                     }
                     
@@ -227,8 +232,29 @@ class GameScreenModel(
     private fun handleMatchSuccess(newState: MemoryGameState) {
         hapticsService.vibrateMatch()
         clearCommentAfterDelay()
+        
+        if (newState.mode == GameMode.TIME_ATTACK) {
+            val timeGain = 5 // 5 seconds per match
+            _state.update { 
+                it.copy(
+                    elapsedTimeSeconds = it.elapsedTimeSeconds + timeGain,
+                    showTimeGain = true,
+                    timeGainAmount = timeGain
+                )
+            }
+            triggerTimeGainFeedback()
+        }
+
         if (newState.comboMultiplier > 2) {
             triggerComboExplosion()
+        }
+    }
+
+    private fun triggerTimeGainFeedback() {
+        timeGainJob?.cancel()
+        timeGainJob = screenModelScope.launch {
+            delay(1500)
+            _state.update { it.copy(showTimeGain = false) }
         }
     }
 
@@ -306,6 +332,7 @@ class GameScreenModel(
         statsJob?.cancel()
         explosionJob?.cancel()
         peekJob?.cancel()
+        timeGainJob?.cancel()
         saveGame()
     }
 }

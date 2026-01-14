@@ -1,5 +1,6 @@
 package io.github.smithjustinn.components.game
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -7,6 +8,10 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,15 +59,21 @@ fun GameTopBar(
     onBackClick: () -> Unit,
     isPeeking: Boolean = false,
     mode: GameMode = GameMode.STANDARD,
-    maxTime: Long = 0
+    maxTime: Long = 0,
+    showTimeGain: Boolean = false,
+    timeGainAmount: Int = 0
 ) {
     val isTimeAttack = mode == GameMode.TIME_ATTACK
     val isLowTime = isTimeAttack && time <= 10
     val isCriticalTime = isTimeAttack && time <= 5
 
     val timerColor by animateColorAsState(
-        targetValue = if (isLowTime) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary,
-        animationSpec = tween(durationMillis = 500)
+        targetValue = when {
+            showTimeGain -> Color(0xFF4CAF50) // Success Green
+            isLowTime -> MaterialTheme.colorScheme.error
+            else -> MaterialTheme.colorScheme.secondary
+        },
+        animationSpec = tween(durationMillis = if (showTimeGain) 100 else 500)
     )
 
     val infiniteTransition = rememberInfiniteTransition()
@@ -100,18 +112,34 @@ fun GameTopBar(
                             }
                         }
 
-                        Column {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = stringResource(Res.string.time_label, formatTime(time)),
                                 style = MaterialTheme.typography.labelSmall,
                                 modifier = Modifier.scale(timerScale),
                                 color = timerColor
                             )
+                            
+                            AnimatedVisibility(
+                                visible = showTimeGain,
+                                enter = fadeIn() + slideInVertically { it / 2 },
+                                exit = fadeOut() + slideOutVertically { -it / 2 }
+                            ) {
+                                Text(
+                                    text = "+${timeGainAmount}s",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFF4CAF50),
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(start = 4.dp)
+                                )
+                            }
+
                             if (bestTime > 0 && !isTimeAttack) {
                                 Text(
                                     text = stringResource(Res.string.best_time_label, formatTime(bestTime)),
                                     style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp),
-                                    color = MaterialTheme.colorScheme.outline
+                                    color = MaterialTheme.colorScheme.outline,
+                                    modifier = Modifier.padding(start = 8.dp)
                                 )
                             }
                         }
