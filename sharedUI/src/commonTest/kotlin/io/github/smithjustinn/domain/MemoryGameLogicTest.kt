@@ -43,7 +43,7 @@ class MemoryGameLogicTest {
         val (newState, event) = MemoryGameLogic.flipCard(state, cardId)
         
         assertTrue(newState.cards.first { it.id == cardId }.isFaceUp)
-        assertNull(event)
+        assertEquals(GameDomainEvent.CardFlipped, event)
     }
 
     @Test

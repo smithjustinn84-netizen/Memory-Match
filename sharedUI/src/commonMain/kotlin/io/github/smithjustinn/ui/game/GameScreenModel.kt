@@ -105,6 +105,11 @@ class GameScreenModel(
                         )
                     }
                     startTimer(mode)
+
+                    // If the game was saved with mismatched cards flipped, trigger the reset
+                    if (savedGame.first.cards.any { it.isError }) {
+                        handleMatchFailure(savedGame.first)
+                    }
                 } else {
                     val initialGameState = startNewGameUseCase(pairCount, mode = mode)
                     val initialTime = if (mode == GameMode.TIME_ATTACK) calculateInitialTime(pairCount) else 0L
