@@ -18,7 +18,6 @@ class SettingsRepositoryImpl(
     private val dao: SettingsDao
 ) : SettingsRepository {
     
-    // Using a dedicated scope for the StateFlow to ensure it lives as long as the repository
     private val scope = CoroutineScope(Dispatchers.IO)
 
     override val isPeekEnabled: StateFlow<Boolean> = dao.getSettings()
@@ -29,8 +28,21 @@ class SettingsRepositoryImpl(
             initialValue = true
         )
 
+    override val isSoundEnabled: StateFlow<Boolean> = dao.getSettings()
+        .map { it?.isSoundEnabled ?: true }
+        .stateIn(
+            scope = scope,
+            started = SharingStarted.Eagerly,
+            initialValue = true
+        )
+
     override suspend fun setPeekEnabled(enabled: Boolean) {
         val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
         dao.saveSettings(current.copy(isPeekEnabled = enabled))
+    }
+
+    override suspend fun setSoundEnabled(enabled: Boolean) {
+        val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
+        dao.saveSettings(current.copy(isSoundEnabled = enabled))
     }
 }

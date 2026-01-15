@@ -47,8 +47,17 @@ class SettingsScreen : Screen {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
-                    .padding(16.dp)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                // Sound Effects Setting
+                SettingsToggle(
+                    title = "Sound Effects",
+                    description = "Play sounds for card flips, matches, and wins",
+                    checked = state.isSoundEnabled,
+                    onCheckedChange = { screenModel.toggleSoundEnabled(it) }
+                )
+
                 // Memory Peek Setting
                 SettingsToggle(
                     title = "Enable Memory Peek",

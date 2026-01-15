@@ -7,6 +7,7 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import co.touchlab.kermit.Logger
 import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.createGraphFactory
 import io.github.smithjustinn.services.HapticsService
 import io.github.smithjustinn.services.AndroidHapticsServiceImpl
@@ -70,12 +71,15 @@ interface AndroidAppGraph : AppGraph {
     }
 
     @Provides
+    @SingleIn(AppScope::class)
     fun provideHapticsService(impl: AndroidHapticsServiceImpl): HapticsService = impl
 
     @Provides
+    @SingleIn(AppScope::class)
     fun provideAudioService(impl: AndroidAudioServiceImpl): AudioService = impl
 
     @Provides
+    @SingleIn(AppScope::class)
     fun provideDatabase(context: Context): AppDatabase {
         val dbFile = context.getDatabasePath("memory_match.db")
         return Room.databaseBuilder<AppDatabase>(
@@ -89,30 +93,39 @@ interface AndroidAppGraph : AppGraph {
     }
 
     @Provides
+    @SingleIn(AppScope::class)
     fun provideGameStatsDao(database: AppDatabase): GameStatsDao = database.gameStatsDao()
 
     @Provides
+    @SingleIn(AppScope::class)
     fun provideLeaderboardDao(database: AppDatabase): LeaderboardDao = database.leaderboardDao()
 
     @Provides
+    @SingleIn(AppScope::class)
     fun provideGameStateDao(database: AppDatabase): GameStateDao = database.gameStateDao()
 
     @Provides
+    @SingleIn(AppScope::class)
     fun provideSettingsDao(database: AppDatabase): SettingsDao = database.settingsDao()
 
     @Provides
+    @SingleIn(AppScope::class)
     fun provideGameStatsRepository(impl: GameStatsRepositoryImpl): GameStatsRepository = impl
 
     @Provides
+    @SingleIn(AppScope::class)
     fun provideLeaderboardRepository(impl: LeaderboardRepositoryImpl): LeaderboardRepository = impl
 
     @Provides
+    @SingleIn(AppScope::class)
     fun provideGameStateRepository(impl: GameStateRepositoryImpl): GameStateRepository = impl
 
     @Provides
+    @SingleIn(AppScope::class)
     fun provideSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository = impl
 
     @Provides
+    @SingleIn(AppScope::class)
     fun provideJson(): Json = Json { ignoreUnknownKeys = true }
 }
 

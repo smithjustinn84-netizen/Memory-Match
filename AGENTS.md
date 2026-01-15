@@ -12,6 +12,7 @@ This document serves as the **Source of Truth** for all AI agents and developers
 5. [Testing Strategy](#5-testing-strategy)
 6. [Prohibited Patterns](#6-prohibited-patterns)
 7. [Feature Generation Workflow](#7-feature-generation-workflow)
+8. [Platform Specific Notes](#8-platform-specific-notes)
 
 ---
 
@@ -128,3 +129,12 @@ When creating a new feature (e.g., `FeatureX`), generate the following component
 5.  [ ] `ui/feature_x/FeatureXScreen.kt`
 6.  [ ] `ui/feature_x/FeatureXScreenModel.kt`
 7.  [ ] Update Metro `@BindingContainer` or `@Module` to include new dependencies.
+
+---
+
+## 8. Platform Specific Notes
+
+### iOS Audio
+- **AVAudioPlayer**: In modern Kotlin/Native, `AVAudioPlayer` resides in `platform.AVFAudio.AVAudioPlayer`. Do **NOT** use `platform.AVFoundation.AVAudioPlayer`.
+- **Interop Annotations**: iOS audio implementations using `NSData` and `addressOf` require `@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)`.
+- **Threading**: `AVAudioPlayer` should be initialized and played on the `Dispatchers.Main` scope to ensure stability.

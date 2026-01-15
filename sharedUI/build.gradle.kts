@@ -17,7 +17,7 @@ kotlin {
     android {
         namespace = "io.github.smithjustinn"
         compileSdk = 36
-        minSdk = 23
+        minSdk = 26
         androidResources.enable = true
         compilerOptions { jvmTarget.set(JvmTarget.JVM_17) }
     }
