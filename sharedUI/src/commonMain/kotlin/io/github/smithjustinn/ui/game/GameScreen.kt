@@ -16,11 +16,11 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import io.github.smithjustinn.components.game.*
 import io.github.smithjustinn.di.LocalAppGraph
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.platform.CommonTransient
 import io.github.smithjustinn.platform.JavaSerializable
+import io.github.smithjustinn.ui.game.components.*
 import io.github.smithjustinn.utils.BackPressScreen
 
 data class GameScreen(

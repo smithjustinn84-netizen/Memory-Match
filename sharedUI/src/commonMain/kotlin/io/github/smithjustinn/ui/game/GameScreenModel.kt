@@ -14,37 +14,6 @@ import io.github.smithjustinn.services.HapticsService
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
-/**
- * Represents the overall state of the game screen, including the UI-only state.
- */
-data class GameUIState(
-    val game: MemoryGameState = MemoryGameState(),
-    val elapsedTimeSeconds: Long = 0,
-    val maxTimeSeconds: Long = 0,
-    val bestScore: Int = 0,
-    val bestTimeSeconds: Long = 0,
-    val showComboExplosion: Boolean = false,
-    val isNewHighScore: Boolean = false,
-    val isPeeking: Boolean = false,
-    val isPeekFeatureEnabled: Boolean = true,
-    val showTimeGain: Boolean = false,
-    val timeGainAmount: Int = 0,
-    val isMegaBonus: Boolean = false
-)
-
-/**
- * Sealed class representing user intents for the game screen.
- */
-sealed class GameIntent {
-    data class StartGame(
-        val pairCount: Int,
-        val forceNewGame: Boolean = false,
-        val mode: GameMode = GameMode.STANDARD
-    ) : GameIntent()
-    data class FlipCard(val cardId: Int) : GameIntent()
-    data object SaveGame : GameIntent()
-}
-
 @Inject
 class GameScreenModel(
     private val hapticsService: HapticsService,

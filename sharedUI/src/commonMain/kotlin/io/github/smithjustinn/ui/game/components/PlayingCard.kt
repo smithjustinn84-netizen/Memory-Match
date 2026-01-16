@@ -1,4 +1,4 @@
-package io.github.smithjustinn.components.game
+package io.github.smithjustinn.ui.game.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
