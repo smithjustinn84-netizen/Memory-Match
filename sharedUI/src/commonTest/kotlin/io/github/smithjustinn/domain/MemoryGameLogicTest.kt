@@ -180,4 +180,29 @@ class MemoryGameLogicTest {
         assertTrue(finalState.scoreBreakdown.moveBonus > 0)
         assertEquals(finalState.score, finalState.scoreBreakdown.totalScore)
     }
+
+    @Test
+    fun `calculateInitialTime should return correct values for difficulties`() {
+        assertEquals(25L, MemoryGameLogic.calculateInitialTime(6))
+        assertEquals(35L, MemoryGameLogic.calculateInitialTime(8))
+        assertEquals(45L, MemoryGameLogic.calculateInitialTime(10))
+        assertEquals(55L, MemoryGameLogic.calculateInitialTime(12))
+        assertEquals(65L, MemoryGameLogic.calculateInitialTime(14))
+        assertEquals(75L, MemoryGameLogic.calculateInitialTime(16))
+    }
+
+    @Test
+    fun `calculateTimeGain should return correct values including combo bonus`() {
+        // Base gain (combo 1)
+        assertEquals(3, MemoryGameLogic.calculateTimeGain(1))
+        // Combo 2
+        assertEquals(4, MemoryGameLogic.calculateTimeGain(2))
+        // Combo 3
+        assertEquals(5, MemoryGameLogic.calculateTimeGain(3))
+    }
+
+    @Test
+    fun `TIME_PENALTY_MISMATCH should be 2 seconds`() {
+        assertEquals(2L, MemoryGameLogic.TIME_PENALTY_MISMATCH)
+    }
 }
