@@ -11,7 +11,7 @@
 
 Before generating code, you **MUST** align with the project state:
 
-1. **Verify Kotlin Version**: Assume Kotlin **2.1+ (K2 Mode)**.
+1. **Verify Kotlin Version**: Assume Kotlin **2.3+ (K2 Mode)**.
 2. **Verify UI Stack**: Compose Multiplatform **1.10.0+** (Stable Hot Reload compatible).
 3. **Check Context**: If you see `context(...)` in code, use **Context Parameters** (`-Xcontext-parameters`), NOT the deprecated Context Receivers.
 
@@ -21,24 +21,24 @@ Before generating code, you **MUST** align with the project state:
 
 | Layer | Technology | 2026 Standard / Note |
 | --- | --- | --- |
-| **Language** | **Kotlin 2.2 (Preview/Stable)** | Use **Context Parameters**, Guard Conditions (`when`), and Multi-dollar strings. |
-| **UI** | **Compose Multiplatform 1.10+** | Shared UI in `composeApp/commonMain`. Use `adaptive` layouts. |
+| **Language** | **Kotlin 2.3 (Stable)** | Use **Context Parameters**, Guard Conditions (`when`), and Multi-dollar strings. |
+| **UI** | **Compose Multiplatform 1.10+** | Shared UI in `sharedUI/src/commonMain`. Use `adaptive` layouts. |
 | **DI** | **Metro** (Compiler Plugin) | **Compile-time**. No Kapt/KSP. Use `@DependencyGraph`. |
 | **Nav** | **Voyager** | ScreenModel + Type-safe `Screen` classes. |
-| **DB** | **Room (KMP)** | Schema in `shared/schemas`. Use Bundled SQLite drivers. |
+| **DB** | **Room (KMP)** | Schema in `sharedUI/schemas`. Use Bundled SQLite drivers. |
 | **Network** | **Ktor 3.x** | CIO Engine. `ContentNegotiation` + `kotlinx.serialization`. |
 
 ### 🏛️ The "Clean KMP" Layering
 
-1. **Domain** (`commonMain`): Pure Kotlin. **Zero** UI/Platform dependencies.
+1. **Domain** (`sharedUI/src/commonMain`): Pure Kotlin. **Zero** UI/Platform dependencies.
 * *Entities, Repository Interfaces, UseCases.*
 
 
-2. **Data** (`commonMain` + `platform`):
+2. **Data** (`sharedUI/src/commonMain` + `platform`):
 * *Repository Impls, API Clients (Ktor), DB (Room).*
 
 
-3. **UI** (`composeApp/commonMain`):
+3. **UI** (`sharedUI/src/commonMain`):
 * *Screens (Voyager), ViewModels (ScreenModels), Composables.*
 
 
@@ -179,7 +179,7 @@ interface DataModule {
 ### iOS (Kotlin/Native)
 
 * **Interop**: Use `@OptIn(ExperimentalForeignApi::class)` only in `iosMain`.
-* **Resources**: Ensure `composeApp/commonMain/composeResources` is updated.
+* **Resources**: Ensure `sharedUI/src/commonMain/composeResources` is updated.
 * **Audio**: Use `platform.AVFAudio.AVAudioPlayer` (NOT `AVFoundation`).
 
 ### Android
