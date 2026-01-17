@@ -52,6 +52,7 @@ class GameScreenModelTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()
     private val isPeekEnabledFlow = MutableStateFlow(false)
+    private val isWalkthroughCompletedFlow = MutableStateFlow(true)
     private val statsFlow = MutableStateFlow<GameStats?>(null)
 
     private lateinit var screenModel: GameScreenModel
@@ -60,33 +61,40 @@ class GameScreenModelTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         isPeekEnabledFlow.value = false
+        isWalkthroughCompletedFlow.value = true
         statsFlow.value = null
         
         every { settingsRepository.isPeekEnabled } returns isPeekEnabledFlow
+        every { settingsRepository.isWalkthroughCompleted } returns isWalkthroughCompletedFlow
         every { gameStatsRepository.getStatsForDifficulty(any()) } returns statsFlow
         
         everySuspend { gameStateRepository.getSavedGameState() } returns null
         everySuspend { gameStateRepository.saveGameState(any(), any()) } returns Unit
         everySuspend { gameStateRepository.clearSavedGameState() } returns Unit
+        everySuspend { settingsRepository.setWalkthroughCompleted(any()) } returns Unit
         
-        screenModel = GameScreenModel(
-            startNewGameUseCase,
-            flipCardUseCase,
-            resetErrorCardsUseCase,
-            calculateFinalScoreUseCase,
-            getGameStatsUseCase,
-            saveGameResultUseCase,
-            getSavedGameUseCase,
-            saveGameStateUseCase,
-            clearSavedGameUseCase,
-            settingsRepository,
-            logger
-        )
+        screenModel = createScreenModel()
     }
+
+    private fun createScreenModel() = GameScreenModel(
+        startNewGameUseCase,
+        flipCardUseCase,
+        resetErrorCardsUseCase,
+        calculateFinalScoreUseCase,
+        getGameStatsUseCase,
+        saveGameResultUseCase,
+        getSavedGameUseCase,
+        saveGameStateUseCase,
+        clearSavedGameUseCase,
+        settingsRepository,
+        logger
+    )
 
     @AfterTest
     fun tearDown() {
-        screenModel.onDispose()
+        if (::screenModel.isInitialized) {
+            screenModel.onDispose()
+        }
         Dispatchers.resetMain()
     }
 
@@ -136,6 +144,59 @@ class GameScreenModelTest {
 
         assertEquals(0, screenModel.state.value.game.moves)
         assertEquals(0, screenModel.state.value.elapsedTimeSeconds)
+        screenModel.onDispose()
+    }
+
+    // endregion
+
+    // region Walkthrough
+
+    @Test
+    fun `Walkthrough should show if not completed`() = runTest {
+        screenModel.onDispose()
+        isWalkthroughCompletedFlow.value = false
+        screenModel = createScreenModel()
+
+        assertTrue(screenModel.state.value.showWalkthrough)
+        assertEquals(0, screenModel.state.value.walkthroughStep)
+        screenModel.onDispose()
+    }
+
+    @Test
+    fun `NextWalkthroughStep should increment step`() = runTest {
+        screenModel.onDispose()
+        isWalkthroughCompletedFlow.value = false
+        screenModel = createScreenModel()
+
+        screenModel.handleIntent(GameIntent.NextWalkthroughStep)
+        assertEquals(1, screenModel.state.value.walkthroughStep)
+        screenModel.onDispose()
+    }
+
+    @Test
+    fun `CompleteWalkthrough should update repository and hide walkthrough`() = runTest {
+        screenModel.onDispose()
+        isWalkthroughCompletedFlow.value = false
+        screenModel = createScreenModel()
+
+        screenModel.handleIntent(GameIntent.CompleteWalkthrough)
+        
+        verifySuspend { settingsRepository.setWalkthroughCompleted(true) }
+        assertFalse(screenModel.state.value.showWalkthrough)
+        screenModel.onDispose()
+    }
+
+    @Test
+    fun `FlipCard should be ignored when walkthrough is showing`() = runTest {
+        screenModel.onDispose()
+        isWalkthroughCompletedFlow.value = false
+        screenModel = createScreenModel()
+        
+        screenModel.handleIntent(GameIntent.StartGame(4))
+        val cardId = screenModel.state.value.game.cards[0].id
+        screenModel.handleIntent(GameIntent.FlipCard(cardId))
+
+        assertFalse(screenModel.state.value.game.cards.first { it.id == cardId }.isFaceUp)
         screenModel.onDispose()
     }
 
