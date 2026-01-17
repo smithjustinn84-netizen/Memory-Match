@@ -34,6 +34,7 @@ fun PlayingCard(
     rank: Rank,
     isFaceUp: Boolean,
     isMatched: Boolean = false,
+    isRecentlyMatched: Boolean = false,
     isError: Boolean = false,
     modifier: Modifier = Modifier,
     backColor: Color = MaterialTheme.colorScheme.primaryContainer,
@@ -76,7 +77,7 @@ fun PlayingCard(
     val suitColor = if (suit.isRed) Color(0xFFD32F2F) else Color(0xFF212121)
     
     val matchedGlowColor by animateColorAsState(
-        targetValue = if (isMatched) MaterialTheme.colorScheme.primary.copy(alpha = 0.3f) else Color.Transparent,
+        targetValue = if (isRecentlyMatched) MaterialTheme.colorScheme.primary.copy(alpha = 0.3f) else Color.Transparent,
         animationSpec = infiniteRepeatable(
             animation = tween(1000),
             repeatMode = RepeatMode.Reverse
@@ -100,7 +101,7 @@ fun PlayingCard(
                 clip = false
             )
             .drawBehind {
-                if (isMatched) {
+                if (isRecentlyMatched) {
                     drawCircle(
                         color = matchedGlowColor,
                         radius = size.maxDimension * 0.7f,
@@ -130,7 +131,7 @@ fun PlayingCard(
             Box(modifier = Modifier.fillMaxSize()) {
                 if (rotation <= 90f) {
                     CardFace(rank = rank, suit = suit, suitColor = suitColor)
-                    if (isMatched) {
+                    if (isRecentlyMatched) {
                         ShimmerEffect()
                     }
                 } else {

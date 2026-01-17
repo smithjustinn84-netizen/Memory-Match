@@ -50,6 +50,7 @@ fun GameGrid(
                     rank = card.rank,
                     isFaceUp = card.isFaceUp || isPeeking,
                     isMatched = card.isMatched,
+                    isRecentlyMatched = lastMatchedIds.contains(card.id),
                     isError = card.isError,
                     onClick = { onCardClick(card.id) },
                     modifier = Modifier.onGloballyPositioned { layoutCoordinates ->

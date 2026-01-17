@@ -69,7 +69,7 @@ class GameScreenModel(
                     val initialTime = if (mode == GameMode.TIME_ATTACK) MemoryGameLogic.calculateInitialTime(pairCount) else 0L
                     _state.update {
                         it.copy(
-                            game = savedGame.first,
+                            game = savedGame.first.copy(lastMatchedIds = emptyList()), // Clear last matched IDs on resume to prevent stuck animation
                             elapsedTimeSeconds = savedGame.second,
                             maxTimeSeconds = initialTime,
                             showComboExplosion = false,
@@ -83,7 +83,7 @@ class GameScreenModel(
 
                     // If the game was saved with mismatched cards flipped, trigger the reset
                     if (savedGame.first.cards.any { it.isError }) {
-                        handleMatchFailure(savedGame.first)
+                        handleMatchFailure(savedGame.first, isResuming = true)
                     }
                 } else {
                     val initialGameState = startNewGameUseCase(pairCount, mode = mode)
@@ -232,14 +232,17 @@ class GameScreenModel(
         }
     }
 
-    private fun handleMatchFailure(newState: MemoryGameState) {
-        screenModelScope.launch {
-            _events.send(GameUiEvent.VibrateMismatch)
-            _events.send(GameUiEvent.PlayMismatch)
+    private fun handleMatchFailure(newState: MemoryGameState, isResuming: Boolean = false) {
+        if (!isResuming) {
+            screenModelScope.launch {
+                _events.send(GameUiEvent.VibrateMismatch)
+                _events.send(GameUiEvent.PlayMismatch)
+            }
         }
         
         var isGameOver = false
-        if (newState.mode == GameMode.TIME_ATTACK) {
+        // Only apply penalty if NOT resuming, as it should have been applied when the mismatch occurred
+        if (newState.mode == GameMode.TIME_ATTACK && !isResuming) {
             val penalty = MemoryGameLogic.TIME_PENALTY_MISMATCH
             _state.update { 
                 val newTime = (it.elapsedTimeSeconds - penalty).coerceAtLeast(0)
@@ -257,12 +260,14 @@ class GameScreenModel(
             handleGameOver()
         } else {
             screenModelScope.launch {
-                delay(1000)
+                // Use a shorter delay if resuming to clear the "stuck" state faster
+                delay(if (isResuming) 500 else 1000)
                 // Re-check game over state before resetting cards to avoid race conditions
                 if (!_state.value.game.isGameOver) {
                     _events.send(GameUiEvent.PlayFlip)
                     val resetState = resetErrorCardsUseCase(newState)
                     _state.update { it.copy(game = resetState) }
+                    saveGame() // Ensure the reset state is saved
                 }
             }
         }
