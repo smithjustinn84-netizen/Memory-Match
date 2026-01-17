@@ -36,6 +36,14 @@ internal class SettingsRepositoryImpl(
             initialValue = true
         )
 
+    override val isWalkthroughCompleted: StateFlow<Boolean> = dao.getSettings()
+        .map { it?.isWalkthroughCompleted ?: false }
+        .stateIn(
+            scope = scope,
+            started = SharingStarted.Eagerly,
+            initialValue = false
+        )
+
     override suspend fun setPeekEnabled(enabled: Boolean) {
         val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
         dao.saveSettings(current.copy(isPeekEnabled = enabled))
@@ -44,5 +52,10 @@ internal class SettingsRepositoryImpl(
     override suspend fun setSoundEnabled(enabled: Boolean) {
         val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
         dao.saveSettings(current.copy(isSoundEnabled = enabled))
+    }
+
+    override suspend fun setWalkthroughCompleted(completed: Boolean) {
+        val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
+        dao.saveSettings(current.copy(isWalkthroughCompleted = completed))
     }
 }

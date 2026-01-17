@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 data class SettingsEntity(
     @PrimaryKey val id: Int = 0, // Single row for settings
     val isPeekEnabled: Boolean = true,
-    val isSoundEnabled: Boolean = true
+    val isSoundEnabled: Boolean = true,
+    val isWalkthroughCompleted: Boolean = false
 )

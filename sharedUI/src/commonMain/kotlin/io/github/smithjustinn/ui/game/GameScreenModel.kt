@@ -47,8 +47,16 @@ class GameScreenModel(
 
     init {
         settingsJob = screenModelScope.launch {
-            settingsRepository.isPeekEnabled.collect { peek ->
-                _state.update { it.copy(isPeekFeatureEnabled = peek) }
+            combine(
+                settingsRepository.isPeekEnabled,
+                settingsRepository.isWalkthroughCompleted
+            ) { peek, walkthroughCompleted ->
+                peek to walkthroughCompleted
+            }.collect { (peek, walkthroughCompleted) ->
+                _state.update { it.copy(
+                    isPeekFeatureEnabled = peek,
+                    showWalkthrough = !walkthroughCompleted
+                ) }
             }
         }
     }
@@ -58,6 +66,19 @@ class GameScreenModel(
             is GameIntent.StartGame -> startGame(intent.pairCount, intent.forceNewGame, intent.mode)
             is GameIntent.FlipCard -> flipCard(intent.cardId)
             is GameIntent.SaveGame -> saveGame()
+            is GameIntent.NextWalkthroughStep -> nextWalkthroughStep()
+            is GameIntent.CompleteWalkthrough -> completeWalkthrough()
+        }
+    }
+
+    private fun nextWalkthroughStep() {
+        _state.update { it.copy(walkthroughStep = it.walkthroughStep + 1) }
+    }
+
+    private fun completeWalkthrough() {
+        screenModelScope.launch {
+            settingsRepository.setWalkthroughCompleted(true)
+            _state.update { it.copy(showWalkthrough = false) }
         }
     }
 
@@ -181,7 +202,7 @@ class GameScreenModel(
     }
 
     private fun flipCard(cardId: Int) {
-        if (_state.value.isPeeking || _state.value.game.isGameOver) return
+        if (_state.value.isPeeking || _state.value.game.isGameOver || _state.value.showWalkthrough) return
 
         try {
             val (newState, event) = flipCardUseCase(_state.value.game, cardId)

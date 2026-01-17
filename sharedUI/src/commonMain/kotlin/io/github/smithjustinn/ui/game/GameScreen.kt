@@ -158,6 +158,14 @@ data class GameScreen(
                             mode = mode
                         )
                     }
+
+                    if (state.showWalkthrough) {
+                        WalkthroughOverlay(
+                            step = state.walkthroughStep,
+                            onNext = { screenModel.handleIntent(GameIntent.NextWalkthroughStep) },
+                            onDismiss = { screenModel.handleIntent(GameIntent.CompleteWalkthrough) }
+                        )
+                    }
                 }
             }
         }

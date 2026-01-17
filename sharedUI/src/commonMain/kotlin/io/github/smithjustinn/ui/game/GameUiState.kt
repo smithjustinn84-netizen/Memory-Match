@@ -21,7 +21,9 @@ data class GameUIState(
     val timeGainAmount: Int = 0,
     val showTimeLoss: Boolean = false,
     val timeLossAmount: Long = 0,
-    val isMegaBonus: Boolean = false
+    val isMegaBonus: Boolean = false,
+    val showWalkthrough: Boolean = false,
+    val walkthroughStep: Int = 0
 )
 
 /**
@@ -35,6 +37,8 @@ sealed class GameIntent {
     ) : GameIntent()
     data class FlipCard(val cardId: Int) : GameIntent()
     data object SaveGame : GameIntent()
+    data object NextWalkthroughStep : GameIntent()
+    data object CompleteWalkthrough : GameIntent()
 }
 
 /**
