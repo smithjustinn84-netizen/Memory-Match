@@ -192,4 +192,26 @@ object MemoryGameLogic {
             }
         }
     }
+
+    // --- Time Attack Logic ---
+
+    fun calculateInitialTime(pairCount: Int): Long {
+        return when (pairCount) {
+            6 -> 25L  // Toddler
+            8 -> 35L  // Casual
+            10 -> 45L // Master
+            12 -> 55L // Shark
+            14 -> 65L // Grandmaster
+            16 -> 75L // Elephant
+            else -> (pairCount * 4).toLong()
+        }
+    }
+
+    fun calculateTimeGain(comboMultiplier: Int): Int {
+        val baseGain = 3
+        val comboBonus = (comboMultiplier - 1) * 1
+        return baseGain + comboBonus
+    }
+
+    const val TIME_PENALTY_MISMATCH = 2L
 }

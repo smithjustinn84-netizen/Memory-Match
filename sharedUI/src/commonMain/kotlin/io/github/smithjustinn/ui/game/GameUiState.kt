@@ -18,6 +18,8 @@ data class GameUIState(
     val isPeekFeatureEnabled: Boolean = true,
     val showTimeGain: Boolean = false,
     val timeGainAmount: Int = 0,
+    val showTimeLoss: Boolean = false,
+    val timeLossAmount: Long = 0,
     val isMegaBonus: Boolean = false
 )
 

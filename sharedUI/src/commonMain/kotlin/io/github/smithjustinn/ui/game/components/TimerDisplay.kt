@@ -26,34 +26,54 @@ fun TimerDisplay(
     isCriticalTime: Boolean,
     showTimeGain: Boolean,
     timeGainAmount: Int,
+    showTimeLoss: Boolean,
+    timeLossAmount: Long,
     isMegaBonus: Boolean,
     infiniteTransition: InfiniteTransition,
     modifier: Modifier = Modifier
 ) {
     val timerColor by animateColorAsState(
         targetValue = when {
+            showTimeLoss -> MaterialTheme.colorScheme.error
             showTimeGain && isMegaBonus -> Color(0xFFFFD700)
             showTimeGain -> Color(0xFF4CAF50)
             isLowTime -> MaterialTheme.colorScheme.error
             else -> MaterialTheme.colorScheme.onSurface
         },
-        animationSpec = tween(durationMillis = if (showTimeGain) 100 else 500)
+        animationSpec = tween(durationMillis = if (showTimeGain || showTimeLoss) 100 else 500)
     )
 
-    val timerScale by infiniteTransition.animateFloat(
+    // Infinite pulse for critical time
+    val infinitePulseScale by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = if (isCriticalTime) 1.15f else 1f,
+        targetValue = 1.15f,
         animationSpec = infiniteRepeatable(
             animation = tween(500, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
         )
     )
 
+    // One-off bouncy pulse for time loss
+    val lossPulseScale by animateFloatAsState(
+        targetValue = if (showTimeLoss) 1.2f else 1f,
+        animationSpec = if (showTimeLoss) {
+            spring(dampingRatio = Spring.DampingRatioHighBouncy, stiffness = Spring.StiffnessMedium)
+        } else {
+            spring(stiffness = Spring.StiffnessLow)
+        }
+    )
+
+    val timerScale = when {
+        showTimeLoss -> lossPulseScale
+        isCriticalTime -> infinitePulseScale
+        else -> 1f
+    }
+
     Surface(
         shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.surface,
         tonalElevation = 2.dp,
-        border = if (isLowTime) BorderStroke(1.5.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.5f)) else null,
+        border = if (isLowTime || showTimeLoss) BorderStroke(1.5.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.5f)) else null,
         modifier = modifier.height(44.dp)
     ) {
         Row(
@@ -81,6 +101,20 @@ fun TimerDisplay(
                     text = "+${timeGainAmount}s",
                     style = MaterialTheme.typography.labelLarge,
                     color = if (isMegaBonus) Color(0xFFFFD700) else Color(0xFF4CAF50),
+                    fontWeight = FontWeight.Black,
+                    modifier = Modifier.padding(start = 6.dp)
+                )
+            }
+
+            AnimatedVisibility(
+                visible = showTimeLoss,
+                enter = fadeIn() + slideInVertically { -it / 2 },
+                exit = fadeOut() + slideOutVertically { it / 2 }
+            ) {
+                Text(
+                    text = "-${timeLossAmount}s",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.error,
                     fontWeight = FontWeight.Black,
                     modifier = Modifier.padding(start = 6.dp)
                 )

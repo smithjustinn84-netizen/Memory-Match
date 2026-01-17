@@ -81,6 +81,8 @@ data class GameScreen(
                         maxTime = state.maxTimeSeconds,
                         showTimeGain = state.showTimeGain,
                         timeGainAmount = state.timeGainAmount,
+                        showTimeLoss = state.showTimeLoss,
+                        timeLossAmount = state.timeLossAmount,
                         isMegaBonus = state.isMegaBonus
                     )
                 }

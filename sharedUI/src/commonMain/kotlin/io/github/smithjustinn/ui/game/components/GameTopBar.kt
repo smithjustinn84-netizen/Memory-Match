@@ -29,6 +29,8 @@ fun GameTopBar(
     maxTime: Long = 0,
     showTimeGain: Boolean = false,
     timeGainAmount: Int = 0,
+    showTimeLoss: Boolean = false,
+    timeLossAmount: Long = 0,
     isMegaBonus: Boolean = false
 ) {
     val isTimeAttack = mode == GameMode.TIME_ATTACK
@@ -57,6 +59,8 @@ fun GameTopBar(
                 isCriticalTime = isCriticalTime,
                 showTimeGain = showTimeGain,
                 timeGainAmount = timeGainAmount,
+                showTimeLoss = showTimeLoss,
+                timeLossAmount = timeLossAmount,
                 isMegaBonus = isMegaBonus,
                 infiniteTransition = infiniteTransition
             )

@@ -4,6 +4,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import co.touchlab.kermit.Logger
 import dev.zacsweers.metro.Inject
+import io.github.smithjustinn.domain.MemoryGameLogic
 import io.github.smithjustinn.domain.models.GameDomainEvent
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
@@ -41,6 +42,7 @@ class GameScreenModel(
     private var explosionJob: Job? = null
     private var peekJob: Job? = null
     private var timeGainJob: Job? = null
+    private var timeLossJob: Job? = null
 
     init {
         screenModelScope.launch {
@@ -63,7 +65,7 @@ class GameScreenModel(
             try {
                 val savedGame = if (forceNewGame) null else getSavedGameUseCase()
                 if (savedGame != null && savedGame.first.pairCount == pairCount && !savedGame.first.isGameOver && savedGame.first.mode == mode) {
-                    val initialTime = if (mode == GameMode.TIME_ATTACK) calculateInitialTime(pairCount) else 0L
+                    val initialTime = if (mode == GameMode.TIME_ATTACK) MemoryGameLogic.calculateInitialTime(pairCount) else 0L
                     _state.update {
                         it.copy(
                             game = savedGame.first,
@@ -72,7 +74,8 @@ class GameScreenModel(
                             showComboExplosion = false,
                             isNewHighScore = false,
                             isPeeking = false,
-                            showTimeGain = false
+                            showTimeGain = false,
+                            showTimeLoss = false
                         )
                     }
                     startTimer(mode)
@@ -83,7 +86,7 @@ class GameScreenModel(
                     }
                 } else {
                     val initialGameState = startNewGameUseCase(pairCount, mode = mode)
-                    val initialTime = if (mode == GameMode.TIME_ATTACK) calculateInitialTime(pairCount) else 0L
+                    val initialTime = if (mode == GameMode.TIME_ATTACK) MemoryGameLogic.calculateInitialTime(pairCount) else 0L
                     
                     _state.update {
                         it.copy(
@@ -93,7 +96,8 @@ class GameScreenModel(
                             showComboExplosion = false,
                             isNewHighScore = false,
                             isPeeking = false,
-                            showTimeGain = false
+                            showTimeGain = false,
+                            showTimeLoss = false
                         )
                     }
                     
@@ -112,18 +116,6 @@ class GameScreenModel(
             } catch (e: Exception) {
                 logger.e(e) { "Error starting game" }
             }
-        }
-    }
-
-    private fun calculateInitialTime(pairCount: Int): Long {
-        return when (pairCount) {
-            6 -> 60L  // Toddler
-            8 -> 50L  // Casual
-            10 -> 45L // Master
-            12 -> 40L // Shark
-            14 -> 35L // Grandmaster
-            16 -> 30L // Elephant
-            else -> (pairCount * 4).toLong()
         }
     }
 
@@ -209,9 +201,7 @@ class GameScreenModel(
         clearCommentAfterDelay()
         
         if (newState.mode == GameMode.TIME_ATTACK) {
-            val baseTimeGain = 5
-            val comboBonus = (newState.comboMultiplier - 1) * 2
-            val totalTimeGain = baseTimeGain + comboBonus
+            val totalTimeGain = MemoryGameLogic.calculateTimeGain(newState.comboMultiplier)
             val isMega = newState.comboMultiplier >= 3
 
             _state.update { 
@@ -242,11 +232,36 @@ class GameScreenModel(
         hapticsService.vibrateMismatch()
         audioService.playMismatch()
         
+        if (newState.mode == GameMode.TIME_ATTACK) {
+            val penalty = MemoryGameLogic.TIME_PENALTY_MISMATCH
+            _state.update { 
+                val newTime = (it.elapsedTimeSeconds - penalty).coerceAtLeast(0)
+                it.copy(
+                    elapsedTimeSeconds = newTime,
+                    showTimeLoss = true,
+                    timeLossAmount = penalty
+                )
+            }
+            triggerTimeLossFeedback()
+            
+            if (_state.value.elapsedTimeSeconds == 0L) {
+                handleGameOver()
+            }
+        }
+
         screenModelScope.launch {
             delay(1000)
             audioService.playFlip() // Play flip sound when cards hide after mismatch
             val resetState = resetErrorCardsUseCase(newState)
             _state.update { it.copy(game = resetState) }
+        }
+    }
+
+    private fun triggerTimeLossFeedback() {
+        timeLossJob?.cancel()
+        timeLossJob = screenModelScope.launch {
+            delay(1500)
+            _state.update { it.copy(showTimeLoss = false) }
         }
     }
 
@@ -318,6 +333,7 @@ class GameScreenModel(
         explosionJob?.cancel()
         peekJob?.cancel()
         timeGainJob?.cancel()
+        timeLossJob?.cancel()
         saveGame()
     }
 }
