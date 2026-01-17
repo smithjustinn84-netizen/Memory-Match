@@ -10,6 +10,15 @@ A professional Kotlin Multiplatform (KMP) memory game built with modern developm
 | **iOS**           | Beta   | Compose Multiplatform / UIKit Interop |
 | **Desktop (JVM)** | Stable | Compose for Desktop                   |
 
+## ✨ Features
+
+- **Multiple Game Modes**: Standard and Time Attack modes for varied gameplay.
+- **Difficulty Levels**: Adjustable pair counts to suit all skill levels.
+- **Rich UX**: Smooth animations (Confetti, Bouncing Cards), Audio feedback, and Haptics.
+- **Persistence**: Local high scores and game state saved via Room KMP.
+- **Interactive Tutorial**: Built-in walkthrough for new players.
+- **Adaptive UI**: Responsive layouts for mobile and desktop screens.
+
 ## 🏗 Project Structure
 
 The project follows a modular KMP architecture to maximize code sharing while maintaining platform flexibility.
@@ -72,19 +81,18 @@ graph TD
     desktopApp --> sharedUI
 ```
 
-## 🛠 Tech Stack
+## 🛠 Tech Stack (2026 Standard)
 
-- **UI Framework:** [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/) for shared UI across all platforms.
-- **Dependency Injection:** [Metro](https://github.com/ZacSweers/metro) for compile-time safe DI.
-- **Networking:** [Ktor](https://ktor.io/) for multiplatform asynchronous HTTP requests.
-- **Persistence:** [Room (KMP)](https://developer.android.com/kotlin/multiplatform/room) for local database storage.
-- **Navigation:** [Voyager](https://voyager.adriel.cafe/) for multiplatform navigation and ScreenModel management.
-- **Concurrency:** [Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html) & [Flow](https://kotlinlang.org/docs/flow.html).
-- **Image Loading:** [Coil3](https://coil-kt.github.io/coil/) for multiplatform image loading.
-- **Logging:** [Kermit](https://github.com/touchlab/Kermit) for multiplatform logging.
-- **Serialization:** [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) for JSON parsing.
-
-Dependencies are managed using **Gradle Version Catalogs** (`libs.versions.toml`).
+- **Language:** [Kotlin 2.3.0](https://kotlinlang.org/) (K2 Mode, Context Parameters).
+- **UI Framework:** [Compose Multiplatform 1.10.0](https://www.jetbrains.com/lp/compose-multiplatform/) for shared UI.
+- **Dependency Injection:** [Metro 0.9.4](https://github.com/ZacSweers/metro) for compile-time safe DI.
+- **Networking:** [Ktor 3.3.3](https://ktor.io/) for multiplatform asynchronous HTTP requests.
+- **Persistence:** [Room (KMP) 2.8.4](https://developer.android.com/kotlin/multiplatform/room) for local database storage.
+- **Navigation:** [Voyager 1.1.0](https://voyager.adriel.cafe/) for multiplatform navigation and ScreenModel management.
+- **Concurrency:** [Kotlin Coroutines 1.10.2](https://kotlinlang.org/docs/coroutines-overview.html) & [Flow](https://kotlinlang.org/docs/flow.html).
+- **Image Loading:** [Coil3 3.3.0](https://coil-kt.github.io/coil/) for multiplatform image loading.
+- **Logging:** [Kermit 2.0.8](https://github.com/touchlab/Kermit) for multiplatform logging.
+- **Testing:** [Turbine 1.2.1](https://github.com/cashapp/turbine) and [Mokkery 3.1.1](https://github.com/lupu11/Mokkery).
 
 ## ⚙️ Setup & Installation
 
@@ -129,6 +137,6 @@ Run the desktop application using:
 1. **Architecture:** Strictly follow Clean Architecture and SOLID principles.
 2. **UI:** All UI should be built using Compose Multiplatform in `sharedUI/commonMain`.
 3. **State Management:** Use Unidirectional Data Flow (UDF) with Voyager ScreenModels.
-4. **Testing:** Ensure logic coverage in `commonTest` using Turbine and Mockk.
+4. **Testing:** Ensure logic coverage in `commonTest` using Turbine and Mokkery.
 
 Please read `AGENTS.md` for detailed architectural rules and coding standards.
