@@ -49,7 +49,9 @@ object MemoryGameLogic {
         val newState = state.copy(
             cards = state.cards.map { card ->
                 if (card.id == cardId) card.copy(isFaceUp = true) else card
-            }
+            },
+            // Clear last matched IDs when starting a new turn
+            lastMatchedIds = if (faceUpCards.isEmpty()) emptyList() else state.lastMatchedIds
         )
 
         val activeCards = newState.cards.filter { it.isFaceUp && !it.isMatched }
@@ -100,7 +102,8 @@ object MemoryGameLogic {
             moves = moves,
             score = state.score + pointsEarned,
             comboMultiplier = state.comboMultiplier + 1,
-            matchComment = comment
+            matchComment = comment,
+            lastMatchedIds = listOf(first.id, second.id)
         )
 
         return newState to if (isWon) GameDomainEvent.GameWon else GameDomainEvent.MatchSuccess
@@ -116,7 +119,8 @@ object MemoryGameLogic {
                 } else {
                     card
                 }
-            }
+            },
+            lastMatchedIds = emptyList()
         )
         return newState to GameDomainEvent.MatchFailure
     }

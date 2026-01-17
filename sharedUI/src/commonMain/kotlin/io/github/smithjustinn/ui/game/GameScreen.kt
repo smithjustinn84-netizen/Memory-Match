@@ -91,7 +91,9 @@ data class GameScreen(
                     GameGrid(
                         cards = state.game.cards,
                         onCardClick = { cardId -> screenModel.handleIntent(GameIntent.FlipCard(cardId)) },
-                        isPeeking = state.isPeeking
+                        isPeeking = state.isPeeking,
+                        lastMatchedIds = state.game.lastMatchedIds,
+                        showComboExplosion = state.showComboExplosion
                     )
 
                     MatchCommentSnackbar(
@@ -100,13 +102,6 @@ data class GameScreen(
                             .align(Alignment.BottomCenter)
                             .padding(bottom = 24.dp, start = 16.dp, end = 16.dp)
                     )
-
-                    if (state.showComboExplosion) {
-                        ExplosionEffect(
-                            modifier = Modifier.fillMaxSize(),
-                            particleCount = 50
-                        )
-                    }
 
                     if (state.game.isGameOver) {
                         if (state.game.isGameWon) {

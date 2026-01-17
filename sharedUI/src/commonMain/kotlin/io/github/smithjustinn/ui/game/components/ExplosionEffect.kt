@@ -27,7 +27,8 @@ private data class ExplosionParticle(
 fun ExplosionEffect(
     modifier: Modifier = Modifier,
     particleCount: Int = 30,
-    colors: List<Color> = listOf(Color.Yellow, Color.Red, Color.Cyan, Color.Magenta, Color.White)
+    colors: List<Color> = listOf(Color.Yellow, Color.Red, Color.Cyan, Color.Magenta, Color.White),
+    centerOverride: Offset? = null
 ) {
     val infiniteTransition = rememberInfiniteTransition()
     val progress by infiniteTransition.animateFloat(
@@ -57,7 +58,7 @@ fun ExplosionEffect(
     }
 
     Canvas(modifier = modifier.fillMaxSize()) {
-        val center = Offset(size.width / 2, size.height / 2)
+        val center = centerOverride ?: Offset(size.width / 2, size.height / 2)
         
         particles.forEach { particle ->
             val currentX = center.x + particle.vx * progress * 50f
