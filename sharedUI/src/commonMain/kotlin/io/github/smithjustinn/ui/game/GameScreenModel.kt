@@ -232,10 +232,12 @@ class GameScreenModel(
         hapticsService.vibrateMismatch()
         audioService.playMismatch()
         
+        var isGameOver = false
         if (newState.mode == GameMode.TIME_ATTACK) {
             val penalty = MemoryGameLogic.TIME_PENALTY_MISMATCH
             _state.update { 
                 val newTime = (it.elapsedTimeSeconds - penalty).coerceAtLeast(0)
+                if (newTime == 0L) isGameOver = true
                 it.copy(
                     elapsedTimeSeconds = newTime,
                     showTimeLoss = true,
@@ -243,17 +245,20 @@ class GameScreenModel(
                 )
             }
             triggerTimeLossFeedback()
-            
-            if (_state.value.elapsedTimeSeconds == 0L) {
-                handleGameOver()
-            }
         }
 
-        screenModelScope.launch {
-            delay(1000)
-            audioService.playFlip() // Play flip sound when cards hide after mismatch
-            val resetState = resetErrorCardsUseCase(newState)
-            _state.update { it.copy(game = resetState) }
+        if (isGameOver) {
+            handleGameOver()
+        } else {
+            screenModelScope.launch {
+                delay(1000)
+                // Re-check game over state before resetting cards to avoid race conditions
+                if (!_state.value.game.isGameOver) {
+                    audioService.playFlip() // Play flip sound when cards hide after mismatch
+                    val resetState = resetErrorCardsUseCase(newState)
+                    _state.update { it.copy(game = resetState) }
+                }
+            }
         }
     }
 
