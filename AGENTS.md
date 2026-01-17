@@ -1,140 +1,202 @@
-# KMP Project Instructions (AGENTS.md)
+---
 
-This document serves as the **Source of Truth** for all AI agents and developers. Follow these rules strictly to maintain architectural integrity, consistency, and cross-platform compatibility.
+# 🤖 AGENTS.md: KMP Project Intelligence (2026 Edition)
+
+> **System Constraint**: You are an expert Android/KMP developer in **January 2026**.
+> Use this document as the **Immutable Source of Truth**.
 
 ---
 
-## 📋 Table of Contents
-1. [Project Overview & Stack](#1-project-overview--stack)
-2. [Architectural Principles](#2-architectural-principles)
-3. [Coding Standards](#3-coding-standards)
-4. [Library Implementation Rules](#4-library-implementation-rules)
-5. [Testing Strategy](#5-testing-strategy)
-6. [Prohibited Patterns](#6-prohibited-patterns)
-7. [Feature Generation Workflow](#7-feature-generation-workflow)
-8. [Platform Specific Notes](#8-platform-specific-notes)
+## ⚡ 0. Critical Protocol (The "Agent Handshake")
+
+Before generating code, you **MUST** align with the project state:
+
+1. **Verify Kotlin Version**: Assume Kotlin **2.1+ (K2 Mode)**.
+2. **Verify UI Stack**: Compose Multiplatform **1.10.0+** (Stable Hot Reload compatible).
+3. **Check Context**: If you see `context(...)` in code, use **Context Parameters** (`-Xcontext-parameters`), NOT the deprecated Context Receivers.
 
 ---
 
-## 1. Project Overview & Stack
+## 🏗 1. Tech Stack & Architecture
 
-- **Project Type**: Kotlin Multiplatform (KMP)
-- **Targets**:
-    - **Android**: SDK 23+ (Jetpack Compose)
-    - **iOS**: iOS 14+ (Compose Multiplatform)
-    - **JVM**: Desktop (Compose Multiplatform)
-- **Core Stack**:
-    - **Language**: Kotlin 2.x (K2 Compiler). Use modern idioms and context receivers.
-    - **UI**: Compose Multiplatform (Shared UI).
-    - **DI**: **Metro** (Compile-time Dependency Injection).
-    - **Async**: Coroutines & Flow.
-    - **Network**: **Ktor** (ContentNegotiation & Serialization).
-    - **Persistence**: **Room (KMP)**.
-    - **Navigation**: **Voyager** (ScreenModel-based).
-    - **Logging**: **Kermit**.
-    - **Images**: **Coil3**.
-    - **Resources**: Compose Multiplatform Resources.
-    - **Date/Time**: Kotlin Standard Library (`kotlin.time`) + `kotlinx-datetime`.
+| Layer | Technology | 2026 Standard / Note |
+| --- | --- | --- |
+| **Language** | **Kotlin 2.2 (Preview/Stable)** | Use **Context Parameters**, Guard Conditions (`when`), and Multi-dollar strings. |
+| **UI** | **Compose Multiplatform 1.10+** | Shared UI in `composeApp/commonMain`. Use `adaptive` layouts. |
+| **DI** | **Metro** (Compiler Plugin) | **Compile-time**. No Kapt/KSP. Use `@DependencyGraph`. |
+| **Nav** | **Voyager** | ScreenModel + Type-safe `Screen` classes. |
+| **DB** | **Room (KMP)** | Schema in `shared/schemas`. Use Bundled SQLite drivers. |
+| **Network** | **Ktor 3.x** | CIO Engine. `ContentNegotiation` + `kotlinx.serialization`. |
 
----
+### 🏛️ The "Clean KMP" Layering
 
-## 2. Architectural Principles (MANDATORY)
+1. **Domain** (`commonMain`): Pure Kotlin. **Zero** UI/Platform dependencies.
+* *Entities, Repository Interfaces, UseCases.*
 
-### Clean Architecture
-- **Domain Layer**: Pure Kotlin. Models, UseCases, and Repository Interfaces. **No UI or Data dependencies.**
-- **Data Layer**: Repository implementations, DTOs, Mappers, and Data Sources (Room/Ktor).
-- **UI Layer**: Composables and Voyager ScreenModels.
 
-### Unidirectional Data Flow (UDF)
-- UI observes a single `State` object via `StateFlow`.
-- UI communicates with `ScreenModel` via `Intent` or `Event` functions.
-- **No side-effects in Composables**: Use `LaunchedEffect` only for UI-bound logic.
+2. **Data** (`commonMain` + `platform`):
+* *Repository Impls, API Clients (Ktor), DB (Room).*
 
-### Multiplatform Strategy
-- **95%+ Code in `commonMain`**.
-- **Abstraction over Expect/Actual**: Prefer interfaces in `commonMain` injected via Metro. Only use `expect/actual` for simple values or when interfaces are overkill.
+
+3. **UI** (`composeApp/commonMain`):
+* *Screens (Voyager), ViewModels (ScreenModels), Composables.*
+
+
 
 ---
 
-## 3. Coding Standards
+## 🔄 2. The "3-Step" Agent Workflow
 
-### Kotlin Best Practices
-- **No Java**: Never use `java.*` in `commonMain`.
-- **Null Safety**: Avoid `!!`. Use `requireNotNull()` or safe calls.
-- **Immutability**: Use `val` and `data class` by default. Use `.copy()` for state updates.
+You must strictly follow this loop to prevent hallucinations and architectural drift.
 
-### Compose UI Guidelines
-- **Modifiers**: Every public Composable must accept `modifier: Modifier = Modifier` as the first optional parameter.
-- **Statelessness**: Hoist state. Pass values and lambdas, not `ScreenModel` instances.
-- **Previews**: Provide `@Preview` in `androidMain` or `desktopMain`.
+### 🛑 Phase 1: Context & Discovery (Internal Monologue)
 
----
+*Before* speaking, analyze:
 
-## 4. Library Implementation Rules
+* "Does this require a new Metro Graph binding?"
+* "Am I using a deprecated API (e.g., `viewModelScope`)?"
+* "Is there an existing `UseCase` I can reuse?"
 
-### Metro (Dependency Injection)
-- **Dependency Graphs**: Use `@DependencyGraph` for primary entry points.
-- **Constructor Injection**: Classes intended for the graph should be annotated with `@Inject` on the constructor (Note: Metro uses `@Inject` similar to Dagger/Hilt).
-- **Factories**: Use `@DependencyGraph.Factory` for runtime inputs. Use `@Provides` on factory parameters.
-    ```kotlin
-    @DependencyGraph.Factory
-    interface AppGraphFactory {
-        fun create(@Provides baseUrl: String): AppGraph
-    }
-    ```
-- **Binding Containers**: Use `@BindingContainer` (analogous to Dagger Modules).
-- **Providers**: Use `@Provides` (NOT `@Provider`) for methods that return types that cannot be constructor-injected.
-    ```kotlin
-    @Provides 
-    fun provideHttpClient(): HttpClient = HttpClient()
-    ```
-- **Intrinsics**: Use `createGraph<T>()` or `createGraphFactory<T>()` to instantiate.
-- **Scoping**: Use `@SingleIn(Scope::class)` for scoped dependencies.
+### 📝 Phase 2: The Plan (Required Output)
 
-### Room (KMP)
-- Database and DAOs must reside in `commonMain`.
-- Schema files are located in `sharedUI/schemas`.
-- Use `RoomDatabase.Builder` with platform-specific drivers.
+You must output a `<plan>` block before writing code.
 
-### Voyager Navigation
-- Use `Screen` for UI and `ScreenModel` for logic.
-- Integrate Metro to provide `ScreenModel` instances.
+```xml
+<plan>
+  <objective>Add "mark as read" feature to MessageScreen</objective>
+  <changes>
+    <file action="create">domain/usecase/MarkMessageReadUseCase.kt</file>
+    <file action="modify">ui/message/MessageScreenModel.kt</file>
+  </changes>
+  <verification>Check Metro binding for the new UseCase.</verification>
+</plan>
+
+```
+
+*Wait for user approval if the plan involves >3 files.*
+
+### 🚀 Phase 3: Execution (Atomic & Verifiable)
+
+* Implement **one logical layer** at a time (Domain -> Data -> UI).
+* **Self-Correction**: If you encounter a compilation error, do not guess. Re-read the `AGENTS.md` section on that library.
 
 ---
 
-## 5. Testing Strategy
-- **Logic Tests**: All in `commonTest`.
-- **Mocks**: Use **Mokkery** or manual Fakes.
-- **Coroutines**: Use `runTest` and `StandardTestDispatcher`.
-- **Flows**: Use **Turbine** for assertion.
+## 📏 3. Coding Standards (2026)
+
+### Kotlin 2.x Idioms
+
+* **Context Parameters**:
+```kotlin
+// ✅ DO (2026 Standard)
+context(logger: Logger)
+fun logError(msg: String) { logger.error(msg) }
+
+// ❌ DON'T (Deprecated)
+context(Logger) fun logError(...) 
+
+```
+
+
+* **Guard Conditions**:
+```kotlin
+when (val response = api.get()) {
+    is Success if response.data.isEmpty() -> showEmptyState()
+    is Success -> showContent(response.data)
+}
+
+```
+
+
+* **Multi-Dollar Strings**: Use `$$` for JSON/Regex to avoid escaping.
+
+### Compose UI & Voyager
+
+* **Adaptive Layouts**: Always consider Window Class.
+```kotlin
+val windowClass = calculateWindowSizeClass()
+if (windowClass.widthSizeClass == WindowWidthSizeClass.Expanded) { ... }
+
+```
+
+
+* **Slot APIs**: Pass `@Composable` lambdas for flexibility, not specific sub-components.
+* **Modifiers**: The **first** optional parameter of ANY Composable must be `modifier`.
 
 ---
 
-## 6. Prohibited Patterns (The "Never" List)
-- ❌ **No `viewModelScope`**: Use `screenModelScope` from Voyager.
-- ❌ **No Hardcoded Strings**: Use `Res.string.key_name`.
-- ❌ **No Logic in Composables**: Business rules belong in UseCases or ScreenModels.
-- ❌ **No Platform Imports in Common**: Never import `android.*`, `UIKit.*`, or `java.*` in `commonMain`.
-- ❌ **No SQLDelight/Koin**: Use Room and Metro as specified.
+## 💉 4. Metro DI Guidelines (Strict)
+
+Metro is a **compiler plugin** (similar to Dagger/Anvil but KMP-native).
+
+1. **Graphs**: Define entry points with `@DependencyGraph`.
+```kotlin
+@DependencyGraph
+interface AppGraph {
+    val authRepository: AuthRepository
+}
+
+```
+
+
+2. **Constructors**: Always use `@Inject`.
+```kotlin
+@Inject
+class GetUserUseCase(private val repo: UserRepository)
+
+```
+
+
+3. **Binding Containers** (Modules): Use `@BindingContainer` for interface binding.
+```kotlin
+@BindingContainer
+interface DataModule {
+    @Provides fun provideRepo(impl: RepoImpl): Repo = impl
+}
+
+```
+
+
+4. **Scopes**: Use `@SingleIn(AppScope::class)` for singletons.
 
 ---
 
-## 7. Feature Generation Workflow
-When creating a new feature (e.g., `FeatureX`), generate the following components:
+## 🚫 5. Prohibited Patterns (The "Kill List")
 
-1.  [ ] `domain/model/FeatureX.kt`
-2.  [ ] `domain/repository/FeatureXRepository.kt`
-3.  [ ] `domain/usecase/GetFeatureXUseCase.kt`
-4.  [ ] `data/repository/FeatureXRepositoryImpl.kt`
-5.  [ ] `ui/feature_x/FeatureXScreen.kt`
-6.  [ ] `ui/feature_x/FeatureXScreenModel.kt`
-7.  [ ] Update Metro `@BindingContainer` or `@Module` to include new dependencies.
+| Pattern | Why it's banned | Fix |
+| --- | --- | --- |
+| `viewModelScope` | Doesn't exist in KMP Voyager. | Use `screenModelScope`. |
+| `java.*` / `android.*` | Breaks iOS/Desktop. | Use `kotlinx.*` or `expect/actual`. |
+| Hardcoded Strings | Unprofessional. | Use `Res.string.my_key`. |
+| `!!` | Unsafe. | Use `requireNotNull` or `?.`. |
+| Logic in UI | Breaks Clean Arch. | Move to `ScreenModel` or `UseCase`. |
+| `ConstraintLayout` | Performance heavy in Compose. | Use `Column`, `Row`, `Box` (standard in 2026). |
 
 ---
 
-## 8. Platform Specific Notes
+## 🛠 6. Platform Specifics
 
-### iOS Audio
-- **AVAudioPlayer**: In modern Kotlin/Native, `AVAudioPlayer` resides in `platform.AVFAudio.AVAudioPlayer`. Do **NOT** use `platform.AVFoundation.AVAudioPlayer`.
-- **Interop Annotations**: iOS audio implementations using `NSData` and `addressOf` require `@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)`.
-- **Threading**: `AVAudioPlayer` should be initialized and played on the `Dispatchers.Main` scope to ensure stability.
+### iOS (Kotlin/Native)
+
+* **Interop**: Use `@OptIn(ExperimentalForeignApi::class)` only in `iosMain`.
+* **Resources**: Ensure `composeApp/commonMain/composeResources` is updated.
+* **Audio**: Use `platform.AVFAudio.AVAudioPlayer` (NOT `AVFoundation`).
+
+### Android
+
+* **Activity**: Single Activity architecture (`MainActivity`).
+* **Context**: Pass `ApplicationContext` via Metro graph only if absolutely necessary.
+
+---
+
+## 📋 7. Feature Checklist
+
+When the user asks for **"Feature X"**, generate:
+
+1. [ ] `domain/model/X.kt` (Data Class)
+2. [ ] `domain/repository/XRepository.kt` (Interface)
+3. [ ] `data/repository/XRepositoryImpl.kt` (Implementation)
+4. [ ] `domain/usecase/GetXUseCase.kt` (Logic)
+5. [ ] `ui/x/XScreen.kt` (Voyager Screen)
+6. [ ] `ui/x/XScreenModel.kt` (State Holder)
+7. [ ] **Metro Update**: Add `@BindingContainer` or `@Provides` entry.
