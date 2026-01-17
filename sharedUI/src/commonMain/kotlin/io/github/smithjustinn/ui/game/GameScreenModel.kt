@@ -79,6 +79,14 @@ class GameScreenModel(
         screenModelScope.launch {
             settingsRepository.setWalkthroughCompleted(true)
             _state.update { it.copy(showWalkthrough = false) }
+            
+            // Start peek or timer after walkthrough is dismissed
+            val isPeekEnabled = settingsRepository.isPeekEnabled.first()
+            if (isPeekEnabled) {
+                peekCards(_state.value.game.mode)
+            } else {
+                startTimer(_state.value.game.mode)
+            }
         }
     }
 
@@ -125,12 +133,15 @@ class GameScreenModel(
                     
                     _events.send(GameUiEvent.PlayDeal)
 
-                    // Wait for the settings to be loaded if they haven't been yet
-                    val isPeekEnabled = settingsRepository.isPeekEnabled.first()
-                    if (isPeekEnabled) {
-                        peekCards(mode)
-                    } else {
-                        startTimer(mode)
+                    // Only start peek/timer if walkthrough is NOT showing
+                    val walkthroughCompleted = settingsRepository.isWalkthroughCompleted.first()
+                    if (walkthroughCompleted) {
+                        val isPeekEnabled = settingsRepository.isPeekEnabled.first()
+                        if (isPeekEnabled) {
+                            peekCards(mode)
+                        } else {
+                            startTimer(mode)
+                        }
                     }
                 }
 
