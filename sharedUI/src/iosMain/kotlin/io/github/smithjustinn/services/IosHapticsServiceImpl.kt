@@ -1,6 +1,8 @@
 package io.github.smithjustinn.services
 
 import dev.zacsweers.metro.Inject
+import platform.UIKit.UINotificationFeedbackGenerator
+import platform.UIKit.UINotificationFeedbackType
 import platform.UIKit.UIImpactFeedbackGenerator
 import platform.UIKit.UIImpactFeedbackStyle
 
@@ -16,5 +18,17 @@ class IosHapticsServiceImpl : HapticsService {
         val generator = UIImpactFeedbackGenerator(UIImpactFeedbackStyle.UIImpactFeedbackStyleHeavy)
         generator.prepare()
         generator.impactOccurred()
+    }
+
+    override fun vibrateTick() {
+        val generator = UIImpactFeedbackGenerator(UIImpactFeedbackStyle.UIImpactFeedbackStyleLight)
+        generator.prepare()
+        generator.impactOccurred()
+    }
+
+    override fun vibrateWarning() {
+        val generator = UINotificationFeedbackGenerator()
+        generator.prepare()
+        generator.notificationOccurred(UINotificationFeedbackType.UINotificationFeedbackTypeWarning)
     }
 }

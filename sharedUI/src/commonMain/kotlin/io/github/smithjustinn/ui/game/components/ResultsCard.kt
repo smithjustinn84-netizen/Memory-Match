@@ -35,7 +35,8 @@ fun ResultsCard(
     scoreBreakdown: ScoreBreakdown,
     onPlayAgain: () -> Unit,
     modifier: Modifier = Modifier,
-    mode: GameMode = GameMode.STANDARD
+    mode: GameMode = GameMode.STANDARD,
+    onScoreTick: () -> Unit = {}
 ) {
     val isTimeAttack = mode == GameMode.TIME_ATTACK
     val titleRes = when {
@@ -45,11 +46,23 @@ fun ResultsCard(
     }
 
     val animatedScore = remember { Animatable(0f) }
+    var lastRoundedScore by remember { mutableStateOf(0) }
+    
+    val scoreTickHandler by rememberUpdatedState(onScoreTick)
+
     LaunchedEffect(score) {
         animatedScore.animateTo(
             targetValue = score.toFloat(),
             animationSpec = tween(durationMillis = 1500, easing = FastOutSlowInEasing)
-        )
+        ) {
+            val currentRounded = value.roundToInt()
+            // Throttle haptics: every 10 points if score is high, or every point if score is low
+            val step = if (score > 100) 10 else 1
+            if (currentRounded != lastRoundedScore && (currentRounded % step == 0 || currentRounded == score)) {
+                scoreTickHandler()
+                lastRoundedScore = currentRounded
+            }
+        }
     }
 
     val scale = remember { Animatable(0.8f) }

@@ -52,4 +52,6 @@ sealed class GameUiEvent {
     data object PlayDeal : GameUiEvent()
     data object VibrateMatch : GameUiEvent()
     data object VibrateMismatch : GameUiEvent()
+    data object VibrateTick : GameUiEvent()
+    data object VibrateWarning : GameUiEvent()
 }

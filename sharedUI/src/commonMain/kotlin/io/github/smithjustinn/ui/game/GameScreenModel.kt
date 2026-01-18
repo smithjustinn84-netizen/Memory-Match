@@ -161,6 +161,7 @@ class GameScreenModel(
             
             for (i in peekDuration downTo 1) {
                 _state.update { it.copy(peekCountdown = i) }
+                _events.send(GameUiEvent.VibrateTick)
                 delay(1000)
             }
             
@@ -194,9 +195,16 @@ class GameScreenModel(
                         if (newTime == 0L && !it.game.isGameOver) {
                             shouldStop = true
                         }
+                        
+                        // Add ticks for the last 5 seconds
+                        if (newTime in 1L..5L && !it.game.isGameOver) {
+                            _events.trySend(GameUiEvent.VibrateTick)
+                        }
+
                         it.copy(elapsedTimeSeconds = newTime)
                     }
                     if (shouldStop) {
+                        _events.send(GameUiEvent.VibrateWarning)
                         handleGameOver()
                         break
                     }
@@ -295,6 +303,7 @@ class GameScreenModel(
         }
 
         if (isGameOver) {
+            _events.trySend(GameUiEvent.VibrateWarning)
             handleGameOver()
         } else {
             screenModelScope.launch {

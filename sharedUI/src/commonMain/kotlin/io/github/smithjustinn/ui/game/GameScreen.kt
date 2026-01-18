@@ -64,6 +64,8 @@ data class GameScreen(
                     GameUiEvent.PlayDeal -> audioService.playDeal()
                     GameUiEvent.VibrateMatch -> hapticsService.vibrateMatch()
                     GameUiEvent.VibrateMismatch -> hapticsService.vibrateMismatch()
+                    GameUiEvent.VibrateTick -> hapticsService.vibrateTick()
+                    GameUiEvent.VibrateWarning -> hapticsService.vibrateWarning()
                 }
             }
         }
@@ -171,6 +173,7 @@ data class GameScreen(
                                     audioService.playClick()
                                     screenModel.handleIntent(GameIntent.StartGame(pairCount, forceNewGame = true, mode = mode))
                                 },
+                                onScoreTick = { hapticsService.vibrateTick() },
                                 modifier = Modifier
                                     .align(Alignment.Center)
                                     .widthIn(max = 550.dp)

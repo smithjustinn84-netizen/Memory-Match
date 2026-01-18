@@ -11,4 +11,12 @@ class JvmHapticsServiceImpl : HapticsService {
     override fun vibrateMismatch() {
         // No-op for Desktop
     }
+
+    override fun vibrateTick() {
+        // No-op for Desktop
+    }
+
+    override fun vibrateWarning() {
+        // No-op for Desktop
+    }
 }
