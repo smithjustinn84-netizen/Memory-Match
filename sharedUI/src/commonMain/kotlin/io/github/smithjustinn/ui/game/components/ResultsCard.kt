@@ -196,11 +196,19 @@ private fun ScoreBox(
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = stringResource(Res.string.final_score_label).uppercase(),
-                style = if (compact) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelMedium.copy(
-                    letterSpacing = 1.2.sp,
-                    fontWeight = FontWeight.Bold
-                ),
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+                style = if (compact) {
+                    MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.2.sp
+                    )
+                } else {
+                    MaterialTheme.typography.labelLarge.copy(
+                        fontWeight = FontWeight.ExtraBold,
+                        letterSpacing = 2.sp
+                    )
+                },
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
             )
             
             Text(
