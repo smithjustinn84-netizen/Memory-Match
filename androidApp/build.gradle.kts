@@ -31,4 +31,6 @@ kotlin {
 dependencies {
     implementation(project(":sharedUI"))
     implementation(libs.androidx.activityCompose)
+    implementation(libs.androidx.core.splashscreen)
+    implementation(libs.google.material)
 }

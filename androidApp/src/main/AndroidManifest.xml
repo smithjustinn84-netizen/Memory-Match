@@ -7,7 +7,7 @@
         android:name=".MemoryMatchApp"
         android:icon="@mipmap/ic_launcher"
         android:label="Memory Match"
-        android:theme="@android:style/Theme.Material.NoActionBar">
+        android:theme="@style/Theme.App.SplashScreen">
         <activity
             android:name=".AppActivity"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
