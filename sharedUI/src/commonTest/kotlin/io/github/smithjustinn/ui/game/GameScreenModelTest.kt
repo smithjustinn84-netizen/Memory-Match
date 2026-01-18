@@ -121,10 +121,8 @@ class GameScreenModelTest {
         screenModel.handleIntent(GameIntent.StartGame(pairCount))
         
         screenModel.state.test {
-            // StateFlow emits current value first, then updates.
-            // We wait for the state that has the stats.
             var state = awaitItem()
-            if (state.bestScore == 0) {
+            while (state.bestScore == 0) {
                 state = awaitItem()
             }
             assertEquals(500, state.bestScore)
@@ -144,6 +142,19 @@ class GameScreenModelTest {
 
         assertEquals(0, screenModel.state.value.game.moves)
         assertEquals(0, screenModel.state.value.elapsedTimeSeconds)
+        screenModel.onDispose()
+    }
+
+    @Test
+    fun `StartGame should resume existing game if found and matching`() = runTest {
+        val pairCount = 4
+        val savedState = MemoryGameLogic.createInitialState(pairCount).copy(moves = 5)
+        everySuspend { gameStateRepository.getSavedGameState() } returns (savedState to 45L)
+
+        screenModel.handleIntent(GameIntent.StartGame(pairCount))
+
+        assertEquals(5, screenModel.state.value.game.moves)
+        assertEquals(45, screenModel.state.value.elapsedTimeSeconds)
         screenModel.onDispose()
     }
 
@@ -187,6 +198,20 @@ class GameScreenModelTest {
     }
 
     @Test
+    fun `CompleteWalkthrough should start peek if enabled`() = runTest {
+        screenModel.onDispose()
+        isWalkthroughCompletedFlow.value = false
+        isPeekEnabledFlow.value = true
+        screenModel = createScreenModel()
+
+        screenModel.handleIntent(GameIntent.CompleteWalkthrough)
+        
+        assertTrue(screenModel.state.value.isPeeking)
+        assertEquals(3, screenModel.state.value.peekCountdown)
+        screenModel.onDispose()
+    }
+
+    @Test
     fun `FlipCard should be ignored when walkthrough is showing`() = runTest {
         screenModel.onDispose()
         isWalkthroughCompletedFlow.value = false
@@ -210,7 +235,6 @@ class GameScreenModelTest {
         isPeekEnabledFlow.value = true
         
         screenModel.handleIntent(GameIntent.StartGame(pairCount))
-        // We are now in peeking state
         assertTrue(screenModel.state.value.isPeeking)
 
         val cardId = screenModel.state.value.game.cards[0].id
@@ -232,18 +256,76 @@ class GameScreenModelTest {
         everySuspend { gameStateRepository.getSavedGameState() } returns (initialState to 0L)
         screenModel.handleIntent(GameIntent.StartGame(pairCount))
 
-        // First match (combo 1 -> 2)
         screenModel.handleIntent(GameIntent.FlipCard(card1.id))
         screenModel.handleIntent(GameIntent.FlipCard(card2.id))
-        
-        // Second match (combo 2 -> 3)
         screenModel.handleIntent(GameIntent.FlipCard(card3.id))
         screenModel.handleIntent(GameIntent.FlipCard(card4.id))
 
         assertTrue(screenModel.state.value.showComboExplosion)
         
-        testScheduler.advanceTimeBy(1001)
+        testDispatcher.scheduler.advanceTimeBy(1001)
         assertFalse(screenModel.state.value.showComboExplosion)
+        screenModel.onDispose()
+    }
+
+    @Test
+    fun `Resuming a game with error cards should trigger reset`() = runTest {
+        val pairCount = 4
+        var savedState = MemoryGameLogic.createInitialState(pairCount)
+        val card1 = savedState.cards[0].copy(isFaceUp = true, isError = true)
+        val card2 = savedState.cards[1].copy(isFaceUp = true, isError = true)
+        savedState = savedState.copy(cards = savedState.cards.map { 
+            when (it.id) {
+                card1.id -> card1
+                card2.id -> card2
+                else -> it
+            }
+        })
+        
+        everySuspend { gameStateRepository.getSavedGameState() } returns (savedState to 10L)
+
+        screenModel.handleIntent(GameIntent.StartGame(pairCount))
+
+        assertTrue(screenModel.state.value.game.cards.first { it.id == card1.id }.isFaceUp)
+        
+        testDispatcher.scheduler.advanceTimeBy(501)
+        assertFalse(screenModel.state.value.game.cards.first { it.id == card1.id }.isFaceUp)
+        screenModel.onDispose()
+    }
+
+    @Test
+    fun `FlipCard should send PlayFlip event`() = runTest {
+        screenModel.handleIntent(GameIntent.StartGame(4))
+        val cardId = screenModel.state.value.game.cards[0].id
+        
+        screenModel.events.test {
+            assertEquals(GameUiEvent.PlayDeal, awaitItem())
+            screenModel.handleIntent(GameIntent.FlipCard(cardId))
+            assertEquals(GameUiEvent.PlayFlip, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+        screenModel.onDispose()
+    }
+
+    // endregion
+
+    // region Peeking Logic
+
+    @Test
+    fun `Peek should countdown and then start timer`() = runTest {
+        screenModel.onDispose()
+        isWalkthroughCompletedFlow.value = true
+        isPeekEnabledFlow.value = true
+        screenModel = createScreenModel()
+
+        screenModel.handleIntent(GameIntent.StartGame(4))
+        assertTrue(screenModel.state.value.isPeeking)
+        
+        testDispatcher.scheduler.advanceTimeBy(3001)
+        assertFalse(screenModel.state.value.isPeeking)
+        
+        testDispatcher.scheduler.advanceTimeBy(1001)
+        assertEquals(1, screenModel.state.value.elapsedTimeSeconds)
         screenModel.onDispose()
     }
 
@@ -270,7 +352,7 @@ class GameScreenModelTest {
         assertEquals(30L + expectedBonus, screenModel.state.value.elapsedTimeSeconds)
         assertTrue(screenModel.state.value.showTimeGain)
         
-        testScheduler.advanceTimeBy(1501)
+        testDispatcher.scheduler.advanceTimeBy(1501)
         assertFalse(screenModel.state.value.showTimeGain)
         screenModel.onDispose()
     }
@@ -293,8 +375,58 @@ class GameScreenModelTest {
         assertEquals(30L - penalty, screenModel.state.value.elapsedTimeSeconds)
         assertTrue(screenModel.state.value.showTimeLoss)
         
-        testScheduler.advanceTimeBy(1501)
+        testDispatcher.scheduler.advanceTimeBy(1501)
         assertFalse(screenModel.state.value.showTimeLoss)
+        screenModel.onDispose()
+    }
+
+    @Test
+    fun `Time Attack reaching 0 should trigger game over`() = runTest {
+        val pairCount = 4
+        val mode = GameMode.TIME_ATTACK
+        screenModel.handleIntent(GameIntent.StartGame(pairCount, mode = mode))
+        
+        testDispatcher.scheduler.advanceTimeBy(16001)
+        
+        assertTrue(screenModel.state.value.game.isGameOver)
+        verifySuspend { gameStateRepository.clearSavedGameState() }
+        screenModel.onDispose()
+    }
+
+    // endregion
+
+    // region Game Completion
+
+    @Test
+    fun `Game won should calculate final score and check for high score`() = runTest {
+        val pairCount = 2
+        val initialState = MemoryGameLogic.createInitialState(pairCount)
+        val card1 = initialState.cards[0]
+        val card2 = initialState.cards.first { it.id != card1.id && it.suit == card1.suit && it.rank == card1.rank }
+        val card3 = initialState.cards.first { it.id != card1.id && it.id != card2.id }
+        val card4 = initialState.cards.first { it.id != card3.id && it.suit == card3.suit && it.rank == card3.rank }
+
+        statsFlow.value = GameStats(pairCount, bestScore = 50, bestTimeSeconds = 0L)
+        everySuspend { gameStatsRepository.updateStats(any()) } returns Unit
+        everySuspend { leaderboardRepository.addEntry(any()) } returns Unit
+
+        screenModel.handleIntent(GameIntent.StartGame(pairCount))
+
+        screenModel.handleIntent(GameIntent.FlipCard(card1.id))
+        screenModel.handleIntent(GameIntent.FlipCard(card2.id))
+        screenModel.handleIntent(GameIntent.FlipCard(card3.id))
+        screenModel.handleIntent(GameIntent.FlipCard(card4.id))
+
+        // Wait for coroutines and delays (like clearCommentAfterDelay)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val state = screenModel.state.value
+        assertTrue(state.game.isGameOver, "Game should be over. Score: ${state.game.score}")
+        assertTrue(state.isNewHighScore, "Should be a new high score")
+        assertTrue(state.game.score > 50, "Score ${state.game.score} should be > 50")
+        
+        verifySuspend { leaderboardRepository.addEntry(any()) }
+        verifySuspend { gameStateRepository.clearSavedGameState() }
         screenModel.onDispose()
     }
 
