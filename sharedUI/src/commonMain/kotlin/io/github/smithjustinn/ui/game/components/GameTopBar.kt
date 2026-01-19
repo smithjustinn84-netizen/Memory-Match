@@ -30,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -147,7 +148,7 @@ private fun BackButton(
             Icon(
                 AppIcons.ArrowBack,
                 contentDescription = stringResource(Res.string.back_content_description),
-                tint = Color.White,
+                tint = NeonCyan,
                 modifier = Modifier.size(if (compact) 20.dp else 24.dp)
             )
         }
@@ -171,7 +172,7 @@ private fun RestartButton(
             Icon(
                 AppIcons.Restart,
                 contentDescription = stringResource(Res.string.restart_content_description),
-                tint = Color.White,
+                tint = NeonCyan,
                 modifier = Modifier.size(if (compact) 20.dp else 24.dp)
             )
         }
@@ -198,7 +199,7 @@ private fun MuteButton(
                 contentDescription = stringResource(
                     if (isAudioEnabled) Res.string.mute_content_description else Res.string.unmute_content_description
                 ),
-                tint = if (isAudioEnabled) Color.White else MaterialTheme.colorScheme.error,
+                tint = if (isAudioEnabled) NeonCyan else MaterialTheme.colorScheme.error,
                 modifier = Modifier.size(if (compact) 20.dp else 24.dp)
             )
         }
@@ -229,6 +230,13 @@ private fun TimeProgressBar(
             modifier = Modifier
                 .fillMaxWidth(progress)
                 .fillMaxHeight()
+                .shadow(
+                    elevation = if (isLowTime) 0.dp else 12.dp,
+                    shape = CircleShape,
+                    ambientColor = NeonCyan,
+                    spotColor = NeonCyan,
+                    clip = false
+                )
                 .clip(CircleShape)
                 .background(
                     if (isLowTime) {

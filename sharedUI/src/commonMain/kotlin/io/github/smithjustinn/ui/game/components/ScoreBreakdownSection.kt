@@ -1,6 +1,6 @@
 package io.github.smithjustinn.ui.game.components
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,16 +8,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.domain.models.ScoreBreakdown
+import io.github.smithjustinn.theme.InactiveBackground
 import io.github.smithjustinn.theme.NeonCyan
 import memory_match.sharedui.generated.resources.Res
 import memory_match.sharedui.generated.resources.score_breakdown_title
@@ -33,36 +34,39 @@ fun ScoreBreakdownSection(
     scoreBreakdown: ScoreBreakdown,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color.White.copy(alpha = 0.05f))
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        color = InactiveBackground.copy(alpha = 0.4f),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
     ) {
-        Text(
-            text = stringResource(Res.string.score_breakdown_title).uppercase(),
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.Black,
-            color = NeonCyan
-        )
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = stringResource(Res.string.score_breakdown_title).uppercase(),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Black,
+                color = NeonCyan
+            )
 
-        BreakdownRow(
-            label = stringResource(Res.string.score_match_points),
-            value = scoreBreakdown.matchPoints.toString(),
-            color = Color.White
-        )
-        BreakdownRow(
-            label = stringResource(Res.string.score_time_bonus),
-            value = if (scoreBreakdown.timeBonus > 0) "+${scoreBreakdown.timeBonus}" else "0",
-            color = if (scoreBreakdown.timeBonus > 0) BonusColor else Color.White
-        )
-        BreakdownRow(
-            label = stringResource(Res.string.score_move_bonus),
-            value = if (scoreBreakdown.moveBonus > 0) "+${scoreBreakdown.moveBonus}" else "0",
-            color = if (scoreBreakdown.moveBonus > 0) BonusColor else Color.White
-        )
+            BreakdownRow(
+                label = stringResource(Res.string.score_match_points),
+                value = scoreBreakdown.matchPoints.toString(),
+                color = Color.White
+            )
+            BreakdownRow(
+                label = stringResource(Res.string.score_time_bonus),
+                value = if (scoreBreakdown.timeBonus > 0) "+${scoreBreakdown.timeBonus}" else "0",
+                color = if (scoreBreakdown.timeBonus > 0) BonusColor else Color.White
+            )
+            BreakdownRow(
+                label = stringResource(Res.string.score_move_bonus),
+                value = if (scoreBreakdown.moveBonus > 0) "+${scoreBreakdown.moveBonus}" else "0",
+                color = if (scoreBreakdown.moveBonus > 0) BonusColor else Color.White
+            )
+        }
     }
 }
 

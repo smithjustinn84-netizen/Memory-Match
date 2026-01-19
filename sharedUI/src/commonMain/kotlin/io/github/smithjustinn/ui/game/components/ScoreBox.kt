@@ -38,7 +38,7 @@ fun ScoreBox(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        color = InactiveBackground.copy(alpha = 0.4f),
+        color = InactiveBackground.copy(alpha = 0.5f),
         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.15f))
     ) {
         Column(
@@ -49,12 +49,12 @@ fun ScoreBox(
                 text = stringResource(Res.string.final_score_label).uppercase(),
                 style = if (compact) {
                     MaterialTheme.typography.labelMedium.copy(
-                        fontWeight = FontWeight.ExtraBold,
+                        fontWeight = FontWeight.Black,
                         letterSpacing = 1.2.sp
                     )
                 } else {
                     MaterialTheme.typography.labelLarge.copy(
-                        fontWeight = FontWeight.ExtraBold,
+                        fontWeight = FontWeight.Black,
                         letterSpacing = 2.sp
                     )
                 },
@@ -79,12 +79,12 @@ fun ScoreBox(
             ) {
                 StatItem(
                     label = stringResource(Res.string.time_label, formatTime(elapsedTimeSeconds)),
-                    color = Color.White.copy(alpha = 0.8f),
+                    color = Color.White.copy(alpha = 0.9f),
                     compact = compact
                 )
                 StatItem(
                     label = stringResource(Res.string.moves_label, moves),
-                    color = Color.White.copy(alpha = 0.8f),
+                    color = Color.White.copy(alpha = 0.9f),
                     compact = compact
                 )
             }
@@ -113,7 +113,7 @@ private fun StatItem(
             ),
             style = if (compact) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelLarge,
             color = color,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Black
         )
     }
 }
