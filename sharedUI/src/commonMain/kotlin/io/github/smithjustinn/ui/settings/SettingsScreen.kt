@@ -1,16 +1,44 @@
 package io.github.smithjustinn.ui.settings
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -23,7 +51,12 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import io.github.smithjustinn.di.LocalAppGraph
 import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.domain.models.CardSymbolTheme
+import io.github.smithjustinn.theme.InactiveBackground
+import io.github.smithjustinn.theme.NeonCyan
+import io.github.smithjustinn.theme.StartBackgroundBottom
+import io.github.smithjustinn.theme.StartBackgroundTop
 import io.github.smithjustinn.ui.components.AppIcons
+import io.github.smithjustinn.ui.components.NeonSegmentedControl
 import memory_match.sharedui.generated.resources.Res
 import memory_match.sharedui.generated.resources.back_content_description
 import memory_match.sharedui.generated.resources.settings
@@ -52,12 +85,8 @@ class SettingsScreen : Screen {
             modifier = Modifier
                 .fillMaxSize()
                 .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.surface,
-                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f),
-                            MaterialTheme.colorScheme.surface
-                        )
+                    brush = Brush.verticalGradient(
+                        colors = listOf(StartBackgroundTop, StartBackgroundBottom)
                     )
                 )
         ) {
@@ -69,7 +98,8 @@ class SettingsScreen : Screen {
                             Text(
                                 text = stringResource(Res.string.settings),
                                 style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
                             )
                         },
                         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
@@ -81,7 +111,7 @@ class SettingsScreen : Screen {
                                 Icon(
                                     imageVector = AppIcons.ArrowBack,
                                     contentDescription = stringResource(Res.string.back_content_description),
-                                    tint = MaterialTheme.colorScheme.onSurface
+                                    tint = Color.White
                                 )
                             }
                         }
@@ -110,10 +140,7 @@ class SettingsScreen : Screen {
                                 labelProvider = { it.name.lowercase().replaceFirstChar { char -> char.uppercase() } }
                             )
 
-                            HorizontalDivider(
-                                modifier = Modifier.padding(vertical = 12.dp),
-                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
-                            )
+                            Spacer(modifier = Modifier.height(16.dp))
 
                             ThemeSelector(
                                 title = "Symbol Style",
@@ -128,7 +155,7 @@ class SettingsScreen : Screen {
 
                             HorizontalDivider(
                                 modifier = Modifier.padding(vertical = 12.dp),
-                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                                color = Color.White.copy(alpha = 0.1f)
                             )
 
                             SettingsToggle(
@@ -162,7 +189,7 @@ class SettingsScreen : Screen {
                             
                             HorizontalDivider(
                                 modifier = Modifier.padding(vertical = 8.dp),
-                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                                color = Color.White.copy(alpha = 0.1f)
                             )
 
                             SettingsToggle(
@@ -184,7 +211,7 @@ class SettingsScreen : Screen {
 
                             HorizontalDivider(
                                 modifier = Modifier.padding(vertical = 8.dp),
-                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                                color = Color.White.copy(alpha = 0.1f)
                             )
 
                             SettingsToggle(
@@ -208,12 +235,13 @@ class SettingsScreen : Screen {
                                     Text(
                                         text = "Reset Walkthrough",
                                         style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
                                     )
                                     Text(
                                         text = "Show the tutorial again on the next game",
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        color = Color.White.copy(alpha = 0.6f),
                                         lineHeight = 16.sp
                                     )
                                 }
@@ -224,8 +252,10 @@ class SettingsScreen : Screen {
                                     },
                                     enabled = state.isWalkthroughCompleted,
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                                        containerColor = NeonCyan.copy(alpha = 0.2f),
+                                        contentColor = NeonCyan,
+                                        disabledContainerColor = InactiveBackground.copy(alpha = 0.5f),
+                                        disabledContentColor = Color.White.copy(alpha = 0.3f)
                                     )
                                 ) {
                                     Text("Reset")
@@ -244,57 +274,22 @@ class SettingsScreen : Screen {
         options: List<T>,
         selected: T,
         onSelect: (T) -> Unit,
-        labelProvider: (T) -> String
+        labelProvider: @Composable (T) -> String
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = Color.White
             )
             
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                options.forEach { option ->
-                    val isSelected = option == selected
-                    val containerColor = if (isSelected) 
-                        MaterialTheme.colorScheme.primaryContainer 
-                    else 
-                        MaterialTheme.colorScheme.surface
-                    
-                    val contentColor = if (isSelected)
-                        MaterialTheme.colorScheme.onPrimaryContainer
-                    else
-                        MaterialTheme.colorScheme.onSurface
-                    
-                    Surface(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(8.dp))
-                            .clickable { onSelect(option) },
-                        color = containerColor,
-                        shape = RoundedCornerShape(8.dp),
-                        border = androidx.compose.foundation.BorderStroke(
-                            1.dp,
-                            if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                        )
-                    ) {
-                        Box(
-                            modifier = Modifier.padding(vertical = 12.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = labelProvider(option),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = contentColor,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                            )
-                        }
-                    }
-                }
-            }
+            NeonSegmentedControl(
+                items = options,
+                selectedItem = selected,
+                onItemSelected = onSelect,
+                labelProvider = { labelProvider(it) }
+            )
         }
     }
 
@@ -314,7 +309,7 @@ class SettingsScreen : Screen {
             Icon(
                 imageVector = AppIcons.VolumeUp,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
+                tint = NeonCyan,
                 modifier = Modifier.size(18.dp)
             )
             Slider(
@@ -322,15 +317,15 @@ class SettingsScreen : Screen {
                 onValueChange = onValueChange,
                 modifier = Modifier.weight(1f),
                 colors = SliderDefaults.colors(
-                    thumbColor = MaterialTheme.colorScheme.primary,
-                    activeTrackColor = MaterialTheme.colorScheme.primary,
-                    inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant
+                    thumbColor = Color.White,
+                    activeTrackColor = NeonCyan,
+                    inactiveTrackColor = InactiveBackground
                 )
             )
             Text(
                 text = "${(value * 100).toInt()}%",
                 style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = Color.White.copy(alpha = 0.6f),
                 modifier = Modifier.width(32.dp)
             )
         }
@@ -344,19 +339,19 @@ class SettingsScreen : Screen {
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(24.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+            color = InactiveBackground.copy(alpha = 0.4f),
             border = androidx.compose.foundation.BorderStroke(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                color = Color.White.copy(alpha = 0.1f)
             )
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
                 if (title != null) {
                     Text(
-                        text = title,
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold,
+                        text = title.uppercase(),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = NeonCyan,
+                        fontWeight = FontWeight.ExtraBold,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
                 }
@@ -382,12 +377,13 @@ class SettingsScreen : Screen {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
                 )
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = Color.White.copy(alpha = 0.6f),
                     lineHeight = 16.sp
                 )
             }
@@ -395,8 +391,11 @@ class SettingsScreen : Screen {
                 checked = checked,
                 onCheckedChange = onCheckedChange,
                 colors = SwitchDefaults.colors(
-                    checkedThumbColor = MaterialTheme.colorScheme.primary,
-                    checkedTrackColor = MaterialTheme.colorScheme.primaryContainer
+                    checkedThumbColor = Color.White,
+                    checkedTrackColor = NeonCyan,
+                    uncheckedTrackColor = InactiveBackground,
+                    uncheckedThumbColor = Color.White.copy(alpha = 0.6f),
+                    uncheckedBorderColor = Color.Transparent
                 )
             )
         }
