@@ -77,7 +77,10 @@ class StartScreen : Screen, JavaSerializable {
                 verticalArrangement = Arrangement.Top
             ) {
                 // Step 2: Implement the Header (Contains Title and Tilted Cards)
-                StartHeader()
+                StartHeader(
+                    cardBackTheme = state.cardBackTheme,
+                    cardSymbolTheme = state.cardSymbolTheme
+                )
 
                 Spacer(modifier = Modifier.height(48.dp)) // Restored airy spacing
 
