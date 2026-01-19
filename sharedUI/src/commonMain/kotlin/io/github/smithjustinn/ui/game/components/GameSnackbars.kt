@@ -122,7 +122,8 @@ fun MatchCommentSnackbar(
             ) {
                 Row(
                     modifier = Modifier
-                        .padding(horizontal = 20.dp, vertical = 14.dp),
+                        .padding(horizontal = 20.dp, vertical = 14.dp)
+                        .align(Alignment.CenterHorizontally),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
