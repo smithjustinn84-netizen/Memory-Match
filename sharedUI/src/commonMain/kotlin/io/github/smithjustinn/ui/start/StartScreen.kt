@@ -4,21 +4,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,7 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
@@ -36,17 +28,11 @@ import io.github.smithjustinn.di.LocalAppGraph
 import io.github.smithjustinn.platform.JavaSerializable
 import io.github.smithjustinn.theme.StartBackgroundBottom
 import io.github.smithjustinn.theme.StartBackgroundTop
-import io.github.smithjustinn.ui.components.AppIcons
 import io.github.smithjustinn.ui.game.GameScreen
 import io.github.smithjustinn.ui.settings.SettingsScreen
-import io.github.smithjustinn.ui.start.components.CardPreview
 import io.github.smithjustinn.ui.start.components.DifficultySelectionSection
 import io.github.smithjustinn.ui.start.components.StartHeader
 import io.github.smithjustinn.ui.stats.StatsScreen
-import memory_match.sharedui.generated.resources.Res
-import memory_match.sharedui.generated.resources.settings
-import memory_match.sharedui.generated.resources.stats
-import org.jetbrains.compose.resources.stringResource
 
 class StartScreen : Screen, JavaSerializable {
     @Composable
@@ -86,36 +72,16 @@ class StartScreen : Screen, JavaSerializable {
                     .statusBarsPadding()
                     .navigationBarsPadding()
                     .verticalScroll(rememberScrollState())
-                    .padding(24.dp),
+                    .padding(horizontal = 24.dp, vertical = 32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
-                GlobalActionsRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    onSettingsClick = {
-                        audioService.playClick()
-                        navigator.push(SettingsScreen())
-                    },
-                    onStatsClick = {
-                        audioService.playClick()
-                        navigator.push(StatsScreen())
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
+                // Step 2: Implement the Header (Contains Title and Tilted Cards)
                 StartHeader()
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(64.dp)) // Increased spacing for airy feel
 
-                CardPreview(
-                    modifier = Modifier.height(180.dp),
-                    cardBackTheme = state.cardBackTheme,
-                    cardSymbolTheme = state.cardSymbolTheme
-                )
-
-                Spacer(modifier = Modifier.height(32.dp))
-
+                // Steps 3, 4, 5: Difficulty Selector, Game Mode Selector, and Action Buttons
                 DifficultySelectionSection(
                     state = state,
                     onDifficultySelected = { level ->
@@ -138,56 +104,19 @@ class StartScreen : Screen, JavaSerializable {
                     onResumeGame = {
                         audioService.playClick()
                         screenModel.handleIntent(DifficultyIntent.ResumeGame)
+                    },
+                    onSettingsClick = {
+                        audioService.playClick()
+                        navigator.push(SettingsScreen())
+                    },
+                    onStatsClick = {
+                        audioService.playClick()
+                        navigator.push(StatsScreen())
                     }
                 )
                 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(48.dp)) // Final bottom breathing room
             }
-        }
-    }
-
-    @Composable
-    private fun GlobalActionsRow(
-        modifier: Modifier = Modifier,
-        onSettingsClick: () -> Unit,
-        onStatsClick: () -> Unit
-    ) {
-        Row(
-            modifier = modifier,
-            horizontalArrangement = Arrangement.End
-        ) {
-            ActionIconButton(
-                icon = AppIcons.Settings,
-                contentDescription = stringResource(Res.string.settings),
-                onClick = onSettingsClick
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            ActionIconButton(
-                icon = AppIcons.Info,
-                contentDescription = stringResource(Res.string.stats),
-                onClick = onStatsClick
-            )
-        }
-    }
-
-    @Composable
-    private fun ActionIconButton(
-        icon: androidx.compose.ui.graphics.vector.ImageVector,
-        contentDescription: String,
-        onClick: () -> Unit
-    ) {
-        IconButton(
-            onClick = onClick,
-            modifier = Modifier
-                .background(Color(0xFF0F1E3D).copy(alpha = 0.5f), MaterialTheme.shapes.medium)
-                .size(40.dp)
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = contentDescription,
-                tint = Color(0xFF60A5FA), // Light Blue tint
-                modifier = Modifier.size(20.dp)
-            )
         }
     }
 }
