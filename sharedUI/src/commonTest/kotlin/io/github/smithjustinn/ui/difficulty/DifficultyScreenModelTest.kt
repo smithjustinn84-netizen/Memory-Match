@@ -4,15 +4,20 @@ import app.cash.turbine.test
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.StaticConfig
 import dev.mokkery.answering.returns
+import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
+import io.github.smithjustinn.domain.models.CardBackTheme
+import io.github.smithjustinn.domain.models.CardSymbolTheme
 import io.github.smithjustinn.domain.models.DifficultyLevel
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
 import io.github.smithjustinn.domain.repositories.GameStateRepository
+import io.github.smithjustinn.domain.repositories.SettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -29,6 +34,7 @@ class DifficultyScreenModelTest {
 
     // region Dependencies & Setup
     private val gameStateRepository: GameStateRepository = mock()
+    private val settingsRepository: SettingsRepository = mock()
     private val logger: Logger = Logger(StaticConfig())
     private lateinit var screenModel: DifficultyScreenModel
     private val testDispatcher = StandardTestDispatcher()
@@ -36,7 +42,11 @@ class DifficultyScreenModelTest {
     @BeforeTest
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        screenModel = DifficultyScreenModel(gameStateRepository, logger)
+        
+        every { settingsRepository.cardBackTheme } returns MutableStateFlow(CardBackTheme.GEOMETRIC)
+        every { settingsRepository.cardSymbolTheme } returns MutableStateFlow(CardSymbolTheme.CLASSIC)
+        
+        screenModel = DifficultyScreenModel(gameStateRepository, settingsRepository, logger)
     }
 
     @AfterTest
