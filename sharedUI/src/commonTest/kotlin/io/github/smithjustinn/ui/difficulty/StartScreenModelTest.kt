@@ -30,13 +30,13 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DifficultyScreenModelTest {
+class StartScreenModelTest {
 
     // region Dependencies & Setup
     private val gameStateRepository: GameStateRepository = mock()
     private val settingsRepository: SettingsRepository = mock()
     private val logger: Logger = Logger(StaticConfig())
-    private lateinit var screenModel: DifficultyScreenModel
+    private lateinit var screenModel: StartScreenModel
     private val testDispatcher = StandardTestDispatcher()
 
     @BeforeTest
@@ -46,7 +46,7 @@ class DifficultyScreenModelTest {
         every { settingsRepository.cardBackTheme } returns MutableStateFlow(CardBackTheme.GEOMETRIC)
         every { settingsRepository.cardSymbolTheme } returns MutableStateFlow(CardSymbolTheme.CLASSIC)
         
-        screenModel = DifficultyScreenModel(gameStateRepository, settingsRepository, logger)
+        screenModel = StartScreenModel(gameStateRepository, settingsRepository, logger)
     }
 
     @AfterTest

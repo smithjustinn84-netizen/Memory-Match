@@ -47,7 +47,7 @@ sealed class DifficultyUiEvent {
 }
 
 @Inject
-class DifficultyScreenModel(
+class StartScreenModel(
     private val gameStateRepository: GameStateRepository,
     private val settingsRepository: SettingsRepository,
     private val logger: Logger

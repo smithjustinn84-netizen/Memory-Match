@@ -45,7 +45,7 @@ import io.github.smithjustinn.di.LocalAppGraph
 import io.github.smithjustinn.platform.JavaSerializable
 import io.github.smithjustinn.ui.components.AppIcons
 import io.github.smithjustinn.ui.difficulty.components.CardPreview
-import io.github.smithjustinn.ui.difficulty.components.DifficultyHeader
+import io.github.smithjustinn.ui.difficulty.components.StartHeader
 import io.github.smithjustinn.ui.difficulty.components.DifficultySelectionSection
 import io.github.smithjustinn.ui.game.GameScreen
 import io.github.smithjustinn.ui.settings.SettingsScreen
@@ -55,11 +55,11 @@ import memory_match.sharedui.generated.resources.settings
 import memory_match.sharedui.generated.resources.stats
 import org.jetbrains.compose.resources.stringResource
 
-class DifficultyScreen : Screen, JavaSerializable {
+class StartScreen : Screen, JavaSerializable {
     @Composable
     override fun Content() {
         val graph = LocalAppGraph.current
-        val screenModel = rememberScreenModel { graph.difficultyScreenModel }
+        val screenModel = rememberScreenModel { graph.startScreenModel }
         val state by screenModel.state.collectAsState()
         val navigator = LocalNavigator.currentOrThrow
         val audioService = graph.audioService
@@ -150,7 +150,7 @@ class DifficultyScreen : Screen, JavaSerializable {
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
-                            DifficultyHeader(scale = if (isCompactHeight) 0.75f else 1f)
+                            StartHeader(scale = if (isCompactHeight) 0.75f else 1f)
                             Spacer(modifier = Modifier.height(if (isCompactHeight) 8.dp else 16.dp))
                             CardPreview(
                                 modifier = Modifier.height(if (isCompactHeight) 110.dp else 180.dp),
@@ -237,7 +237,7 @@ class DifficultyScreen : Screen, JavaSerializable {
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        DifficultyHeader(
+                        StartHeader(
                             modifier = Modifier.padding(horizontal = 32.dp),
                             scale = if (isNarrow) 0.75f else 1f
                         )

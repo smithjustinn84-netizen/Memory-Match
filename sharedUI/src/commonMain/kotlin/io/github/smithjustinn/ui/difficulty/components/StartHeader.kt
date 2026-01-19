@@ -23,7 +23,7 @@ import memory_match.sharedui.generated.resources.app_name
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun DifficultyHeader(
+fun StartHeader(
     modifier: Modifier = Modifier,
     scale: Float = 1f
 ) {

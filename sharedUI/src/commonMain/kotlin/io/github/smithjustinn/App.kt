@@ -7,7 +7,7 @@ import cafe.adriel.voyager.transitions.SlideTransition
 import io.github.smithjustinn.di.AppGraph
 import io.github.smithjustinn.di.LocalAppGraph
 import io.github.smithjustinn.utils.BackPressScreen
-import io.github.smithjustinn.ui.difficulty.DifficultyScreen
+import io.github.smithjustinn.ui.difficulty.StartScreen
 import io.github.smithjustinn.theme.AppTheme
 
 @Composable
@@ -17,7 +17,7 @@ fun App(
 ) = AppTheme(onThemeChanged) {
     CompositionLocalProvider(LocalAppGraph provides appGraph) {
         Navigator(
-            screen = DifficultyScreen(),
+            screen = StartScreen(),
             onBackPressed = { currentScreen ->
                 if (currentScreen is BackPressScreen) {
                     currentScreen.handleBack()
