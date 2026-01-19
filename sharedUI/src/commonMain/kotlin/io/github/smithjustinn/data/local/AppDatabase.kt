@@ -12,7 +12,7 @@ import androidx.sqlite.execSQL
         GameStateEntity::class,
         SettingsEntity::class
     ],
-    version = 4
+    version = 5
 )
 @TypeConverters(Converters::class)
 @ConstructedBy(AppDatabaseConstructor::class)
@@ -39,6 +39,13 @@ abstract class AppDatabase : RoomDatabase() {
             override fun migrate(connection: SQLiteConnection) {
                 connection.execSQL("ALTER TABLE settings ADD COLUMN soundVolume REAL NOT NULL DEFAULT 1.0")
                 connection.execSQL("ALTER TABLE settings ADD COLUMN musicVolume REAL NOT NULL DEFAULT 1.0")
+            }
+        }
+
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(connection: SQLiteConnection) {
+                connection.execSQL("ALTER TABLE settings ADD COLUMN cardBackTheme TEXT NOT NULL DEFAULT 'GEOMETRIC'")
+                connection.execSQL("ALTER TABLE settings ADD COLUMN cardSymbolTheme TEXT NOT NULL DEFAULT 'CLASSIC'")
             }
         }
     }

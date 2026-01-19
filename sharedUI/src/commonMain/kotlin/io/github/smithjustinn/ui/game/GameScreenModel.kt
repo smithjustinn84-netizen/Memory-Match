@@ -45,19 +45,36 @@ class GameScreenModel(
     private var timeLossJob: Job? = null
     private var settingsJob: Job? = null
 
+    private data class CoreSettings(
+        val isPeekEnabled: Boolean,
+        val isWalkthroughCompleted: Boolean,
+        val isMusicEnabled: Boolean,
+        val isSoundEnabled: Boolean
+    )
+
     init {
         settingsJob = screenModelScope.launch {
-            combine(
+            val coreSettingsFlow = combine(
                 settingsRepository.isPeekEnabled,
                 settingsRepository.isWalkthroughCompleted,
                 settingsRepository.isMusicEnabled,
                 settingsRepository.isSoundEnabled
-            ) { peek, walkthroughCompleted, musicEnabled, soundEnabled ->
+            ) { peek, walkthrough, music, sound ->
+                CoreSettings(peek, walkthrough, music, sound)
+            }
+
+            combine(
+                coreSettingsFlow,
+                settingsRepository.cardBackTheme,
+                settingsRepository.cardSymbolTheme
+            ) { core, cardBack, cardSymbol ->
                 _state.update { it.copy(
-                    isPeekFeatureEnabled = peek,
-                    showWalkthrough = !walkthroughCompleted,
-                    isMusicEnabled = musicEnabled,
-                    isSoundEnabled = soundEnabled
+                    isPeekFeatureEnabled = core.isPeekEnabled,
+                    showWalkthrough = !core.isWalkthroughCompleted,
+                    isMusicEnabled = core.isMusicEnabled,
+                    isSoundEnabled = core.isSoundEnabled,
+                    cardBackTheme = cardBack,
+                    cardSymbolTheme = cardSymbol
                 ) }
             }.collect()
         }
@@ -420,4 +437,27 @@ class GameScreenModel(
         settingsJob?.cancel()
         saveGame()
     }
+}
+
+sealed class GameIntent {
+    data class StartGame(val pairCount: Int, val forceNewGame: Boolean = false, val mode: GameMode = GameMode.STANDARD) : GameIntent()
+    data class FlipCard(val cardId: Int) : GameIntent()
+    data object SaveGame : GameIntent()
+    data object NextWalkthroughStep : GameIntent()
+    data object CompleteWalkthrough : GameIntent()
+    data object ToggleAudio : GameIntent()
+}
+
+sealed class GameUiEvent {
+    data object PlayFlip : GameUiEvent()
+    data object PlayMatch : GameUiEvent()
+    data object PlayMismatch : GameUiEvent()
+    data object PlayWin : GameUiEvent()
+    data object PlayLose : GameUiEvent()
+    data object PlayHighScore : GameUiEvent()
+    data object PlayDeal : GameUiEvent()
+    data object VibrateMatch : GameUiEvent()
+    data object VibrateMismatch : GameUiEvent()
+    data object VibrateTick : GameUiEvent()
+    data object VibrateWarning : GameUiEvent()
 }

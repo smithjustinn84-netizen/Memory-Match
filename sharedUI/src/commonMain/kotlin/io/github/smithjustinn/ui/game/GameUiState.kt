@@ -1,6 +1,7 @@
 package io.github.smithjustinn.ui.game
 
-import io.github.smithjustinn.domain.models.GameMode
+import io.github.smithjustinn.domain.models.CardBackTheme
+import io.github.smithjustinn.domain.models.CardSymbolTheme
 import io.github.smithjustinn.domain.models.MemoryGameState
 
 /**
@@ -25,38 +26,7 @@ data class GameUIState(
     val showWalkthrough: Boolean = false,
     val walkthroughStep: Int = 0,
     val isMusicEnabled: Boolean = true,
-    val isSoundEnabled: Boolean = true
+    val isSoundEnabled: Boolean = true,
+    val cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC,
+    val cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC
 )
-
-/**
- * Sealed class representing user intents for the game screen.
- */
-sealed class GameIntent {
-    data class StartGame(
-        val pairCount: Int,
-        val forceNewGame: Boolean = false,
-        val mode: GameMode = GameMode.STANDARD
-    ) : GameIntent()
-    data class FlipCard(val cardId: Int) : GameIntent()
-    data object SaveGame : GameIntent()
-    data object NextWalkthroughStep : GameIntent()
-    data object CompleteWalkthrough : GameIntent()
-    data object ToggleAudio : GameIntent()
-}
-
-/**
- * Sealed class representing one-time UI events triggered by the ViewModel.
- */
-sealed class GameUiEvent {
-    data object PlayFlip : GameUiEvent()
-    data object PlayMatch : GameUiEvent()
-    data object PlayMismatch : GameUiEvent()
-    data object PlayWin : GameUiEvent()
-    data object PlayLose : GameUiEvent()
-    data object PlayHighScore : GameUiEvent()
-    data object PlayDeal : GameUiEvent()
-    data object VibrateMatch : GameUiEvent()
-    data object VibrateMismatch : GameUiEvent()
-    data object VibrateTick : GameUiEvent()
-    data object VibrateWarning : GameUiEvent()
-}

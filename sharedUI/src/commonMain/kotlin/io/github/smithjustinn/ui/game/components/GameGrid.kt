@@ -13,7 +13,9 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
+import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.domain.models.CardState
+import io.github.smithjustinn.domain.models.CardSymbolTheme
 import kotlin.math.ceil
 
 private data class CardLayoutInfo(val position: Offset, val size: Size)
@@ -24,7 +26,9 @@ fun GameGrid(
     onCardClick: (Int) -> Unit,
     isPeeking: Boolean = false,
     lastMatchedIds: List<Int> = emptyList(),
-    showComboExplosion: Boolean = false
+    showComboExplosion: Boolean = false,
+    cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC,
+    cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC
 ) {
     val cardLayouts = remember { mutableStateMapOf<Int, CardLayoutInfo>() }
     var gridPosition by remember { mutableStateOf(Offset.Zero) }
@@ -131,6 +135,8 @@ fun GameGrid(
                     isMatched = card.isMatched,
                     isRecentlyMatched = lastMatchedIds.contains(card.id),
                     isError = card.isError,
+                    cardBackTheme = cardBackTheme,
+                    cardSymbolTheme = cardSymbolTheme,
                     onClick = { onCardClick(card.id) },
                     modifier = Modifier.onGloballyPositioned { layoutCoordinates ->
                         cardLayouts[card.id] = CardLayoutInfo(

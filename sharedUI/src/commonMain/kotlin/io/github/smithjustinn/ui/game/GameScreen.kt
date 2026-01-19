@@ -147,7 +147,9 @@ data class GameScreen(
                             onCardClick = { cardId -> screenModel.handleIntent(GameIntent.FlipCard(cardId)) },
                             isPeeking = state.isPeeking,
                             lastMatchedIds = state.game.lastMatchedIds,
-                            showComboExplosion = state.showComboExplosion
+                            showComboExplosion = state.showComboExplosion,
+                            cardBackTheme = state.cardBackTheme,
+                            cardSymbolTheme = state.cardSymbolTheme
                         )
 
                         MatchCommentSnackbar(

@@ -3,6 +3,8 @@ package io.github.smithjustinn.ui.settings
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import dev.zacsweers.metro.Inject
+import io.github.smithjustinn.domain.models.CardBackTheme
+import io.github.smithjustinn.domain.models.CardSymbolTheme
 import io.github.smithjustinn.domain.repositories.SettingsRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -14,7 +16,9 @@ data class SettingsUIState(
     val isMusicEnabled: Boolean = true,
     val isWalkthroughCompleted: Boolean = false,
     val soundVolume: Float = 1.0f,
-    val musicVolume: Float = 1.0f
+    val musicVolume: Float = 1.0f,
+    val cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC,
+    val cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC
 )
 
 sealed class SettingsUiEvent {
@@ -38,18 +42,28 @@ class SettingsScreenModel(
         AudioSettings(sound, music, soundVol, musicVol)
     }
 
+    private val themeSettingsFlow = combine(
+        settingsRepository.cardBackTheme,
+        settingsRepository.cardSymbolTheme
+    ) { back, symbol ->
+        ThemeSettings(back, symbol)
+    }
+
     val state: StateFlow<SettingsUIState> = combine(
         settingsRepository.isPeekEnabled,
         settingsRepository.isWalkthroughCompleted,
-        audioSettingsFlow
-    ) { peek, walkthrough, audio ->
+        audioSettingsFlow,
+        themeSettingsFlow
+    ) { peek, walkthrough, audio, theme ->
         SettingsUIState(
             isPeekEnabled = peek,
             isWalkthroughCompleted = walkthrough,
             isSoundEnabled = audio.isSoundEnabled,
             isMusicEnabled = audio.isMusicEnabled,
             soundVolume = audio.soundVolume,
-            musicVolume = audio.musicVolume
+            musicVolume = audio.musicVolume,
+            cardBackTheme = theme.cardBackTheme,
+            cardSymbolTheme = theme.cardSymbolTheme
         )
     }.stateIn(
         scope = screenModelScope,
@@ -62,6 +76,11 @@ class SettingsScreenModel(
         val isMusicEnabled: Boolean,
         val soundVolume: Float,
         val musicVolume: Float
+    )
+
+    private data class ThemeSettings(
+        val cardBackTheme: CardBackTheme,
+        val cardSymbolTheme: CardSymbolTheme
     )
 
     fun togglePeekEnabled(enabled: Boolean) {
@@ -91,6 +110,18 @@ class SettingsScreenModel(
     fun setMusicVolume(volume: Float) {
         screenModelScope.launch {
             settingsRepository.setMusicVolume(volume)
+        }
+    }
+
+    fun setCardBackTheme(theme: CardBackTheme) {
+        screenModelScope.launch {
+            settingsRepository.setCardBackTheme(theme)
+        }
+    }
+
+    fun setCardSymbolTheme(theme: CardSymbolTheme) {
+        screenModelScope.launch {
+            settingsRepository.setCardSymbolTheme(theme)
         }
     }
 

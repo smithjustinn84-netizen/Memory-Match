@@ -10,6 +10,8 @@ import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import io.github.smithjustinn.domain.MemoryGameLogic
+import io.github.smithjustinn.domain.models.CardBackTheme
+import io.github.smithjustinn.domain.models.CardSymbolTheme
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.GameStats
 import io.github.smithjustinn.domain.repositories.GameStateRepository
@@ -50,6 +52,10 @@ class GameScreenModelTest {
     private val testDispatcher = UnconfinedTestDispatcher()
     private val isPeekEnabledFlow = MutableStateFlow(false)
     private val isWalkthroughCompletedFlow = MutableStateFlow(true)
+    private val isMusicEnabledFlow = MutableStateFlow(true)
+    private val isSoundEnabledFlow = MutableStateFlow(true)
+    private val cardBackThemeFlow = MutableStateFlow(CardBackTheme.GEOMETRIC)
+    private val cardSymbolThemeFlow = MutableStateFlow(CardSymbolTheme.CLASSIC)
     private val statsFlow = MutableStateFlow<GameStats?>(null)
 
     private lateinit var screenModel: GameScreenModel
@@ -59,10 +65,18 @@ class GameScreenModelTest {
         Dispatchers.setMain(testDispatcher)
         isPeekEnabledFlow.value = false
         isWalkthroughCompletedFlow.value = true
+        isMusicEnabledFlow.value = true
+        isSoundEnabledFlow.value = true
+        cardBackThemeFlow.value = CardBackTheme.GEOMETRIC
+        cardSymbolThemeFlow.value = CardSymbolTheme.CLASSIC
         statsFlow.value = null
         
         every { settingsRepository.isPeekEnabled } returns isPeekEnabledFlow
         every { settingsRepository.isWalkthroughCompleted } returns isWalkthroughCompletedFlow
+        every { settingsRepository.isMusicEnabled } returns isMusicEnabledFlow
+        every { settingsRepository.isSoundEnabled } returns isSoundEnabledFlow
+        every { settingsRepository.cardBackTheme } returns cardBackThemeFlow
+        every { settingsRepository.cardSymbolTheme } returns cardSymbolThemeFlow
         every { gameStatsRepository.getStatsForDifficulty(any()) } returns statsFlow
         
         everySuspend { gameStateRepository.getSavedGameState() } returns null
@@ -104,6 +118,8 @@ class GameScreenModelTest {
             assertEquals(0, state.elapsedTimeSeconds)
             assertFalse(state.isPeeking)
             assertFalse(state.game.isGameOver)
+            assertEquals(CardBackTheme.GEOMETRIC, state.cardBackTheme)
+            assertEquals(CardSymbolTheme.CLASSIC, state.cardSymbolTheme)
             cancelAndIgnoreRemainingEvents()
         }
         screenModel.onDispose()

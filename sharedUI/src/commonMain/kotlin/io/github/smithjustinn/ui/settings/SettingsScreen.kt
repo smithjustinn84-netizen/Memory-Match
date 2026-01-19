@@ -1,12 +1,16 @@
 package io.github.smithjustinn.ui.settings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -17,6 +21,8 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import io.github.smithjustinn.di.LocalAppGraph
+import io.github.smithjustinn.domain.models.CardBackTheme
+import io.github.smithjustinn.domain.models.CardSymbolTheme
 import io.github.smithjustinn.ui.components.AppIcons
 import memory_match.sharedui.generated.resources.Res
 import memory_match.sharedui.generated.resources.back_content_description
@@ -86,12 +92,42 @@ class SettingsScreen : Screen {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
                             .padding(horizontal = 24.dp, vertical = 16.dp)
                             .widthIn(max = 600.dp)
                             .align(Alignment.TopCenter),
                         verticalArrangement = Arrangement.spacedBy(20.dp)
                     ) {
-                        SettingsCard {
+                        SettingsCard(title = "Appearance") {
+                            ThemeSelector(
+                                title = "Card Back Style",
+                                options = CardBackTheme.entries,
+                                selected = state.cardBackTheme,
+                                onSelect = { 
+                                    audioService.playClick()
+                                    screenModel.setCardBackTheme(it) 
+                                },
+                                labelProvider = { it.name.lowercase().replaceFirstChar { char -> char.uppercase() } }
+                            )
+
+                            HorizontalDivider(
+                                modifier = Modifier.padding(vertical = 12.dp),
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                            )
+
+                            ThemeSelector(
+                                title = "Symbol Style",
+                                options = CardSymbolTheme.entries,
+                                selected = state.cardSymbolTheme,
+                                onSelect = { 
+                                    audioService.playClick()
+                                    screenModel.setCardSymbolTheme(it) 
+                                },
+                                labelProvider = { it.name.lowercase().replace("text_only", "text only").replaceFirstChar { char -> char.uppercase() } }
+                            )
+                        }
+
+                        SettingsCard(title = "Gameplay & Audio") {
                             SettingsToggle(
                                 title = "Sound Effects",
                                 description = "Play sounds for card flips, matches, and wins",
@@ -188,6 +224,66 @@ class SettingsScreen : Screen {
     }
 
     @Composable
+    private fun <T> ThemeSelector(
+        title: String,
+        options: List<T>,
+        selected: T,
+        onSelect: (T) -> Unit,
+        labelProvider: (T) -> String
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                options.forEach { option ->
+                    val isSelected = option == selected
+                    val containerColor = if (isSelected) 
+                        MaterialTheme.colorScheme.primaryContainer 
+                    else 
+                        MaterialTheme.colorScheme.surface
+                    
+                    val contentColor = if (isSelected)
+                        MaterialTheme.colorScheme.onPrimaryContainer
+                    else
+                        MaterialTheme.colorScheme.onSurface
+                    
+                    Surface(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable { onSelect(option) },
+                        color = containerColor,
+                        shape = RoundedCornerShape(8.dp),
+                        border = androidx.compose.foundation.BorderStroke(
+                            1.dp,
+                            if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier.padding(vertical = 12.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = labelProvider(option),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = contentColor,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
     private fun VolumeSlider(
         value: Float,
         onValueChange: (Float) -> Unit,
@@ -226,7 +322,10 @@ class SettingsScreen : Screen {
     }
 
     @Composable
-    private fun SettingsCard(content: @Composable ColumnScope.() -> Unit) {
+    private fun SettingsCard(
+        title: String? = null,
+        content: @Composable ColumnScope.() -> Unit
+    ) {
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(24.dp),
@@ -236,10 +335,18 @@ class SettingsScreen : Screen {
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
             )
         ) {
-            Column(
-                modifier = Modifier.padding(20.dp),
-                content = content
-            )
+            Column(modifier = Modifier.padding(20.dp)) {
+                if (title != null) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
+                content()
+            }
         }
     }
 
