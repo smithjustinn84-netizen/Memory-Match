@@ -64,20 +64,13 @@ fun DifficultySelectionSection(
                     letterSpacing = 1.2.sp
                 )
 
-                val displayDifficulties = state.difficulties.filter { it.pairs in listOf(8, 12, 16) }
+                val displayDifficulties = state.difficulties
                 
                 NeonSegmentedControl(
-                    items = displayDifficulties.ifEmpty { state.difficulties.take(3) },
+                    items = displayDifficulties.ifEmpty { state.difficulties },
                     selectedItem = state.selectedDifficulty,
                     onItemSelected = onDifficultySelected,
-                    labelProvider = { level ->
-                        when (level.pairs) {
-                            8 -> "Easy (8)"
-                            12 -> "Medium (12)"
-                            16 -> "Hard (16)"
-                            else -> "${stringResource(level.nameRes)} (${level.pairs})"
-                        }
-                    }
+                    labelProvider = { level -> level.pairs.toString() }
                 )
             }
 
