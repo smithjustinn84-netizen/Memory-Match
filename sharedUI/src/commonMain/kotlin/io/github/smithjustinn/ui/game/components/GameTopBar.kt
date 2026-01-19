@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.theme.InactiveBackground
 import io.github.smithjustinn.theme.NeonCyan
+import io.github.smithjustinn.theme.TacticalRed
 import io.github.smithjustinn.ui.components.AppIcons
 import memory_match.sharedui.generated.resources.Res
 import memory_match.sharedui.generated.resources.back_content_description
@@ -199,7 +199,7 @@ private fun MuteButton(
                 contentDescription = stringResource(
                     if (isAudioEnabled) Res.string.mute_content_description else Res.string.unmute_content_description
                 ),
-                tint = if (isAudioEnabled) NeonCyan else MaterialTheme.colorScheme.error,
+                tint = if (isAudioEnabled) NeonCyan else TacticalRed,
                 modifier = Modifier.size(if (compact) 20.dp else 24.dp)
             )
         }
@@ -240,7 +240,7 @@ private fun TimeProgressBar(
                 .clip(CircleShape)
                 .background(
                     if (isLowTime) {
-                        Brush.horizontalGradient(listOf(MaterialTheme.colorScheme.error, MaterialTheme.colorScheme.error.copy(alpha = 0.7f)))
+                        Brush.horizontalGradient(listOf(TacticalRed, TacticalRed.copy(alpha = 0.7f)))
                     } else {
                         Brush.horizontalGradient(listOf(NeonCyan, NeonCyan.copy(alpha = 0.7f)))
                     }

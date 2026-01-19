@@ -41,6 +41,7 @@ import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.ScoreBreakdown
 import io.github.smithjustinn.theme.InactiveBackground
 import io.github.smithjustinn.theme.NeonCyan
+import io.github.smithjustinn.theme.TacticalRed
 import memory_match.sharedui.generated.resources.Res
 import memory_match.sharedui.generated.resources.game_complete
 import memory_match.sharedui.generated.resources.game_over
@@ -113,7 +114,7 @@ fun ResultsCard(
         ) {
             val contentPadding = if (isCompactHeight) 12.dp else 24.dp
             val verticalSpacing = if (isCompactHeight) 8.dp else 16.dp
-            val headerColor = if (isWon) NeonCyan else MaterialTheme.colorScheme.error
+            val headerColor = if (isWon) NeonCyan else TacticalRed
 
             Column(
                 modifier = Modifier

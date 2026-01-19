@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.theme.InactiveBackground
 import io.github.smithjustinn.theme.NeonCyan
+import io.github.smithjustinn.theme.TacticalRed
 import io.github.smithjustinn.utils.formatTime
 
 @Composable
@@ -38,10 +39,10 @@ fun TimerDisplay(
 ) {
     val timerColor by animateColorAsState(
         targetValue = when {
-            showTimeLoss -> MaterialTheme.colorScheme.error
+            showTimeLoss -> TacticalRed
             showTimeGain && isMegaBonus -> Color(0xFFFFD700)
             showTimeGain -> Color(0xFF4CAF50)
-            isLowTime -> MaterialTheme.colorScheme.error
+            isLowTime -> TacticalRed
             minimal -> Color.White
             else -> NeonCyan
         },
@@ -109,7 +110,7 @@ fun TimerDisplay(
             color = InactiveBackground.copy(alpha = 0.4f),
             border = BorderStroke(
                 width = 1.dp, 
-                color = if (isLowTime || showTimeLoss) MaterialTheme.colorScheme.error.copy(alpha = 0.5f) else Color.White.copy(alpha = 0.15f)
+                color = if (isLowTime || showTimeLoss) TacticalRed.copy(alpha = 0.5f) else Color.White.copy(alpha = 0.15f)
             ),
             modifier = modifier.height(if (compact) 36.dp else 44.dp)
         ) {
@@ -151,7 +152,7 @@ fun TimerDisplay(
                     Text(
                         text = "-${timeLossAmount}s",
                         style = if (compact) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.error,
+                        color = TacticalRed,
                         fontWeight = FontWeight.Black,
                         modifier = Modifier.padding(start = 6.dp)
                     )
