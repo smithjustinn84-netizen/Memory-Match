@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -31,9 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.theme.InactiveBackground
 import io.github.smithjustinn.theme.NeonCyan
@@ -47,14 +46,10 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun GameTopBar(
-    score: Int,
     time: Long,
-    bestScore: Int,
-    combo: Int,
     onBackClick: () -> Unit,
     onRestartClick: () -> Unit,
     modifier: Modifier = Modifier,
-    isPeeking: Boolean = false,
     mode: GameMode = GameMode.STANDARD,
     maxTime: Long = 0,
     showTimeGain: Boolean = false,
@@ -63,7 +58,6 @@ fun GameTopBar(
     timeLossAmount: Long = 0,
     isMegaBonus: Boolean = false,
     compact: Boolean = false,
-    isGameOver: Boolean = false,
     isAudioEnabled: Boolean = true,
     onMuteClick: () -> Unit = {}
 ) {
@@ -78,57 +72,40 @@ fun GameTopBar(
             .fillMaxWidth()
             .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal))
             .padding(
-                horizontal = if (compact) 8.dp else 16.dp, 
-                vertical = if (compact) 4.dp else 8.dp
+                horizontal = if (compact) 16.dp else 24.dp, 
+                vertical = if (compact) 8.dp else 12.dp
             ),
-        verticalArrangement = Arrangement.spacedBy(if (compact) 4.dp else 8.dp)
+        verticalArrangement = Arrangement.spacedBy(if (compact) 8.dp else 12.dp)
     ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
+        // Main HUD Row
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            // Left Controls
             BackButton(
                 onClick = onBackClick, 
-                compact = compact,
-                modifier = Modifier.align(Alignment.CenterStart)
+                compact = compact
             )
 
-            DynamicIsland(
-                timerContent = {
-                    TimerDisplay(
-                        time = time,
-                        isLowTime = isLowTime,
-                        isCriticalTime = isCriticalTime,
-                        showTimeGain = showTimeGain,
-                        timeGainAmount = timeGainAmount,
-                        showTimeLoss = showTimeLoss,
-                        timeLossAmount = timeLossAmount,
-                        isMegaBonus = isMegaBonus,
-                        infiniteTransition = infiniteTransition,
-                        minimal = true
-                    )
-                },
-                scoreContent = {
-                    AnimatedScoreText(
-                        score = score,
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Black,
-                            fontSize = 15.sp
-                        ),
-                        color = Color.White
-                    )
-                },
-                combo = combo,
-                isGameOver = isGameOver,
-                finalScore = score,
-                bestScore = bestScore,
+            // Center Area - Timer
+            TimerDisplay(
+                time = time,
+                isLowTime = isLowTime,
+                isCriticalTime = isCriticalTime,
+                showTimeGain = showTimeGain,
+                timeGainAmount = timeGainAmount,
+                showTimeLoss = showTimeLoss,
+                timeLossAmount = timeLossAmount,
                 isMegaBonus = isMegaBonus,
-                isPeeking = isPeeking,
-                modifier = Modifier.align(Alignment.TopCenter)
+                infiniteTransition = infiniteTransition,
+                compact = compact,
+                minimal = false
             )
 
-            Row(
-                modifier = Modifier.align(Alignment.CenterEnd),
-                horizontalArrangement = Arrangement.spacedBy(if (compact) 4.dp else 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            // Right Controls
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 MuteButton(
                     isAudioEnabled = isAudioEnabled,
                     onClick = onMuteClick,
@@ -161,10 +138,10 @@ private fun BackButton(
 ) {
     Surface(
         onClick = onClick,
-        shape = CircleShape,
+        shape = RoundedCornerShape(12.dp),
         color = InactiveBackground.copy(alpha = 0.4f),
         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.15f)),
-        modifier = modifier.size(if (compact) 36.dp else 44.dp)
+        modifier = modifier.size(if (compact) 40.dp else 48.dp)
     ) {
         Box(contentAlignment = Alignment.Center) {
             Icon(
@@ -185,10 +162,10 @@ private fun RestartButton(
 ) {
     Surface(
         onClick = onClick,
-        shape = CircleShape,
+        shape = RoundedCornerShape(12.dp),
         color = InactiveBackground.copy(alpha = 0.4f),
         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.15f)),
-        modifier = modifier.size(if (compact) 36.dp else 44.dp)
+        modifier = modifier.size(if (compact) 40.dp else 48.dp)
     ) {
         Box(contentAlignment = Alignment.Center) {
             Icon(
@@ -210,10 +187,10 @@ private fun MuteButton(
 ) {
     Surface(
         onClick = onClick,
-        shape = CircleShape,
+        shape = RoundedCornerShape(12.dp),
         color = InactiveBackground.copy(alpha = 0.4f),
         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.15f)),
-        modifier = modifier.size(if (compact) 36.dp else 44.dp)
+        modifier = modifier.size(if (compact) 40.dp else 48.dp)
     ) {
         Box(contentAlignment = Alignment.Center) {
             Icon(
