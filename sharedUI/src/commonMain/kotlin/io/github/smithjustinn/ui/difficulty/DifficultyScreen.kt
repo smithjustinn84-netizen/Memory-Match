@@ -148,8 +148,11 @@ class DifficultyScreen : Screen, JavaSerializable {
                                     audioService.playClick()
                                     screenModel.handleIntent(DifficultyIntent.ResumeGame)
                                 },
-                                modifier = Modifier.widthIn(max = 450.dp).padding(vertical = 16.dp),
-                                compact = true
+                                modifier = Modifier
+                                    .widthIn(max = if (isWide) 650.dp else 450.dp)
+                                    .padding(vertical = 16.dp),
+                                compact = isCompactHeight,
+                                useSmallCards = isCompactHeight || (isWide && screenWidth < 1100.dp)
                             )
                         }
                     }

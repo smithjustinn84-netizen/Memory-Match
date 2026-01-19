@@ -33,7 +33,8 @@ fun DifficultySelectionSection(
     onStartGame: () -> Unit,
     onResumeGame: () -> Unit,
     modifier: Modifier = Modifier,
-    compact: Boolean = false
+    compact: Boolean = false,
+    useSmallCards: Boolean = compact
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -44,7 +45,7 @@ fun DifficultySelectionSection(
             difficulties = state.difficulties,
             selectedDifficulty = state.selectedDifficulty,
             onDifficultySelected = onDifficultySelected,
-            compact = compact
+            compact = useSmallCards
         )
 
         if (compact) {
