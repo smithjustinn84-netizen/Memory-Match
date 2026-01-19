@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.domain.models.MatchComment
+import io.github.smithjustinn.theme.*
 import io.github.smithjustinn.ui.components.AppIcons
 import memory_match.sharedui.generated.resources.Res
 import memory_match.sharedui.generated.resources.new_high_score
@@ -31,33 +32,29 @@ fun NewHighScoreSnackbar(
     val infiniteTransition = rememberInfiniteTransition(label = "HighScorePulse")
     val scale by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = 1.1f,
+        targetValue = 1.05f,
         animationSpec = infiniteRepeatable(
-            animation = tween(1000),
+            animation = tween(durationMillis = 800, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "Scale"
     )
 
     Card(
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-            contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+            containerColor = StartBackgroundTop,
+            contentColor = Color.White
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
         modifier = modifier
             .scale(scale)
             .border(
                 width = 2.dp,
-                brush = Brush.sweepGradient(
-                    listOf(
-                        MaterialTheme.colorScheme.primary,
-                        MaterialTheme.colorScheme.tertiary,
-                        MaterialTheme.colorScheme.primary
-                    )
+                brush = Brush.linearGradient(
+                    listOf(GoldenYellow, GoldenYellow.copy(alpha = 0.5f), GoldenYellow)
                 ),
-                shape = RoundedCornerShape(24.dp)
+                shape = RoundedCornerShape(12.dp)
             )
     ) {
         Row(
@@ -69,18 +66,19 @@ fun NewHighScoreSnackbar(
                 imageVector = AppIcons.Trophy,
                 contentDescription = null,
                 modifier = Modifier.size(32.dp),
-                tint = Color(0xFFFFD700) // Gold color
+                tint = GoldenYellow
             )
             Text(
                 text = stringResource(Res.string.new_high_score).uppercase(),
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Black
+                fontWeight = FontWeight.Black,
+                color = Color.White
             )
             Icon(
                 imageVector = AppIcons.Trophy,
                 contentDescription = null,
                 modifier = Modifier.size(32.dp),
-                tint = Color(0xFFFFD700)
+                tint = GoldenYellow
             )
         }
     }
@@ -93,61 +91,64 @@ fun MatchCommentSnackbar(
 ) {
     AnimatedVisibility(
         visible = matchComment != null,
-        enter = fadeIn() + slideInVertically(initialOffsetY = { it }),
-        exit = fadeOut() + slideOutVertically(targetOffsetY = { it }),
+        enter = fadeIn(animationSpec = spring()) + slideInVertically(
+            initialOffsetY = { it },
+            animationSpec = spring()
+        ),
+        exit = fadeOut(animationSpec = spring()) + slideOutVertically(
+            targetOffsetY = { it },
+            animationSpec = spring()
+        ),
         modifier = modifier
     ) {
         if (matchComment != null) {
             val commentText = stringResource(matchComment.res, *matchComment.args.toTypedArray())
             
-            Box(
+            Card(
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = StartBackgroundBottom,
+                    contentColor = LightGreyBlue
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
                 modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+                    .border(
+                        width = 1.dp,
+                        color = NeonCyan.copy(alpha = 0.6f),
+                        shape = RoundedCornerShape(12.dp)
+                    )
             ) {
-                Card(
-                    shape = RoundedCornerShape(topStart = 24.dp, bottomEnd = 24.dp, topEnd = 4.dp, bottomStart = 4.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                Row(
                     modifier = Modifier
-                        .align(Alignment.Center)
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
-                            shape = RoundedCornerShape(topStart = 24.dp, bottomEnd = 24.dp, topEnd = 4.dp, bottomStart = 4.dp)
-                        )
+                        .padding(horizontal = 20.dp, vertical = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "“",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = commentText,
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontStyle = FontStyle.Italic,
-                                lineHeight = 20.sp
-                            ),
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(horizontal = 8.dp)
-                        )
-                        Text(
-                            text = "”",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                    Text(
+                        text = "“",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = NeonCyan,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = commentText,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontStyle = FontStyle.Italic,
+                            lineHeight = 20.sp,
+                            color = LightGreyBlue
+                        ),
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
+                    Text(
+                        text = "”",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = NeonCyan,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
