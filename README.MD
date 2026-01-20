@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="screenshots/Hero.png" width="100%" alt="Memory Match Hero Banner">
+</p>
+
 # 🧩 Memory-Match
 
 [![Kotlin 2.3.0](https://img.shields.io/badge/Kotlin-2.3.0-purple?logo=kotlin)](https://kotlinlang.org/)
@@ -7,10 +11,6 @@
 **A high-performance, cross-platform memory game built with Kotlin Multiplatform, showcasing modern 2026 development standards.**
 
 Memory-Match is not just a game; it's a reference implementation for **Clean Architecture**, **Modular Design**, and **AI-Agentic Development** in the Kotlin ecosystem.
-
-<p align="center">
-  <img src="screenshots/Screenshot_20260119_134420.png" width="300" alt="Memory Match Gameplay" style="border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-</p>
 
 ---
 
