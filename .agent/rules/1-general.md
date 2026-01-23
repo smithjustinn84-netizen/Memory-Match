@@ -18,15 +18,15 @@ Before generating code, you **MUST** align with:
 ## 1. Tech Stack Overview
 - **UI**: Compose Multiplatform 1.10+
 - **DI**: Metro (Compiler Plugin)
-- **Nav**: Voyager
+- [ ] Nav: Decompose
 - **DB**: Room (KMP)
 - **Network**: Ktor 3.x
 - **Testing**: Turbine + Mokkery
 
 ## 🚫 Prohibited Patterns (The "Kill List")
-- `viewModelScope` -> Use `screenModelScope`.
+- `viewModelScope` -> Use `componentScope` (Decompose lifecycle scope).
 - `java.*` / `android.*` in shared code -> Use `kotlinx.*` or `expect/actual`.
 - Hardcoded Strings -> Use `Res.string.my_key`.
 - `!!` -> Use `requireNotNull` or `?.`.
-- Logic in UI -> Move to `ScreenModel` or `UseCase`.
+- Logic in UI -> Move to `Component` or `UseCase`.
 - `ConstraintLayout` -> Use `Column`, `Row`, `Box`.

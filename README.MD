@@ -79,6 +79,25 @@ graph TD
 
 ---
 
+## 🏛 Architecture (MVVM)
+
+We use a **Component-Based MVVM** pattern powered by **Decompose**, ensuring strict state management and lifecycle awareness across all platforms.
+
+| Role          | Responsibility             | Implementation                               |
+| :------------ | :------------------------- | :------------------------------------------- |
+| **Model**     | Business Logic & Data      | Domain Models, UseCases, Repositories        |
+| **View**      | UI Representation          | Compose Multiplatform (`@Composable`)        |
+| **ViewModel** | State & Logic Orchestrator | Decompose Components (e.g., `GameComponent`) |
+
+### 🔄 Unidirectional Data Flow (UDF)
+
+1.  **State Exposure**: Components expose a single, immutable `StateFlow<UIState>` (e.g., `GameUIState`) that the UI observes.
+2.  **User Intent**: The UI communicates user actions (e.g., `onFlipCard`) by calling methods directly on the Component.
+3.  **Side Effects**: One-time ephemeral events (e.g., playing a sound, vibrating, or navigating) are broadcast via a `Flow` or `Channel` to be collected by the UI or platform layer.
+4.  **Lifecycle Safety**: Components are tied to the Decompose lifecycle, ensuring state is preserved during configuration changes but cleared when the screen is destroyed.
+
+---
+
 ## 🛠 Tech Stack (2026 Standard)
 
 | Layer             | Technology                | Version       | Key Benefit                                         |

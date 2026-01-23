@@ -71,7 +71,7 @@ fun StatsContent(
                         }) {
                             Icon(
                                 imageVector = AppIcons.ArrowBack,
-                                contentDescription = "Back",
+                                contentDescription = stringResource(Res.string.back_content_description),
                                 tint = Color.White
                             )
                         }

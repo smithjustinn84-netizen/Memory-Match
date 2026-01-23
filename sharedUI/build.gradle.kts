@@ -14,6 +14,10 @@ plugins {
     alias(libs.plugins.mokkery)
 }
 
+ksp {
+    arg("mokkery.stubs.allowConcreteClassInstantiation", "true")
+}
+
 kotlin {
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")

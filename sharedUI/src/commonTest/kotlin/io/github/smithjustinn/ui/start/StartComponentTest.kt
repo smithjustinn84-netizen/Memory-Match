@@ -21,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -41,11 +42,22 @@ class StartComponentTest {
     
     private lateinit var component: DefaultStartComponent
     private val testDispatcher = StandardTestDispatcher()
-    private val lifecycle = LifecycleRegistry()
-
+    private var lifecycle: LifecycleRegistry? = null
     private var navigatedToGame: Triple<Int, GameMode, Boolean>? = null
     private var navigatedToSettings = false
     private var navigatedToStats = false
+
+    private fun runStartTest(block: suspend TestScope.() -> Unit) = runTest {
+        val l = LifecycleRegistry()
+        l.onCreate()
+        lifecycle = l
+        try {
+            block()
+        } finally {
+            l.onDestroy()
+            lifecycle = null
+        }
+    }
 
     @BeforeTest
     fun setUp() {
@@ -57,23 +69,25 @@ class StartComponentTest {
         
         every { settingsRepository.cardBackTheme } returns MutableStateFlow(CardBackTheme.GEOMETRIC)
         every { settingsRepository.cardSymbolTheme } returns MutableStateFlow(CardSymbolTheme.CLASSIC)
+        everySuspend { gameStateRepository.getSavedGameState() } returns null
         
-        component = DefaultStartComponent(
-            componentContext = DefaultComponentContext(lifecycle = lifecycle),
-            appGraph = appGraph,
-            onNavigateToGame = { pairs, mode, force -> navigatedToGame = Triple(pairs, mode, force) },
-            onNavigateToSettings = { navigatedToSettings = true },
-            onNavigateToStats = { navigatedToStats = true }
+        every { appGraph.coroutineDispatchers } returns io.github.smithjustinn.utils.CoroutineDispatchers(
+            main = testDispatcher,
+            mainImmediate = testDispatcher,
+            io = testDispatcher,
+            default = testDispatcher
         )
     }
 
     @AfterTest
     fun tearDown() {
+        lifecycle?.onDestroy()
         Dispatchers.resetMain()
     }
 
     @Test
-    fun `initial state is correct`() = runTest {
+    fun `initial state is correct`() = runStartTest {
+        component = createDefaultComponent()
         component.state.test {
             val state = awaitItem()
             assertEquals(DifficultyLevel.defaultLevels.size, state.difficulties.size)
@@ -84,7 +98,8 @@ class StartComponentTest {
     }
 
     @Test
-    fun `onDifficultySelected updates state`() = runTest {
+    fun `onDifficultySelected updates state`() = runStartTest {
+        component = createDefaultComponent()
         val newDifficulty = DifficultyLevel.defaultLevels[0]
         component.state.test {
             awaitItem() // Initial state
@@ -95,7 +110,8 @@ class StartComponentTest {
     }
 
     @Test
-    fun `onModeSelected updates state`() = runTest {
+    fun `onModeSelected updates state`() = runStartTest {
+        component = createDefaultComponent()
         val newMode = GameMode.TIME_ATTACK
         component.state.test {
             awaitItem() // Initial state
@@ -106,20 +122,15 @@ class StartComponentTest {
     }
 
     @Test
-    fun `Checks saved game on init and updates state when game exists`() = runTest {
+    fun `Checks saved game on init and updates state when game exists`() = runStartTest {
         // We need to re-init because check is in init
         val savedGame = MemoryGameState(pairCount = 12, mode = GameMode.TIME_ATTACK, isGameOver = false)
         everySuspend { gameStateRepository.getSavedGameState() } returns (savedGame to 100L)
 
-        val newComponent = DefaultStartComponent(
-            componentContext = DefaultComponentContext(lifecycle = LifecycleRegistry()),
-            appGraph = appGraph,
-            onNavigateToGame = { _, _, _ -> },
-            onNavigateToSettings = { },
-            onNavigateToStats = { }
-        )
+        val newComponent = createDefaultComponent()
 
         newComponent.state.test {
+            awaitItem() // Initial state
             val state = awaitItem()
             assertTrue(state.hasSavedGame)
             assertEquals(12, state.savedGamePairCount)
@@ -128,7 +139,8 @@ class StartComponentTest {
     }
 
     @Test
-    fun `onStartGame triggers navigation callback`() = runTest {
+    fun `onStartGame triggers navigation callback`() = runStartTest {
+        component = createDefaultComponent()
         component.onDifficultySelected(DifficultyLevel.defaultLevels[2]) // 10 pairs
         component.onModeSelected(GameMode.TIME_ATTACK)
         
@@ -140,22 +152,30 @@ class StartComponentTest {
     }
 
     @Test
-    fun `onResumeGame triggers navigation callback if saved game exists`() = runTest {
+    fun `onResumeGame triggers navigation callback if saved game exists`() = runStartTest {
         val savedGame = MemoryGameState(pairCount = 12, mode = GameMode.TIME_ATTACK, isGameOver = false)
         everySuspend { gameStateRepository.getSavedGameState() } returns (savedGame to 100L)
 
-        val newComponent = DefaultStartComponent(
-            componentContext = DefaultComponentContext(lifecycle = LifecycleRegistry()),
-            appGraph = appGraph,
-            onNavigateToGame = { pairs, mode, force -> navigatedToGame = Triple(pairs, mode, force) },
-            onNavigateToSettings = { },
-            onNavigateToStats = { }
-        )
+        val newComponent = createDefaultComponent()
         
         testDispatcher.scheduler.advanceUntilIdle()
 
         newComponent.onResumeGame()
         
         assertEquals(Triple(12, GameMode.TIME_ATTACK, false), navigatedToGame)
+    }
+
+    private fun createDefaultComponent(): DefaultStartComponent {
+        val l = lifecycle ?: LifecycleRegistry().also { 
+            it.onCreate()
+            lifecycle = it 
+        }
+        return DefaultStartComponent(
+            componentContext = DefaultComponentContext(lifecycle = l),
+            appGraph = appGraph,
+            onNavigateToGame = { pairs, mode, force -> navigatedToGame = Triple(pairs, mode, force) },
+            onNavigateToSettings = { navigatedToSettings = true },
+            onNavigateToStats = { navigatedToStats = true }
+        )
     }
 }

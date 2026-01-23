@@ -1,14 +1,10 @@
 package io.github.smithjustinn.ui.start
 
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.essenty.lifecycle.doOnDestroy
 import io.github.smithjustinn.di.AppGraph
 import io.github.smithjustinn.domain.models.DifficultyLevel
 import io.github.smithjustinn.domain.models.GameMode
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
+import io.github.smithjustinn.utils.componentScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,8 +20,8 @@ class DefaultStartComponent(
     private val onNavigateToSettings: () -> Unit,
     private val onNavigateToStats: () -> Unit
 ) : StartComponent, ComponentContext by componentContext {
-
-    private val scope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
+    private val dispatchers = appGraph.coroutineDispatchers
+    private val scope = lifecycle.componentScope(dispatchers.mainImmediate)
 
     private val _state = MutableStateFlow(DifficultyState())
     override val state: StateFlow<DifficultyState> = _state.asStateFlow()
@@ -35,7 +31,6 @@ class DefaultStartComponent(
     private val logger = appGraph.logger
 
     init {
-        lifecycle.doOnDestroy { scope.cancel() }
 
         scope.launch {
             combine(

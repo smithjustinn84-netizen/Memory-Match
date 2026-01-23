@@ -19,6 +19,7 @@ interface AppGraph {
     val logger: Logger
     val audioService: AudioService
     val hapticsService: HapticsService
+    val coroutineDispatchers: io.github.smithjustinn.utils.CoroutineDispatchers
     
     val gameStateRepository: GameStateRepository
     val settingsRepository: SettingsRepository

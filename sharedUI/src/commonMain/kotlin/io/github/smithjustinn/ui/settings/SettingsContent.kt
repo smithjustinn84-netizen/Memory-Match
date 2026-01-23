@@ -53,9 +53,7 @@ import io.github.smithjustinn.theme.StartBackgroundBottom
 import io.github.smithjustinn.theme.StartBackgroundTop
 import io.github.smithjustinn.ui.components.AppIcons
 import io.github.smithjustinn.ui.components.NeonSegmentedControl
-import memory_match.sharedui.generated.resources.Res
-import memory_match.sharedui.generated.resources.back_content_description
-import memory_match.sharedui.generated.resources.settings
+import memory_match.sharedui.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -123,9 +121,9 @@ fun SettingsContent(
                         .align(Alignment.TopCenter),
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    SettingsCard(title = "Appearance") {
+                    SettingsCard(title = stringResource(Res.string.settings_appearance)) {
                         ThemeSelector(
-                            title = "Card Back Style",
+                            title = stringResource(Res.string.settings_card_back_style),
                             options = CardBackTheme.entries,
                             selected = state.cardBackTheme,
                             onSelect = { 
@@ -138,7 +136,7 @@ fun SettingsContent(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         ThemeSelector(
-                            title = "Symbol Style",
+                            title = stringResource(Res.string.settings_symbol_style),
                             options = CardSymbolTheme.entries,
                             selected = state.cardSymbolTheme,
                             onSelect = { 
@@ -154,8 +152,8 @@ fun SettingsContent(
                         )
 
                         SettingsToggle(
-                            title = "Four Color Deck",
-                            description = "Use different colors for each suit (Hearts Red, Diamonds Blue, Clubs Green, Spades Black)",
+                            title = stringResource(Res.string.settings_four_color_deck),
+                            description = stringResource(Res.string.settings_four_color_deck_desc),
                             checked = state.areSuitsMultiColored,
                             onCheckedChange = {
                                 audioService.playClick()
@@ -164,10 +162,10 @@ fun SettingsContent(
                         )
                     }
 
-                    SettingsCard(title = "Gameplay & Audio") {
+                    SettingsCard(title = stringResource(Res.string.settings_gameplay_audio)) {
                         SettingsToggle(
-                            title = "Sound Effects",
-                            description = "Play sounds for card flips, matches, and wins",
+                            title = stringResource(Res.string.settings_sound_effects),
+                            description = stringResource(Res.string.settings_sound_effects_desc),
                             checked = state.isSoundEnabled,
                             onCheckedChange = { 
                                 audioService.playClick()
@@ -188,8 +186,8 @@ fun SettingsContent(
                         )
 
                         SettingsToggle(
-                            title = "Game Music",
-                            description = "Play background music during gameplay",
+                            title = stringResource(Res.string.settings_game_music),
+                            description = stringResource(Res.string.settings_game_music_desc),
                             checked = state.isMusicEnabled,
                             onCheckedChange = { 
                                 audioService.playClick()
@@ -210,8 +208,8 @@ fun SettingsContent(
                         )
 
                         SettingsToggle(
-                            title = "Enable Memory Peek",
-                            description = "Show cards briefly at the start of the game",
+                            title = stringResource(Res.string.settings_enable_peek),
+                            description = stringResource(Res.string.settings_enable_peek_desc),
                             checked = state.isPeekEnabled,
                             onCheckedChange = { 
                                 audioService.playClick()
@@ -228,13 +226,13 @@ fun SettingsContent(
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = "Reset Walkthrough",
+                                    text = stringResource(Res.string.settings_reset_walkthrough),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White
                                 )
                                 Text(
-                                    text = "Show the tutorial again on the next game",
+                                    text = stringResource(Res.string.settings_reset_walkthrough_desc),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = Color.White.copy(alpha = 0.6f),
                                     lineHeight = 16.sp
@@ -253,7 +251,7 @@ fun SettingsContent(
                                     disabledContentColor = Color.White.copy(alpha = 0.3f)
                                 )
                             ) {
-                                Text("Reset")
+                                Text(stringResource(Res.string.settings_reset))
                             }
                         }
                     }

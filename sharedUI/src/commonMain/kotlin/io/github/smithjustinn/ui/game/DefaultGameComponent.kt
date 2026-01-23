@@ -7,9 +7,13 @@ import io.github.smithjustinn.domain.MemoryGameLogic
 import io.github.smithjustinn.domain.models.GameDomainEvent
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
-import kotlinx.coroutines.*
+import io.github.smithjustinn.utils.componentScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 class DefaultGameComponent(
     componentContext: ComponentContext,
@@ -19,8 +23,8 @@ class DefaultGameComponent(
     forceNewGame: Boolean,
     private val onBackClicked: () -> Unit
 ) : GameComponent, ComponentContext by componentContext {
-
-    private val scope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
+    private val dispatchers = appGraph.coroutineDispatchers
+    private val scope = lifecycle.componentScope(dispatchers.mainImmediate)
 
     private val _state = MutableStateFlow(GameUIState())
     override val state: StateFlow<GameUIState> = _state.asStateFlow()
@@ -59,7 +63,6 @@ class DefaultGameComponent(
     init {
         lifecycle.doOnDestroy { 
             stopTimer()
-            scope.cancel()
             saveGame()
         }
 
@@ -188,7 +191,7 @@ class DefaultGameComponent(
     private fun startTimer(mode: GameMode) {
         timerJob?.cancel()
         timerJob = scope.launch {
-            while (true) {
+            while (isActive) {
                 delay(1000)
                 if (mode == GameMode.TIME_ATTACK) {
                     var shouldStop = false
