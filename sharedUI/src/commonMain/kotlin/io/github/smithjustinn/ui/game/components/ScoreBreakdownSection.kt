@@ -18,8 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.domain.models.ScoreBreakdown
-import io.github.smithjustinn.theme.InactiveBackground
-import io.github.smithjustinn.theme.NeonCyan
+import io.github.smithjustinn.theme.*
 import memory_match.sharedui.generated.resources.Res
 import memory_match.sharedui.generated.resources.score_breakdown_title
 import memory_match.sharedui.generated.resources.score_match_points
@@ -27,7 +26,7 @@ import memory_match.sharedui.generated.resources.score_move_bonus
 import memory_match.sharedui.generated.resources.score_time_bonus
 import org.jetbrains.compose.resources.stringResource
 
-private val BonusColor = Color(0xFF4CAF50)
+private val BonusColor = BonusGreen
 
 @Composable
 fun ScoreBreakdownSection(

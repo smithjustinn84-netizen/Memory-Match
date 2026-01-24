@@ -10,7 +10,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -19,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.domain.models.CardSymbolTheme
+import io.github.smithjustinn.theme.LightPurple
+import io.github.smithjustinn.theme.SoftBlue
 import memory_match.sharedui.generated.resources.Res
 import memory_match.sharedui.generated.resources.app_name
 import org.jetbrains.compose.resources.stringResource
@@ -49,13 +50,13 @@ fun StartHeader(
                 fontWeight = FontWeight.ExtraBold,
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFFC084FC), // Light Purple
-                        Color(0xFF60A5FA), // Soft Blue
+                        LightPurple, // Light Purple
+                        SoftBlue, // Soft Blue
                     ),
                 ),
                 textAlign = TextAlign.Center,
                 shadow = Shadow(
-                    color = Color(0xFFC084FC).copy(alpha = 0.4f),
+                    color = LightPurple.copy(alpha = 0.4f),
                     offset = Offset(0f, 0f),
                     blurRadius = 30f,
                 ),

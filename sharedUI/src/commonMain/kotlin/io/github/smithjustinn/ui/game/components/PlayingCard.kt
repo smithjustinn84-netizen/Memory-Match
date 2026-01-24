@@ -53,8 +53,7 @@ import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.domain.models.CardSymbolTheme
 import io.github.smithjustinn.domain.models.Rank
 import io.github.smithjustinn.domain.models.Suit
-import io.github.smithjustinn.theme.NeonCyan
-import io.github.smithjustinn.theme.StartBackgroundTop
+import io.github.smithjustinn.theme.*
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -113,13 +112,13 @@ fun PlayingCard(
     val cardFaceColor = Color.White
     val suitColor = if (areSuitsMultiColored) {
         when (suit) {
-            Suit.Hearts -> Color(0xFFD32F2F) // Red
-            Suit.Diamonds -> Color(0xFF1976D2) // Blue
-            Suit.Clubs -> Color(0xFF388E3C) // Green
-            Suit.Spades -> Color(0xFF212121) // Black
+            Suit.Hearts -> HeartRed // Red
+            Suit.Diamonds -> DiamondBlue // Blue
+            Suit.Clubs -> ClubGreen // Green
+            Suit.Spades -> SpadeBlack // Black
         }
     } else {
-        if (suit.isRed) Color(0xFFD32F2F) else Color(0xFF212121)
+        if (suit.isRed) HeartRed else SpadeBlack
     }
 
     val matchedGlowAlpha by animateFloatAsState(

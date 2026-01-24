@@ -1,7 +1,16 @@
 package io.github.smithjustinn.ui.game.components
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.InfiniteTransition
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CutCornerShape
@@ -13,10 +22,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.smithjustinn.theme.GoldenYellow
 import io.github.smithjustinn.theme.InactiveBackground
 import io.github.smithjustinn.theme.NeonCyan
 import memory_match.sharedui.generated.resources.Res
@@ -46,7 +55,7 @@ fun ComboBadge(
             ),
         )
 
-        val badgeColor = if (isMegaBonus) Color(0xFFFFD700) else NeonCyan
+        val badgeColor = if (isMegaBonus) GoldenYellow else NeonCyan
         val tacticalShape = CutCornerShape(topStart = 8.dp, bottomEnd = 8.dp)
 
         Surface(

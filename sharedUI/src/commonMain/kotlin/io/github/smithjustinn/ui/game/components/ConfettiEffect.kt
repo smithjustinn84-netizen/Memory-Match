@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
+import io.github.smithjustinn.theme.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -57,17 +58,17 @@ fun ConfettiEffect(
     particleCount: Int = 100,
     colors: List<Color> = listOf(
         // Pink
-        Color(0xFFE91E63),
+        ConfettiPink,
         // Purple
-        Color(0xFF9C27B0),
+        ConfettiPurple,
         // Blue
-        Color(0xFF2196F3),
+        ConfettiBlue,
         // Green
-        Color(0xFF4CAF50),
+        BonusGreen,
         // Yellow
-        Color(0xFFFFEB3B),
+        ConfettiYellow,
         // Orange
-        Color(0xFFFF9800),
+        ConfettiOrange,
     ),
 ) {
     val particles = remember { mutableStateListOf<Particle>() }

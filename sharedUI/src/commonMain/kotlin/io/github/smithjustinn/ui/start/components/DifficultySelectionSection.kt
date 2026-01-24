@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.smithjustinn.theme.*
 import io.github.smithjustinn.domain.models.DifficultyLevel
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.ui.components.AppIcons
@@ -170,7 +171,7 @@ fun NeonStyleButton(
         label = "buttonScale",
     )
 
-    val backgroundColor = if (isPrimary) Color(0xFF2D8EFF) else Color(0xFF1E2A4F)
+    val backgroundColor = if (isPrimary) NeonCyan else InactiveBackground
     val buttonShape = RoundedCornerShape(12.dp)
 
     Surface(
@@ -187,8 +188,8 @@ fun NeonStyleButton(
                     Modifier.shadow(
                         elevation = 12.dp,
                         shape = buttonShape,
-                        ambientColor = Color(0xFF2D8EFF).copy(alpha = 0.6f),
-                        spotColor = Color(0xFF2D8EFF).copy(alpha = 0.6f),
+                        ambientColor = NeonCyan.copy(alpha = 0.6f),
+                        spotColor = NeonCyan.copy(alpha = 0.6f),
                     )
                 } else {
                     Modifier

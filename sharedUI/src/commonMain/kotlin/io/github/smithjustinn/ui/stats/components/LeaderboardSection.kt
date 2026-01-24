@@ -16,8 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.domain.models.DifficultyLevel
 import io.github.smithjustinn.domain.models.LeaderboardEntry
-import io.github.smithjustinn.theme.InactiveBackground
-import io.github.smithjustinn.theme.NeonCyan
+import io.github.smithjustinn.theme.*
 import io.github.smithjustinn.utils.formatTime
 import kotlinx.collections.immutable.ImmutableList
 import memory_match.sharedui.generated.resources.Res
@@ -115,17 +114,17 @@ private fun LeaderboardRow(rank: Int, entry: LeaderboardEntry) {
             modifier = Modifier.size(32.dp),
             shape = CircleShape,
             color = when (rank) {
-                1 -> Color(0xFFFFD700).copy(alpha = 0.2f) // Gold
-                2 -> Color(0xFFC0C0C0).copy(alpha = 0.2f) // Silver
-                3 -> Color(0xFFCD7F32).copy(alpha = 0.2f) // Bronze
+                1 -> GoldenYellow.copy(alpha = 0.2f) // Gold
+                2 -> Silver.copy(alpha = 0.2f) // Silver
+                3 -> Bronze.copy(alpha = 0.2f) // Bronze
                 else -> Color.White.copy(alpha = 0.05f)
             },
             border = androidx.compose.foundation.BorderStroke(
                 width = 1.dp,
                 color = when (rank) {
-                    1 -> Color(0xFFFFD700).copy(alpha = 0.5f)
-                    2 -> Color(0xFFC0C0C0).copy(alpha = 0.5f)
-                    3 -> Color(0xFFCD7F32).copy(alpha = 0.5f)
+                    1 -> GoldenYellow.copy(alpha = 0.5f)
+                    2 -> Silver.copy(alpha = 0.5f)
+                    3 -> Bronze.copy(alpha = 0.5f)
                     else -> Color.White.copy(alpha = 0.1f)
                 },
             ),
@@ -136,9 +135,9 @@ private fun LeaderboardRow(rank: Int, entry: LeaderboardEntry) {
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.ExtraBold,
                     color = when (rank) {
-                        1 -> Color(0xFFFFD700)
-                        2 -> Color(0xFFC0C0C0)
-                        3 -> Color(0xFFCD7F32)
+                        1 -> GoldenYellow
+                        2 -> Silver
+                        3 -> Bronze
                         else -> Color.White.copy(alpha = 0.6f)
                     },
                 )

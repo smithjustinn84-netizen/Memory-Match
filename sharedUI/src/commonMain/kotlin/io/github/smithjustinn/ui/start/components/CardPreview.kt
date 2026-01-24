@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import io.github.smithjustinn.theme.*
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -82,8 +83,8 @@ fun CardPreview(
                     drawCircle(
                         brush = Brush.radialGradient(
                             colors = listOf(
-                                Color(0xFF60A5FA).copy(alpha = 0.2f),
-                                Color(0xFF1E3A8A).copy(alpha = 0.1f),
+                                SoftBlue.copy(alpha = 0.2f),
+                                DarkBlue.copy(alpha = 0.1f),
                                 Color.Transparent,
                             ),
                         ),
@@ -224,11 +225,11 @@ fun AnimatedStar(
         // Outer glow
         drawPath(
             path = path,
-            color = Color(0xFFFFD700).copy(alpha = 0.3f),
+            color = GoldenYellow.copy(alpha = 0.3f),
             style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round),
         )
 
         // Core
-        drawPath(path, Color(0xFFFFD700))
+        drawPath(path, GoldenYellow)
     }
 }

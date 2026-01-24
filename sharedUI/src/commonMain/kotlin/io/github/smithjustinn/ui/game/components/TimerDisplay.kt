@@ -17,9 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.smithjustinn.theme.InactiveBackground
-import io.github.smithjustinn.theme.NeonCyan
-import io.github.smithjustinn.theme.TacticalRed
+import io.github.smithjustinn.theme.*
 import io.github.smithjustinn.utils.formatTime
 
 @Composable
@@ -40,8 +38,8 @@ fun TimerDisplay(
     val timerColor by animateColorAsState(
         targetValue = when {
             showTimeLoss -> TacticalRed
-            showTimeGain && isMegaBonus -> Color(0xFFFFD700)
-            showTimeGain -> Color(0xFF4CAF50)
+            showTimeGain && isMegaBonus -> GoldenYellow
+            showTimeGain -> BonusGreen
             isLowTime -> TacticalRed
             minimal -> Color.White
             else -> NeonCyan
@@ -98,7 +96,7 @@ fun TimerDisplay(
                 Text(
                     text = "+${timeGainAmount}s",
                     style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
-                    color = if (isMegaBonus) Color(0xFFFFD700) else Color(0xFF4CAF50),
+                    color = if (isMegaBonus) GoldenYellow else BonusGreen,
                     fontWeight = FontWeight.Black,
                     modifier = Modifier.padding(start = 4.dp),
                 )
@@ -138,7 +136,7 @@ fun TimerDisplay(
                     Text(
                         text = "+${timeGainAmount}s",
                         style = if (compact) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelLarge,
-                        color = if (isMegaBonus) Color(0xFFFFD700) else Color(0xFF4CAF50),
+                        color = if (isMegaBonus) GoldenYellow else BonusGreen,
                         fontWeight = FontWeight.Black,
                         modifier = Modifier.padding(start = 6.dp),
                     )

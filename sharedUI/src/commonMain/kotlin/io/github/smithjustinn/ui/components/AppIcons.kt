@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
+import io.github.smithjustinn.theme.*
 
 object AppIcons {
     private var _arrowBack: ImageVector? = null
@@ -79,7 +80,7 @@ object AppIcons {
                 viewportWidth = 24.0f,
                 viewportHeight = 24.0f,
             ).path(
-                fill = SolidColor(Color(0xFF000000)),
+                fill = SolidColor(PureBlack),
                 strokeLineWidth = 0f,
                 strokeLineCap = StrokeCap.Butt,
                 strokeLineJoin = StrokeJoin.Miter,
@@ -148,7 +149,7 @@ object AppIcons {
                 viewportWidth = 24.0f,
                 viewportHeight = 24.0f,
             ).path(
-                fill = SolidColor(Color(0xFF000000)),
+                fill = SolidColor(PureBlack),
                 strokeLineWidth = 0f,
                 strokeLineCap = StrokeCap.Butt,
                 strokeLineJoin = StrokeJoin.Miter,
