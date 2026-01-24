@@ -121,6 +121,8 @@ Memory-Match is developed using modern AI-first tooling and professional IDEs:
 - **Google Antigravity**: For advanced agentic coding and architectural orchestration.
 - **Android Studio**: The primary development environment for Kotlin Multiplatform.
 - **Gemini**: Powering AI-assisted development, brainstorming, and code generation.
+- **Google AI Studio**: For rapid prototyping and testing of generative AI models.
+- **Warp Terminal**: The intelligent terminal for modern development workflows.
 
 
 ---
@@ -149,7 +151,12 @@ Alternatively, run specific module tests:
 
 ## 🤖 AI-Agentic Development
 
-This repository is **Agent-Ready**. If you are using an AI coding assistant (like Cursor, Windsurf, or Copilot), please point it to the `AGENTS.md` file. It contains the **Immutable Source of Truth** for architectural rules, 2026 coding idioms, and platform-specific constraints.
+This repository is **Agent-Ready**, designed to be seamlessly navigated and extended by AI coding assistants.
+
+- **[AGENTS.md](AGENTS.md)**: Serves as the **Immutable Source of Truth** for the project. It outlines the architectural foundation, 2026 coding idioms (like Context Parameters), and platform-specific constraints that agents must follow.
+- **[.Agent/rules](.Agent/rules)**: Contains granular, context-specific instructions and linting rules. These rules ensure that AI-generated code adheres to the project's strict standards for Compose Multiplatform, Decompose, and Clean Architecture.
+
+If you are using an AI coding assistant (like Cursor, Windsurf, or Antigravity), ensure it indexes these files to maintain high-quality, idiomatic contributions.
 
 ---
 
