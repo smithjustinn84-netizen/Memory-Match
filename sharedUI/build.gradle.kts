@@ -95,6 +95,7 @@ room {
 }
 
 dependencies {
+    add("kspCommonMainMetadata", libs.room.compiler)
     with(libs.room.compiler) {
         add("kspAndroid", this)
         add("kspJvm", this)
