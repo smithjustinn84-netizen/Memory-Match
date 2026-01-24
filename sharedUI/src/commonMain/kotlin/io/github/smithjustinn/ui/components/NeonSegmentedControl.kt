@@ -23,7 +23,7 @@ import io.github.smithjustinn.theme.NeonCyan
 
 /**
  * NeonSegmentedControl (2026 Design)
- * 
+ *
  * A custom segmented control with a rounded rectangle shape, animated sliding indicator,
  * and neon glow effects. Updated to match the refined aesthetic.
  */
@@ -33,26 +33,26 @@ fun <T> NeonSegmentedControl(
     selectedItem: T,
     onItemSelected: (T) -> Unit,
     labelProvider: @Composable (T) -> String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val selectedIndex = items.indexOf(selectedItem).coerceAtLeast(0)
     val controlShape = RoundedCornerShape(12.dp)
-    
+
     BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
             .height(52.dp)
             .clip(controlShape)
             .background(InactiveBackground.copy(alpha = 0.5f))
-            .padding(4.dp)
+            .padding(4.dp),
     ) {
         val maxWidth = maxWidth
         val itemWidth = maxWidth / items.size
-        
+
         val indicatorOffset by animateDpAsState(
             targetValue = itemWidth * selectedIndex,
             animationSpec = tween(durationMillis = 300),
-            label = "indicatorOffset"
+            label = "indicatorOffset",
         )
 
         // Sliding Indicator (The "active" state background)
@@ -65,10 +65,10 @@ fun <T> NeonSegmentedControl(
                     elevation = 8.dp,
                     shape = controlShape,
                     ambientColor = NeonCyan.copy(alpha = 0.5f),
-                    spotColor = NeonCyan.copy(alpha = 0.5f)
+                    spotColor = NeonCyan.copy(alpha = 0.5f),
                 )
                 .clip(controlShape)
-                .background(NeonCyan)
+                .background(NeonCyan),
         )
 
         // Labels Row
@@ -78,9 +78,9 @@ fun <T> NeonSegmentedControl(
                 val textColor by animateColorAsState(
                     targetValue = if (isSelected) Color.White else Color.White.copy(alpha = 0.5f),
                     animationSpec = tween(durationMillis = 300),
-                    label = "textColor"
+                    label = "textColor",
                 )
-                
+
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -89,15 +89,15 @@ fun <T> NeonSegmentedControl(
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
-                            onClick = { onItemSelected(item) }
+                            onClick = { onItemSelected(item) },
                         ),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = labelProvider(item),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                        color = textColor
+                        color = textColor,
                     )
                 }
             }

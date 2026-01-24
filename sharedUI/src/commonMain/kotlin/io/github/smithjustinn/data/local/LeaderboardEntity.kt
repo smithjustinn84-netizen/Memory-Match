@@ -13,5 +13,5 @@ data class LeaderboardEntity(
     val timeSeconds: Long,
     val moves: Int,
     val timestamp: Instant,
-    val gameMode: GameMode = GameMode.STANDARD
+    val gameMode: GameMode = GameMode.STANDARD,
 )

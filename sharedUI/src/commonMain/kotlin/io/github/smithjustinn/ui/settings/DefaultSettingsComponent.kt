@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.*
 class DefaultSettingsComponent(
     componentContext: ComponentContext,
     appGraph: AppGraph,
-    private val onBackClicked: () -> Unit
+    private val onBackClicked: () -> Unit,
 ) : SettingsComponent, ComponentContext by componentContext {
 
     private val scope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
@@ -26,7 +26,7 @@ class DefaultSettingsComponent(
         settingsRepository.isSoundEnabled,
         settingsRepository.isMusicEnabled,
         settingsRepository.soundVolume,
-        settingsRepository.musicVolume
+        settingsRepository.musicVolume,
     ) { sound, music, soundVol, musicVol ->
         AudioSettings(sound, music, soundVol, musicVol)
     }
@@ -34,7 +34,7 @@ class DefaultSettingsComponent(
     private val themeSettingsFlow = combine(
         settingsRepository.cardBackTheme,
         settingsRepository.cardSymbolTheme,
-        settingsRepository.areSuitsMultiColored
+        settingsRepository.areSuitsMultiColored,
     ) { back, symbol, multiColor ->
         ThemeSettings(back, symbol, multiColor)
     }
@@ -43,7 +43,7 @@ class DefaultSettingsComponent(
         settingsRepository.isPeekEnabled,
         settingsRepository.isWalkthroughCompleted,
         audioSettingsFlow,
-        themeSettingsFlow
+        themeSettingsFlow,
     ) { peek, walkthrough, audio, theme ->
         SettingsState(
             isPeekEnabled = peek,
@@ -54,25 +54,25 @@ class DefaultSettingsComponent(
             musicVolume = audio.musicVolume,
             cardBackTheme = theme.cardBackTheme,
             cardSymbolTheme = theme.cardSymbolTheme,
-            areSuitsMultiColored = theme.areSuitsMultiColored
+            areSuitsMultiColored = theme.areSuitsMultiColored,
         )
     }.stateIn(
         scope = scope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = SettingsState()
+        initialValue = SettingsState(),
     )
 
     private data class AudioSettings(
         val isSoundEnabled: Boolean,
         val isMusicEnabled: Boolean,
         val soundVolume: Float,
-        val musicVolume: Float
+        val musicVolume: Float,
     )
 
     private data class ThemeSettings(
         val cardBackTheme: CardBackTheme,
         val cardSymbolTheme: CardSymbolTheme,
-        val areSuitsMultiColored: Boolean
+        val areSuitsMultiColored: Boolean,
     )
 
     init {

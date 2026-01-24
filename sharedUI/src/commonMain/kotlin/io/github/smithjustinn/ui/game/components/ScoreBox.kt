@@ -33,33 +33,33 @@ fun ScoreBox(
     elapsedTimeSeconds: Long,
     moves: Int,
     modifier: Modifier = Modifier,
-    compact: Boolean = false
+    compact: Boolean = false,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         color = InactiveBackground.copy(alpha = 0.5f),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.15f))
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.15f)),
     ) {
         Column(
             modifier = Modifier.padding(if (compact) 12.dp else 20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = stringResource(Res.string.final_score_label).uppercase(),
                 style = if (compact) {
                     MaterialTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.Black,
-                        letterSpacing = 1.2.sp
+                        letterSpacing = 1.2.sp,
                     )
                 } else {
                     MaterialTheme.typography.labelLarge.copy(
                         fontWeight = FontWeight.Black,
-                        letterSpacing = 2.sp
+                        letterSpacing = 2.sp,
                     )
                 },
                 color = NeonCyan,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
 
             Text(
@@ -70,22 +70,22 @@ fun ScoreBox(
                     MaterialTheme.typography.displayMedium
                 }.copy(fontWeight = FontWeight.Black),
                 color = Color.White,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
 
             Row(
                 horizontalArrangement = Arrangement.spacedBy(if (compact) 8.dp else 16.dp),
-                modifier = Modifier.padding(top = if (compact) 4.dp else 12.dp)
+                modifier = Modifier.padding(top = if (compact) 4.dp else 12.dp),
             ) {
                 StatItem(
                     label = stringResource(Res.string.time_label, formatTime(elapsedTimeSeconds)),
                     color = Color.White.copy(alpha = 0.9f),
-                    compact = compact
+                    compact = compact,
                 )
                 StatItem(
                     label = stringResource(Res.string.moves_label, moves),
                     color = Color.White.copy(alpha = 0.9f),
-                    compact = compact
+                    compact = compact,
                 )
             }
         }
@@ -97,23 +97,23 @@ private fun StatItem(
     label: String,
     color: Color,
     modifier: Modifier = Modifier,
-    compact: Boolean = false
+    compact: Boolean = false,
 ) {
     Surface(
         modifier = modifier,
         color = Color.White.copy(alpha = 0.05f),
         shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)),
     ) {
         Text(
             text = label,
             modifier = Modifier.padding(
                 horizontal = if (compact) 8.dp else 12.dp,
-                vertical = if (compact) 4.dp else 6.dp
+                vertical = if (compact) 4.dp else 6.dp,
             ),
             style = if (compact) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelLarge,
             color = color,
-            fontWeight = FontWeight.Black
+            fontWeight = FontWeight.Black,
         )
     }
 }

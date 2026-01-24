@@ -60,7 +60,7 @@ fun ResultsCard(
     onPlayAgain: () -> Unit,
     modifier: Modifier = Modifier,
     mode: GameMode = GameMode.STANDARD,
-    onScoreTick: () -> Unit = {}
+    onScoreTick: () -> Unit = {},
 ) {
     val isTimeAttack = mode == GameMode.TIME_ATTACK
     val titleRes = when {
@@ -71,13 +71,13 @@ fun ResultsCard(
 
     val animatedScore = remember { Animatable(0f) }
     var lastRoundedScore by remember { mutableStateOf(0) }
-    
+
     val scoreTickHandler by rememberUpdatedState(onScoreTick)
 
     LaunchedEffect(score) {
         animatedScore.animateTo(
             targetValue = score.toFloat(),
-            animationSpec = tween(durationMillis = 1500, easing = FastOutSlowInEasing)
+            animationSpec = tween(durationMillis = 1500, easing = FastOutSlowInEasing),
         ) {
             val currentRounded = value.roundToInt()
             // Throttle haptics: every 10 points if score is high, or every point if score is low
@@ -95,8 +95,8 @@ fun ResultsCard(
             targetValue = 1f,
             animationSpec = spring(
                 dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessLow
-            )
+                stiffness = Spring.StiffnessLow,
+            ),
         )
     }
 
@@ -110,7 +110,7 @@ fun ResultsCard(
             shape = RoundedCornerShape(24.dp),
             color = InactiveBackground.copy(alpha = 0.8f),
             border = BorderStroke(1.dp, Color.White.copy(alpha = 0.15f)),
-            shadowElevation = 16.dp
+            shadowElevation = 16.dp,
         ) {
             val contentPadding = if (isCompactHeight) 12.dp else 24.dp
             val verticalSpacing = if (isCompactHeight) 8.dp else 16.dp
@@ -122,7 +122,7 @@ fun ResultsCard(
                     .padding(contentPadding)
                     .then(if (isCompactHeight) Modifier.verticalScroll(rememberScrollState()) else Modifier),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(verticalSpacing)
+                verticalArrangement = Arrangement.spacedBy(verticalSpacing),
             ) {
                 Text(
                     text = stringResource(titleRes).uppercase(),
@@ -131,39 +131,39 @@ fun ResultsCard(
                     } else {
                         MaterialTheme.typography.headlineLarge.copy(
                             fontWeight = FontWeight.Black,
-                            letterSpacing = 2.sp
+                            letterSpacing = 2.sp,
                         )
                     },
                     color = headerColor,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
 
                 if (isCompactHeight) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         ScoreBox(
                             score = animatedScore.value.roundToInt(),
                             elapsedTimeSeconds = elapsedTimeSeconds,
                             moves = moves,
                             modifier = Modifier.weight(1f),
-                            compact = true
+                            compact = true,
                         )
-                        
+
                         Button(
                             onClick = onPlayAgain,
                             modifier = Modifier.height(48.dp),
                             shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = NeonCyan)
+                            colors = ButtonDefaults.buttonColors(containerColor = NeonCyan),
                         ) {
                             Text(
                                 text = stringResource(Res.string.play_again).uppercase(),
                                 style = MaterialTheme.typography.labelLarge.copy(
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
+                                    color = Color.White,
+                                ),
                             )
                         }
                     }
@@ -171,7 +171,7 @@ fun ResultsCard(
                     ScoreBox(
                         score = animatedScore.value.roundToInt(),
                         elapsedTimeSeconds = elapsedTimeSeconds,
-                        moves = moves
+                        moves = moves,
                     )
 
                     ScoreBreakdownSection(scoreBreakdown = scoreBreakdown)
@@ -183,15 +183,15 @@ fun ResultsCard(
                             .height(56.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = NeonCyan),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                     ) {
                         Text(
                             text = stringResource(Res.string.play_again).uppercase(),
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Black,
                                 letterSpacing = 1.sp,
-                                color = Color.White
-                            )
+                                color = Color.White,
+                            ),
                         )
                     }
                 }

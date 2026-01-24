@@ -10,12 +10,12 @@ import dev.mokkery.matcher.any
 import dev.mokkery.verifySuspend
 import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.test.BaseComponentTest
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SettingsComponentTest : BaseComponentTest() {
@@ -82,9 +82,9 @@ class SettingsComponentTest : BaseComponentTest() {
 
     private fun createComponent(lifecycle: Lifecycle): DefaultSettingsComponent {
         return DefaultSettingsComponent(
-                componentContext = DefaultComponentContext(lifecycle = lifecycle),
-                appGraph = context.appGraph,
-                onBackClicked = {}
+            componentContext = DefaultComponentContext(lifecycle = lifecycle),
+            appGraph = context.appGraph,
+            onBackClicked = {},
         )
     }
 }

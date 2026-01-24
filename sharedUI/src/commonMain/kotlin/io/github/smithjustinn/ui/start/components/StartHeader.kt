@@ -25,7 +25,7 @@ import org.jetbrains.compose.resources.stringResource
 
 /**
  * StartHeader (Header Section - 2026 Design)
- * 
+ *
  * Contains the "Memory Match" title with a vibrant gradient and the tilted cards preview.
  * Refined to match the reference image while keeping the "airy" feel the user liked.
  */
@@ -33,14 +33,14 @@ import org.jetbrains.compose.resources.stringResource
 fun StartHeader(
     modifier: Modifier = Modifier,
     cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC,
-    cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC
+    cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         val title = stringResource(Res.string.app_name)
-        
+
         Text(
             text = title,
             style = TextStyle(
@@ -49,16 +49,16 @@ fun StartHeader(
                 brush = Brush.verticalGradient(
                     colors = listOf(
                         Color(0xFFC084FC), // Light Purple
-                        Color(0xFF60A5FA)  // Soft Blue
-                    )
+                        Color(0xFF60A5FA), // Soft Blue
+                    ),
                 ),
                 textAlign = TextAlign.Center,
                 shadow = Shadow(
                     color = Color(0xFFC084FC).copy(alpha = 0.4f),
                     offset = Offset(0f, 0f),
-                    blurRadius = 30f
-                )
-            )
+                    blurRadius = 30f,
+                ),
+            ),
         )
 
         Spacer(modifier = Modifier.height(32.dp)) // Restored original spacing
@@ -66,7 +66,7 @@ fun StartHeader(
         CardPreview(
             modifier = Modifier.height(180.dp), // Restored original size
             cardBackTheme = cardBackTheme,
-            cardSymbolTheme = cardSymbolTheme
+            cardSymbolTheme = cardSymbolTheme,
         )
     }
 }

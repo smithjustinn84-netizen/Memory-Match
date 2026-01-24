@@ -26,7 +26,7 @@ import org.jetbrains.compose.resources.stringResource
 
 /**
  * DifficultySelectionSection (2026 Design)
- * 
+ *
  * Contains the difficulty and game mode selectors, and primary action buttons.
  * Updated: Buttons are now rounded rectangles to match the refined aesthetic.
  */
@@ -39,36 +39,36 @@ fun DifficultySelectionSection(
     onResumeGame: () -> Unit,
     onSettingsClick: () -> Unit,
     onStatsClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         // Step 4: Assemble Settings Selectors
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(32.dp)
+            verticalArrangement = Arrangement.spacedBy(32.dp),
         ) {
             // Difficulty Selector
             Column(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
                     text = stringResource(Res.string.select_difficulty),
                     style = MaterialTheme.typography.labelLarge,
                     color = Color.White.copy(alpha = 0.5f),
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.2.sp
+                    letterSpacing = 1.2.sp,
                 )
 
                 NeonSegmentedControl(
                     items = state.difficulties,
                     selectedItem = state.selectedDifficulty,
                     onItemSelected = onDifficultySelected,
-                    labelProvider = { level -> level.pairs.toString() }
+                    labelProvider = { level -> level.pairs.toString() },
                 )
             }
 
@@ -76,14 +76,14 @@ fun DifficultySelectionSection(
             Column(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
                     text = stringResource(Res.string.game_mode),
                     style = MaterialTheme.typography.labelLarge,
                     color = Color.White.copy(alpha = 0.5f),
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.2.sp
+                    letterSpacing = 1.2.sp,
                 )
 
                 NeonSegmentedControl(
@@ -95,7 +95,7 @@ fun DifficultySelectionSection(
                             GameMode.STANDARD -> stringResource(Res.string.mode_standard)
                             GameMode.TIME_ATTACK -> stringResource(Res.string.mode_time_attack)
                         }
-                    }
+                    },
                 )
             }
         }
@@ -105,7 +105,7 @@ fun DifficultySelectionSection(
         // Step 5: Implement Action Buttons
         Column(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             // Main Button(s)
             if (state.hasSavedGame) {
@@ -113,41 +113,41 @@ fun DifficultySelectionSection(
                     text = stringResource(Res.string.resume_game),
                     onClick = onResumeGame,
                     modifier = Modifier.fillMaxWidth(),
-                    trailingIcon = AppIcons.ArrowBack
+                    trailingIcon = AppIcons.ArrowBack,
                 )
-                
+
                 NeonStyleButton(
                     text = stringResource(Res.string.start),
                     onClick = onStartGame,
                     modifier = Modifier.fillMaxWidth(),
-                    isPrimary = false
+                    isPrimary = false,
                 )
             } else {
                 NeonStyleButton(
                     text = stringResource(Res.string.start),
                     onClick = onStartGame,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
 
             // Secondary Buttons Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 NeonStyleButton(
                     text = stringResource(Res.string.settings),
                     onClick = onSettingsClick,
                     modifier = Modifier.weight(1f),
                     isPrimary = false,
-                    leadingIcon = AppIcons.Settings
+                    leadingIcon = AppIcons.Settings,
                 )
                 NeonStyleButton(
                     text = stringResource(Res.string.leaderboard),
                     onClick = onStatsClick,
                     modifier = Modifier.weight(1f),
                     isPrimary = false,
-                    leadingIcon = AppIcons.Trophy
+                    leadingIcon = AppIcons.Trophy,
                 )
             }
         }
@@ -161,18 +161,18 @@ fun NeonStyleButton(
     modifier: Modifier = Modifier,
     isPrimary: Boolean = true,
     leadingIcon: androidx.compose.ui.graphics.vector.ImageVector? = null,
-    trailingIcon: androidx.compose.ui.graphics.vector.ImageVector? = null
+    trailingIcon: androidx.compose.ui.graphics.vector.ImageVector? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val scale by animateFloatAsState(
         targetValue = if (isPressed) 0.96f else 1f,
-        label = "buttonScale"
+        label = "buttonScale",
     )
 
     val backgroundColor = if (isPrimary) Color(0xFF2D8EFF) else Color(0xFF1E2A4F)
     val buttonShape = RoundedCornerShape(12.dp)
-    
+
     Surface(
         onClick = onClick,
         interactionSource = interactionSource,
@@ -188,32 +188,34 @@ fun NeonStyleButton(
                         elevation = 12.dp,
                         shape = buttonShape,
                         ambientColor = Color(0xFF2D8EFF).copy(alpha = 0.6f),
-                        spotColor = Color(0xFF2D8EFF).copy(alpha = 0.6f)
+                        spotColor = Color(0xFF2D8EFF).copy(alpha = 0.6f),
                     )
-                } else Modifier
+                } else {
+                    Modifier
+                },
             ),
         shape = buttonShape,
         color = backgroundColor,
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(horizontal = 12.dp)
+                modifier = Modifier.padding(horizontal = 12.dp),
             ) {
                 if (leadingIcon != null) {
                     Icon(
                         imageVector = leadingIcon,
                         contentDescription = null,
                         tint = Color.White,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(18.dp),
                     )
                     Spacer(Modifier.width(8.dp))
                 }
-                
+
                 Text(
                     text = text,
                     style = MaterialTheme.typography.titleMedium,
@@ -221,16 +223,16 @@ fun NeonStyleButton(
                     color = Color.White,
                     maxLines = 1,
                     softWrap = false,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
-                
+
                 if (trailingIcon != null) {
                     Spacer(Modifier.width(8.dp))
                     Icon(
                         imageVector = trailingIcon,
                         contentDescription = null,
                         tint = Color.White,
-                        modifier = Modifier.size(18.dp).graphicsLayer { rotationZ = 145f } // Diagonal arrow up-right as in image
+                        modifier = Modifier.size(18.dp).graphicsLayer { rotationZ = 145f }, // Diagonal arrow up-right as in image
                     )
                 }
             }

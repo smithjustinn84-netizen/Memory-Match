@@ -21,26 +21,26 @@ import io.github.smithjustinn.theme.NeonCyan
 @Composable
 fun PeekCountdownOverlay(
     countdown: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(Color.Black.copy(alpha = 0.4f)),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         AnimatedContent(
             targetState = countdown,
             transitionSpec = {
                 (scaleIn() + fadeIn()).togetherWith(scaleOut() + fadeOut())
-            }
+            },
         ) { targetCount ->
             Surface(
                 modifier = Modifier.size(140.dp),
                 shape = CircleShape,
                 color = InactiveBackground.copy(alpha = 0.8f),
                 border = BorderStroke(2.dp, NeonCyan.copy(alpha = 0.5f)),
-                shadowElevation = 16.dp
+                shadowElevation = 16.dp,
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Text(
@@ -48,8 +48,8 @@ fun PeekCountdownOverlay(
                         style = MaterialTheme.typography.displayLarge.copy(
                             fontSize = 80.sp,
                             fontWeight = FontWeight.Black,
-                            color = NeonCyan
-                        )
+                            color = NeonCyan,
+                        ),
                     )
                 }
             }

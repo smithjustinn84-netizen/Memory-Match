@@ -7,7 +7,8 @@ enum class Suit(val symbol: String) {
     Hearts("♥"),
     Diamonds("♦"),
     Clubs("♣"),
-    Spades("♠");
+    Spades("♠"),
+    ;
 
     val isRed: Boolean get() = this == Hearts || this == Diamonds
 }
@@ -26,7 +27,7 @@ enum class Rank(val symbol: String) {
     Ten("10"),
     Jack("J"),
     Queen("Q"),
-    King("K")
+    King("K"),
 }
 
 @Serializable
@@ -36,5 +37,5 @@ data class CardState(
     val rank: Rank,
     val isFaceUp: Boolean = false,
     val isMatched: Boolean = false,
-    val isError: Boolean = false
+    val isError: Boolean = false,
 )

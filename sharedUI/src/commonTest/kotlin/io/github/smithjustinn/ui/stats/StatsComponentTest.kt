@@ -5,9 +5,9 @@ import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.Lifecycle
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.test.BaseComponentTest
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class StatsComponentTest : BaseComponentTest() {
@@ -18,7 +18,7 @@ class StatsComponentTest : BaseComponentTest() {
         return DefaultStatsComponent(
             componentContext = DefaultComponentContext(lifecycle = lifecycle),
             appGraph = context.appGraph,
-            onBackClicked = {}
+            onBackClicked = {},
         )
     }
 
@@ -31,8 +31,8 @@ class StatsComponentTest : BaseComponentTest() {
             val state = awaitItem()
             assertEquals(GameMode.STANDARD, state.selectedGameMode)
             assertEquals(
-                    io.github.smithjustinn.domain.models.DifficultyLevel.defaultLevels.size,
-                    state.difficultyLeaderboards.size
+                io.github.smithjustinn.domain.models.DifficultyLevel.defaultLevels.size,
+                state.difficultyLeaderboards.size,
             )
         }
     }

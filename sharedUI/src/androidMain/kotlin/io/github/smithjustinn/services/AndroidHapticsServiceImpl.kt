@@ -11,7 +11,7 @@ import dev.zacsweers.metro.Inject
 
 @Inject
 class AndroidHapticsServiceImpl(
-    private val context: Context
+    private val context: Context,
 ) : HapticsService {
 
     private val vibrator: Vibrator? by lazy {

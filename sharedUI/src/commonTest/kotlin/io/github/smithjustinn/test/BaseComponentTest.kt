@@ -1,11 +1,11 @@
 package io.github.smithjustinn.test
 
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 
 /**
  * An abstract base class for component tests that provides a [MokkeryTestContext] and handles
@@ -30,5 +30,5 @@ abstract class BaseComponentTest {
 
     /** A helper to run component tests using the class-level [testDispatcher]. */
     protected fun runTest(block: suspend TestScope.(LifecycleRegistry) -> Unit) =
-            runComponentTest(testDispatcher, block = block)
+        runComponentTest(testDispatcher, block = block)
 }

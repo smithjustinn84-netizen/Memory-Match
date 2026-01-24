@@ -95,3 +95,4 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 metro = { id = "dev.zacsweers.metro", version.ref = "metro" }
 mokkery = { id = "dev.mokkery", version.ref = "mokkery" }
 room = { id = "androidx.room", version.ref = "room" }
+spotless = { id = "com.diffplug.spotless", version = "8.2.0" }

@@ -12,7 +12,7 @@ import kotlinx.serialization.json.Json
 internal class GameStateRepositoryImpl(
     private val dao: GameStateDao,
     private val json: Json,
-    private val logger: Logger
+    private val logger: Logger,
 ) : GameStateRepository {
     override suspend fun saveGameState(gameState: MemoryGameState, elapsedTimeSeconds: Long) {
         try {

@@ -20,7 +20,7 @@ import kotlinx.coroutines.Dispatchers
     scope = AppScope::class,
     bindingContainers = [
         DataModule::class,
-    ]
+    ],
 )
 interface AndroidAppGraph : AppGraph {
     @Provides fun provideApplicationContext(application: Application): Context = application
@@ -46,12 +46,12 @@ interface AndroidAppGraph : AppGraph {
         val dbFile = context.getDatabasePath("memory_match.db")
         return Room.databaseBuilder<AppDatabase>(
             context = context,
-            name = dbFile.absolutePath
+            name = dbFile.absolutePath,
         )
-        .setDriver(BundledSQLiteDriver())
-        .setQueryCoroutineContext(Dispatchers.IO)
-        .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3, AppDatabase.MIGRATION_3_4, AppDatabase.MIGRATION_4_5, AppDatabase.MIGRATION_5_6)
-        .build()
+            .setDriver(BundledSQLiteDriver())
+            .setQueryCoroutineContext(Dispatchers.IO)
+            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3, AppDatabase.MIGRATION_3_4, AppDatabase.MIGRATION_4_5, AppDatabase.MIGRATION_5_6)
+            .build()
     }
 }
 

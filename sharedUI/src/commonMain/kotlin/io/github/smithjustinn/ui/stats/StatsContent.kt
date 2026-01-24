@@ -28,7 +28,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun StatsContent(
     component: StatsComponent,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val graph = LocalAppGraph.current
     val state by component.state.collectAsState()
@@ -47,60 +47,60 @@ fun StatsContent(
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(StartBackgroundTop, StartBackgroundBottom)
-                )
-            )
+                    colors = listOf(StartBackgroundTop, StartBackgroundBottom),
+                ),
+            ),
     ) {
         Scaffold(
             containerColor = Color.Transparent,
             topBar = {
                 TopAppBar(
-                    title = { 
+                    title = {
                         Text(
                             text = stringResource(Res.string.high_scores),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        ) 
+                            color = Color.White,
+                        )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                     navigationIcon = {
-                        IconButton(onClick = { 
+                        IconButton(onClick = {
                             audioService.playClick()
-                            component.onBack() 
+                            component.onBack()
                         }) {
                             Icon(
                                 imageVector = AppIcons.ArrowBack,
                                 contentDescription = stringResource(Res.string.back_content_description),
-                                tint = Color.White
+                                tint = Color.White,
                             )
                         }
-                    }
+                    },
                 )
-            }
+            },
         ) { paddingValues ->
             Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .widthIn(max = 800.dp)
-                        .align(Alignment.TopCenter)
+                        .align(Alignment.TopCenter),
                 ) {
                     ModeSelector(
                         selectedMode = state.selectedGameMode,
-                        onModeSelected = { 
+                        onModeSelected = {
                             audioService.playClick()
-                            component.onGameModeSelected(it) 
+                            component.onGameModeSelected(it)
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 24.dp, vertical = 12.dp)
+                            .padding(horizontal = 24.dp, vertical = 12.dp),
                     )
 
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(24.dp)
+                        verticalArrangement = Arrangement.spacedBy(24.dp),
                     ) {
                         items(state.difficultyLeaderboards) { (level, entries) ->
                             LeaderboardSection(level, entries)

@@ -18,22 +18,22 @@ import kotlin.time.Clock
 open class SaveGameResultUseCase(
     private val gameStatsRepository: GameStatsRepository,
     private val leaderboardRepository: LeaderboardRepository,
-    private val logger: Logger
+    private val logger: Logger,
 ) {
-    suspend open operator fun invoke(pairCount: Int, score: Int, timeSeconds: Long, moves: Int, gameMode: GameMode) {
+    open suspend operator fun invoke(pairCount: Int, score: Int, timeSeconds: Long, moves: Int, gameMode: GameMode) {
         try {
             // Stats are currently per difficulty, we might want to separate them by mode too in the future
             val currentStats = gameStatsRepository.getStatsForDifficulty(pairCount).firstOrNull()
-            
+
             val newBestScore = if (currentStats == null || score > currentStats.bestScore) score else currentStats.bestScore
             val newBestTime = if (currentStats == null || currentStats.bestTimeSeconds == 0L || timeSeconds < currentStats.bestTimeSeconds) {
                 timeSeconds
             } else {
                 currentStats.bestTimeSeconds
             }
-            
+
             gameStatsRepository.updateStats(GameStats(pairCount, newBestScore, newBestTime))
-            
+
             leaderboardRepository.addEntry(
                 LeaderboardEntry(
                     pairCount = pairCount,
@@ -41,8 +41,8 @@ open class SaveGameResultUseCase(
                     timeSeconds = timeSeconds,
                     moves = moves,
                     timestamp = Clock.System.now(),
-                    gameMode = gameMode
-                )
+                    gameMode = gameMode,
+                ),
             )
         } catch (e: Exception) {
             logger.e(e) { "Failed to save game result via use case" }

@@ -25,17 +25,17 @@ import java.util.concurrent.ConcurrentHashMap
 class AndroidAudioServiceImpl(
     private val context: Context,
     private val logger: Logger,
-    settingsRepository: SettingsRepository
+    settingsRepository: SettingsRepository,
 ) : AudioService {
     private val scope = CoroutineScope(Dispatchers.IO)
-    
+
     private val soundPool = SoundPool.Builder()
         .setMaxStreams(10)
         .setAudioAttributes(
             AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_GAME)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .build()
+                .build(),
         )
         .build()
 
@@ -87,7 +87,7 @@ class AndroidAudioServiceImpl(
                 AudioService.LOSE,
                 AudioService.HIGH_SCORE,
                 AudioService.CLICK,
-                AudioService.DEAL
+                AudioService.DEAL,
             ).forEach { resource ->
                 loadSound(resource)
             }
@@ -186,7 +186,7 @@ class AndroidAudioServiceImpl(
                 val name = getString(AudioService.MUSIC)
                 val fileName = "$name.m4a"
                 val tempFile = File(context.cacheDir, fileName)
-                
+
                 if (!tempFile.exists()) {
                     val bytes = Res.readBytes("files/$fileName")
                     withContext(Dispatchers.IO) {
@@ -197,7 +197,7 @@ class AndroidAudioServiceImpl(
                 withContext(Dispatchers.Main) {
                     // Double check conditions after context switch
                     if (!isMusicRequested || !isMusicEnabled || musicPlayer?.isPlaying == true) return@withContext
-                    
+
                     musicPlayer?.release()
                     musicPlayer = MediaPlayer().apply {
                         setDataSource(tempFile.absolutePath)

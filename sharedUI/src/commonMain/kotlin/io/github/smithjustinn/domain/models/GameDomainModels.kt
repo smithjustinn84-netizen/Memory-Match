@@ -10,7 +10,7 @@ import org.jetbrains.compose.resources.StringResource
 @Serializable
 enum class GameMode {
     STANDARD,
-    TIME_ATTACK
+    TIME_ATTACK,
 }
 
 /**
@@ -22,7 +22,7 @@ data class ScoringConfig(
     val comboBonusPoints: Int = 50,
     val timeBonusPerPair: Int = 50,
     val timePenaltyPerSecond: Int = 1,
-    val moveBonusMultiplier: Int = 10000 // Base for move efficiency
+    val moveBonusMultiplier: Int = 10000, // Base for move efficiency
 )
 
 /**
@@ -33,7 +33,7 @@ data class ScoreBreakdown(
     val matchPoints: Int = 0,
     val timeBonus: Int = 0,
     val moveBonus: Int = 0,
-    val totalScore: Int = 0
+    val totalScore: Int = 0,
 )
 
 /**
@@ -57,7 +57,7 @@ data class MemoryGameState(
     val config: ScoringConfig = ScoringConfig(),
     val scoreBreakdown: ScoreBreakdown = ScoreBreakdown(),
     val mode: GameMode = GameMode.STANDARD,
-    val lastMatchedIds: List<Int> = emptyList()
+    val lastMatchedIds: List<Int> = emptyList(),
 )
 
 /**

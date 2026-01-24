@@ -18,21 +18,21 @@ import org.jetbrains.compose.resources.stringResource
 fun ModeSelector(
     selectedMode: GameMode,
     onModeSelected: (GameMode) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val modes = listOf(GameMode.STANDARD, GameMode.TIME_ATTACK)
-    
+
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Text(
             text = stringResource(Res.string.game_mode),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = Color.White,
         )
-        
+
         NeonSegmentedControl(
             items = modes,
             selectedItem = selectedMode,
@@ -42,7 +42,7 @@ fun ModeSelector(
                     GameMode.STANDARD -> stringResource(Res.string.mode_standard)
                     GameMode.TIME_ATTACK -> stringResource(Res.string.mode_time_attack)
                 }
-            }
+            },
         )
     }
 }

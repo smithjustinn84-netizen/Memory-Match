@@ -22,15 +22,15 @@ class AppActivity : ComponentActivity() {
         val appGraph = (application as MemoryMatchApp).appGraph
         val root = DefaultRootComponent(
             componentContext = defaultComponentContext(),
-            appGraph = appGraph
+            appGraph = appGraph,
         )
 
-        setContent { 
+        setContent {
             App(
                 root = root,
                 appGraph = appGraph,
-                onThemeChanged = { ThemeChanged(it) }
-            ) 
+                onThemeChanged = { ThemeChanged(it) },
+            )
         }
     }
 }

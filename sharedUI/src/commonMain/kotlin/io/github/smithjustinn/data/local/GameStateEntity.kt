@@ -7,5 +7,5 @@ import androidx.room.PrimaryKey
 data class GameStateEntity(
     @PrimaryKey val id: Int = 0, // Only one saved game at a time
     val gameStateJson: String,
-    val elapsedTimeSeconds: Long
+    val elapsedTimeSeconds: Long,
 )

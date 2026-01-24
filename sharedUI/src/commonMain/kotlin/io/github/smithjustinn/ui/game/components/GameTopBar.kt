@@ -40,8 +40,8 @@ import io.github.smithjustinn.theme.TacticalRed
 import io.github.smithjustinn.ui.components.AppIcons
 import memory_match.sharedui.generated.resources.Res
 import memory_match.sharedui.generated.resources.back_content_description
-import memory_match.sharedui.generated.resources.restart_content_description
 import memory_match.sharedui.generated.resources.mute_content_description
+import memory_match.sharedui.generated.resources.restart_content_description
 import memory_match.sharedui.generated.resources.unmute_content_description
 import org.jetbrains.compose.resources.stringResource
 
@@ -60,7 +60,7 @@ fun GameTopBar(
     isMegaBonus: Boolean = false,
     compact: Boolean = false,
     isAudioEnabled: Boolean = true,
-    onMuteClick: () -> Unit = {}
+    onMuteClick: () -> Unit = {},
 ) {
     val isTimeAttack = mode == GameMode.TIME_ATTACK
     val isLowTime = isTimeAttack && time <= 10
@@ -73,21 +73,21 @@ fun GameTopBar(
             .fillMaxWidth()
             .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal))
             .padding(
-                horizontal = if (compact) 16.dp else 24.dp, 
-                vertical = if (compact) 8.dp else 12.dp
+                horizontal = if (compact) 16.dp else 24.dp,
+                vertical = if (compact) 8.dp else 12.dp,
             ),
-        verticalArrangement = Arrangement.spacedBy(if (compact) 8.dp else 12.dp)
+        verticalArrangement = Arrangement.spacedBy(if (compact) 8.dp else 12.dp),
     ) {
         // Main HUD Row
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             // Left Controls
             BackButton(
-                onClick = onBackClick, 
-                compact = compact
+                onClick = onBackClick,
+                compact = compact,
             )
 
             // Center Area - Timer
@@ -102,7 +102,7 @@ fun GameTopBar(
                 isMegaBonus = isMegaBonus,
                 infiniteTransition = infiniteTransition,
                 compact = compact,
-                minimal = false
+                minimal = false,
             )
 
             // Right Controls
@@ -110,12 +110,12 @@ fun GameTopBar(
                 MuteButton(
                     isAudioEnabled = isAudioEnabled,
                     onClick = onMuteClick,
-                    compact = compact
+                    compact = compact,
                 )
-                
+
                 RestartButton(
                     onClick = onRestartClick,
-                    compact = compact
+                    compact = compact,
                 )
             }
         }
@@ -125,7 +125,7 @@ fun GameTopBar(
                 time = time,
                 maxTime = maxTime,
                 isLowTime = isLowTime,
-                compact = compact
+                compact = compact,
             )
         }
     }
@@ -135,21 +135,21 @@ fun GameTopBar(
 private fun BackButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    compact: Boolean = false
+    compact: Boolean = false,
 ) {
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(12.dp),
         color = InactiveBackground.copy(alpha = 0.4f),
         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.15f)),
-        modifier = modifier.size(if (compact) 40.dp else 48.dp)
+        modifier = modifier.size(if (compact) 40.dp else 48.dp),
     ) {
         Box(contentAlignment = Alignment.Center) {
             Icon(
                 AppIcons.ArrowBack,
                 contentDescription = stringResource(Res.string.back_content_description),
                 tint = NeonCyan,
-                modifier = Modifier.size(if (compact) 20.dp else 24.dp)
+                modifier = Modifier.size(if (compact) 20.dp else 24.dp),
             )
         }
     }
@@ -159,21 +159,21 @@ private fun BackButton(
 private fun RestartButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    compact: Boolean = false
+    compact: Boolean = false,
 ) {
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(12.dp),
         color = InactiveBackground.copy(alpha = 0.4f),
         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.15f)),
-        modifier = modifier.size(if (compact) 40.dp else 48.dp)
+        modifier = modifier.size(if (compact) 40.dp else 48.dp),
     ) {
         Box(contentAlignment = Alignment.Center) {
             Icon(
                 AppIcons.Restart,
                 contentDescription = stringResource(Res.string.restart_content_description),
                 tint = NeonCyan,
-                modifier = Modifier.size(if (compact) 20.dp else 24.dp)
+                modifier = Modifier.size(if (compact) 20.dp else 24.dp),
             )
         }
     }
@@ -184,23 +184,23 @@ private fun MuteButton(
     isAudioEnabled: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    compact: Boolean = false
+    compact: Boolean = false,
 ) {
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(12.dp),
         color = InactiveBackground.copy(alpha = 0.4f),
         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.15f)),
-        modifier = modifier.size(if (compact) 40.dp else 48.dp)
+        modifier = modifier.size(if (compact) 40.dp else 48.dp),
     ) {
         Box(contentAlignment = Alignment.Center) {
             Icon(
                 if (isAudioEnabled) AppIcons.VolumeUp else AppIcons.VolumeOff,
                 contentDescription = stringResource(
-                    if (isAudioEnabled) Res.string.mute_content_description else Res.string.unmute_content_description
+                    if (isAudioEnabled) Res.string.mute_content_description else Res.string.unmute_content_description,
                 ),
                 tint = if (isAudioEnabled) NeonCyan else TacticalRed,
-                modifier = Modifier.size(if (compact) 20.dp else 24.dp)
+                modifier = Modifier.size(if (compact) 20.dp else 24.dp),
             )
         }
     }
@@ -212,11 +212,11 @@ private fun TimeProgressBar(
     maxTime: Long,
     isLowTime: Boolean,
     modifier: Modifier = Modifier,
-    compact: Boolean = false
+    compact: Boolean = false,
 ) {
     val progress by animateFloatAsState(
         targetValue = (time.toFloat() / maxTime.toFloat()).coerceIn(0f, 1f),
-        animationSpec = spring(stiffness = Spring.StiffnessLow)
+        animationSpec = spring(stiffness = Spring.StiffnessLow),
     )
 
     Box(
@@ -224,7 +224,7 @@ private fun TimeProgressBar(
             .fillMaxWidth()
             .height(if (compact) 4.dp else 8.dp)
             .clip(CircleShape)
-            .background(InactiveBackground.copy(alpha = 0.5f))
+            .background(InactiveBackground.copy(alpha = 0.5f)),
     ) {
         Box(
             modifier = Modifier
@@ -235,7 +235,7 @@ private fun TimeProgressBar(
                     shape = CircleShape,
                     ambientColor = NeonCyan,
                     spotColor = NeonCyan,
-                    clip = false
+                    clip = false,
                 )
                 .clip(CircleShape)
                 .background(
@@ -243,8 +243,8 @@ private fun TimeProgressBar(
                         Brush.horizontalGradient(listOf(TacticalRed, TacticalRed.copy(alpha = 0.7f)))
                     } else {
                         Brush.horizontalGradient(listOf(NeonCyan, NeonCyan.copy(alpha = 0.7f)))
-                    }
-                )
+                    },
+                ),
         )
     }
 }

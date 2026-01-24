@@ -31,35 +31,35 @@ import org.jetbrains.compose.resources.stringResource
 fun LeaderboardSection(
     level: DifficultyLevel,
     entries: List<LeaderboardEntry>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = stringResource(level.nameRes).uppercase(),
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.ExtraBold,
                 color = NeonCyan,
-                letterSpacing = 1.sp
+                letterSpacing = 1.sp,
             )
             Surface(
                 color = NeonCyan.copy(alpha = 0.15f),
                 shape = RoundedCornerShape(8.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, NeonCyan.copy(alpha = 0.3f))
+                border = androidx.compose.foundation.BorderStroke(1.dp, NeonCyan.copy(alpha = 0.3f)),
             ) {
                 Text(
                     text = stringResource(Res.string.pairs_format, level.pairs),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                 )
             }
         }
@@ -70,18 +70,18 @@ fun LeaderboardSection(
             color = InactiveBackground.copy(alpha = 0.4f),
             border = androidx.compose.foundation.BorderStroke(
                 width = 1.dp,
-                color = Color.White.copy(alpha = 0.1f)
-            )
+                color = Color.White.copy(alpha = 0.1f),
+            ),
         ) {
             if (entries.isEmpty()) {
                 Box(
                     modifier = Modifier.padding(32.dp),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = stringResource(Res.string.no_stats_yet),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.4f)
+                        color = Color.White.copy(alpha = 0.4f),
                     )
                 }
             } else {
@@ -91,7 +91,7 @@ fun LeaderboardSection(
                         if (index < entries.size - 1) {
                             HorizontalDivider(
                                 modifier = Modifier.padding(horizontal = 16.dp),
-                                color = Color.White.copy(alpha = 0.05f)
+                                color = Color.White.copy(alpha = 0.05f),
                             )
                         }
                     }
@@ -108,7 +108,7 @@ private fun LeaderboardRow(rank: Int, entry: LeaderboardEntry) {
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Surface(
             modifier = Modifier.size(32.dp),
@@ -126,8 +126,8 @@ private fun LeaderboardRow(rank: Int, entry: LeaderboardEntry) {
                     2 -> Color(0xFFC0C0C0).copy(alpha = 0.5f)
                     3 -> Color(0xFFCD7F32).copy(alpha = 0.5f)
                     else -> Color.White.copy(alpha = 0.1f)
-                }
-            )
+                },
+            ),
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Text(
@@ -139,7 +139,7 @@ private fun LeaderboardRow(rank: Int, entry: LeaderboardEntry) {
                         2 -> Color(0xFFC0C0C0)
                         3 -> Color(0xFFCD7F32)
                         else -> Color.White.copy(alpha = 0.6f)
-                    }
+                    },
                 )
             }
         }
@@ -149,18 +149,18 @@ private fun LeaderboardRow(rank: Int, entry: LeaderboardEntry) {
                 text = stringResource(Res.string.score_label, entry.score),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = Color.White,
             )
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             StatMiniItem(
                 label = stringResource(Res.string.stats_time_header),
-                value = formatTime(entry.timeSeconds)
+                value = formatTime(entry.timeSeconds),
             )
             StatMiniItem(
                 label = stringResource(Res.string.stats_moves_header),
-                value = entry.moves.toString()
+                value = entry.moves.toString(),
             )
         }
     }
@@ -174,13 +174,13 @@ private fun StatMiniItem(label: String, value: String) {
             style = MaterialTheme.typography.labelSmall,
             color = NeonCyan.copy(alpha = 0.6f),
             fontWeight = FontWeight.ExtraBold,
-            letterSpacing = 0.5.sp
+            letterSpacing = 0.5.sp,
         )
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = Color.White,
         )
     }
 }

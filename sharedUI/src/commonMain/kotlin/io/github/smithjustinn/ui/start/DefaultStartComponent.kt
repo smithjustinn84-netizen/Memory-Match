@@ -18,7 +18,7 @@ class DefaultStartComponent(
     appGraph: AppGraph,
     private val onNavigateToGame: (pairs: Int, mode: GameMode, forceNewGame: Boolean) -> Unit,
     private val onNavigateToSettings: () -> Unit,
-    private val onNavigateToStats: () -> Unit
+    private val onNavigateToStats: () -> Unit,
 ) : StartComponent, ComponentContext by componentContext {
     private val dispatchers = appGraph.coroutineDispatchers
     private val scope = lifecycle.componentScope(dispatchers.mainImmediate)
@@ -35,12 +35,12 @@ class DefaultStartComponent(
         scope.launch {
             combine(
                 settingsRepository.cardBackTheme,
-                settingsRepository.cardSymbolTheme
+                settingsRepository.cardSymbolTheme,
             ) { cardBack, cardSymbol ->
                 _state.update {
                     it.copy(
                         cardBackTheme = cardBack,
-                        cardSymbolTheme = cardSymbol
+                        cardSymbolTheme = cardSymbol,
                     )
                 }
             }.collect()
@@ -57,7 +57,7 @@ class DefaultStartComponent(
                     it.copy(
                         hasSavedGame = savedGame != null && !savedGame.first.isGameOver,
                         savedGamePairCount = savedGame?.first?.pairCount ?: 0,
-                        savedGameMode = savedGame?.first?.mode ?: GameMode.STANDARD
+                        savedGameMode = savedGame?.first?.mode ?: GameMode.STANDARD,
                     )
                 }
             } catch (e: Exception) {
@@ -85,7 +85,7 @@ class DefaultStartComponent(
             onNavigateToGame(
                 state.value.savedGamePairCount,
                 state.value.savedGameMode,
-                false
+                false,
             )
         }
     }

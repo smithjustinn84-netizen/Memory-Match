@@ -1,11 +1,11 @@
 package io.github.smithjustinn.data.repositories
 
 import co.touchlab.kermit.Logger
+import dev.zacsweers.metro.Inject
 import io.github.smithjustinn.data.local.GameStatsDao
 import io.github.smithjustinn.data.local.GameStatsEntity
 import io.github.smithjustinn.domain.models.GameStats
 import io.github.smithjustinn.domain.repositories.GameStatsRepository
-import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -13,9 +13,9 @@ import kotlinx.coroutines.flow.map
 @Inject
 internal class GameStatsRepositoryImpl(
     private val dao: GameStatsDao,
-    private val logger: Logger
+    private val logger: Logger,
 ) : GameStatsRepository {
-    override fun getStatsForDifficulty(pairCount: Int): Flow<GameStats?> = 
+    override fun getStatsForDifficulty(pairCount: Int): Flow<GameStats?> =
         dao.getStatsForDifficulty(pairCount)
             .map { it?.toDomain() }
             .catch { e ->
@@ -34,12 +34,12 @@ internal class GameStatsRepositoryImpl(
     private fun GameStatsEntity.toDomain(): GameStats = GameStats(
         pairCount = pairCount,
         bestScore = bestScore,
-        bestTimeSeconds = bestTimeSeconds
+        bestTimeSeconds = bestTimeSeconds,
     )
 
     private fun GameStats.toEntity(): GameStatsEntity = GameStatsEntity(
         pairCount = pairCount,
         bestScore = bestScore,
-        bestTimeSeconds = bestTimeSeconds
+        bestTimeSeconds = bestTimeSeconds,
     )
 }

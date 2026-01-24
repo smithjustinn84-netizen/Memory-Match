@@ -9,11 +9,11 @@ import io.github.smithjustinn.domain.models.DifficultyLevel
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
 import io.github.smithjustinn.test.BaseComponentTest
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class StartComponentTest : BaseComponentTest() {
@@ -68,7 +68,7 @@ class StartComponentTest : BaseComponentTest() {
     @Test
     fun `Checks saved game on init and updates state when game exists`() = runTest { lifecycle ->
         val savedGame =
-                MemoryGameState(pairCount = 12, mode = GameMode.TIME_ATTACK, isGameOver = false)
+            MemoryGameState(pairCount = 12, mode = GameMode.TIME_ATTACK, isGameOver = false)
         everySuspend { context.gameStateRepository.getSavedGameState() } returns (savedGame to 100L)
 
         component = createDefaultComponent(lifecycle)
@@ -103,7 +103,7 @@ class StartComponentTest : BaseComponentTest() {
     @Test
     fun `onResumeGame triggers navigation callback if saved game exists`() = runTest { lifecycle ->
         val savedGame =
-                MemoryGameState(pairCount = 12, mode = GameMode.TIME_ATTACK, isGameOver = false)
+            MemoryGameState(pairCount = 12, mode = GameMode.TIME_ATTACK, isGameOver = false)
         everySuspend { context.gameStateRepository.getSavedGameState() } returns (savedGame to 100L)
 
         component = createDefaultComponent(lifecycle)
@@ -115,13 +115,13 @@ class StartComponentTest : BaseComponentTest() {
 
     private fun createDefaultComponent(lifecycle: Lifecycle): DefaultStartComponent {
         return DefaultStartComponent(
-                componentContext = DefaultComponentContext(lifecycle = lifecycle),
-                appGraph = context.appGraph,
-                onNavigateToGame = { pairs, mode, isNewGame ->
-                    navigatedToGame = Triple(pairs, mode, isNewGame)
-                },
-                onNavigateToSettings = { navigatedToSettings = true },
-                onNavigateToStats = { navigatedToStats = true }
+            componentContext = DefaultComponentContext(lifecycle = lifecycle),
+            appGraph = context.appGraph,
+            onNavigateToGame = { pairs, mode, isNewGame ->
+                navigatedToGame = Triple(pairs, mode, isNewGame)
+            },
+            onNavigateToSettings = { navigatedToSettings = true },
+            onNavigateToStats = { navigatedToStats = true },
         )
     }
 }

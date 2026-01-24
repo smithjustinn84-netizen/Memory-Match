@@ -38,7 +38,7 @@ import io.github.smithjustinn.ui.game.components.PlayingCard
 
 /**
  * CardPreview (Visual Section - 2026 Design)
- * 
+ *
  * Restored the "airy" layout and star animations that provided the feel the user liked,
  * while updating the cards to the Ace of Spades and Ace of Clubs to match the reference image.
  */
@@ -46,33 +46,33 @@ import io.github.smithjustinn.ui.game.components.PlayingCard
 fun CardPreview(
     modifier: Modifier = Modifier,
     cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC,
-    cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC
+    cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC,
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "card_preview_anim")
-    
+
     val rotation by infiniteTransition.animateFloat(
         initialValue = -3f,
         targetValue = 3f,
         animationSpec = infiniteRepeatable(
             animation = tween(3000, easing = EaseInOutSine),
-            repeatMode = RepeatMode.Reverse
+            repeatMode = RepeatMode.Reverse,
         ),
-        label = "rotation"
+        label = "rotation",
     )
-    
+
     val floatOffset by infiniteTransition.animateFloat(
         initialValue = -5f,
         targetValue = 5f,
         animationSpec = infiniteRepeatable(
             animation = tween(2500, easing = EaseInOutSine),
-            repeatMode = RepeatMode.Reverse
+            repeatMode = RepeatMode.Reverse,
         ),
-        label = "float"
+        label = "float",
     )
 
     Box(
         modifier = modifier.fillMaxWidth(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         // Background Glow Effect
         Box(
@@ -84,18 +84,18 @@ fun CardPreview(
                             colors = listOf(
                                 Color(0xFF60A5FA).copy(alpha = 0.2f),
                                 Color(0xFF1E3A8A).copy(alpha = 0.1f),
-                                Color.Transparent
-                            )
-                        )
+                                Color.Transparent,
+                            ),
+                        ),
                     )
-                }
+                },
         )
-        
+
         // Cards
         Row(
             horizontalArrangement = Arrangement.spacedBy((-55).dp),
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.offset(y = floatOffset.dp)
+            modifier = Modifier.offset(y = floatOffset.dp),
         ) {
             PlayingCard(
                 suit = Suit.Hearts,
@@ -107,11 +107,11 @@ fun CardPreview(
                 modifier = Modifier
                     .width(110.dp)
                     .zIndex(1f) // Keep Spades on top as in the image
-                    .graphicsLayer { 
-                        rotationZ = -12f + rotation 
+                    .graphicsLayer {
+                        rotationZ = -12f + rotation
                         scaleX = 1f
                         scaleY = 1f
-                    }
+                    },
             )
             PlayingCard(
                 suit = Suit.Spades,
@@ -123,22 +123,22 @@ fun CardPreview(
                 modifier = Modifier
                     .width(110.dp)
                     .zIndex(0f)
-                    .graphicsLayer { 
-                        rotationZ = 12f - rotation 
+                    .graphicsLayer {
+                        rotationZ = 12f - rotation
                         scaleX = 1f
                         scaleY = 1f
                         translationY = 10f
-                    }
+                    },
             )
         }
-        
+
         // Stars/Sparkles (Restored)
         AnimatedStar(Modifier.offset(x = (-70).dp, y = (-60).dp).size(20.dp), 0)
         AnimatedStar(Modifier.offset(x = 80.dp, y = (-50).dp).size(16.dp), 500)
         AnimatedStar(Modifier.offset(x = (-80).dp, y = 40.dp).size(14.dp), 1000)
         AnimatedStar(Modifier.offset(x = 70.dp, y = 60.dp).size(18.dp), 200)
         AnimatedStar(Modifier.offset(x = 10.dp, y = (-85).dp).size(10.dp), 1500)
-        
+
         // Some tiny ones
         AnimatedStar(Modifier.offset(x = (-30).dp, y = (-40).dp).size(6.dp), 800)
         AnimatedStar(Modifier.offset(x = 40.dp, y = 30.dp).size(8.dp), 1200)
@@ -148,28 +148,28 @@ fun CardPreview(
 @Composable
 fun AnimatedStar(
     modifier: Modifier = Modifier,
-    delayMillis: Int = 0
+    delayMillis: Int = 0,
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "star_anim")
-    
+
     // Floating movement for the star itself
     val floatX by infiniteTransition.animateFloat(
         initialValue = -4f,
         targetValue = 4f,
         animationSpec = infiniteRepeatable(
             animation = tween(2000 + delayMillis % 1000, easing = EaseInOutSine),
-            repeatMode = RepeatMode.Reverse
+            repeatMode = RepeatMode.Reverse,
         ),
-        label = "floatX"
+        label = "floatX",
     )
     val floatY by infiniteTransition.animateFloat(
         initialValue = -4f,
         targetValue = 4f,
         animationSpec = infiniteRepeatable(
             animation = tween(2500 + delayMillis % 1000, easing = EaseInOutSine),
-            repeatMode = RepeatMode.Reverse
+            repeatMode = RepeatMode.Reverse,
         ),
-        label = "floatY"
+        label = "floatY",
     )
 
     val scale by infiniteTransition.animateFloat(
@@ -177,28 +177,28 @@ fun AnimatedStar(
         targetValue = 1.2f,
         animationSpec = infiniteRepeatable(
             animation = tween(1500, delayMillis = delayMillis, easing = EaseInOutSine),
-            repeatMode = RepeatMode.Reverse
+            repeatMode = RepeatMode.Reverse,
         ),
-        label = "scale"
+        label = "scale",
     )
     val alpha by infiniteTransition.animateFloat(
         initialValue = 0.4f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
             animation = tween(1500, delayMillis = delayMillis, easing = EaseInOutSine),
-            repeatMode = RepeatMode.Reverse
+            repeatMode = RepeatMode.Reverse,
         ),
-        label = "alpha"
+        label = "alpha",
     )
-    
+
     val rotation by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 360f,
         animationSpec = infiniteRepeatable(
             animation = tween(8000 + delayMillis, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
+            repeatMode = RepeatMode.Restart,
         ),
-        label = "rotation"
+        label = "rotation",
     )
 
     Canvas(
@@ -206,11 +206,11 @@ fun AnimatedStar(
             .offset(x = floatX.dp, y = floatY.dp)
             .scale(scale)
             .alpha(alpha)
-            .graphicsLayer { rotationZ = rotation }
+            .graphicsLayer { rotationZ = rotation },
     ) {
         val center = center
         val radius = size.minDimension / 2
-        
+
         // Drawing a 4-pointed star (sparkle)
         val path = Path().apply {
             moveTo(center.x, center.y - radius)
@@ -220,14 +220,14 @@ fun AnimatedStar(
             quadraticTo(center.x, center.y, center.x, center.y - radius)
             close()
         }
-        
+
         // Outer glow
         drawPath(
             path = path,
             color = Color(0xFFFFD700).copy(alpha = 0.3f),
-            style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round)
+            style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round),
         )
-        
+
         // Core
         drawPath(path, Color(0xFFFFD700))
     }

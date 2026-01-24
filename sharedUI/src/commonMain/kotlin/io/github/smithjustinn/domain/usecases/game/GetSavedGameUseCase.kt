@@ -11,9 +11,9 @@ import io.github.smithjustinn.domain.repositories.GameStateRepository
 @Inject
 open class GetSavedGameUseCase(
     private val gameStateRepository: GameStateRepository,
-    private val logger: Logger
+    private val logger: Logger,
 ) {
-    suspend open operator fun invoke(): Pair<MemoryGameState, Long>? {
+    open suspend operator fun invoke(): Pair<MemoryGameState, Long>? {
         return try {
             gameStateRepository.getSavedGameState()
         } catch (e: Exception) {

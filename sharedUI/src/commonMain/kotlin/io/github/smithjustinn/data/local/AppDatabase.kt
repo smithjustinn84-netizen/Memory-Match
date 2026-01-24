@@ -10,9 +10,9 @@ import androidx.sqlite.execSQL
         GameStatsEntity::class,
         LeaderboardEntity::class,
         GameStateEntity::class,
-        SettingsEntity::class
+        SettingsEntity::class,
     ],
-    version = 6
+    version = 6,
 )
 @TypeConverters(Converters::class)
 @ConstructedBy(AppDatabaseConstructor::class)
@@ -28,7 +28,7 @@ abstract class AppDatabase : RoomDatabase() {
                 connection.execSQL("ALTER TABLE settings ADD COLUMN isWalkthroughCompleted INTEGER NOT NULL DEFAULT 0")
             }
         }
-        
+
         val MIGRATION_2_3 = object : Migration(2, 3) {
             override fun migrate(connection: SQLiteConnection) {
                 connection.execSQL("ALTER TABLE settings ADD COLUMN isMusicEnabled INTEGER NOT NULL DEFAULT 1")

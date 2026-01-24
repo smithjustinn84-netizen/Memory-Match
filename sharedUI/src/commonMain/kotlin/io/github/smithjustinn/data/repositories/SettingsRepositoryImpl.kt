@@ -20,16 +20,16 @@ import kotlinx.coroutines.flow.stateIn
 @Inject
 internal class SettingsRepositoryImpl(
     private val dao: SettingsDao,
-    private val logger: Logger
+    private val logger: Logger,
 ) : SettingsRepository {
-    
+
     private val scope = CoroutineScope(Dispatchers.IO)
 
     private val settingsFlow = dao.getSettings()
         .shareIn(
             scope = scope,
             started = SharingStarted.Eagerly,
-            replay = 1
+            replay = 1,
         )
 
     override val isPeekEnabled: StateFlow<Boolean> = settingsFlow
@@ -37,7 +37,7 @@ internal class SettingsRepositoryImpl(
         .stateIn(
             scope = scope,
             started = SharingStarted.Eagerly,
-            initialValue = true
+            initialValue = true,
         )
 
     override val isSoundEnabled: StateFlow<Boolean> = settingsFlow
@@ -45,7 +45,7 @@ internal class SettingsRepositoryImpl(
         .stateIn(
             scope = scope,
             started = SharingStarted.Eagerly,
-            initialValue = true
+            initialValue = true,
         )
 
     override val isMusicEnabled: StateFlow<Boolean> = settingsFlow
@@ -53,7 +53,7 @@ internal class SettingsRepositoryImpl(
         .stateIn(
             scope = scope,
             started = SharingStarted.Eagerly,
-            initialValue = true
+            initialValue = true,
         )
 
     override val isWalkthroughCompleted: StateFlow<Boolean> = settingsFlow
@@ -61,7 +61,7 @@ internal class SettingsRepositoryImpl(
         .stateIn(
             scope = scope,
             started = SharingStarted.Eagerly,
-            initialValue = false
+            initialValue = false,
         )
 
     override val soundVolume: StateFlow<Float> = settingsFlow
@@ -69,7 +69,7 @@ internal class SettingsRepositoryImpl(
         .stateIn(
             scope = scope,
             started = SharingStarted.Eagerly,
-            initialValue = 1.0f
+            initialValue = 1.0f,
         )
 
     override val musicVolume: StateFlow<Float> = settingsFlow
@@ -77,7 +77,7 @@ internal class SettingsRepositoryImpl(
         .stateIn(
             scope = scope,
             started = SharingStarted.Eagerly,
-            initialValue = 1.0f
+            initialValue = 1.0f,
         )
 
     override val cardBackTheme: StateFlow<CardBackTheme> = settingsFlow
@@ -92,7 +92,7 @@ internal class SettingsRepositoryImpl(
         .stateIn(
             scope = scope,
             started = SharingStarted.Eagerly,
-            initialValue = CardBackTheme.GEOMETRIC
+            initialValue = CardBackTheme.GEOMETRIC,
         )
 
     override val cardSymbolTheme: StateFlow<CardSymbolTheme> = settingsFlow
@@ -107,7 +107,7 @@ internal class SettingsRepositoryImpl(
         .stateIn(
             scope = scope,
             started = SharingStarted.Eagerly,
-            initialValue = CardSymbolTheme.CLASSIC
+            initialValue = CardSymbolTheme.CLASSIC,
         )
 
     override val areSuitsMultiColored: StateFlow<Boolean> = settingsFlow
@@ -115,7 +115,7 @@ internal class SettingsRepositoryImpl(
         .stateIn(
             scope = scope,
             started = SharingStarted.Eagerly,
-            initialValue = false
+            initialValue = false,
         )
 
     override suspend fun setPeekEnabled(enabled: Boolean) {

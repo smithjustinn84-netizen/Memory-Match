@@ -39,7 +39,7 @@ import io.github.smithjustinn.ui.game.components.WalkthroughOverlay
 @Composable
 fun GameContent(
     component: GameComponent,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val graph = LocalAppGraph.current
     val state by component.state.collectAsState()
@@ -87,9 +87,9 @@ fun GameContent(
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(StartBackgroundTop, StartBackgroundBottom)
-                    )
-                )
+                        colors = listOf(StartBackgroundTop, StartBackgroundBottom),
+                    ),
+                ),
         ) {
             Scaffold(
                 containerColor = Color.Transparent,
@@ -119,9 +119,9 @@ fun GameContent(
                         onMuteClick = {
                             audioService.playClick()
                             component.onToggleAudio()
-                        }
+                        },
                     )
-                }
+                },
             ) { paddingValues ->
                 Box(modifier = Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding())) {
                     GameGrid(
@@ -132,7 +132,7 @@ fun GameContent(
                         showComboExplosion = state.showComboExplosion,
                         cardBackTheme = state.cardBackTheme,
                         cardSymbolTheme = state.cardSymbolTheme,
-                        areSuitsMultiColored = state.areSuitsMultiColored
+                        areSuitsMultiColored = state.areSuitsMultiColored,
                     )
 
                     if (state.game.comboMultiplier > 1) {
@@ -143,7 +143,7 @@ fun GameContent(
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .padding(top = 16.dp, end = 24.dp),
-                            compact = useCompactUI
+                            compact = useCompactUI,
                         )
                     }
 
@@ -155,10 +155,10 @@ fun GameContent(
                             .padding(
                                 bottom = if (useCompactUI) 0.dp else 32.dp,
                                 top = if (useCompactUI) 8.dp else 0.dp,
-                                start = 16.dp, 
-                                end = 16.dp
+                                start = 16.dp,
+                                end = 16.dp,
                             )
-                            .widthIn(max = 600.dp)
+                            .widthIn(max = 600.dp),
                     )
 
                     if (state.isPeeking) {
@@ -169,7 +169,7 @@ fun GameContent(
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(Color.Black.copy(alpha = 0.4f))
+                                .background(Color.Black.copy(alpha = 0.4f)),
                         )
 
                         if (state.game.isGameWon) {
@@ -177,7 +177,7 @@ fun GameContent(
                                 cards = state.game.cards,
                                 cardBackTheme = state.cardBackTheme,
                                 cardSymbolTheme = state.cardSymbolTheme,
-                                areSuitsMultiColored = state.areSuitsMultiColored
+                                areSuitsMultiColored = state.areSuitsMultiColored,
                             )
                             ConfettiEffect()
 
@@ -186,7 +186,7 @@ fun GameContent(
                                     modifier = Modifier
                                         .align(Alignment.TopCenter)
                                         .padding(top = 16.dp, start = 16.dp, end = 16.dp)
-                                        .widthIn(max = 500.dp)
+                                        .widthIn(max = 500.dp),
                                 )
                             }
                         }
@@ -207,7 +207,7 @@ fun GameContent(
                                 .align(Alignment.Center)
                                 .widthIn(max = 550.dp)
                                 .padding(vertical = if (useCompactUI) 8.dp else 24.dp),
-                            mode = state.game.mode
+                            mode = state.game.mode,
                         )
                     }
 
@@ -215,7 +215,7 @@ fun GameContent(
                         WalkthroughOverlay(
                             step = state.walkthroughStep,
                             onNext = { component.onNextWalkthroughStep() },
-                            onDismiss = { component.onCompleteWalkthrough() }
+                            onDismiss = { component.onCompleteWalkthrough() },
                         )
                     }
                 }

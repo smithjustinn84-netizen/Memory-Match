@@ -71,7 +71,7 @@ fun PlayingCard(
     cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC,
     cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC,
     areSuitsMultiColored: Boolean = false,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
@@ -79,7 +79,7 @@ fun PlayingCard(
     val rotation by animateFloatAsState(
         targetValue = if (isFaceUp) 0f else 180f,
         animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing),
-        label = "cardFlip"
+        label = "cardFlip",
     )
 
     // Rim light intensity based on rotation (strongest when the card is edge-on, i.e., 90 degrees)
@@ -94,9 +94,9 @@ fun PlayingCard(
         },
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
+            stiffness = Spring.StiffnessLow,
         ),
-        label = "pulse"
+        label = "pulse",
     )
 
     val shakeOffset = remember { Animatable(0f) }
@@ -121,13 +121,13 @@ fun PlayingCard(
     } else {
         if (suit.isRed) Color(0xFFD32F2F) else Color(0xFF212121)
     }
-    
+
     val matchedGlowAlpha by animateFloatAsState(
         targetValue = if (isRecentlyMatched) 0.3f else 0f,
         animationSpec = infiniteRepeatable(
             animation = tween(1000),
-            repeatMode = RepeatMode.Reverse
-        )
+            repeatMode = RepeatMode.Reverse,
+        ),
     )
 
     Box(
@@ -146,17 +146,17 @@ fun PlayingCard(
                 shape = RoundedCornerShape(12.dp),
                 clip = false,
                 ambientColor = if (isRecentlyMatched) NeonCyan else Color.Black,
-                spotColor = if (isRecentlyMatched) NeonCyan else Color.Black
+                spotColor = if (isRecentlyMatched) NeonCyan else Color.Black,
             )
             .drawBehind {
                 if (isRecentlyMatched) {
                     drawCircle(
                         color = NeonCyan.copy(alpha = matchedGlowAlpha),
                         radius = size.maxDimension * 0.75f,
-                        center = center
+                        center = center,
                     )
                 }
-            }
+            },
     ) {
         Card(
             onClick = onClick,
@@ -164,7 +164,7 @@ fun PlayingCard(
             modifier = Modifier.fillMaxSize(),
             shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(
-                containerColor = if (rotation <= 90f) cardFaceColor else backColor
+                containerColor = if (rotation <= 90f) cardFaceColor else backColor,
             ),
             border = if (rotation <= 90f) {
                 when {
@@ -177,9 +177,9 @@ fun PlayingCard(
                 // Back side border with dynamic rim light
                 BorderStroke(
                     width = (2.dp + (rimLightAlpha * 2).dp),
-                    color = if (rimLightAlpha > 0.1f) rimLightColor else Color.White.copy(alpha = 0.3f)
+                    color = if (rimLightAlpha > 0.1f) rimLightColor else Color.White.copy(alpha = 0.3f),
                 )
-            }
+            },
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 if (rotation <= 90f) {
@@ -191,14 +191,14 @@ fun PlayingCard(
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .graphicsLayer { rotationY = 180f }
+                            .graphicsLayer { rotationY = 180f },
                     ) {
                         when (cardBackTheme) {
                             CardBackTheme.GEOMETRIC -> GeometricCardBack(backColor)
                             CardBackTheme.CLASSIC -> ClassicCardBack(backColor)
                             CardBackTheme.PATTERN -> PatternCardBack(backColor)
                         }
-                        
+
                         // Rim light overlay on the back
                         if (rimLightAlpha > 0f) {
                             Box(
@@ -209,10 +209,10 @@ fun PlayingCard(
                                             colors = listOf(
                                                 Color.Transparent,
                                                 rimLightColor,
-                                                Color.Transparent
-                                            )
-                                        )
-                                    )
+                                                Color.Transparent,
+                                            ),
+                                        ),
+                                    ),
                             )
                         }
                     }
@@ -227,11 +227,11 @@ private fun CardFace(
     rank: Rank,
     suit: Suit,
     suitColor: Color,
-    theme: CardSymbolTheme
+    theme: CardSymbolTheme,
 ) {
     BoxWithConstraints(modifier = Modifier.fillMaxSize().padding(6.dp)) {
         val fontSizeMultiplier = maxWidth.value / 80f
-        
+
         when (theme) {
             CardSymbolTheme.CLASSIC -> {
                 // Top Left
@@ -241,13 +241,13 @@ private fun CardFace(
                         color = suitColor,
                         style = MaterialTheme.typography.labelLarge.copy(
                             fontWeight = FontWeight.Bold,
-                            fontSize = (14 * fontSizeMultiplier).sp
-                        )
+                            fontSize = (14 * fontSizeMultiplier).sp,
+                        ),
                     )
                     Text(
                         text = suit.symbol,
                         color = suitColor,
-                        style = MaterialTheme.typography.labelSmall.copy(fontSize = (10 * fontSizeMultiplier).sp)
+                        style = MaterialTheme.typography.labelSmall.copy(fontSize = (10 * fontSizeMultiplier).sp),
                     )
                 }
 
@@ -256,36 +256,36 @@ private fun CardFace(
                     text = suit.symbol,
                     color = suitColor.copy(alpha = 0.15f),
                     style = MaterialTheme.typography.displayLarge.copy(fontSize = (60 * fontSizeMultiplier).sp),
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = Modifier.align(Alignment.Center),
                 )
-                
+
                 Text(
                     text = rank.symbol,
                     color = suitColor,
                     style = MaterialTheme.typography.headlineMedium.copy(
                         fontWeight = FontWeight.ExtraBold,
-                        fontSize = (24 * fontSizeMultiplier).sp
+                        fontSize = (24 * fontSizeMultiplier).sp,
                     ),
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = Modifier.align(Alignment.Center),
                 )
 
                 // Bottom Right
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.align(Alignment.BottomEnd).graphicsLayer { rotationZ = 180f }
+                    modifier = Modifier.align(Alignment.BottomEnd).graphicsLayer { rotationZ = 180f },
                 ) {
                     Text(
                         text = rank.symbol,
                         color = suitColor,
                         style = MaterialTheme.typography.labelLarge.copy(
                             fontWeight = FontWeight.Bold,
-                            fontSize = (14 * fontSizeMultiplier).sp
-                        )
+                            fontSize = (14 * fontSizeMultiplier).sp,
+                        ),
                     )
                     Text(
                         text = suit.symbol,
                         color = suitColor,
-                        style = MaterialTheme.typography.labelSmall.copy(fontSize = (10 * fontSizeMultiplier).sp)
+                        style = MaterialTheme.typography.labelSmall.copy(fontSize = (10 * fontSizeMultiplier).sp),
                     )
                 }
             }
@@ -296,24 +296,24 @@ private fun CardFace(
                     color = suitColor,
                     style = MaterialTheme.typography.displayLarge.copy(
                         fontWeight = FontWeight.ExtraBold,
-                        fontSize = (48 * fontSizeMultiplier).sp
+                        fontSize = (48 * fontSizeMultiplier).sp,
                     ),
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = Modifier.align(Alignment.Center),
                 )
-                
+
                 // Small Suit in Corners
                 Text(
                     text = suit.symbol,
                     color = suitColor.copy(alpha = 0.6f),
                     style = MaterialTheme.typography.titleMedium.copy(fontSize = (16 * fontSizeMultiplier).sp),
-                    modifier = Modifier.align(Alignment.TopStart).padding(4.dp)
+                    modifier = Modifier.align(Alignment.TopStart).padding(4.dp),
                 )
-                
+
                 Text(
                     text = suit.symbol,
                     color = suitColor.copy(alpha = 0.6f),
                     style = MaterialTheme.typography.titleMedium.copy(fontSize = (16 * fontSizeMultiplier).sp),
-                    modifier = Modifier.align(Alignment.BottomEnd).padding(4.dp).graphicsLayer { rotationZ = 180f }
+                    modifier = Modifier.align(Alignment.BottomEnd).padding(4.dp).graphicsLayer { rotationZ = 180f },
                 )
             }
             CardSymbolTheme.TEXT_ONLY -> {
@@ -323,20 +323,20 @@ private fun CardFace(
                     color = suitColor,
                     style = MaterialTheme.typography.displayLarge.copy(
                         fontWeight = FontWeight.Black,
-                        fontSize = (56 * fontSizeMultiplier).sp
+                        fontSize = (56 * fontSizeMultiplier).sp,
                     ),
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = Modifier.align(Alignment.Center),
                 )
-                
+
                 // Suit name instead of symbol at bottom
                 Text(
                     text = suit.name.lowercase().replaceFirstChar { it.uppercase() },
                     color = suitColor.copy(alpha = 0.5f),
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontSize = (10 * fontSizeMultiplier).sp,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
                     ),
-                    modifier = Modifier.align(Alignment.BottomCenter)
+                    modifier = Modifier.align(Alignment.BottomCenter),
                 )
             }
         }
@@ -351,8 +351,8 @@ fun ShimmerEffect() {
         targetValue = 2000f,
         animationSpec = infiniteRepeatable(
             animation = tween(1500, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        )
+            repeatMode = RepeatMode.Restart,
+        ),
     )
 
     val brush = Brush.linearGradient(
@@ -362,13 +362,13 @@ fun ShimmerEffect() {
             Color.White.copy(alpha = 0.0f),
         ),
         start = Offset(translateAnim - 500f, translateAnim - 500f),
-        end = Offset(translateAnim, translateAnim)
+        end = Offset(translateAnim, translateAnim),
     )
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(brush)
+            .background(brush),
     )
 }
 
@@ -377,7 +377,7 @@ private fun GeometricCardBack(baseColor: Color) {
     val patternColor = Color.White.copy(alpha = 0.2f)
     Canvas(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp))) {
         drawRect(baseColor)
-        
+
         val step = 16.dp.toPx()
         for (x in -step.toInt() until size.width.toInt() + step.toInt() step step.toInt()) {
             for (y in -step.toInt() until size.height.toInt() + step.toInt() step step.toInt()) {
@@ -386,19 +386,19 @@ private fun GeometricCardBack(baseColor: Color) {
                         color = patternColor,
                         topLeft = Offset(x.toFloat(), y.toFloat()),
                         size = androidx.compose.ui.geometry.Size(step / 2, step / 2),
-                        style = Stroke(width = 1.dp.toPx())
+                        style = Stroke(width = 1.dp.toPx()),
                     )
                 }
             }
         }
-        
+
         // Inner border
         drawRoundRect(
             color = Color.White.copy(alpha = 0.3f),
             topLeft = Offset(8.dp.toPx(), 8.dp.toPx()),
             size = androidx.compose.ui.geometry.Size(size.width - 16.dp.toPx(), size.height - 16.dp.toPx()),
             cornerRadius = androidx.compose.ui.geometry.CornerRadius(8.dp.toPx()),
-            style = Stroke(width = 1.dp.toPx())
+            style = Stroke(width = 1.dp.toPx()),
         )
     }
 }
@@ -407,29 +407,29 @@ private fun GeometricCardBack(baseColor: Color) {
 private fun ClassicCardBack(baseColor: Color) {
     Canvas(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp))) {
         drawRect(baseColor)
-        
+
         // Diamond pattern
         val step = 12.dp.toPx()
         val color1 = Color.White.copy(alpha = 0.15f)
-        
+
         for (x in 0 until (size.width / step).toInt() + 1) {
             for (y in 0 until (size.height / step).toInt() + 1) {
                 if ((x + y) % 2 == 0) {
                     drawCircle(
                         color = color1,
                         radius = 2.dp.toPx(),
-                        center = Offset(x * step, y * step)
+                        center = Offset(x * step, y * step),
                     )
                 }
             }
         }
-        
+
         drawRoundRect(
             color = Color.White,
             topLeft = Offset(4.dp.toPx(), 4.dp.toPx()),
             size = androidx.compose.ui.geometry.Size(size.width - 8.dp.toPx(), size.height - 8.dp.toPx()),
             cornerRadius = androidx.compose.ui.geometry.CornerRadius(6.dp.toPx()),
-            style = Stroke(width = 3.dp.toPx())
+            style = Stroke(width = 3.dp.toPx()),
         )
     }
 }
@@ -438,37 +438,37 @@ private fun ClassicCardBack(baseColor: Color) {
 private fun PatternCardBack(baseColor: Color) {
     Canvas(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp))) {
         drawRect(baseColor)
-        
+
         val path = Path()
         val step = 20.dp.toPx()
-        
+
         for (y in -1 until (size.height / step).toInt() + 2) {
             val yPos = y * step
             path.moveTo(0f, yPos)
-            
+
             for (x in 0 until (size.width / step).toInt() + 1) {
                 val xPos = x * step
                 path.quadraticTo(
                     xPos + step / 2,
                     yPos + (if (x % 2 == 0) step / 2 else -step / 2),
                     xPos + step,
-                    yPos
+                    yPos,
                 )
             }
         }
-        
+
         drawPath(
             path = path,
             color = Color.White.copy(alpha = 0.2f),
-            style = Stroke(width = 2.dp.toPx())
+            style = Stroke(width = 2.dp.toPx()),
         )
-        
+
         drawRoundRect(
             color = Color.White.copy(alpha = 0.4f),
             topLeft = Offset(6.dp.toPx(), 6.dp.toPx()),
             size = androidx.compose.ui.geometry.Size(size.width - 12.dp.toPx(), size.height - 12.dp.toPx()),
             cornerRadius = androidx.compose.ui.geometry.CornerRadius(6.dp.toPx()),
-            style = Stroke(width = 1.5.dp.toPx())
+            style = Stroke(width = 1.5.dp.toPx()),
         )
     }
 }

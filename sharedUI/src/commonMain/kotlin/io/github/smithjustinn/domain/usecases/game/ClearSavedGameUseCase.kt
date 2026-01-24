@@ -10,9 +10,9 @@ import io.github.smithjustinn.domain.repositories.GameStateRepository
 @Inject
 open class ClearSavedGameUseCase(
     private val gameStateRepository: GameStateRepository,
-    private val logger: Logger
+    private val logger: Logger,
 ) {
-    suspend open operator fun invoke() {
+    open suspend operator fun invoke() {
         try {
             gameStateRepository.clearSavedGameState()
         } catch (e: Exception) {

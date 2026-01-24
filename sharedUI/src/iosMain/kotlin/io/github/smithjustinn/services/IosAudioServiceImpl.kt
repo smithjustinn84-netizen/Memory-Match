@@ -27,7 +27,7 @@ import platform.Foundation.create
 @Inject
 class IosAudioServiceImpl(
     private val logger: Logger,
-    settingsRepository: SettingsRepository
+    settingsRepository: SettingsRepository,
 ) : AudioService {
     private val scope = CoroutineScope(Dispatchers.Main)
     private val players = mutableMapOf<StringResource, AVAudioPlayer>()
@@ -90,7 +90,7 @@ class IosAudioServiceImpl(
                 AudioService.LOSE,
                 AudioService.HIGH_SCORE,
                 AudioService.CLICK,
-                AudioService.DEAL
+                AudioService.DEAL,
             )
             sounds.forEach { resource ->
                 try {

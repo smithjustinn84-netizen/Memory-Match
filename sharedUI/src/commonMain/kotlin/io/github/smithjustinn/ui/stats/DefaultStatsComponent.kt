@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.*
 class DefaultStatsComponent(
     componentContext: ComponentContext,
     appGraph: AppGraph,
-    private val onBackClicked: () -> Unit
+    private val onBackClicked: () -> Unit,
 ) : StatsComponent, ComponentContext by componentContext {
 
     private val scope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
@@ -41,7 +41,7 @@ class DefaultStatsComponent(
                 combine(flows) { pairs ->
                     StatsState(
                         difficultyLeaderboards = pairs.toList(),
-                        selectedGameMode = mode
+                        selectedGameMode = mode,
                     )
                 }
             }

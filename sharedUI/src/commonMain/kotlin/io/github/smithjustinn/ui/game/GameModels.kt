@@ -26,7 +26,7 @@ data class GameUIState(
     val timeLossAmount: Long = 0,
     val isMegaBonus: Boolean = false,
     val showWalkthrough: Boolean = false,
-    val walkthroughStep: Int = 0
+    val walkthroughStep: Int = 0,
 )
 
 sealed class GameUiEvent {

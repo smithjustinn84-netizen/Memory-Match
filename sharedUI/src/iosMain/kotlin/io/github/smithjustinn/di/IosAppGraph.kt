@@ -21,7 +21,7 @@ import platform.Foundation.NSHomeDirectory
     scope = AppScope::class,
     bindingContainers = [
         DataModule::class,
-    ]
+    ],
 )
 interface IosAppGraph : AppGraph {
     @Provides
@@ -38,12 +38,12 @@ interface IosAppGraph : AppGraph {
         val dbFile = NSHomeDirectory() + "/memory_match.db"
         return Room.databaseBuilder<AppDatabase>(
             name = dbFile,
-            factory = { AppDatabaseConstructor.initialize() }
+            factory = { AppDatabaseConstructor.initialize() },
         )
-        .setDriver(BundledSQLiteDriver())
-        .setQueryCoroutineContext(Dispatchers.IO)
-        .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3, AppDatabase.MIGRATION_3_4, AppDatabase.MIGRATION_4_5, AppDatabase.MIGRATION_5_6)
-        .build()
+            .setDriver(BundledSQLiteDriver())
+            .setQueryCoroutineContext(Dispatchers.IO)
+            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3, AppDatabase.MIGRATION_3_4, AppDatabase.MIGRATION_4_5, AppDatabase.MIGRATION_5_6)
+            .build()
     }
 }
 

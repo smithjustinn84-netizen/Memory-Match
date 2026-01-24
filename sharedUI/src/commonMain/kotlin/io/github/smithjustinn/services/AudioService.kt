@@ -21,7 +21,7 @@ interface AudioService {
     fun playHighScore()
     fun playClick()
     fun playDeal()
-    
+
     fun startMusic()
     fun stopMusic()
 

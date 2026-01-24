@@ -18,16 +18,16 @@ fun main() {
     val appGraph = createJvmGraph()
     val root = DefaultRootComponent(
         componentContext = DefaultComponentContext(lifecycle = lifecycle),
-        appGraph = appGraph
+        appGraph = appGraph,
     )
 
     application {
         val windowState = rememberWindowState(
             position = WindowPosition(Alignment.Center),
             size = DpSize(1100.dp, 850.dp),
-            placement = WindowPlacement.Floating
+            placement = WindowPlacement.Floating,
         )
-        
+
         Window(
             title = "Memory Match",
             state = windowState,
@@ -37,7 +37,7 @@ fun main() {
             appGraph.logger.i { "Logging initialized via Metro" }
             App(
                 root = root,
-                appGraph = appGraph
+                appGraph = appGraph,
             )
         }
     }

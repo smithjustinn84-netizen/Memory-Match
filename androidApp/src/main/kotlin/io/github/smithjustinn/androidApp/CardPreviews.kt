@@ -13,7 +13,7 @@ fun PlayingCardFaceUpPreview() {
     PlayingCard(
         suit = Suit.Hearts,
         rank = Rank.Ace,
-        isFaceUp = true
+        isFaceUp = true,
     )
 }
 
@@ -24,6 +24,6 @@ fun PlayingCardFaceDownPreview() {
         suit = Suit.Spades,
         rank = Rank.King,
         isFaceUp = false,
-        backColor = Color.Red
+        backColor = Color.Red,
     )
 }

@@ -40,12 +40,12 @@ class MokkeryTestContext(testDispatcher: TestDispatcher) {
     val appGraph: AppGraph = mock()
 
     val coroutineDispatchers =
-            CoroutineDispatchers(
-                    main = testDispatcher,
-                    mainImmediate = testDispatcher,
-                    io = testDispatcher,
-                    default = testDispatcher
-            )
+        CoroutineDispatchers(
+            main = testDispatcher,
+            mainImmediate = testDispatcher,
+            io = testDispatcher,
+            default = testDispatcher,
+        )
 
     init {
         setupAppGraph()
@@ -69,13 +69,13 @@ class MokkeryTestContext(testDispatcher: TestDispatcher) {
         every { appGraph.calculateFinalScoreUseCase } returns CalculateFinalScoreUseCase()
         every { appGraph.getGameStatsUseCase } returns GetGameStatsUseCase(gameStatsRepository)
         every { appGraph.saveGameResultUseCase } returns
-                SaveGameResultUseCase(gameStatsRepository, leaderboardRepository, logger)
+            SaveGameResultUseCase(gameStatsRepository, leaderboardRepository, logger)
         every { appGraph.getSavedGameUseCase } returns
-                GetSavedGameUseCase(gameStateRepository, logger)
+            GetSavedGameUseCase(gameStateRepository, logger)
         every { appGraph.saveGameStateUseCase } returns
-                SaveGameStateUseCase(gameStateRepository, logger)
+            SaveGameStateUseCase(gameStateRepository, logger)
         every { appGraph.clearSavedGameUseCase } returns
-                ClearSavedGameUseCase(gameStateRepository, logger)
+            ClearSavedGameUseCase(gameStateRepository, logger)
     }
 
     private fun setupDefaultMockBehaviors() {
@@ -88,19 +88,19 @@ class MokkeryTestContext(testDispatcher: TestDispatcher) {
         every { settingsRepository.musicVolume } returns MutableStateFlow(0.5f)
         every { settingsRepository.cardBackTheme } returns MutableStateFlow(CardBackTheme.GEOMETRIC)
         every { settingsRepository.cardSymbolTheme } returns
-                MutableStateFlow(CardSymbolTheme.CLASSIC)
+            MutableStateFlow(CardSymbolTheme.CLASSIC)
         every { settingsRepository.areSuitsMultiColored } returns MutableStateFlow(false)
 
         // Repository defaults
         everySuspend { gameStateRepository.getSavedGameState() } returns null
         everySuspend { gameStateRepository.saveGameState(any(), any()) } returns Unit
         everySuspend { gameStatsRepository.getStatsForDifficulty(any()) } returns
-                MutableStateFlow(null)
+            MutableStateFlow(null)
 
         // Leaderboard defaults
         DifficultyLevel.defaultLevels.forEach { level ->
             every { leaderboardRepository.getTopEntries(level.pairs, any()) } returns
-                    MutableStateFlow(emptyList())
+                MutableStateFlow(emptyList())
         }
     }
 }

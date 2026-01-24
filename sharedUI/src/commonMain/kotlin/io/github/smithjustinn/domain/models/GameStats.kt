@@ -6,5 +6,5 @@ package io.github.smithjustinn.domain.models
 data class GameStats(
     val pairCount: Int,
     val bestScore: Int,
-    val bestTimeSeconds: Long
+    val bestTimeSeconds: Long,
 )

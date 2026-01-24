@@ -27,7 +27,7 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun NewHighScoreSnackbar(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "HighScorePulse")
     val scale by infiniteTransition.animateFloat(
@@ -35,16 +35,16 @@ fun NewHighScoreSnackbar(
         targetValue = 1.05f,
         animationSpec = infiniteRepeatable(
             animation = tween(durationMillis = 800, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
+            repeatMode = RepeatMode.Reverse,
         ),
-        label = "Scale"
+        label = "Scale",
     )
 
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = StartBackgroundTop,
-            contentColor = Color.White
+            contentColor = Color.White,
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
         modifier = modifier
@@ -52,33 +52,33 @@ fun NewHighScoreSnackbar(
             .border(
                 width = 2.dp,
                 brush = Brush.linearGradient(
-                    listOf(GoldenYellow, GoldenYellow.copy(alpha = 0.5f), GoldenYellow)
+                    listOf(GoldenYellow, GoldenYellow.copy(alpha = 0.5f), GoldenYellow),
                 ),
-                shape = RoundedCornerShape(12.dp)
-            )
+                shape = RoundedCornerShape(12.dp),
+            ),
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Icon(
                 imageVector = AppIcons.Trophy,
                 contentDescription = null,
                 modifier = Modifier.size(32.dp),
-                tint = GoldenYellow
+                tint = GoldenYellow,
             )
             Text(
                 text = stringResource(Res.string.new_high_score).uppercase(),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Black,
-                color = Color.White
+                color = Color.White,
             )
             Icon(
                 imageVector = AppIcons.Trophy,
                 contentDescription = null,
                 modifier = Modifier.size(32.dp),
-                tint = GoldenYellow
+                tint = GoldenYellow,
             )
         }
     }
@@ -87,28 +87,28 @@ fun NewHighScoreSnackbar(
 @Composable
 fun MatchCommentSnackbar(
     matchComment: MatchComment?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     AnimatedVisibility(
         visible = matchComment != null,
         enter = fadeIn(animationSpec = spring()) + slideInVertically(
             initialOffsetY = { it },
-            animationSpec = spring()
+            animationSpec = spring(),
         ),
         exit = fadeOut(animationSpec = spring()) + slideOutVertically(
             targetOffsetY = { it },
-            animationSpec = spring()
+            animationSpec = spring(),
         ),
-        modifier = modifier
+        modifier = modifier,
     ) {
         if (matchComment != null) {
             val commentText = stringResource(matchComment.res, *matchComment.args.toTypedArray())
-            
+
             Card(
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = StartBackgroundBottom,
-                    contentColor = LightGreyBlue
+                    contentColor = LightGreyBlue,
                 ),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
                 modifier = Modifier
@@ -117,38 +117,38 @@ fun MatchCommentSnackbar(
                     .border(
                         width = 1.dp,
                         color = NeonCyan.copy(alpha = 0.6f),
-                        shape = RoundedCornerShape(12.dp)
-                    )
+                        shape = RoundedCornerShape(12.dp),
+                    ),
             ) {
                 Row(
                     modifier = Modifier
                         .padding(horizontal = 20.dp, vertical = 14.dp)
                         .align(Alignment.CenterHorizontally),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+                    horizontalArrangement = Arrangement.Center,
                 ) {
                     Text(
                         text = "“",
                         style = MaterialTheme.typography.headlineSmall,
                         color = NeonCyan,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                     Text(
                         text = commentText,
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontStyle = FontStyle.Italic,
                             lineHeight = 20.sp,
-                            color = LightGreyBlue
+                            color = LightGreyBlue,
                         ),
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(horizontal = 8.dp)
+                        modifier = Modifier.padding(horizontal = 8.dp),
                     )
                     Text(
                         text = "”",
                         style = MaterialTheme.typography.headlineSmall,
                         color = NeonCyan,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                 }
             }

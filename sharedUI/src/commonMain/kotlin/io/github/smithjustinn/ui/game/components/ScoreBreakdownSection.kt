@@ -32,39 +32,39 @@ private val BonusColor = Color(0xFF4CAF50)
 @Composable
 fun ScoreBreakdownSection(
     scoreBreakdown: ScoreBreakdown,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         color = InactiveBackground.copy(alpha = 0.4f),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)),
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
                 text = stringResource(Res.string.score_breakdown_title).uppercase(),
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Black,
-                color = NeonCyan
+                color = NeonCyan,
             )
 
             BreakdownRow(
                 label = stringResource(Res.string.score_match_points),
                 value = scoreBreakdown.matchPoints.toString(),
-                color = Color.White
+                color = Color.White,
             )
             BreakdownRow(
                 label = stringResource(Res.string.score_time_bonus),
                 value = if (scoreBreakdown.timeBonus > 0) "+${scoreBreakdown.timeBonus}" else "0",
-                color = if (scoreBreakdown.timeBonus > 0) BonusColor else Color.White
+                color = if (scoreBreakdown.timeBonus > 0) BonusColor else Color.White,
             )
             BreakdownRow(
                 label = stringResource(Res.string.score_move_bonus),
                 value = if (scoreBreakdown.moveBonus > 0) "+${scoreBreakdown.moveBonus}" else "0",
-                color = if (scoreBreakdown.moveBonus > 0) BonusColor else Color.White
+                color = if (scoreBreakdown.moveBonus > 0) BonusColor else Color.White,
             )
         }
     }
@@ -75,27 +75,27 @@ private fun BreakdownRow(
     label: String,
     value: String,
     color: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
             color = Color.White.copy(alpha = 0.6f),
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
         )
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium.copy(
-                fontFeatureSettings = "tnum"
+                fontFeatureSettings = "tnum",
             ),
             color = color,
             fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.End
+            textAlign = TextAlign.End,
         )
     }
 }

@@ -1,9 +1,9 @@
 package io.github.smithjustinn.ui.start
 
-import io.github.smithjustinn.domain.models.DifficultyLevel
-import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.domain.models.CardSymbolTheme
+import io.github.smithjustinn.domain.models.DifficultyLevel
+import io.github.smithjustinn.domain.models.GameMode
 
 data class DifficultyState(
     val selectedDifficulty: DifficultyLevel = DifficultyLevel.defaultLevels[1],
@@ -13,5 +13,5 @@ data class DifficultyState(
     val cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC,
     val hasSavedGame: Boolean = false,
     val savedGamePairCount: Int = 0,
-    val savedGameMode: GameMode = GameMode.STANDARD
+    val savedGameMode: GameMode = GameMode.STANDARD,
 )

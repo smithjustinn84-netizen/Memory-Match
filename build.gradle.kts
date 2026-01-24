@@ -9,4 +9,33 @@ plugins {
     alias(libs.plugins.metro).apply(false)
     alias(libs.plugins.room).apply(false)
     alias(libs.plugins.ksp).apply(false)
+    alias(libs.plugins.spotless)
+}
+
+subprojects {
+    apply(plugin = "com.diffplug.spotless")
+    configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+        kotlin {
+            target("**/*.kt")
+            targetExclude("**/build/**")
+            ktlint("0.50.0")
+                .editorConfigOverride(
+                    mapOf(
+                        "ktlint_standard_filename" to "disabled",
+                        "ktlint_standard_no-wildcard-imports" to "disabled"
+                    )
+                )
+        }
+        kotlinGradle {
+            target("**/*.kts")
+            targetExclude("**/build/**")
+            ktlint("0.50.0")
+                .editorConfigOverride(
+                    mapOf(
+                        "ktlint_standard_filename" to "disabled",
+                        "ktlint_standard_no-wildcard-imports" to "disabled"
+                    )
+                )
+        }
+    }
 }

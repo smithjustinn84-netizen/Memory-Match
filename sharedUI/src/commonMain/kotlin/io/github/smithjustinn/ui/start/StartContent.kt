@@ -28,7 +28,7 @@ import io.github.smithjustinn.ui.start.components.StartHeader
 @Composable
 fun StartContent(
     component: StartComponent,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val state by component.state.collectAsState()
     val graph = LocalAppGraph.current
@@ -39,9 +39,9 @@ fun StartContent(
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(StartBackgroundTop, StartBackgroundBottom)
-                )
-            )
+                    colors = listOf(StartBackgroundTop, StartBackgroundBottom),
+                ),
+            ),
     ) {
         Column(
             modifier = Modifier
@@ -51,11 +51,11 @@ fun StartContent(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+            verticalArrangement = Arrangement.Top,
         ) {
             StartHeader(
                 cardBackTheme = state.cardBackTheme,
-                cardSymbolTheme = state.cardSymbolTheme
+                cardSymbolTheme = state.cardSymbolTheme,
             )
 
             Spacer(modifier = Modifier.height(48.dp))
@@ -85,7 +85,7 @@ fun StartContent(
                 onStatsClick = {
                     audioService.playClick()
                     component.onStatsClick()
-                }
+                },
             )
         }
     }

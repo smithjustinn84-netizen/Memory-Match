@@ -34,89 +34,86 @@ interface RootComponent {
 }
 
 class DefaultRootComponent(componentContext: ComponentContext, private val appGraph: AppGraph) :
-        RootComponent, ComponentContext by componentContext {
+    RootComponent, ComponentContext by componentContext {
 
     private val navigation = StackNavigation<Config>()
 
     override val childStack: Value<ChildStack<*, RootComponent.Child>> =
-            childStack(
-                    source = navigation,
-                    serializer = Config.serializer(),
-                    initialConfiguration = Config.Start,
-                    handleBackButton = true,
-                    childFactory = ::createChild,
-            )
+        childStack(
+            source = navigation,
+            serializer = Config.serializer(),
+            initialConfiguration = Config.Start,
+            handleBackButton = true,
+            childFactory = ::createChild,
+        )
 
     override fun pop() {
         navigation.pop()
     }
 
     private fun createChild(
-            config: Config,
-            componentContext: ComponentContext
+        config: Config,
+        componentContext: ComponentContext,
     ): RootComponent.Child =
-            when (config) {
-                is Config.Start ->
-                        RootComponent.Child.Start(
-                                DefaultStartComponent(
-                                        componentContext = componentContext,
-                                        appGraph = appGraph,
-                                        onNavigateToGame =
-                                                @OptIn(
-                                                        com.arkivanov.decompose
-                                                                .DelicateDecomposeApi::class
-                                                )
-                                                { pairs, mode, forceNewGame ->
-                                                    navigation.push(
-                                                            Config.Game(pairs, mode, forceNewGame)
-                                                    )
-                                                },
-                                        onNavigateToSettings =
-                                                @OptIn(
-                                                        com.arkivanov.decompose
-                                                                .DelicateDecomposeApi::class
-                                                )
-                                                {
-                                                    navigation.push(Config.Settings)
-                                                },
-                                        onNavigateToStats =
-                                                @OptIn(
-                                                        com.arkivanov.decompose
-                                                                .DelicateDecomposeApi::class
-                                                )
-                                                {
-                                                    navigation.push(Config.Stats)
-                                                }
-                                )
-                        )
-                is Config.Game ->
-                        RootComponent.Child.Game(
-                                DefaultGameComponent(
-                                        componentContext = componentContext,
-                                        appGraph = appGraph,
-                                        pairCount = config.pairs,
-                                        mode = config.mode,
-                                        forceNewGame = config.forceNewGame,
-                                        onBackClicked = navigation::pop
-                                )
-                        )
-                is Config.Settings ->
-                        RootComponent.Child.Settings(
-                                DefaultSettingsComponent(
-                                        componentContext = componentContext,
-                                        appGraph = appGraph,
-                                        onBackClicked = navigation::pop
-                                )
-                        )
-                is Config.Stats ->
-                        RootComponent.Child.Stats(
-                                DefaultStatsComponent(
-                                        componentContext = componentContext,
-                                        appGraph = appGraph,
-                                        onBackClicked = navigation::pop
-                                )
-                        )
-            }
+        when (config) {
+            is Config.Start ->
+                RootComponent.Child.Start(
+                    DefaultStartComponent(
+                        componentContext = componentContext,
+                        appGraph = appGraph,
+                        onNavigateToGame =
+                        @OptIn(
+                            com.arkivanov.decompose
+                                .DelicateDecomposeApi::class,
+                        ) { pairs, mode, forceNewGame ->
+                            navigation.push(
+                                Config.Game(pairs, mode, forceNewGame),
+                            )
+                        },
+                        onNavigateToSettings =
+                        @OptIn(
+                            com.arkivanov.decompose
+                                .DelicateDecomposeApi::class,
+                        ) {
+                            navigation.push(Config.Settings)
+                        },
+                        onNavigateToStats =
+                        @OptIn(
+                            com.arkivanov.decompose
+                                .DelicateDecomposeApi::class,
+                        ) {
+                            navigation.push(Config.Stats)
+                        },
+                    ),
+                )
+            is Config.Game ->
+                RootComponent.Child.Game(
+                    DefaultGameComponent(
+                        componentContext = componentContext,
+                        appGraph = appGraph,
+                        pairCount = config.pairs,
+                        mode = config.mode,
+                        forceNewGame = config.forceNewGame,
+                        onBackClicked = navigation::pop,
+                    ),
+                )
+            is Config.Settings ->
+                RootComponent.Child.Settings(
+                    DefaultSettingsComponent(
+                        componentContext = componentContext,
+                        appGraph = appGraph,
+                        onBackClicked = navigation::pop,
+                    ),
+                )
+            is Config.Stats ->
+                RootComponent.Child.Stats(
+                    DefaultStatsComponent(
+                        componentContext = componentContext,
+                        appGraph = appGraph,
+                        onBackClicked = navigation::pop,
+                    ),
+                )
+        }
 
     @Serializable
     private sealed interface Config {

@@ -20,7 +20,7 @@ class DefaultGameComponent(
     private val pairCount: Int,
     private val mode: GameMode,
     forceNewGame: Boolean,
-    private val onBackClicked: () -> Unit
+    private val onBackClicked: () -> Unit,
 ) : GameComponent, ComponentContext by componentContext {
     private val dispatchers = appGraph.coroutineDispatchers
     private val scope = lifecycle.componentScope(dispatchers.mainImmediate)
@@ -56,11 +56,11 @@ class DefaultGameComponent(
         val isPeekEnabled: Boolean,
         val isWalkthroughCompleted: Boolean,
         val isMusicEnabled: Boolean,
-        val isSoundEnabled: Boolean
+        val isSoundEnabled: Boolean,
     )
 
     init {
-        lifecycle.doOnDestroy { 
+        lifecycle.doOnDestroy {
             stopTimer()
             saveGame()
         }
@@ -70,7 +70,7 @@ class DefaultGameComponent(
                 settingsRepository.isPeekEnabled,
                 settingsRepository.isWalkthroughCompleted,
                 settingsRepository.isMusicEnabled,
-                settingsRepository.isSoundEnabled
+                settingsRepository.isSoundEnabled,
             ) { peek, walkthrough, music, sound ->
                 CoreSettings(peek, walkthrough, music, sound)
             }
@@ -79,17 +79,19 @@ class DefaultGameComponent(
                 coreSettingsFlow,
                 settingsRepository.cardBackTheme,
                 settingsRepository.cardSymbolTheme,
-                settingsRepository.areSuitsMultiColored
+                settingsRepository.areSuitsMultiColored,
             ) { core, cardBack, cardSymbol, multiColor ->
-                _state.update { it.copy(
-                    isPeekFeatureEnabled = core.isPeekEnabled,
-                    showWalkthrough = !core.isWalkthroughCompleted,
-                    isMusicEnabled = core.isMusicEnabled,
-                    isSoundEnabled = core.isSoundEnabled,
-                    cardBackTheme = cardBack,
-                    cardSymbolTheme = cardSymbol,
-                    areSuitsMultiColored = multiColor
-                ) }
+                _state.update {
+                    it.copy(
+                        isPeekFeatureEnabled = core.isPeekEnabled,
+                        showWalkthrough = !core.isWalkthroughCompleted,
+                        isMusicEnabled = core.isMusicEnabled,
+                        isSoundEnabled = core.isSoundEnabled,
+                        cardBackTheme = cardBack,
+                        cardSymbolTheme = cardSymbol,
+                        areSuitsMultiColored = multiColor,
+                    )
+                }
             }.collect()
         }
 
@@ -111,7 +113,7 @@ class DefaultGameComponent(
                             isNewHighScore = false,
                             isPeeking = false,
                             showTimeGain = false,
-                            showTimeLoss = false
+                            showTimeLoss = false,
                         )
                     }
                     startTimer(mode)
@@ -122,7 +124,7 @@ class DefaultGameComponent(
                 } else {
                     val initialGameState = startNewGameUseCase(pairCount, mode = mode)
                     val initialTime = if (mode == GameMode.TIME_ATTACK) MemoryGameLogic.calculateInitialTime(pairCount) else 0L
-                    
+
                     _state.update {
                         it.copy(
                             game = initialGameState,
@@ -132,10 +134,10 @@ class DefaultGameComponent(
                             isNewHighScore = false,
                             isPeeking = false,
                             showTimeGain = false,
-                            showTimeLoss = false
+                            showTimeLoss = false,
                         )
                     }
-                    
+
                     _events.emit(GameUiEvent.PlayDeal)
 
                     val walkthroughCompleted = settingsRepository.isWalkthroughCompleted.first()
@@ -162,13 +164,13 @@ class DefaultGameComponent(
             stopTimer()
             val peekDuration = 3
             _state.update { it.copy(isPeeking = true, peekCountdown = peekDuration) }
-            
+
             for (i in peekDuration downTo 1) {
                 _state.update { it.copy(peekCountdown = i) }
                 _events.emit(GameUiEvent.VibrateTick)
                 delay(1000)
             }
-            
+
             _state.update { it.copy(isPeeking = false, peekCountdown = 0) }
             _events.emit(GameUiEvent.PlayFlip)
             startTimer(mode)
@@ -179,10 +181,12 @@ class DefaultGameComponent(
         statsJob?.cancel()
         statsJob = scope.launch {
             getGameStatsUseCase(pairCount).collect { stats ->
-                _state.update { it.copy(
-                    bestScore = stats?.bestScore ?: 0,
-                    bestTimeSeconds = stats?.bestTimeSeconds ?: 0
-                ) }
+                _state.update {
+                    it.copy(
+                        bestScore = stats?.bestScore ?: 0,
+                        bestTimeSeconds = stats?.bestTimeSeconds ?: 0,
+                    )
+                }
             }
         }
     }
@@ -194,12 +198,12 @@ class DefaultGameComponent(
                 delay(1000)
                 if (mode == GameMode.TIME_ATTACK) {
                     var shouldStop = false
-                    _state.update { 
+                    _state.update {
                         val newTime = (it.elapsedTimeSeconds - 1).coerceAtLeast(0)
                         if (newTime == 0L && !it.game.isGameOver) {
                             shouldStop = true
                         }
-                        
+
                         if (newTime in 1L..5L && !it.game.isGameOver) {
                             _events.tryEmit(GameUiEvent.VibrateTick)
                         }
@@ -229,11 +233,11 @@ class DefaultGameComponent(
 
         try {
             val (newState, event) = flipCardUseCase(currentState.game, cardId)
-            
+
             if (newState === currentState.game && event == null) return
 
             _state.update { it.copy(game = newState) }
-            
+
             saveGame()
 
             when (event) {
@@ -252,19 +256,19 @@ class DefaultGameComponent(
     private fun handleMatchSuccess(newState: MemoryGameState) {
         _events.tryEmit(GameUiEvent.VibrateMatch)
         _events.tryEmit(GameUiEvent.PlayMatch)
-        
+
         clearCommentAfterDelay()
-        
+
         if (newState.mode == GameMode.TIME_ATTACK) {
             val totalTimeGain = MemoryGameLogic.calculateTimeGain(newState.comboMultiplier - 1)
             val isMega = newState.comboMultiplier >= 3
 
-            _state.update { 
+            _state.update {
                 it.copy(
                     elapsedTimeSeconds = it.elapsedTimeSeconds + totalTimeGain,
                     showTimeGain = true,
                     timeGainAmount = totalTimeGain,
-                    isMegaBonus = isMega
+                    isMegaBonus = isMega,
                 )
             }
             triggerTimeGainFeedback()
@@ -288,17 +292,17 @@ class DefaultGameComponent(
             _events.tryEmit(GameUiEvent.VibrateMismatch)
             _events.tryEmit(GameUiEvent.PlayMismatch)
         }
-        
+
         var isGameOver = false
         if (newState.mode == GameMode.TIME_ATTACK && !isResuming) {
             val penalty = MemoryGameLogic.TIME_PENALTY_MISMATCH
-            _state.update { 
+            _state.update {
                 val newTime = (it.elapsedTimeSeconds - penalty).coerceAtLeast(0)
                 if (newTime == 0L) isGameOver = true
                 it.copy(
                     elapsedTimeSeconds = newTime,
                     showTimeLoss = true,
-                    timeLossAmount = penalty
+                    timeLossAmount = penalty,
                 )
             }
             triggerTimeLossFeedback()
@@ -341,10 +345,12 @@ class DefaultGameComponent(
             _events.tryEmit(GameUiEvent.PlayWin)
         }
 
-        _state.update { it.copy(
-            game = gameWithBonuses,
-            isNewHighScore = isNewHigh
-        ) }
+        _state.update {
+            it.copy(
+                game = gameWithBonuses,
+                isNewHighScore = isNewHigh,
+            )
+        }
 
         saveStats(gameWithBonuses.pairCount, gameWithBonuses.score, _state.value.elapsedTimeSeconds, gameWithBonuses.moves, gameWithBonuses.mode)
         clearCommentAfterDelay()

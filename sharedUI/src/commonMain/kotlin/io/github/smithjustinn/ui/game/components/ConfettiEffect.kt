@@ -25,7 +25,7 @@ private class Particle(
     val color: Color,
     val size: Float,
     angle: Double,
-    speed: Float
+    speed: Float,
 ) {
     var x = 0f
     var y = 0f
@@ -61,8 +61,8 @@ fun ConfettiEffect(
         Color(0xFF2196F3), // Blue
         Color(0xFF4CAF50), // Green
         Color(0xFFFFEB3B), // Yellow
-        Color(0xFFFF9800)  // Orange
-    )
+        Color(0xFFFF9800), // Orange
+    ),
 ) {
     val particles = remember { mutableStateListOf<Particle>() }
     val frameState = remember { mutableLongStateOf(0L) }
@@ -74,7 +74,7 @@ fun ConfettiEffect(
                 color = colors.random(),
                 size = Random.nextFloat() * 10f + 8f,
                 angle = Random.nextDouble(0.0, 2.0 * PI),
-                speed = Random.nextFloat() * 12f + 4f
+                speed = Random.nextFloat() * 12f + 4f,
             )
         }
         particles.addAll(newParticles)
@@ -108,7 +108,7 @@ fun ConfettiEffect(
                 drawRect(
                     color = p.color.copy(alpha = p.alpha.coerceIn(0f, 1f)),
                     topLeft = position,
-                    size = Size(p.size, p.size)
+                    size = Size(p.size, p.size),
                 )
             }
         }

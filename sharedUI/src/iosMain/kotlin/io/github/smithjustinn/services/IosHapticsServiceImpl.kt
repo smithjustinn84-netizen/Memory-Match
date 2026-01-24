@@ -1,10 +1,10 @@
 package io.github.smithjustinn.services
 
 import dev.zacsweers.metro.Inject
-import platform.UIKit.UINotificationFeedbackGenerator
-import platform.UIKit.UINotificationFeedbackType
 import platform.UIKit.UIImpactFeedbackGenerator
 import platform.UIKit.UIImpactFeedbackStyle
+import platform.UIKit.UINotificationFeedbackGenerator
+import platform.UIKit.UINotificationFeedbackType
 
 @Inject
 class IosHapticsServiceImpl : HapticsService {

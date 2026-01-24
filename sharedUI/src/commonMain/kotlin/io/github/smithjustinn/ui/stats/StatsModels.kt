@@ -6,7 +6,7 @@ import io.github.smithjustinn.domain.models.LeaderboardEntry
 
 data class StatsState(
     val difficultyLeaderboards: List<Pair<DifficultyLevel, List<LeaderboardEntry>>> = emptyList(),
-    val selectedGameMode: GameMode = GameMode.STANDARD
+    val selectedGameMode: GameMode = GameMode.STANDARD,
 )
 
 sealed class StatsUiEvent {

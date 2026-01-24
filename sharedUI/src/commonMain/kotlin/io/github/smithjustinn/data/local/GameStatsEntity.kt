@@ -7,5 +7,5 @@ import androidx.room.PrimaryKey
 data class GameStatsEntity(
     @PrimaryKey val pairCount: Int,
     val bestScore: Int,
-    val bestTimeSeconds: Long
+    val bestTimeSeconds: Long,
 )

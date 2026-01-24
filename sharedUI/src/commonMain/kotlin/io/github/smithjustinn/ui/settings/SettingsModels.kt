@@ -12,7 +12,7 @@ data class SettingsUIState(
     val musicVolume: Float = 1.0f,
     val cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC,
     val cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC,
-    val areSuitsMultiColored: Boolean = false
+    val areSuitsMultiColored: Boolean = false,
 )
 
 sealed class SettingsUiEvent {

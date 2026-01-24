@@ -29,21 +29,21 @@ fun ComboBadge(
     isMegaBonus: Boolean,
     infiniteTransition: InfiniteTransition,
     modifier: Modifier = Modifier,
-    compact: Boolean = false
+    compact: Boolean = false,
 ) {
     AnimatedVisibility(
         visible = combo > 1,
         enter = fadeIn() + scaleIn(),
         exit = fadeOut() + scaleOut(),
-        modifier = modifier
+        modifier = modifier,
     ) {
         val comboPulseScale by infiniteTransition.animateFloat(
             initialValue = 1f,
             targetValue = if (compact) 1.05f else 1.1f,
             animationSpec = infiniteRepeatable(
                 animation = tween(400, easing = FastOutSlowInEasing),
-                repeatMode = RepeatMode.Reverse
-            )
+                repeatMode = RepeatMode.Reverse,
+            ),
         )
 
         val badgeColor = if (isMegaBonus) Color(0xFFFFD700) else NeonCyan
@@ -59,8 +59,8 @@ fun ComboBadge(
                     elevation = if (compact) 6.dp else 12.dp,
                     shape = tacticalShape,
                     ambientColor = badgeColor,
-                    spotColor = badgeColor
-                )
+                    spotColor = badgeColor,
+                ),
         ) {
             Text(
                 text = stringResource(Res.string.combo_format, combo).uppercase(),
@@ -68,9 +68,9 @@ fun ComboBadge(
                 style = MaterialTheme.typography.labelLarge.copy(
                     fontWeight = FontWeight.Black,
                     fontSize = if (compact) 12.sp else 16.sp,
-                    letterSpacing = 1.sp
+                    letterSpacing = 1.sp,
                 ),
-                color = badgeColor
+                color = badgeColor,
             )
         }
     }

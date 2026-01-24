@@ -20,7 +20,7 @@ private data class ExplosionParticle(
     val color: Color,
     val size: Float,
     val rotation: Float,
-    val rotationSpeed: Float
+    val rotationSpeed: Float,
 )
 
 @Composable
@@ -28,7 +28,7 @@ fun ExplosionEffect(
     modifier: Modifier = Modifier,
     particleCount: Int = 30,
     colors: List<Color> = listOf(Color.Yellow, Color.Red, Color.Cyan, Color.Magenta, Color.White),
-    centerOverride: Offset? = null
+    centerOverride: Offset? = null,
 ) {
     val infiniteTransition = rememberInfiniteTransition()
     val progress by infiniteTransition.animateFloat(
@@ -36,8 +36,8 @@ fun ExplosionEffect(
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
             animation = tween(1000, easing = LinearOutSlowInEasing),
-            repeatMode = RepeatMode.Restart
-        )
+            repeatMode = RepeatMode.Restart,
+        ),
     )
 
     val particles = remember {
@@ -52,24 +52,24 @@ fun ExplosionEffect(
                 color = colors.random(),
                 size = Random.nextFloat() * 10f + 5f,
                 rotation = Random.nextFloat() * 360f,
-                rotationSpeed = Random.nextFloat() * 10f - 5f
+                rotationSpeed = Random.nextFloat() * 10f - 5f,
             )
         }
     }
 
     Canvas(modifier = modifier.fillMaxSize()) {
         val center = centerOverride ?: Offset(size.width / 2, size.height / 2)
-        
+
         particles.forEach { particle ->
             val currentX = center.x + particle.vx * progress * 50f
             val currentY = center.y + particle.vy * progress * 50f
             val alpha = 1f - progress
-            
+
             rotate(particle.rotation + particle.rotationSpeed * progress * 100f, Offset(currentX, currentY)) {
                 drawRect(
                     color = particle.color.copy(alpha = alpha),
                     topLeft = Offset(currentX - particle.size / 2, currentY - particle.size / 2),
-                    size = androidx.compose.ui.geometry.Size(particle.size, particle.size)
+                    size = androidx.compose.ui.geometry.Size(particle.size, particle.size),
                 )
             }
         }

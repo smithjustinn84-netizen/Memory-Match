@@ -60,7 +60,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun SettingsContent(
     component: SettingsComponent,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val graph = LocalAppGraph.current
     val state by component.state.collectAsState()
@@ -79,9 +79,9 @@ fun SettingsContent(
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(StartBackgroundTop, StartBackgroundBottom)
-                )
-            )
+                    colors = listOf(StartBackgroundTop, StartBackgroundBottom),
+                ),
+            ),
     ) {
         Scaffold(
             containerColor = Color.Transparent,
@@ -92,24 +92,24 @@ fun SettingsContent(
                             text = stringResource(Res.string.settings),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = Color.White,
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                     navigationIcon = {
-                        IconButton(onClick = { 
+                        IconButton(onClick = {
                             audioService.playClick()
-                            component.onBack() 
+                            component.onBack()
                         }) {
                             Icon(
                                 imageVector = AppIcons.ArrowBack,
                                 contentDescription = stringResource(Res.string.back_content_description),
-                                tint = Color.White
+                                tint = Color.White,
                             )
                         }
-                    }
+                    },
                 )
-            }
+            },
         ) { padding ->
             Box(modifier = Modifier.fillMaxSize().padding(padding)) {
                 Column(
@@ -119,18 +119,18 @@ fun SettingsContent(
                         .padding(horizontal = 24.dp, vertical = 16.dp)
                         .widthIn(max = 600.dp)
                         .align(Alignment.TopCenter),
-                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                    verticalArrangement = Arrangement.spacedBy(20.dp),
                 ) {
                     SettingsCard(title = stringResource(Res.string.settings_appearance)) {
                         ThemeSelector(
                             title = stringResource(Res.string.settings_card_back_style),
                             options = CardBackTheme.entries,
                             selected = state.cardBackTheme,
-                            onSelect = { 
+                            onSelect = {
                                 audioService.playClick()
-                                component.setCardBackTheme(it) 
+                                component.setCardBackTheme(it)
                             },
-                            labelProvider = { it.name.lowercase().replaceFirstChar { char -> char.uppercase() } }
+                            labelProvider = { it.name.lowercase().replaceFirstChar { char -> char.uppercase() } },
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -139,16 +139,16 @@ fun SettingsContent(
                             title = stringResource(Res.string.settings_symbol_style),
                             options = CardSymbolTheme.entries,
                             selected = state.cardSymbolTheme,
-                            onSelect = { 
+                            onSelect = {
                                 audioService.playClick()
-                                component.setCardSymbolTheme(it) 
+                                component.setCardSymbolTheme(it)
                             },
-                            labelProvider = { it.name.lowercase().replace("text_only", "text only").replaceFirstChar { char -> char.uppercase() } }
+                            labelProvider = { it.name.lowercase().replace("text_only", "text only").replaceFirstChar { char -> char.uppercase() } },
                         )
 
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 12.dp),
-                            color = Color.White.copy(alpha = 0.1f)
+                            color = Color.White.copy(alpha = 0.1f),
                         )
 
                         SettingsToggle(
@@ -158,7 +158,7 @@ fun SettingsContent(
                             onCheckedChange = {
                                 audioService.playClick()
                                 component.toggleSuitsMultiColored(it)
-                            }
+                            },
                         )
                     }
 
@@ -167,54 +167,54 @@ fun SettingsContent(
                             title = stringResource(Res.string.settings_sound_effects),
                             description = stringResource(Res.string.settings_sound_effects_desc),
                             checked = state.isSoundEnabled,
-                            onCheckedChange = { 
+                            onCheckedChange = {
                                 audioService.playClick()
-                                component.toggleSoundEnabled(it) 
-                            }
+                                component.toggleSoundEnabled(it)
+                            },
                         )
 
                         if (state.isSoundEnabled) {
                             VolumeSlider(
                                 value = state.soundVolume,
-                                onValueChange = { component.setSoundVolume(it) }
+                                onValueChange = { component.setSoundVolume(it) },
                             )
                         }
-                        
+
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 8.dp),
-                            color = Color.White.copy(alpha = 0.1f)
+                            color = Color.White.copy(alpha = 0.1f),
                         )
 
                         SettingsToggle(
                             title = stringResource(Res.string.settings_game_music),
                             description = stringResource(Res.string.settings_game_music_desc),
                             checked = state.isMusicEnabled,
-                            onCheckedChange = { 
+                            onCheckedChange = {
                                 audioService.playClick()
-                                component.toggleMusicEnabled(it) 
-                            }
+                                component.toggleMusicEnabled(it)
+                            },
                         )
 
                         if (state.isMusicEnabled) {
                             VolumeSlider(
                                 value = state.musicVolume,
-                                onValueChange = { component.setMusicVolume(it) }
+                                onValueChange = { component.setMusicVolume(it) },
                             )
                         }
 
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 8.dp),
-                            color = Color.White.copy(alpha = 0.1f)
+                            color = Color.White.copy(alpha = 0.1f),
                         )
 
                         SettingsToggle(
                             title = stringResource(Res.string.settings_enable_peek),
                             description = stringResource(Res.string.settings_enable_peek_desc),
                             checked = state.isPeekEnabled,
-                            onCheckedChange = { 
+                            onCheckedChange = {
                                 audioService.playClick()
-                                component.togglePeekEnabled(it) 
-                            }
+                                component.togglePeekEnabled(it)
+                            },
                         )
                     }
 
@@ -222,20 +222,20 @@ fun SettingsContent(
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = stringResource(Res.string.settings_reset_walkthrough),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White
+                                    color = Color.White,
                                 )
                                 Text(
                                     text = stringResource(Res.string.settings_reset_walkthrough_desc),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = Color.White.copy(alpha = 0.6f),
-                                    lineHeight = 16.sp
+                                    lineHeight = 16.sp,
                                 )
                             }
                             Button(
@@ -248,8 +248,8 @@ fun SettingsContent(
                                     containerColor = NeonCyan.copy(alpha = 0.2f),
                                     contentColor = NeonCyan,
                                     disabledContainerColor = InactiveBackground.copy(alpha = 0.5f),
-                                    disabledContentColor = Color.White.copy(alpha = 0.3f)
-                                )
+                                    disabledContentColor = Color.White.copy(alpha = 0.3f),
+                                ),
                             ) {
                                 Text(stringResource(Res.string.settings_reset))
                             }
@@ -267,21 +267,21 @@ private fun <T> ThemeSelector(
     options: List<T>,
     selected: T,
     onSelect: (T) -> Unit,
-    labelProvider: @Composable (T) -> String
+    labelProvider: @Composable (T) -> String,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = Color.White,
         )
-        
+
         NeonSegmentedControl(
             items = options,
             selectedItem = selected,
             onItemSelected = onSelect,
-            labelProvider = { labelProvider(it) }
+            labelProvider = { labelProvider(it) },
         )
     }
 }
@@ -290,20 +290,20 @@ private fun <T> ThemeSelector(
 private fun VolumeSlider(
     value: Float,
     onValueChange: (Float) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(top = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Icon(
             imageVector = AppIcons.VolumeUp,
             contentDescription = null,
             tint = NeonCyan,
-            modifier = Modifier.size(18.dp)
+            modifier = Modifier.size(18.dp),
         )
         Slider(
             value = value,
@@ -312,14 +312,14 @@ private fun VolumeSlider(
             colors = SliderDefaults.colors(
                 thumbColor = Color.White,
                 activeTrackColor = NeonCyan,
-                inactiveTrackColor = InactiveBackground
-            )
+                inactiveTrackColor = InactiveBackground,
+            ),
         )
         Text(
             text = "${(value * 100).toInt()}%",
             style = MaterialTheme.typography.labelMedium,
             color = Color.White.copy(alpha = 0.6f),
-            modifier = Modifier.width(32.dp)
+            modifier = Modifier.width(32.dp),
         )
     }
 }
@@ -327,7 +327,7 @@ private fun VolumeSlider(
 @Composable
 private fun SettingsCard(
     title: String? = null,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -335,8 +335,8 @@ private fun SettingsCard(
         color = InactiveBackground.copy(alpha = 0.4f),
         border = androidx.compose.foundation.BorderStroke(
             width = 1.dp,
-            color = Color.White.copy(alpha = 0.1f)
-        )
+            color = Color.White.copy(alpha = 0.1f),
+        ),
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             if (title != null) {
@@ -345,7 +345,7 @@ private fun SettingsCard(
                     style = MaterialTheme.typography.labelLarge,
                     color = NeonCyan,
                     fontWeight = FontWeight.ExtraBold,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier.padding(bottom = 16.dp),
                 )
             }
             content()
@@ -359,25 +359,25 @@ private fun SettingsToggle(
     description: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = Color.White,
             )
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.White.copy(alpha = 0.6f),
-                lineHeight = 16.sp
+                lineHeight = 16.sp,
             )
         }
         Switch(
@@ -388,8 +388,8 @@ private fun SettingsToggle(
                 checkedTrackColor = NeonCyan,
                 uncheckedTrackColor = InactiveBackground,
                 uncheckedThumbColor = Color.White.copy(alpha = 0.6f),
-                uncheckedBorderColor = Color.Transparent
-            )
+                uncheckedBorderColor = Color.Transparent,
+            ),
         )
     }
 }

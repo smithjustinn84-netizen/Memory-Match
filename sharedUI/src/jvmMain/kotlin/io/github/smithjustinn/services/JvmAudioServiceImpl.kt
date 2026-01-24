@@ -22,7 +22,7 @@ import kotlin.math.log10
 @Inject
 class JvmAudioServiceImpl(
     private val logger: Logger,
-    settingsRepository: SettingsRepository
+    settingsRepository: SettingsRepository,
 ) : AudioService {
     private val scope = CoroutineScope(Dispatchers.IO)
     private val clips = ConcurrentHashMap<StringResource, Clip>()
@@ -68,7 +68,7 @@ class JvmAudioServiceImpl(
                 AudioService.LOSE,
                 AudioService.HIGH_SCORE,
                 AudioService.CLICK,
-                AudioService.DEAL
+                AudioService.DEAL,
             )
             sounds.forEach { resource ->
                 try {
@@ -153,7 +153,7 @@ class JvmAudioServiceImpl(
                         open(audioStream)
                     }
                 }
-                
+
                 musicClip?.apply {
                     setVolume(musicVolume)
                     if (!isRunning && isMusicRequested && isMusicEnabled) {

@@ -14,7 +14,7 @@ interface SettingsRepository {
     val cardBackTheme: StateFlow<CardBackTheme>
     val cardSymbolTheme: StateFlow<CardSymbolTheme>
     val areSuitsMultiColored: StateFlow<Boolean>
-    
+
     suspend fun setPeekEnabled(enabled: Boolean)
     suspend fun setSoundEnabled(enabled: Boolean)
     suspend fun setMusicEnabled(enabled: Boolean)

@@ -19,7 +19,7 @@ object AppIcons {
                 defaultWidth = 24.0.dp,
                 defaultHeight = 24.0.dp,
                 viewportWidth = 24.0f,
-                viewportHeight = 24.0f
+                viewportHeight = 24.0f,
             ).apply {
                 path(fill = SolidColor(Color.Black)) {
                     moveTo(20.0f, 11.0f)
@@ -46,7 +46,7 @@ object AppIcons {
                 defaultWidth = 24.0.dp,
                 defaultHeight = 24.0.dp,
                 viewportWidth = 24.0f,
-                viewportHeight = 24.0f
+                viewportHeight = 24.0f,
             ).apply {
                 path(fill = SolidColor(Color.Black)) {
                     moveTo(17.65f, 6.35f)
@@ -77,13 +77,13 @@ object AppIcons {
                 defaultWidth = 24.0.dp,
                 defaultHeight = 24.0.dp,
                 viewportWidth = 24.0f,
-                viewportHeight = 24.0f
+                viewportHeight = 24.0f,
             ).path(
                 fill = SolidColor(Color(0xFF000000)),
                 strokeLineWidth = 0f,
                 strokeLineCap = StrokeCap.Butt,
                 strokeLineJoin = StrokeJoin.Miter,
-                pathFillType = PathFillType.NonZero
+                pathFillType = PathFillType.NonZero,
             ) {
                 // The outer shape and teeth
                 moveTo(19.14f, 12.94f)
@@ -146,13 +146,13 @@ object AppIcons {
                 defaultWidth = 24.0.dp,
                 defaultHeight = 24.0.dp,
                 viewportWidth = 24.0f,
-                viewportHeight = 24.0f
+                viewportHeight = 24.0f,
             ).path(
                 fill = SolidColor(Color(0xFF000000)),
                 strokeLineWidth = 0f,
                 strokeLineCap = StrokeCap.Butt,
                 strokeLineJoin = StrokeJoin.Miter,
-                pathFillType = PathFillType.NonZero
+                pathFillType = PathFillType.NonZero,
             ) {
                 // The main cup body
                 moveTo(19.0f, 5.0f)
@@ -206,7 +206,7 @@ object AppIcons {
                 defaultWidth = 24.0.dp,
                 defaultHeight = 24.0.dp,
                 viewportWidth = 24.0f,
-                viewportHeight = 24.0f
+                viewportHeight = 24.0f,
             ).apply {
                 path(fill = SolidColor(Color.Black)) {
                     moveTo(3.0f, 9.0f)
@@ -243,7 +243,7 @@ object AppIcons {
                 defaultWidth = 24.0.dp,
                 defaultHeight = 24.0.dp,
                 viewportWidth = 24.0f,
-                viewportHeight = 24.0f
+                viewportHeight = 24.0f,
             ).apply {
                 path(fill = SolidColor(Color.Black)) {
                     moveTo(16.5f, 12.0f)

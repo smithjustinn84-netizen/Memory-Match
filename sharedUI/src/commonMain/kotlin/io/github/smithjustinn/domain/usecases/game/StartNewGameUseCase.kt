@@ -14,7 +14,7 @@ open class StartNewGameUseCase {
     open operator fun invoke(
         pairCount: Int,
         config: ScoringConfig = ScoringConfig(),
-        mode: GameMode = GameMode.STANDARD
+        mode: GameMode = GameMode.STANDARD,
     ): MemoryGameState {
         return MemoryGameLogic.createInitialState(pairCount, config, mode)
     }

@@ -11,7 +11,7 @@ object MemoryGameLogic {
     fun createInitialState(
         pairCount: Int,
         config: ScoringConfig = ScoringConfig(),
-        mode: GameMode = GameMode.STANDARD
+        mode: GameMode = GameMode.STANDARD,
     ): MemoryGameState {
         val allPossibleCards = Suit.entries.flatMap { suit ->
             Rank.entries.map { rank -> suit to rank }
@@ -22,7 +22,7 @@ object MemoryGameLogic {
         val gameCards = selectedPairs.flatMap { (suit, rank) ->
             listOf(
                 CardState(id = 0, suit = suit, rank = rank),
-                CardState(id = 0, suit = suit, rank = rank)
+                CardState(id = 0, suit = suit, rank = rank),
             )
         }.shuffled().mapIndexed { index, card ->
             card.copy(id = index)
@@ -32,13 +32,13 @@ object MemoryGameLogic {
             cards = gameCards,
             pairCount = pairCount,
             config = config,
-            mode = mode
+            mode = mode,
         )
     }
 
     fun flipCard(state: MemoryGameState, cardId: Int): Pair<MemoryGameState, GameDomainEvent?> {
         if (state.isGameOver) return state to null
-        
+
         val cardToFlip = state.cards.find { it.id == cardId } ?: return state to null
 
         if (cardToFlip.isFaceUp || cardToFlip.isMatched) return state to null
@@ -51,7 +51,7 @@ object MemoryGameLogic {
                 if (card.id == cardId) card.copy(isFaceUp = true) else card
             },
             // Clear last matched IDs when starting a new turn
-            lastMatchedIds = if (faceUpCards.isEmpty()) emptyList() else state.lastMatchedIds
+            lastMatchedIds = if (faceUpCards.isEmpty()) emptyList() else state.lastMatchedIds,
         )
 
         val activeCards = newState.cards.filter { it.isFaceUp && !it.isMatched }
@@ -88,13 +88,13 @@ object MemoryGameLogic {
 
         val config = state.config
         val pointsEarned = config.baseMatchPoints + (state.comboMultiplier - 1) * config.comboBonusPoints
-        
+
         val isWon = newCards.all { it.isMatched }
         val matchesFound = newCards.count { it.isMatched } / 2
         val moves = state.moves + 1
-        
+
         val comment = generateMatchComment(moves, matchesFound, state.pairCount, state.comboMultiplier)
-        
+
         val newState = state.copy(
             cards = newCards,
             isGameWon = isWon,
@@ -103,7 +103,7 @@ object MemoryGameLogic {
             score = state.score + pointsEarned,
             comboMultiplier = state.comboMultiplier + 1,
             matchComment = comment,
-            lastMatchedIds = listOf(first.id, second.id)
+            lastMatchedIds = listOf(first.id, second.id),
         )
 
         return newState to if (isWon) GameDomainEvent.GameWon else GameDomainEvent.MatchSuccess
@@ -120,7 +120,7 @@ object MemoryGameLogic {
                     card
                 }
             },
-            lastMatchedIds = emptyList()
+            lastMatchedIds = emptyList(),
         )
         return newState to GameDomainEvent.MatchFailure
     }
@@ -129,7 +129,7 @@ object MemoryGameLogic {
         return state.copy(
             cards = state.cards.map { card ->
                 if (card.isError) card.copy(isFaceUp = false, isError = false) else card
-            }
+            },
         )
     }
 
@@ -139,9 +139,9 @@ object MemoryGameLogic {
      */
     fun applyFinalBonuses(state: MemoryGameState, elapsedTimeSeconds: Long): MemoryGameState {
         if (!state.isGameWon) return state
-        
+
         val config = state.config
-        
+
         // Time Bonus: Small impact
         val timeBonus = if (state.mode == GameMode.TIME_ATTACK) {
             // In Time Attack, remaining time is the bonus
@@ -150,21 +150,21 @@ object MemoryGameLogic {
             (state.pairCount * config.timeBonusPerPair - (elapsedTimeSeconds * config.timePenaltyPerSecond))
                 .coerceAtLeast(0).toInt()
         }
-        
+
         // Move Efficiency Bonus: Dominant factor
         val moveEfficiency = state.pairCount.toDouble() / state.moves.toDouble()
         val moveBonus = (moveEfficiency * config.moveBonusMultiplier).toInt()
-        
+
         val totalScore = state.score + timeBonus + moveBonus
-        
+
         return state.copy(
             score = totalScore,
             scoreBreakdown = ScoreBreakdown(
                 matchPoints = state.score,
                 timeBonus = timeBonus,
                 moveBonus = moveBonus,
-                totalScore = totalScore
-            )
+                totalScore = totalScore,
+            ),
         )
     }
 
@@ -186,7 +186,7 @@ object MemoryGameLogic {
                     Res.string.comment_eagle_eyes,
                     Res.string.comment_sharp,
                     Res.string.comment_on_a_roll,
-                    Res.string.comment_keep_it_up
+                    Res.string.comment_keep_it_up,
                 ).random()
                 MatchComment(randomRes)
             }
@@ -197,8 +197,8 @@ object MemoryGameLogic {
 
     fun calculateInitialTime(pairCount: Int): Long {
         return when (pairCount) {
-            6 -> 25L  // Toddler
-            8 -> 35L  // Casual
+            6 -> 25L // Toddler
+            8 -> 35L // Casual
             10 -> 45L // Master
             12 -> 55L // Shark
             14 -> 65L // Grandmaster

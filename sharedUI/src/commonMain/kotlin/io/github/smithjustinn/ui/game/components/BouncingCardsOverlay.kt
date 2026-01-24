@@ -32,7 +32,7 @@ private class CelebrationCard(
     val vy0: Float,
     val vRot: Float,
     val targetScale: Float,
-    val delaySeconds: Float
+    val delaySeconds: Float,
 ) {
     var x by mutableStateOf(initialX)
     var y by mutableStateOf(initialY)
@@ -69,8 +69,8 @@ private class CelebrationCard(
 }
 
 /**
- * A "surprise" celebration overlay that replaces the old bouncing cards with a 
- * dynamic "Card Fountain" explosion. Cards shoot up from the bottom center 
+ * A "surprise" celebration overlay that replaces the old bouncing cards with a
+ * dynamic "Card Fountain" explosion. Cards shoot up from the bottom center
  * in a staggered sequence, creating a jackpot-like effect.
  */
 @Composable
@@ -79,13 +79,13 @@ fun BouncingCardsOverlay(
     modifier: Modifier = Modifier,
     cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC,
     cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC,
-    areSuitsMultiColored: Boolean = false
+    areSuitsMultiColored: Boolean = false,
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val density = LocalDensity.current
         val widthPx = with(density) { maxWidth.toPx() }
         val heightPx = with(density) { maxHeight.toPx() }
-        
+
         val centerX = widthPx / 2f
         val cardWidthPx = with(density) { BASE_CARD_WIDTH.toPx() }
 
@@ -102,7 +102,7 @@ fun BouncingCardsOverlay(
                     val angleDeg = Random.nextFloat() * 80f - 130f // Range approx -130 to -50 degrees
                     val radians = angleDeg * (PI.toFloat() / 180f)
                     val speed = 20f + Random.nextFloat() * 20f
-                    
+
                     celebrationCards.add(
                         CelebrationCard(
                             card = card,
@@ -112,8 +112,8 @@ fun BouncingCardsOverlay(
                             vy0 = sin(radians) * speed,
                             vRot = (Random.nextFloat() - 0.5f) * 12f,
                             targetScale = 0.7f + Random.nextFloat() * 0.5f,
-                            delaySeconds = index * 0.08f // Staggered launch for "fountain" feel
-                        )
+                            delaySeconds = index * 0.08f, // Staggered launch for "fountain" feel
+                        ),
                     )
                 }
             }
@@ -126,13 +126,13 @@ fun BouncingCardsOverlay(
                     withFrameNanos { frameTime ->
                         if (startTimeNanos == 0L) startTimeNanos = frameTime
                         val elapsedSeconds = (frameTime - startTimeNanos) / 1_000_000_000f
-                        
+
                         celebrationCards.forEach { card ->
                             card.update(
                                 gravity = 0.7f,
                                 friction = 0.992f,
                                 elapsedSeconds = elapsedSeconds,
-                                screenHeight = heightPx
+                                screenHeight = heightPx,
                             )
                         }
                     }
@@ -162,7 +162,7 @@ fun BouncingCardsOverlay(
                                 alpha = cCard.alpha
                                 // Add a slight shadow for depth as they fly
                                 shadowElevation = 8.dp.toPx()
-                            }
+                            },
                     )
                 }
             }
