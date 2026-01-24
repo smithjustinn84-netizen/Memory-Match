@@ -39,24 +39,14 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api(libs.compose.runtime)
-            api(libs.compose.ui)
-            api(libs.compose.foundation)
-            api(libs.compose.resources)
-            api(libs.compose.ui.tooling.preview)
-            api(libs.compose.material3)
+            api(libs.bundles.compose.ui)
             api(libs.kermit)
             implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.ktor.client.serialization)
-            implementation(libs.ktor.serialization.json)
-            implementation(libs.ktor.client.logging)
+            implementation(libs.bundles.ktor.common)
             api(libs.decompose)
             api(libs.decompose.extensions.compose)
             implementation(libs.kotlinx.serialization.json)
-            implementation(libs.coil)
-            implementation(libs.coil.network.ktor)
+            implementation(libs.bundles.coil)
             implementation(libs.kotlinx.datetime)
             implementation(libs.room.runtime)
             implementation(libs.sqlite.bundled)
@@ -64,9 +54,7 @@ kotlin {
 
         commonTest.dependencies {
             implementation(kotlin("test"))
-            implementation(libs.compose.ui.test)
-            implementation(libs.kotlinx.coroutines.test)
-            implementation(libs.turbine)
+            implementation(libs.bundles.testing)
         }
 
         androidMain.dependencies {

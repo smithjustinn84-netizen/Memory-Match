@@ -83,6 +83,32 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 # Testing
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 
+[bundles]
+compose-ui = [
+    "compose-runtime",
+    "compose-ui",
+    "compose-foundation",
+    "compose-resources",
+    "compose-ui-tooling-preview",
+    "compose-material3"
+]
+ktor-common = [
+    "ktor-client-core",
+    "ktor-client-content-negotiation",
+    "ktor-client-serialization",
+    "ktor-serialization-json",
+    "ktor-client-logging"
+]
+coil = [
+    "coil",
+    "coil-network-ktor"
+]
+testing = [
+    "kotlinx-coroutines-test",
+    "turbine",
+    "compose-ui-test"
+]
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-kmp-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
