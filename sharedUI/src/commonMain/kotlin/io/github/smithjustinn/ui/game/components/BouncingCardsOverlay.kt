@@ -22,6 +22,12 @@ private val BASE_CARD_HEIGHT = 88.dp
 /**
  * Internal state for a celebration card animation.
  * Features physics-based movement with gravity and rotation.
+ *
+ * Marked as @Stable because:
+ * 1. All its mutable properties ([x], [y], [rotation], [scale], [alpha]) are backed
+ *    by Compose [MutableState] objects.
+ * 2. When these properties change, Compose is notified via the Snapshot system.
+ * 3. The class instance itself remains stable while its internal state evolves.
  */
 @Stable
 private class CelebrationCard(
