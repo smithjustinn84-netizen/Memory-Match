@@ -111,7 +111,29 @@ We use a **Component-Based MVVM** pattern powered by **Decompose**, ensuring str
 | **Persistence**   | **Room (KMP)**            | 2.8.4         | Type-safe SQLite, Bundled Drivers                   |
 | **Networking**    | **Ktor**                  | 3.3.3         | CIO Engine, Type-safe Content Negotiation           |
 | **Image Loading** | **Coil3**                 | 3.3.0         | Multiplatform-first image pipeline                  |
-| **Testing**       | **Turbine + Mokkery**     | 1.2.1 / 3.1.1 | Flow-first testing, KSP-based mocking               |
+| Testing           | **Turbine + Mokkery**     | 1.2.1 / 3.1.1 | Flow-first testing, KSP-based mocking               |
+
+---
+
+## 🧪 Testing Strategy
+
+Quality is baked into the foundation. We use a multi-layered testing approach to ensure stability across platforms.
+
+### 🛠 Test Suite
+- **Shared Domain & Data**: Logic is tested in `commonTest` using **Mokkery** for mocking and **Turbine** for asynchronous Flow validation.
+- **Component Tests**: Decompose components are tested in isolation, validating state transitions and side effects.
+- **Platform Unit Tests**: Specific implementations (e.g., Room migrations, Android-specific logic) have dedicated tests in their respective modules.
+
+### 🚀 Running Tests
+You can run all tests across the entire project with a single command:
+```bash
+./run_tests.sh
+```
+
+Alternatively, run specific module tests:
+- **Shared Module**: `./gradlew :sharedUI:allTests`
+- **Android App**: `./gradlew :androidApp:testDebugUnitTest`
+- **Desktop App**: `./gradlew :desktopApp:test`
 
 ---
 
