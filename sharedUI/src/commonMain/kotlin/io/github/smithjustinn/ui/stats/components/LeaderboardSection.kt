@@ -19,6 +19,7 @@ import io.github.smithjustinn.domain.models.LeaderboardEntry
 import io.github.smithjustinn.theme.InactiveBackground
 import io.github.smithjustinn.theme.NeonCyan
 import io.github.smithjustinn.utils.formatTime
+import kotlinx.collections.immutable.ImmutableList
 import memory_match.sharedui.generated.resources.Res
 import memory_match.sharedui.generated.resources.no_stats_yet
 import memory_match.sharedui.generated.resources.pairs_format
@@ -30,7 +31,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun LeaderboardSection(
     level: DifficultyLevel,
-    entries: List<LeaderboardEntry>,
+    entries: ImmutableList<LeaderboardEntry>,
     modifier: Modifier = Modifier,
 ) {
     Column(

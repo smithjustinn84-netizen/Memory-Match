@@ -13,6 +13,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.collections.immutable.persistentListOf
 
 class DefaultGameComponent(
     componentContext: ComponentContext,
@@ -106,7 +107,7 @@ class DefaultGameComponent(
                     val initialTime = if (mode == GameMode.TIME_ATTACK) MemoryGameLogic.calculateInitialTime(pairCount) else 0L
                     _state.update {
                         it.copy(
-                            game = savedGame.first.copy(lastMatchedIds = emptyList()),
+                            game = savedGame.first.copy(lastMatchedIds = persistentListOf()),
                             elapsedTimeSeconds = savedGame.second,
                             maxTimeSeconds = initialTime,
                             showComboExplosion = false,

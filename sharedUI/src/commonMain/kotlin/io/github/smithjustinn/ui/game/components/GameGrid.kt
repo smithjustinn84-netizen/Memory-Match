@@ -16,16 +16,18 @@ import androidx.compose.ui.unit.toSize
 import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.domain.models.CardState
 import io.github.smithjustinn.domain.models.CardSymbolTheme
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlin.math.ceil
 
 private data class CardLayoutInfo(val position: Offset, val size: Size)
 
 @Composable
 fun GameGrid(
-    cards: List<CardState>,
+    cards: ImmutableList<CardState>,
     onCardClick: (Int) -> Unit,
     isPeeking: Boolean = false,
-    lastMatchedIds: List<Int> = emptyList(),
+    lastMatchedIds: ImmutableList<Int> = persistentListOf(),
     showComboExplosion: Boolean = false,
     cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC,
     cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC,

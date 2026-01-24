@@ -5,6 +5,7 @@ import com.arkivanov.essenty.lifecycle.doOnDestroy
 import io.github.smithjustinn.di.AppGraph
 import io.github.smithjustinn.domain.models.DifficultyLevel
 import io.github.smithjustinn.domain.models.GameMode
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -36,11 +37,11 @@ class DefaultStatsComponent(
             .flatMapLatest { mode ->
                 val difficulties = DifficultyLevel.defaultLevels
                 val flows = difficulties.map { level ->
-                    leaderboardRepository.getTopEntries(level.pairs, mode).map { entries -> level to entries }
+                    leaderboardRepository.getTopEntries(level.pairs, mode).map { entries -> level to entries.toImmutableList() }
                 }
                 combine(flows) { pairs ->
                     StatsState(
-                        difficultyLeaderboards = pairs.toList(),
+                        difficultyLeaderboards = pairs.toList().toImmutableList(),
                         selectedGameMode = mode,
                     )
                 }

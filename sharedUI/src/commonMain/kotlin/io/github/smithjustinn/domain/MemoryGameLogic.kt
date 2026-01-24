@@ -1,6 +1,8 @@
 package io.github.smithjustinn.domain
 
 import io.github.smithjustinn.domain.models.*
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import memory_match.sharedui.generated.resources.*
 
 /**
@@ -26,7 +28,7 @@ object MemoryGameLogic {
             )
         }.shuffled().mapIndexed { index, card ->
             card.copy(id = index)
-        }
+        }.toImmutableList()
 
         return MemoryGameState(
             cards = gameCards,
@@ -49,9 +51,9 @@ object MemoryGameLogic {
         val newState = state.copy(
             cards = state.cards.map { card ->
                 if (card.id == cardId) card.copy(isFaceUp = true) else card
-            },
+            }.toImmutableList(),
             // Clear last matched IDs when starting a new turn
-            lastMatchedIds = if (faceUpCards.isEmpty()) emptyList() else state.lastMatchedIds,
+            lastMatchedIds = if (faceUpCards.isEmpty()) persistentListOf() else state.lastMatchedIds,
         )
 
         val activeCards = newState.cards.filter { it.isFaceUp && !it.isMatched }
@@ -84,7 +86,7 @@ object MemoryGameLogic {
             } else {
                 card
             }
-        }
+        }.toImmutableList()
 
         val config = state.config
         val pointsEarned = config.baseMatchPoints + (state.comboMultiplier - 1) * config.comboBonusPoints
@@ -103,7 +105,7 @@ object MemoryGameLogic {
             score = state.score + pointsEarned,
             comboMultiplier = state.comboMultiplier + 1,
             matchComment = comment,
-            lastMatchedIds = listOf(first.id, second.id),
+            lastMatchedIds = persistentListOf(first.id, second.id),
         )
 
         return newState to if (isWon) GameDomainEvent.GameWon else GameDomainEvent.MatchSuccess
@@ -119,8 +121,8 @@ object MemoryGameLogic {
                 } else {
                     card
                 }
-            },
-            lastMatchedIds = emptyList(),
+            }.toImmutableList(),
+            lastMatchedIds = persistentListOf(),
         )
         return newState to GameDomainEvent.MatchFailure
     }
@@ -129,7 +131,7 @@ object MemoryGameLogic {
         return state.copy(
             cards = state.cards.map { card ->
                 if (card.isError) card.copy(isFaceUp = false, isError = false) else card
-            },
+            }.toImmutableList(),
         )
     }
 
@@ -172,8 +174,8 @@ object MemoryGameLogic {
         if (matchesFound == totalPairs) return MatchComment(Res.string.comment_perfect)
 
         return when {
-            combo > 3 -> MatchComment(Res.string.comment_incredible, listOf(combo))
-            combo > 1 -> MatchComment(Res.string.comment_nice, listOf(combo))
+            combo > 3 -> MatchComment(Res.string.comment_incredible, persistentListOf(combo))
+            combo > 1 -> MatchComment(Res.string.comment_nice, persistentListOf(combo))
             matchesFound == 1 -> MatchComment(Res.string.comment_first_match)
             matchesFound == totalPairs / 2 -> MatchComment(Res.string.comment_halfway)
             moves <= matchesFound * 2 -> MatchComment(Res.string.comment_photographic)

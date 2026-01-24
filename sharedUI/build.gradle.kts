@@ -42,6 +42,7 @@ kotlin {
             api(libs.bundles.compose.ui)
             api(libs.kermit)
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.collections.immutable)
             implementation(libs.bundles.ktor.common)
             api(libs.decompose)
             api(libs.decompose.extensions.compose)

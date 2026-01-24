@@ -16,6 +16,7 @@ import io.github.smithjustinn.domain.models.Suit
 import io.github.smithjustinn.test.BaseComponentTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.collections.immutable.toImmutableList
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -79,7 +80,7 @@ class GameComponentTest : BaseComponentTest() {
             MemoryGameState(
                 pairCount = 8,
                 mode = GameMode.STANDARD,
-                cards = listOf(card1, card2) + otherCards,
+                cards = (listOf(card1, card2) + otherCards).toImmutableList(),
             )
 
         everySuspend { context.gameStateRepository.getSavedGameState() } returns
@@ -171,7 +172,7 @@ class GameComponentTest : BaseComponentTest() {
             MemoryGameState(
                 pairCount = 8,
                 mode = GameMode.STANDARD,
-                cards = cards,
+                cards = cards.toImmutableList(),
                 comboMultiplier = 3, // High multiplier
             )
 
@@ -207,7 +208,7 @@ class GameComponentTest : BaseComponentTest() {
                 }
 
         val savedGame =
-            MemoryGameState(pairCount = 8, mode = GameMode.TIME_ATTACK, cards = cards)
+            MemoryGameState(pairCount = 8, mode = GameMode.TIME_ATTACK, cards = cards.toImmutableList())
 
         everySuspend { context.gameStateRepository.getSavedGameState() } returns
             (savedGame to 30L)

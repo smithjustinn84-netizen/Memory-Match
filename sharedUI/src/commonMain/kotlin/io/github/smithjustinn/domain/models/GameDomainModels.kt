@@ -1,5 +1,7 @@
 package io.github.smithjustinn.domain.models
 
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import org.jetbrains.compose.resources.StringResource
@@ -39,14 +41,14 @@ data class ScoreBreakdown(
 /**
  * Represents a match comment with its resource and optional arguments.
  */
-data class MatchComment(val res: StringResource, val args: List<Any> = emptyList())
+data class MatchComment(val res: StringResource, val args: ImmutableList<Any> = persistentListOf())
 
 /**
  * Represents the core state of the memory game.
  */
 @Serializable
 data class MemoryGameState(
-    val cards: List<CardState> = emptyList(),
+    val cards: ImmutableList<CardState> = persistentListOf(),
     val pairCount: Int = 8,
     val isGameWon: Boolean = false,
     val isGameOver: Boolean = false,
@@ -57,7 +59,7 @@ data class MemoryGameState(
     val config: ScoringConfig = ScoringConfig(),
     val scoreBreakdown: ScoreBreakdown = ScoreBreakdown(),
     val mode: GameMode = GameMode.STANDARD,
-    val lastMatchedIds: List<Int> = emptyList(),
+    val lastMatchedIds: ImmutableList<Int> = persistentListOf(),
 )
 
 /**

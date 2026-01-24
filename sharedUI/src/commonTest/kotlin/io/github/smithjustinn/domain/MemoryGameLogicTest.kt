@@ -206,10 +206,13 @@ class MemoryGameLogicTest {
         val pairCount = 4
         val initialState = MemoryGameLogic.createInitialState(pairCount)
 
-        // Find a pair and a non-matching card
+        // Find a pair
         val card1 = initialState.cards[0]
         val card2 = initialState.cards.first { it.id != card1.id && it.suit == card1.suit && it.rank == card1.rank }
-        val card3 = initialState.cards.first { it.suit != card1.suit || it.rank != card1.rank }
+        
+        // Find a card that is NOT card1/card2 and its counterpart is NOT card3
+        val card3 = initialState.cards.first { it.id != card1.id && it.id != card2.id }
+        val card4 = initialState.cards.first { it.id != card3.id && (it.suit != card3.suit || it.rank != card3.rank) && !it.isMatched && it.id != card1.id && it.id != card2.id }
 
         // First match: combo becomes 2
         val (s1, _) = MemoryGameLogic.flipCard(initialState, card1.id)
@@ -218,8 +221,6 @@ class MemoryGameLogicTest {
 
         // Mis-match: combo resets to 1
         val (s3, _) = MemoryGameLogic.flipCard(s2, card3.id)
-        // Need to flip another card to trigger match check
-        val card4 = s3.cards.first { it.id != card3.id && !it.isMatched }
         val (s4, _) = MemoryGameLogic.flipCard(s3, card4.id)
 
         assertEquals(1, s4.comboMultiplier)
