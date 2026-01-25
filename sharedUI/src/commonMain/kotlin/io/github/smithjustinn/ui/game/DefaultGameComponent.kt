@@ -43,6 +43,8 @@ class DefaultGameComponent(
     private var timeLossJob: Job? = null
     private var settingsJob: Job? = null
 
+    private val applicationScope = appGraph.applicationScope
+
     private val startNewGameUseCase = appGraph.startNewGameUseCase
     private val flipCardUseCase = appGraph.flipCardUseCase
     private val resetErrorCardsUseCase = appGraph.resetErrorCardsUseCase
@@ -414,7 +416,7 @@ class DefaultGameComponent(
      * Launch saveGameSuspend in a background scope.
      */
     private fun saveGame() {
-        scope.launch(dispatchers.io) {
+        applicationScope.launch(dispatchers.io) {
             val currentState = _state.value
             if (!currentState.game.isGameOver && currentState.game.cards.isNotEmpty()) {
                 saveGameStateUseCase(currentState.game, currentState.elapsedTimeSeconds)

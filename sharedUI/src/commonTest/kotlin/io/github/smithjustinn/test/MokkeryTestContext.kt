@@ -7,6 +7,7 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import io.github.smithjustinn.data.repository.DailyChallengeRepository
 import io.github.smithjustinn.di.AppGraph
 import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.domain.models.CardSymbolTheme
@@ -15,7 +16,13 @@ import io.github.smithjustinn.domain.repositories.GameStateRepository
 import io.github.smithjustinn.domain.repositories.GameStatsRepository
 import io.github.smithjustinn.domain.repositories.LeaderboardRepository
 import io.github.smithjustinn.domain.repositories.SettingsRepository
-import io.github.smithjustinn.domain.usecases.game.*
+import io.github.smithjustinn.domain.usecases.game.CalculateFinalScoreUseCase
+import io.github.smithjustinn.domain.usecases.game.ClearSavedGameUseCase
+import io.github.smithjustinn.domain.usecases.game.FlipCardUseCase
+import io.github.smithjustinn.domain.usecases.game.GetSavedGameUseCase
+import io.github.smithjustinn.domain.usecases.game.ResetErrorCardsUseCase
+import io.github.smithjustinn.domain.usecases.game.SaveGameStateUseCase
+import io.github.smithjustinn.domain.usecases.game.StartNewGameUseCase
 import io.github.smithjustinn.domain.usecases.stats.GetGameStatsUseCase
 import io.github.smithjustinn.domain.usecases.stats.SaveGameResultUseCase
 import io.github.smithjustinn.services.AudioService
@@ -23,6 +30,7 @@ import io.github.smithjustinn.services.HapticsService
 import io.github.smithjustinn.utils.CoroutineDispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.TestDispatcher
+import kotlinx.coroutines.test.TestScope
 
 /**
  * A centralized context for Mokkery-based tests. Provides pre-configured mocks for repositories and
@@ -33,6 +41,7 @@ class MokkeryTestContext(testDispatcher: TestDispatcher) {
     val settingsRepository: SettingsRepository = mock()
     val gameStatsRepository: GameStatsRepository = mock()
     val leaderboardRepository: LeaderboardRepository = mock()
+    val dailyChallengeRepository: DailyChallengeRepository = mock()
     val audioService: AudioService = mock()
     val hapticsService: HapticsService = mock()
     val logger: Logger = Logger(StaticConfig())
@@ -57,10 +66,15 @@ class MokkeryTestContext(testDispatcher: TestDispatcher) {
         every { appGraph.settingsRepository } returns settingsRepository
         every { appGraph.gameStatsRepository } returns gameStatsRepository
         every { appGraph.leaderboardRepository } returns leaderboardRepository
+        every { appGraph.dailyChallengeRepository } returns dailyChallengeRepository
         every { appGraph.audioService } returns audioService
         every { appGraph.hapticsService } returns hapticsService
         every { appGraph.logger } returns logger
+        every { appGraph.logger } returns logger
         every { appGraph.coroutineDispatchers } returns coroutineDispatchers
+        every { appGraph.applicationScope } returns TestScope(coroutineDispatchers.main)
+
+        // UseCases - initialized with mocked repositories where needed
 
         // UseCases - initialized with mocked repositories where needed
         every { appGraph.startNewGameUseCase } returns StartNewGameUseCase()
@@ -102,5 +116,7 @@ class MokkeryTestContext(testDispatcher: TestDispatcher) {
             every { leaderboardRepository.getTopEntries(level.pairs, any()) } returns
                 MutableStateFlow(emptyList())
         }
+
+        everySuspend { dailyChallengeRepository.isChallengeCompleted(any()) } returns MutableStateFlow(false)
     }
 }

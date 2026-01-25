@@ -20,6 +20,7 @@ interface AppGraph {
     val audioService: AudioService
     val hapticsService: HapticsService
     val coroutineDispatchers: io.github.smithjustinn.utils.CoroutineDispatchers
+    val applicationScope: kotlinx.coroutines.CoroutineScope
 
     val gameStateRepository: GameStateRepository
     val settingsRepository: SettingsRepository

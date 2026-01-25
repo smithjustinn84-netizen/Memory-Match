@@ -23,6 +23,11 @@ import kotlinx.coroutines.Dispatchers
     ],
 )
 interface AndroidAppGraph : AppGraph {
+    @Provides
+    @SingleIn(AppScope::class)
+    fun provideApplicationScope(): kotlinx.coroutines.CoroutineScope =
+        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.Main)
+
     @Provides fun provideApplicationContext(application: Application): Context = application
 
     @DependencyGraph.Factory

@@ -24,6 +24,11 @@ import java.io.File
 interface JvmAppGraph : AppGraph {
     @Provides
     @SingleIn(AppScope::class)
+    fun provideApplicationScope(): kotlinx.coroutines.CoroutineScope =
+        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.Main)
+
+    @Provides
+    @SingleIn(AppScope::class)
     fun provideHapticsService(impl: JvmHapticsServiceImpl): HapticsService = impl
 
     @Provides

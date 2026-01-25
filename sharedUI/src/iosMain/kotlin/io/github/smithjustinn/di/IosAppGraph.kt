@@ -26,6 +26,11 @@ import platform.Foundation.NSHomeDirectory
 interface IosAppGraph : AppGraph {
     @Provides
     @SingleIn(AppScope::class)
+    fun provideApplicationScope(): kotlinx.coroutines.CoroutineScope =
+        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.Main)
+
+    @Provides
+    @SingleIn(AppScope::class)
     fun provideHapticsService(impl: IosHapticsServiceImpl): HapticsService = impl
 
     @Provides
