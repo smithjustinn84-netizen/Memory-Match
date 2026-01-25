@@ -53,6 +53,11 @@ private data class GridSpacing(
     val horizontalSpacing: androidx.compose.ui.unit.Dp,
 )
 
+private data class GridLayoutConfig(
+    val metrics: GridMetrics,
+    val spacing: GridSpacing,
+)
+
 data class GridCardState(
     val cards: ImmutableList<CardState>,
     val lastMatchedIds: ImmutableList<Int> = persistentListOf(),
@@ -114,10 +119,11 @@ fun GameGrid(
 
         val spacing = remember(isWide, isCompactHeight) { calculateGridSpacing(isWide, isCompactHeight) }
 
+        val layoutConfig = remember(metrics, spacing) { GridLayoutConfig(metrics, spacing) }
+
         GridContent(
             gridCardState = gridCardState,
-            metrics = metrics,
-            spacing = spacing,
+            layoutConfig = layoutConfig,
             settings = settings,
             onCardClick = onCardClick,
             cardLayouts = cardLayouts,
@@ -135,27 +141,26 @@ fun GameGrid(
 @Composable
 private fun GridContent(
     gridCardState: GridCardState,
-    metrics: GridMetrics,
-    spacing: GridSpacing,
+    layoutConfig: GridLayoutConfig,
     settings: GridSettings,
     onCardClick: (Int) -> Unit,
     cardLayouts: SnapshotStateMap<Int, CardLayoutInfo>,
 ) {
     LazyVerticalGrid(
-        columns = metrics.cells,
+        columns = layoutConfig.metrics.cells,
         contentPadding =
             PaddingValues(
-                start = spacing.horizontalPadding,
-                top = spacing.topPadding,
-                end = spacing.horizontalPadding,
-                bottom = spacing.bottomPadding,
+                start = layoutConfig.spacing.horizontalPadding,
+                top = layoutConfig.spacing.topPadding,
+                end = layoutConfig.spacing.horizontalPadding,
+                bottom = layoutConfig.spacing.bottomPadding,
             ),
-        verticalArrangement = Arrangement.spacedBy(spacing.verticalSpacing),
-        horizontalArrangement = Arrangement.spacedBy(spacing.horizontalSpacing),
+        verticalArrangement = Arrangement.spacedBy(layoutConfig.spacing.verticalSpacing),
+        horizontalArrangement = Arrangement.spacedBy(layoutConfig.spacing.horizontalSpacing),
         modifier =
             Modifier
                 .fillMaxHeight()
-                .widthIn(max = metrics.maxWidth),
+                .widthIn(max = layoutConfig.metrics.maxWidth),
     ) {
         items(gridCardState.cards, key = { it.id }) { card ->
             PlayingCard(
