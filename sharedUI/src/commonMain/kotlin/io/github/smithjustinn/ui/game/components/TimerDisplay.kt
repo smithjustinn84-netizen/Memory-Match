@@ -49,11 +49,7 @@ data class TimerFeedback(
     val isMegaBonus: Boolean = false,
 )
 
-data class TimerVisuals(
-    val color: Color,
-    val scale: Float,
-    val isCompact: Boolean = false,
-)
+data class TimerVisuals(val color: Color, val scale: Float, val isCompact: Boolean = false)
 
 @Composable
 fun TimerDisplay(

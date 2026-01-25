@@ -35,9 +35,9 @@ import io.github.smithjustinn.ui.game.components.BouncingCardsOverlay
 import io.github.smithjustinn.ui.game.components.ComboBadge
 import io.github.smithjustinn.ui.game.components.ConfettiEffect
 import io.github.smithjustinn.ui.game.components.GameGrid
+import io.github.smithjustinn.ui.game.components.GameTopBar
 import io.github.smithjustinn.ui.game.components.GridCardState
 import io.github.smithjustinn.ui.game.components.GridSettings
-import io.github.smithjustinn.ui.game.components.GameTopBar
 import io.github.smithjustinn.ui.game.components.MatchCommentSnackbar
 import io.github.smithjustinn.ui.game.components.NewHighScoreSnackbar
 import io.github.smithjustinn.ui.game.components.PeekCountdownOverlay

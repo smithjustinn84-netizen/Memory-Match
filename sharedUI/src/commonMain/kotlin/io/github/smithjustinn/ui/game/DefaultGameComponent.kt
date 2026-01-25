@@ -22,8 +22,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
 
-
-
 class DefaultGameComponent(
     componentContext: ComponentContext,
     private val appGraph: AppGraph,
@@ -45,24 +43,12 @@ class DefaultGameComponent(
             scope = scope,
             state = _state,
             events = _events,
-            onGameOver = { handleGameOver() },
+            onGameOver = { processGameEnd() },
         )
 
-    private val feedbackHandler =
-        GameFeedbackHandler(
-            scope = scope,
-            state = _state,
-            events = _events,
-            onGameOver = { handleGameOver() },
-            onResetCards = { newState ->
-                val resetState = appGraph.resetErrorCardsUseCase(newState)
-                _state.update { it.copy(game = resetState) }
-                saveGame()
-            },
-        )
-
-    private val lifecycleHandler =
+    private val lifecycleHandler: GameLifecycleHandler =
         GameLifecycleHandler(
+            appGraph = appGraph,
             state = _state,
             events = _events,
             timerHandler = timerHandler,
@@ -71,10 +57,23 @@ class DefaultGameComponent(
             },
         )
 
+    private val feedbackHandler: GameFeedbackHandler =
+        GameFeedbackHandler(
+            scope = scope,
+            state = _state,
+            events = _events,
+            onGameOver = { processGameEnd() },
+            onResetCards = { newState ->
+                val resetState = appGraph.resetErrorCardsUseCase(newState)
+                _state.update { it.copy(game = resetState) }
+                lifecycleHandler.saveGame()
+            },
+        )
+
     init {
         lifecycle.doOnDestroy {
             timerHandler.stopTimer()
-            saveGame()
+            lifecycleHandler.saveGame()
         }
 
         scope.launch {
@@ -127,7 +126,15 @@ class DefaultGameComponent(
                 } else {
                     setupNewGame(args.pairCount, args.mode, args.seed)
                 }
-                observeStats(args.pairCount)
+
+                appGraph.getGameStatsUseCase(args.pairCount).collect { stats ->
+                    _state.update {
+                        it.copy(
+                            bestScore = stats?.bestScore ?: 0,
+                            bestTimeSeconds = stats?.bestTimeSeconds ?: 0,
+                        )
+                    }
+                }
             } catch (
                 @Suppress("TooGenericExceptionCaught") e: Exception,
             ) {
@@ -163,19 +170,6 @@ class DefaultGameComponent(
         }
     }
 
-    private fun observeStats(pairCount: Int) {
-        scope.launch {
-            appGraph.getGameStatsUseCase(pairCount).collect { stats ->
-                _state.update {
-                    it.copy(
-                        bestScore = stats?.bestScore ?: 0,
-                        bestTimeSeconds = stats?.bestTimeSeconds ?: 0,
-                    )
-                }
-            }
-        }
-    }
-
     override fun onFlipCard(cardId: Int) {
         val currentState = _state.value
         if (currentState.isPeeking || currentState.game.isGameOver || currentState.showWalkthrough) return
@@ -185,7 +179,7 @@ class DefaultGameComponent(
             if (newState === currentState.game && event == null) return
 
             _state.update { it.copy(game = newState) }
-            saveGame()
+            lifecycleHandler.saveGame()
 
             when (event) {
                 GameDomainEvent.CardFlipped -> {
@@ -205,11 +199,11 @@ class DefaultGameComponent(
                 }
 
                 GameDomainEvent.GameWon -> {
-                    handleGameWon(newState)
+                    processGameEnd(newState)
                 }
 
                 GameDomainEvent.GameOver -> {
-                    handleGameOver()
+                    processGameEnd()
                 }
 
                 else -> {}
@@ -221,49 +215,39 @@ class DefaultGameComponent(
         }
     }
 
-    private fun handleGameWon(newState: MemoryGameState) {
+    private fun processGameEnd(wonState: MemoryGameState? = null) {
         timerHandler.stopTimer()
-        val bonuses = appGraph.calculateFinalScoreUseCase(newState, _state.value.elapsedTimeSeconds)
-        val isNewHigh = bonuses.score > _state.value.bestScore
+        if (wonState != null) {
+            val bonuses = appGraph.calculateFinalScoreUseCase(wonState, _state.value.elapsedTimeSeconds)
+            val isNewHigh = bonuses.score > _state.value.bestScore
 
-        _events.tryEmit(GameUiEvent.VibrateMatch)
-        _events.tryEmit(if (isNewHigh) GameUiEvent.PlayHighScore else GameUiEvent.PlayWin)
-        _state.update { it.copy(game = bonuses, isNewHighScore = isNewHigh) }
+            _events.tryEmit(GameUiEvent.VibrateMatch)
+            _events.tryEmit(if (isNewHigh) GameUiEvent.PlayHighScore else GameUiEvent.PlayWin)
+            _state.update { it.copy(game = bonuses, isNewHighScore = isNewHigh) }
 
-        scope.launch {
-            appGraph.saveGameResultUseCase(
-                pairCount = bonuses.pairCount,
-                score = bonuses.score,
-                timeSeconds = _state.value.elapsedTimeSeconds,
-                moves = bonuses.moves,
-                gameMode = bonuses.mode,
-            )
-            if (bonuses.mode == GameMode.DAILY_CHALLENGE) {
-                appGraph.dailyChallengeRepository.saveChallengeResult(
-                    Clock.System.now().toEpochMilliseconds() / GameConstants.MILLIS_IN_DAY,
-                    bonuses.score,
-                    _state.value.elapsedTimeSeconds,
-                    bonuses.moves,
+            scope.launch {
+                appGraph.saveGameResultUseCase(
+                    pairCount = bonuses.pairCount,
+                    score = bonuses.score,
+                    timeSeconds = _state.value.elapsedTimeSeconds,
+                    moves = bonuses.moves,
+                    gameMode = bonuses.mode,
                 )
+                if (bonuses.mode == GameMode.DAILY_CHALLENGE) {
+                    appGraph.dailyChallengeRepository.saveChallengeResult(
+                        Clock.System.now().toEpochMilliseconds() / GameConstants.MILLIS_IN_DAY,
+                        bonuses.score,
+                        _state.value.elapsedTimeSeconds,
+                        bonuses.moves,
+                    )
+                }
+                appGraph.clearSavedGameUseCase()
             }
-            appGraph.clearSavedGameUseCase()
-        }
-        feedbackHandler.clearCommentAfterDelay()
-    }
-
-    private fun handleGameOver() {
-        timerHandler.stopTimer()
-        _state.update { it.copy(game = it.game.copy(isGameOver = true)) }
-        _events.tryEmit(GameUiEvent.PlayLose)
-        scope.launch { appGraph.clearSavedGameUseCase() }
-    }
-
-    private fun saveGame() {
-        appGraph.applicationScope.launch(appGraph.coroutineDispatchers.io) {
-            val currentState = _state.value
-            if (!currentState.game.isGameOver && currentState.game.cards.isNotEmpty()) {
-                appGraph.saveGameStateUseCase(currentState.game, currentState.elapsedTimeSeconds)
-            }
+            feedbackHandler.clearCommentAfterDelay()
+        } else {
+            _state.update { it.copy(game = it.game.copy(isGameOver = true)) }
+            _events.tryEmit(GameUiEvent.PlayLose)
+            scope.launch { appGraph.clearSavedGameUseCase() }
         }
     }
 

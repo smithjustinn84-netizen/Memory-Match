@@ -1,5 +1,6 @@
 package io.github.smithjustinn.ui.game
 
+import io.github.smithjustinn.di.AppGraph
 import io.github.smithjustinn.domain.MemoryGameLogic
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
@@ -218,6 +219,7 @@ internal class GameFeedbackHandler(
 }
 
 internal class GameLifecycleHandler(
+    private val appGraph: AppGraph,
     private val state: MutableStateFlow<GameUIState>,
     private val events: MutableSharedFlow<GameUiEvent>,
     private val timerHandler: GameTimerHandler,
@@ -278,4 +280,13 @@ internal class GameLifecycleHandler(
         savedGame.first.pairCount == pairCount &&
             !savedGame.first.isGameOver &&
             savedGame.first.mode == mode
+
+    fun saveGame() {
+        appGraph.applicationScope.launch(appGraph.coroutineDispatchers.io) {
+            val currentState = state.value
+            if (!currentState.game.isGameOver && currentState.game.cards.isNotEmpty()) {
+                appGraph.saveGameStateUseCase(currentState.game, currentState.elapsedTimeSeconds)
+            }
+        }
+    }
 }
