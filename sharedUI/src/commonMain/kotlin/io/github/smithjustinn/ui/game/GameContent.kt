@@ -32,6 +32,7 @@ import io.github.smithjustinn.theme.HeatBackgroundBottom
 import io.github.smithjustinn.theme.HeatBackgroundTop
 import io.github.smithjustinn.theme.StartBackgroundBottom
 import io.github.smithjustinn.theme.StartBackgroundTop
+import io.github.smithjustinn.ui.components.AdaptiveDensity
 import io.github.smithjustinn.ui.game.components.BouncingCardsOverlay
 import io.github.smithjustinn.ui.game.components.ComboBadge
 import io.github.smithjustinn.ui.game.components.ConfettiEffect
@@ -98,7 +99,8 @@ fun GameContent(component: GameComponent, modifier: Modifier = Modifier) {
         }
     }
 
-    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+    AdaptiveDensity {
+        BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val isLandscape = maxWidth > maxHeight
         val isCompactHeight = maxHeight < 500.dp
         val useCompactUI = isLandscape && isCompactHeight
@@ -261,6 +263,7 @@ fun GameContent(component: GameComponent, modifier: Modifier = Modifier) {
                     }
                 }
             }
+        }
         }
     }
 }

@@ -45,6 +45,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -235,8 +236,14 @@ fun PlayingCard(
 
 @Composable
 private fun CardFace(rank: Rank, suit: Suit, suitColor: Color, theme: CardSymbolTheme) {
+    val density = LocalDensity.current
     BoxWithConstraints(modifier = Modifier.fillMaxSize().padding(6.dp)) {
-        val fontSizeMultiplier = maxWidth.value / 80f
+        // Base scaling on the card width (maxWidth is a Dp value)
+        val baseSize = maxWidth
+        val fontScale = density.fontScale
+
+        // Helper to get size that ignores system font scaling
+        fun getFontSize(size: Float) = (size * (baseSize.value / 80f) / fontScale).sp
 
         when (theme) {
             CardSymbolTheme.CLASSIC -> {
@@ -247,13 +254,13 @@ private fun CardFace(rank: Rank, suit: Suit, suitColor: Color, theme: CardSymbol
                         color = suitColor,
                         style = MaterialTheme.typography.labelLarge.copy(
                             fontWeight = FontWeight.Bold,
-                            fontSize = (14 * fontSizeMultiplier).sp,
+                            fontSize = getFontSize(14f),
                         ),
                     )
                     Text(
                         text = suit.symbol,
                         color = suitColor,
-                        style = MaterialTheme.typography.labelSmall.copy(fontSize = (10 * fontSizeMultiplier).sp),
+                        style = MaterialTheme.typography.labelSmall.copy(fontSize = getFontSize(10f)),
                     )
                 }
 
@@ -261,7 +268,7 @@ private fun CardFace(rank: Rank, suit: Suit, suitColor: Color, theme: CardSymbol
                 Text(
                     text = suit.symbol,
                     color = suitColor.copy(alpha = 0.15f),
-                    style = MaterialTheme.typography.displayLarge.copy(fontSize = (60 * fontSizeMultiplier).sp),
+                    style = MaterialTheme.typography.displayLarge.copy(fontSize = getFontSize(60f)),
                     modifier = Modifier.align(Alignment.Center),
                 )
 
@@ -270,7 +277,7 @@ private fun CardFace(rank: Rank, suit: Suit, suitColor: Color, theme: CardSymbol
                     color = suitColor,
                     style = MaterialTheme.typography.headlineMedium.copy(
                         fontWeight = FontWeight.ExtraBold,
-                        fontSize = (24 * fontSizeMultiplier).sp,
+                        fontSize = getFontSize(24f),
                     ),
                     modifier = Modifier.align(Alignment.Center),
                 )
@@ -285,13 +292,13 @@ private fun CardFace(rank: Rank, suit: Suit, suitColor: Color, theme: CardSymbol
                         color = suitColor,
                         style = MaterialTheme.typography.labelLarge.copy(
                             fontWeight = FontWeight.Bold,
-                            fontSize = (14 * fontSizeMultiplier).sp,
+                            fontSize = getFontSize(14f),
                         ),
                     )
                     Text(
                         text = suit.symbol,
                         color = suitColor,
-                        style = MaterialTheme.typography.labelSmall.copy(fontSize = (10 * fontSizeMultiplier).sp),
+                        style = MaterialTheme.typography.labelSmall.copy(fontSize = getFontSize(10f)),
                     )
                 }
             }
@@ -303,7 +310,7 @@ private fun CardFace(rank: Rank, suit: Suit, suitColor: Color, theme: CardSymbol
                     color = suitColor,
                     style = MaterialTheme.typography.displayLarge.copy(
                         fontWeight = FontWeight.ExtraBold,
-                        fontSize = (48 * fontSizeMultiplier).sp,
+                        fontSize = getFontSize(48f),
                     ),
                     modifier = Modifier.align(Alignment.Center),
                 )
@@ -312,14 +319,14 @@ private fun CardFace(rank: Rank, suit: Suit, suitColor: Color, theme: CardSymbol
                 Text(
                     text = suit.symbol,
                     color = suitColor.copy(alpha = 0.6f),
-                    style = MaterialTheme.typography.titleMedium.copy(fontSize = (16 * fontSizeMultiplier).sp),
+                    style = MaterialTheme.typography.titleMedium.copy(fontSize = getFontSize(16f)),
                     modifier = Modifier.align(Alignment.TopStart).padding(4.dp),
                 )
 
                 Text(
                     text = suit.symbol,
                     color = suitColor.copy(alpha = 0.6f),
-                    style = MaterialTheme.typography.titleMedium.copy(fontSize = (16 * fontSizeMultiplier).sp),
+                    style = MaterialTheme.typography.titleMedium.copy(fontSize = getFontSize(16f)),
                     modifier = Modifier.align(Alignment.BottomEnd).padding(4.dp).graphicsLayer { rotationZ = 180f },
                 )
             }
@@ -331,7 +338,7 @@ private fun CardFace(rank: Rank, suit: Suit, suitColor: Color, theme: CardSymbol
                     color = suitColor,
                     style = MaterialTheme.typography.displayLarge.copy(
                         fontWeight = FontWeight.Black,
-                        fontSize = (56 * fontSizeMultiplier).sp,
+                        fontSize = getFontSize(56f),
                     ),
                     modifier = Modifier.align(Alignment.Center),
                 )
@@ -341,7 +348,7 @@ private fun CardFace(rank: Rank, suit: Suit, suitColor: Color, theme: CardSymbol
                     text = suit.name.lowercase().replaceFirstChar { it.uppercase() },
                     color = suitColor.copy(alpha = 0.5f),
                     style = MaterialTheme.typography.labelSmall.copy(
-                        fontSize = (10 * fontSizeMultiplier).sp,
+                        fontSize = getFontSize(10f),
                         fontWeight = FontWeight.Medium,
                     ),
                     modifier = Modifier.align(Alignment.BottomCenter),

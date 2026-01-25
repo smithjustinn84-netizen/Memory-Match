@@ -126,12 +126,15 @@ fun TimerDisplay(
                 Text(
                     text = formatTime(time),
                     style = MaterialTheme.typography.titleLarge.copy(
-                        fontSize = if (compact) 16.sp else 20.sp,
+                        fontSize = (if (compact) 16.sp else 20.sp),
                         fontWeight = FontWeight.Black,
                         letterSpacing = 0.5.sp,
                     ),
-                    modifier = Modifier.scale(timerScale),
+                    modifier = Modifier
+                        .scale(timerScale)
+                        .padding(bottom = 2.dp), // Fine-tune vertical alignment
                     color = timerColor,
+                    maxLines = 1,
                 )
 
                 AnimatedVisibility(
