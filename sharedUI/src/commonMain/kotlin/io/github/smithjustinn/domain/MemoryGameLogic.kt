@@ -155,7 +155,7 @@ object MemoryGameLogic {
         // Time Bonus: Small impact
         val timeBonus = if (state.mode == GameMode.TIME_ATTACK) {
             // In Time Attack, remaining time is the bonus
-            (elapsedTimeSeconds * 10).toInt() // Example: 10 points per remaining second
+            (elapsedTimeSeconds * TIME_ATTACK_BONUS_MULTIPLIER).toInt() // Example: 10 points per remaining second
         } else {
             (state.pairCount * config.timeBonusPerPair - (elapsedTimeSeconds * config.timePenaltyPerSecond))
                 .coerceAtLeast(0).toInt()
@@ -182,9 +182,9 @@ object MemoryGameLogic {
         if (matchesFound == totalPairs) return MatchComment(Res.string.comment_perfect)
 
         return when {
-            combo > 3 -> MatchComment(Res.string.comment_incredible, persistentListOf(combo))
+            combo > INCREDIBLE_COMBO_THRESHOLD -> MatchComment(Res.string.comment_incredible, persistentListOf(combo))
 
-            combo > 1 -> MatchComment(Res.string.comment_nice, persistentListOf(combo))
+            combo > NICE_COMBO_THRESHOLD -> MatchComment(Res.string.comment_nice, persistentListOf(combo))
 
             matchesFound == 1 -> MatchComment(Res.string.comment_first_match)
 
@@ -212,32 +212,51 @@ object MemoryGameLogic {
     // --- Time Attack Logic ---
 
     fun calculateInitialTime(pairCount: Int): Long = when (pairCount) {
-        6 -> 25L
+        DIFF_LEVEL_6 -> INITIAL_TIME_6
 
         // Toddler
-        8 -> 35L
+        DIFF_LEVEL_8 -> INITIAL_TIME_8
 
         // Casual
-        10 -> 45L
+        DIFF_LEVEL_10 -> INITIAL_TIME_10
 
         // Master
-        12 -> 55L
+        DIFF_LEVEL_12 -> INITIAL_TIME_12
 
         // Shark
-        14 -> 65L
+        DIFF_LEVEL_14 -> INITIAL_TIME_14
 
         // Grandmaster
-        16 -> 75L
+        DIFF_LEVEL_16 -> INITIAL_TIME_16
 
         // Elephant
-        else -> (pairCount * 4).toLong()
+        else -> (pairCount * TIME_PER_PAIR_FALLBACK).toLong()
     }
 
     fun calculateTimeGain(comboMultiplier: Int): Int {
-        val baseGain = 3
-        val comboBonus = (comboMultiplier - 1) * 1
+        val baseGain = BASE_TIME_GAIN
+        val comboBonus = (comboMultiplier - 1) * COMBO_TIME_GAIN_FACTOR
         return baseGain + comboBonus
     }
+
+    private const val TIME_ATTACK_BONUS_MULTIPLIER = 10
+    private const val INCREDIBLE_COMBO_THRESHOLD = 3
+    private const val NICE_COMBO_THRESHOLD = 1
+    private const val DIFF_LEVEL_6 = 6
+    private const val DIFF_LEVEL_8 = 8
+    private const val DIFF_LEVEL_10 = 10
+    private const val DIFF_LEVEL_12 = 12
+    private const val DIFF_LEVEL_14 = 14
+    private const val DIFF_LEVEL_16 = 16
+    private const val INITIAL_TIME_6 = 25L
+    private const val INITIAL_TIME_8 = 35L
+    private const val INITIAL_TIME_10 = 45L
+    private const val INITIAL_TIME_12 = 55L
+    private const val INITIAL_TIME_14 = 65L
+    private const val INITIAL_TIME_16 = 75L
+    private const val TIME_PER_PAIR_FALLBACK = 4
+    private const val BASE_TIME_GAIN = 3
+    private const val COMBO_TIME_GAIN_FACTOR = 1
 
     const val TIME_PENALTY_MISMATCH = 2L
 }

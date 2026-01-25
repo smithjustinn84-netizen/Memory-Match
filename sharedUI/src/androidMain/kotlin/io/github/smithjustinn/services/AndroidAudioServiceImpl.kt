@@ -30,7 +30,7 @@ class AndroidAudioServiceImpl(
     private val scope = CoroutineScope(Dispatchers.IO)
 
     private val soundPool = SoundPool.Builder()
-        .setMaxStreams(10)
+        .setMaxStreams(MAX_STREAMS)
         .setAudioAttributes(
             AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_GAME)
@@ -214,5 +214,9 @@ class AndroidAudioServiceImpl(
         musicPlayer?.stop()
         musicPlayer?.release()
         musicPlayer = null
+    }
+
+    companion object {
+        private const val MAX_STREAMS = 10
     }
 }

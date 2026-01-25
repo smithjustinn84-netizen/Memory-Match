@@ -19,6 +19,17 @@ import kotlin.random.Random
 private val BASE_CARD_WIDTH = 64.dp
 private val BASE_CARD_HEIGHT = 88.dp
 
+private const val POP_IN_DURATION = 0.4f
+private const val MAX_CELEBRATION_DURATION = 5.0f
+private const val OFF_SCREEN_THRESHOLD = 200f
+private const val FADE_OUT_STEP = 0.02f
+private const val MAX_CELEBRATION_CARDS = 24
+private const val ANGLE_SPREAD = 80f
+private const val ANGLE_OFFSET = 130f
+private const val MIN_SPEED = 20f
+private const val SPEED_VARIATION = 20f
+private const val NANOS_PER_SECOND = 1_000_000_000f
+
 /**
  * Internal state for a celebration card animation.
  * Features physics-based movement with gravity and rotation.
@@ -61,15 +72,15 @@ private class CelebrationCard(
         rotation += vRot
 
         // Appearance animation (Pop in)
-        scale = if (activeTime < 0.4f) {
-            (activeTime / 0.4f) * targetScale
+        scale = if (activeTime < POP_IN_DURATION) {
+            (activeTime / POP_IN_DURATION) * targetScale
         } else {
             targetScale
         }
 
         // Exit animation (Fade out when falling off screen or after duration)
-        if (y > screenHeight + 200f || activeTime > 5.0f) {
-            alpha = (alpha - 0.02f).coerceAtLeast(0f)
+        if (y > screenHeight + OFF_SCREEN_THRESHOLD || activeTime > MAX_CELEBRATION_DURATION) {
+            alpha = (alpha - FADE_OUT_STEP).coerceAtLeast(0f)
         }
     }
 }
@@ -103,11 +114,11 @@ fun BouncingCardsOverlay(
         LaunchedEffect(cards) {
             if (celebrationCards.isEmpty() && cards.isNotEmpty()) {
                 // Shuffle and take a subset to keep performance smooth but visual impact high
-                cards.shuffled().take(24).forEachIndexed { index, card ->
+                cards.shuffled().take(MAX_CELEBRATION_CARDS).forEachIndexed { index, card ->
                     // Aim upwards with a slight spread
-                    val angleDeg = Random.nextFloat() * 80f - 130f // Range approx -130 to -50 degrees
+                    val angleDeg = Random.nextFloat() * ANGLE_SPREAD - ANGLE_OFFSET // Range approx -130 to -50 degrees
                     val radians = angleDeg * (PI.toFloat() / 180f)
-                    val speed = 20f + Random.nextFloat() * 20f
+                    val speed = MIN_SPEED + Random.nextFloat() * SPEED_VARIATION
 
                     celebrationCards.add(
                         CelebrationCard(
@@ -132,7 +143,7 @@ fun BouncingCardsOverlay(
                 while (true) {
                     withFrameNanos { frameTime ->
                         if (startTimeNanos == 0L) startTimeNanos = frameTime
-                        val elapsedSeconds = (frameTime - startTimeNanos) / 1_000_000_000f
+                        val elapsedSeconds = (frameTime - startTimeNanos) / NANOS_PER_SECOND
 
                         celebrationCards.forEach { card ->
                             card.update(

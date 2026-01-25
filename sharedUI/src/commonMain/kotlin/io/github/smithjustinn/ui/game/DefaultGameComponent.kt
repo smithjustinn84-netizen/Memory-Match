@@ -142,7 +142,7 @@ class DefaultGameComponent(
                 } else {
                     val finalSeed =
                         seed ?: if (mode == GameMode.DAILY_CHALLENGE) {
-                            Clock.System.now().toEpochMilliseconds() / 86400000
+                            Clock.System.now().toEpochMilliseconds() / MILLIS_IN_DAY
                         } else {
                             null
                         }
@@ -173,7 +173,7 @@ class DefaultGameComponent(
                     _events.emit(GameUiEvent.PlayDeal)
 
                     // Wait a frame to ensure settings have been collected
-                    delay(50)
+                    delay(SETTINGS_COLLECTION_DELAY)
 
                     val currentState = _state.value
                     if (currentState.showWalkthrough) {
@@ -197,13 +197,13 @@ class DefaultGameComponent(
         peekJob =
             scope.launch {
                 stopTimer()
-                val peekDuration = 3
+                val peekDuration = PEEK_DURATION_SECONDS
                 _state.update { it.copy(isPeeking = true, peekCountdown = peekDuration) }
 
                 for (i in peekDuration downTo 1) {
                     _state.update { it.copy(peekCountdown = i) }
                     _events.emit(GameUiEvent.VibrateTick)
-                    delay(1000)
+                    delay(TIMER_TICK_MS)
                 }
 
                 _state.update { it.copy(isPeeking = false, peekCountdown = 0) }
@@ -232,7 +232,7 @@ class DefaultGameComponent(
         timerJob =
             scope.launch {
                 while (isActive) {
-                    delay(1000)
+                    delay(TIMER_TICK_MS)
                     if (mode == GameMode.TIME_ATTACK) {
                         var shouldStop = false
                         _state.update {
@@ -348,7 +348,7 @@ class DefaultGameComponent(
         timeGainJob?.cancel()
         timeGainJob =
             scope.launch {
-                delay(1500)
+                delay(UI_FEEDBACK_DURATION_MS)
                 _state.update { it.copy(showTimeGain = false) }
             }
     }
@@ -382,7 +382,7 @@ class DefaultGameComponent(
             handleGameOver()
         } else {
             scope.launch {
-                delay(if (isResuming) 500 else 1000)
+                delay(if (isResuming) RESUME_DELAY_MS else REVEAL_DELAY_MS)
                 if (!_state.value.game.isGameOver) {
                     _events.tryEmit(GameUiEvent.PlayFlip)
                     val resetState = resetErrorCardsUseCase(newState)
@@ -397,7 +397,7 @@ class DefaultGameComponent(
         timeLossJob?.cancel()
         timeLossJob =
             scope.launch {
-                delay(1500)
+                delay(UI_FEEDBACK_DURATION_MS)
                 _state.update { it.copy(showTimeLoss = false) }
             }
     }
@@ -431,7 +431,7 @@ class DefaultGameComponent(
         )
 
         if (gameWithBonuses.mode == GameMode.DAILY_CHALLENGE) {
-            val today = Clock.System.now().toEpochMilliseconds() / 86400000
+            val today = Clock.System.now().toEpochMilliseconds() / MILLIS_IN_DAY
             scope.launch {
                 dailyChallengeRepository.saveChallengeResult(
                     today,
@@ -463,7 +463,7 @@ class DefaultGameComponent(
         explosionJob =
             scope.launch {
                 _state.update { it.copy(showComboExplosion = true) }
-                delay(1000)
+                delay(COMBO_EXPLOSION_DURATION_MS)
                 _state.update { it.copy(showComboExplosion = false) }
             }
     }
@@ -472,7 +472,7 @@ class DefaultGameComponent(
         commentJob?.cancel()
         commentJob =
             scope.launch {
-                delay(2500)
+                delay(COMMENT_DURATION_MS)
                 _state.update { it.copy(game = it.game.copy(matchComment = null)) }
             }
     }
@@ -526,5 +526,17 @@ class DefaultGameComponent(
                 startTimer(_state.value.game.mode)
             }
         }
+    }
+
+    companion object {
+        private const val MILLIS_IN_DAY = 86400000L
+        private const val SETTINGS_COLLECTION_DELAY = 50L
+        private const val PEEK_DURATION_SECONDS = 3
+        private const val TIMER_TICK_MS = 1000L
+        private const val UI_FEEDBACK_DURATION_MS = 1500L
+        private const val RESUME_DELAY_MS = 500L
+        private const val REVEAL_DELAY_MS = 1000L
+        private const val COMBO_EXPLOSION_DURATION_MS = 1000L
+        private const val COMMENT_DURATION_MS = 2500L
     }
 }

@@ -24,12 +24,15 @@ class AndroidHapticsServiceImpl(private val context: Context) : HapticsService {
 
     @RequiresPermission(Manifest.permission.VIBRATE)
     override fun vibrateMatch() {
-        vibrate(longArrayOf(0, 50), intArrayOf(0, 255))
+        vibrate(longArrayOf(0, MATCH_DURATION), intArrayOf(0, MAX_AMPLITUDE))
     }
 
     @RequiresPermission(Manifest.permission.VIBRATE)
     override fun vibrateMismatch() {
-        vibrate(longArrayOf(0, 100, 50, 100), intArrayOf(0, 255, 0, 255))
+        vibrate(
+            longArrayOf(0, MISMATCH_DURATION, PAUSE_DURATION, MISMATCH_DURATION),
+            intArrayOf(0, MAX_AMPLITUDE, 0, MAX_AMPLITUDE),
+        )
     }
 
     @RequiresPermission(Manifest.permission.VIBRATE)
@@ -37,7 +40,7 @@ class AndroidHapticsServiceImpl(private val context: Context) : HapticsService {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             vibrator?.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_TICK))
         } else {
-            vibrate(longArrayOf(0, 10), intArrayOf(0, 150))
+            vibrate(longArrayOf(0, TICK_DURATION), intArrayOf(0, TICK_AMPLITUDE))
         }
     }
 
@@ -46,18 +49,32 @@ class AndroidHapticsServiceImpl(private val context: Context) : HapticsService {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             vibrator?.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_HEAVY_CLICK))
         } else {
-            vibrate(longArrayOf(0, 200), intArrayOf(0, 255))
+            vibrate(longArrayOf(0, WARNING_DURATION), intArrayOf(0, MAX_AMPLITUDE))
         }
     }
 
     @RequiresPermission(Manifest.permission.VIBRATE)
     override fun vibrateHeat() {
         // Pronounced heat mode vibration - longer and more intense
-        vibrate(longArrayOf(0, 150, 50, 150), intArrayOf(0, 255, 0, 255))
+        vibrate(
+            longArrayOf(0, HEAT_DURATION, PAUSE_DURATION, HEAT_DURATION),
+            intArrayOf(0, MAX_AMPLITUDE, 0, MAX_AMPLITUDE),
+        )
     }
 
     @RequiresPermission(Manifest.permission.VIBRATE)
     private fun vibrate(timings: LongArray, amplitudes: IntArray) {
         vibrator?.vibrate(VibrationEffect.createWaveform(timings, amplitudes, -1))
+    }
+
+    companion object {
+        private const val MAX_AMPLITUDE = 255
+        private const val PAUSE_DURATION = 50L
+        private const val MATCH_DURATION = 50L
+        private const val MISMATCH_DURATION = 100L
+        private const val TICK_DURATION = 10L
+        private const val TICK_AMPLITUDE = 150
+        private const val WARNING_DURATION = 200L
+        private const val HEAT_DURATION = 150L
     }
 }

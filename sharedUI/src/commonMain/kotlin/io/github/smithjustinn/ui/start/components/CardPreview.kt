@@ -37,6 +37,18 @@ import io.github.smithjustinn.domain.models.Suit
 import io.github.smithjustinn.theme.*
 import io.github.smithjustinn.ui.game.components.PlayingCard
 
+private const val CARD_ROTATION_DURATION = 3000
+private const val CARD_FLOAT_DURATION = 2500
+private const val CARD_SPACING = -55
+private const val CARD_WIDTH = 110
+private const val BASE_ROTATION = 12f
+private const val CARD_TRANSLATION_Y = 10f
+private const val STAR_ROTATION_DURATION_BASE = 8000
+private const val STAR_FLOAT_X_DURATION_BASE = 2000
+private const val STAR_FLOAT_Y_DURATION_BASE = 2500
+private const val STAR_PULSE_DURATION = 1500
+private const val GLOW_SIZE = 220
+
 /**
  * CardPreview (Visual Section - 2026 Design)
  *
@@ -55,7 +67,7 @@ fun CardPreview(
         initialValue = -3f,
         targetValue = 3f,
         animationSpec = infiniteRepeatable(
-            animation = tween(3000, easing = EaseInOutSine),
+            animation = tween(CARD_ROTATION_DURATION, easing = EaseInOutSine),
             repeatMode = RepeatMode.Reverse,
         ),
         label = "rotation",
@@ -65,7 +77,7 @@ fun CardPreview(
         initialValue = -5f,
         targetValue = 5f,
         animationSpec = infiniteRepeatable(
-            animation = tween(2500, easing = EaseInOutSine),
+            animation = tween(CARD_FLOAT_DURATION, easing = EaseInOutSine),
             repeatMode = RepeatMode.Reverse,
         ),
         label = "float",
@@ -78,7 +90,7 @@ fun CardPreview(
         // Background Glow Effect
         Box(
             modifier = Modifier
-                .size(220.dp)
+                .size(GLOW_SIZE.dp)
                 .drawBehind {
                     drawCircle(
                         brush = Brush.radialGradient(
@@ -94,7 +106,7 @@ fun CardPreview(
 
         // Cards
         Row(
-            horizontalArrangement = Arrangement.spacedBy((-55).dp),
+            horizontalArrangement = Arrangement.spacedBy(CARD_SPACING.dp),
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.offset(y = floatOffset.dp),
         ) {
@@ -106,10 +118,10 @@ fun CardPreview(
                 cardBackTheme = cardBackTheme,
                 cardSymbolTheme = cardSymbolTheme,
                 modifier = Modifier
-                    .width(110.dp)
+                    .width(CARD_WIDTH.dp)
                     .zIndex(1f) // Keep Spades on top as in the image
                     .graphicsLayer {
-                        rotationZ = -12f + rotation
+                        rotationZ = -BASE_ROTATION + rotation
                         scaleX = 1f
                         scaleY = 1f
                     },
@@ -122,13 +134,13 @@ fun CardPreview(
                 cardBackTheme = cardBackTheme,
                 cardSymbolTheme = cardSymbolTheme,
                 modifier = Modifier
-                    .width(110.dp)
+                    .width(CARD_WIDTH.dp)
                     .zIndex(0f)
                     .graphicsLayer {
-                        rotationZ = 12f - rotation
+                        rotationZ = BASE_ROTATION - rotation
                         scaleX = 1f
                         scaleY = 1f
-                        translationY = 10f
+                        translationY = CARD_TRANSLATION_Y
                     },
             )
         }
@@ -155,7 +167,7 @@ fun AnimatedStar(modifier: Modifier = Modifier, delayMillis: Int = 0) {
         initialValue = -4f,
         targetValue = 4f,
         animationSpec = infiniteRepeatable(
-            animation = tween(2000 + delayMillis % 1000, easing = EaseInOutSine),
+            animation = tween(STAR_FLOAT_X_DURATION_BASE + delayMillis % 1000, easing = EaseInOutSine),
             repeatMode = RepeatMode.Reverse,
         ),
         label = "floatX",
@@ -164,7 +176,7 @@ fun AnimatedStar(modifier: Modifier = Modifier, delayMillis: Int = 0) {
         initialValue = -4f,
         targetValue = 4f,
         animationSpec = infiniteRepeatable(
-            animation = tween(2500 + delayMillis % 1000, easing = EaseInOutSine),
+            animation = tween(STAR_FLOAT_Y_DURATION_BASE + delayMillis % 1000, easing = EaseInOutSine),
             repeatMode = RepeatMode.Reverse,
         ),
         label = "floatY",
@@ -174,7 +186,7 @@ fun AnimatedStar(modifier: Modifier = Modifier, delayMillis: Int = 0) {
         initialValue = 0.6f,
         targetValue = 1.2f,
         animationSpec = infiniteRepeatable(
-            animation = tween(1500, delayMillis = delayMillis, easing = EaseInOutSine),
+            animation = tween(STAR_PULSE_DURATION, delayMillis = delayMillis, easing = EaseInOutSine),
             repeatMode = RepeatMode.Reverse,
         ),
         label = "scale",
@@ -183,7 +195,7 @@ fun AnimatedStar(modifier: Modifier = Modifier, delayMillis: Int = 0) {
         initialValue = 0.4f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(1500, delayMillis = delayMillis, easing = EaseInOutSine),
+            animation = tween(STAR_PULSE_DURATION, delayMillis = delayMillis, easing = EaseInOutSine),
             repeatMode = RepeatMode.Reverse,
         ),
         label = "alpha",
@@ -193,7 +205,7 @@ fun AnimatedStar(modifier: Modifier = Modifier, delayMillis: Int = 0) {
         initialValue = 0f,
         targetValue = 360f,
         animationSpec = infiniteRepeatable(
-            animation = tween(8000 + delayMillis, easing = LinearEasing),
+            animation = tween(STAR_ROTATION_DURATION_BASE + delayMillis, easing = LinearEasing),
             repeatMode = RepeatMode.Restart,
         ),
         label = "rotation",
