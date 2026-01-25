@@ -76,10 +76,7 @@ import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsContent(
-    component: SettingsComponent,
-    modifier: Modifier = Modifier,
-) {
+fun SettingsContent(component: SettingsComponent, modifier: Modifier = Modifier) {
     val graph = LocalAppGraph.current
     val state by component.state.collectAsState()
     val audioService = graph.audioService
@@ -94,14 +91,14 @@ fun SettingsContent(
 
     Box(
         modifier =
-            modifier
-                .fillMaxSize()
-                .background(
-                    brush =
-                        Brush.verticalGradient(
-                            colors = listOf(StartBackgroundTop, StartBackgroundBottom),
-                        ),
+        modifier
+            .fillMaxSize()
+            .background(
+                brush =
+                Brush.verticalGradient(
+                    colors = listOf(StartBackgroundTop, StartBackgroundBottom),
                 ),
+            ),
     ) {
         Scaffold(
             containerColor = Color.Transparent,
@@ -110,12 +107,12 @@ fun SettingsContent(
             Box(modifier = Modifier.fillMaxSize().padding(padding)) {
                 Column(
                     modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
-                            .padding(horizontal = 24.dp, vertical = 16.dp)
-                            .widthIn(max = 600.dp)
-                            .align(Alignment.TopCenter),
+                    Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 24.dp, vertical = 16.dp)
+                        .widthIn(max = 600.dp)
+                        .align(Alignment.TopCenter),
                     verticalArrangement = Arrangement.spacedBy(20.dp),
                 ) {
                     SettingsAppearanceSection(state, audioService, component)
@@ -129,10 +126,7 @@ fun SettingsContent(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SettingsTopBar(
-    audioService: AudioService,
-    component: SettingsComponent,
-) {
+private fun SettingsTopBar(audioService: AudioService, component: SettingsComponent) {
     TopAppBar(
         title = {
             Text(
@@ -159,11 +153,7 @@ private fun SettingsTopBar(
 }
 
 @Composable
-private fun SettingsAppearanceSection(
-    state: SettingsState,
-    audioService: AudioService,
-    component: SettingsComponent,
-) {
+private fun SettingsAppearanceSection(state: SettingsState, audioService: AudioService, component: SettingsComponent) {
     SettingsCard(title = stringResource(Res.string.settings_appearance)) {
         ThemeSelector(
             title = stringResource(Res.string.settings_card_back_style),
@@ -211,11 +201,7 @@ private fun SettingsAppearanceSection(
 }
 
 @Composable
-private fun SettingsAudioSection(
-    state: SettingsState,
-    audioService: AudioService,
-    component: SettingsComponent,
-) {
+private fun SettingsAudioSection(state: SettingsState, audioService: AudioService, component: SettingsComponent) {
     SettingsCard(title = stringResource(Res.string.settings_gameplay_audio)) {
         SettingsToggle(
             title = stringResource(Res.string.settings_sound_effects),
@@ -274,11 +260,7 @@ private fun SettingsAudioSection(
 }
 
 @Composable
-private fun SettingsResetSection(
-    state: SettingsState,
-    audioService: AudioService,
-    component: SettingsComponent,
-) {
+private fun SettingsResetSection(state: SettingsState, audioService: AudioService, component: SettingsComponent) {
     SettingsCard {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -306,12 +288,12 @@ private fun SettingsResetSection(
                 },
                 enabled = state.isWalkthroughCompleted,
                 colors =
-                    ButtonDefaults.buttonColors(
-                        containerColor = NeonCyan.copy(alpha = 0.2f),
-                        contentColor = NeonCyan,
-                        disabledContainerColor = InactiveBackground.copy(alpha = 0.5f),
-                        disabledContentColor = Color.White.copy(alpha = 0.3f),
-                    ),
+                ButtonDefaults.buttonColors(
+                    containerColor = NeonCyan.copy(alpha = 0.2f),
+                    contentColor = NeonCyan,
+                    disabledContainerColor = InactiveBackground.copy(alpha = 0.5f),
+                    disabledContentColor = Color.White.copy(alpha = 0.3f),
+                ),
             ) {
                 Text(stringResource(Res.string.settings_reset))
             }
@@ -345,16 +327,12 @@ private fun <T> ThemeSelector(
 }
 
 @Composable
-private fun VolumeSlider(
-    value: Float,
-    onValueChange: (Float) -> Unit,
-    modifier: Modifier = Modifier,
-) {
+private fun VolumeSlider(value: Float, onValueChange: (Float) -> Unit, modifier: Modifier = Modifier) {
     Row(
         modifier =
-            modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
+        modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -369,11 +347,11 @@ private fun VolumeSlider(
             onValueChange = onValueChange,
             modifier = Modifier.weight(1f),
             colors =
-                SliderDefaults.colors(
-                    thumbColor = Color.White,
-                    activeTrackColor = NeonCyan,
-                    inactiveTrackColor = InactiveBackground,
-                ),
+            SliderDefaults.colors(
+                thumbColor = Color.White,
+                activeTrackColor = NeonCyan,
+                inactiveTrackColor = InactiveBackground,
+            ),
         )
         Text(
             text = "${(value * 100).toInt()}%",
@@ -385,19 +363,16 @@ private fun VolumeSlider(
 }
 
 @Composable
-private fun SettingsCard(
-    title: String? = null,
-    content: @Composable ColumnScope.() -> Unit,
-) {
+private fun SettingsCard(title: String? = null, content: @Composable ColumnScope.() -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
         color = InactiveBackground.copy(alpha = 0.4f),
         border =
-            androidx.compose.foundation.BorderStroke(
-                width = 1.dp,
-                color = Color.White.copy(alpha = 0.1f),
-            ),
+        androidx.compose.foundation.BorderStroke(
+            width = 1.dp,
+            color = Color.White.copy(alpha = 0.1f),
+        ),
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             if (title != null) {
@@ -445,13 +420,13 @@ private fun SettingsToggle(
             checked = checked,
             onCheckedChange = onCheckedChange,
             colors =
-                SwitchDefaults.colors(
-                    checkedThumbColor = Color.White,
-                    checkedTrackColor = NeonCyan,
-                    uncheckedTrackColor = InactiveBackground,
-                    uncheckedThumbColor = Color.White.copy(alpha = 0.6f),
-                    uncheckedBorderColor = Color.Transparent,
-                ),
+            SwitchDefaults.colors(
+                checkedThumbColor = Color.White,
+                checkedTrackColor = NeonCyan,
+                uncheckedTrackColor = InactiveBackground,
+                uncheckedThumbColor = Color.White.copy(alpha = 0.6f),
+                uncheckedBorderColor = Color.Transparent,
+            ),
         )
     }
 }

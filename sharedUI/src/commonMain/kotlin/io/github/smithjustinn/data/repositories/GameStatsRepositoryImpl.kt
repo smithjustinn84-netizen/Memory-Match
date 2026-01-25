@@ -11,18 +11,14 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 
 @Inject
-class GameStatsRepositoryImpl(
-    private val dao: GameStatsDao,
-    private val logger: Logger,
-) : GameStatsRepository {
-    override fun getStatsForDifficulty(pairCount: Int): Flow<GameStats?> =
-        dao
-            .getStatsForDifficulty(pairCount)
-            .map { it?.toDomain() }
-            .catch { e ->
-                logger.e(e) { "Error fetching stats for difficulty: $pairCount" }
-                emit(null)
-            }
+class GameStatsRepositoryImpl(private val dao: GameStatsDao, private val logger: Logger) : GameStatsRepository {
+    override fun getStatsForDifficulty(pairCount: Int): Flow<GameStats?> = dao
+        .getStatsForDifficulty(pairCount)
+        .map { it?.toDomain() }
+        .catch { e ->
+            logger.e(e) { "Error fetching stats for difficulty: $pairCount" }
+            emit(null)
+        }
 
     @Suppress("TooGenericExceptionCaught")
     override suspend fun updateStats(stats: GameStats) {
@@ -33,17 +29,15 @@ class GameStatsRepositoryImpl(
         }
     }
 
-    private fun GameStatsEntity.toDomain(): GameStats =
-        GameStats(
-            pairCount = pairCount,
-            bestScore = bestScore,
-            bestTimeSeconds = bestTimeSeconds,
-        )
+    private fun GameStatsEntity.toDomain(): GameStats = GameStats(
+        pairCount = pairCount,
+        bestScore = bestScore,
+        bestTimeSeconds = bestTimeSeconds,
+    )
 
-    private fun GameStats.toEntity(): GameStatsEntity =
-        GameStatsEntity(
-            pairCount = pairCount,
-            bestScore = bestScore,
-            bestTimeSeconds = bestTimeSeconds,
-        )
+    private fun GameStats.toEntity(): GameStatsEntity = GameStatsEntity(
+        pairCount = pairCount,
+        bestScore = bestScore,
+        bestTimeSeconds = bestTimeSeconds,
+    )
 }

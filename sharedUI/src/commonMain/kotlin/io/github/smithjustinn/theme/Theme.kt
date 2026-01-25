@@ -7,13 +7,12 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
@@ -266,7 +265,7 @@ fun AppTheme(onThemeChanged: @Composable (isDark: Boolean) -> Unit = {}, content
     val systemIsDark = isSystemInDarkTheme()
     val isDarkState = remember(systemIsDark) { mutableStateOf(systemIsDark) }
     val colors = if (isDarkState.value) DarkAppColors else LightAppColors
-    
+
     CompositionLocalProvider(
         LocalThemeIsDark provides isDarkState,
         LocalAppColors provides colors,

@@ -2,10 +2,6 @@ package io.github.smithjustinn.ui.game.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.core.InfiniteTransition
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -15,6 +11,10 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -39,11 +39,7 @@ import io.github.smithjustinn.utils.formatTime
 private const val COLOR_TRANSITION_DURATION_MS = 500
 private const val PULSE_SCALE_TARGET = 1.15f
 
-data class TimerState(
-    val time: Long,
-    val isLowTime: Boolean,
-    val isCriticalTime: Boolean,
-)
+data class TimerState(val time: Long, val isLowTime: Boolean, val isCriticalTime: Boolean)
 
 data class TimerFeedback(
     val showTimeGain: Boolean = false,
@@ -119,12 +115,12 @@ private fun animateTimerColor(
         minimal -> Color.White
         else -> MemoryMatchTheme.colors.neonCyan
     }
-    
+
     val color by animateColorAsState(
         targetValue = targetValue,
         animationSpec = tween(durationMillis = if (showTimeGain || showTimeLoss) 100 else COLOR_TRANSITION_DURATION_MS),
     )
-    
+
     return color
 }
 
@@ -264,12 +260,7 @@ private fun StandardTimerDisplay(
 }
 
 @Composable
-private fun TimeGainIndicator(
-    showTimeGain: Boolean,
-    timeGainAmount: Int,
-    isMegaBonus: Boolean,
-    compact: Boolean,
-) {
+private fun TimeGainIndicator(showTimeGain: Boolean, timeGainAmount: Int, isMegaBonus: Boolean, compact: Boolean) {
     AnimatedVisibility(
         visible = showTimeGain,
         enter = fadeIn() + slideInVertically { it / 2 },
@@ -290,11 +281,7 @@ private fun TimeGainIndicator(
 }
 
 @Composable
-private fun TimeLossIndicator(
-    showTimeLoss: Boolean,
-    timeLossAmount: Long,
-    compact: Boolean,
-) {
+private fun TimeLossIndicator(showTimeLoss: Boolean, timeLossAmount: Long, compact: Boolean) {
     AnimatedVisibility(
         visible = showTimeLoss,
         enter = fadeIn() + slideInVertically { -it / 2 },

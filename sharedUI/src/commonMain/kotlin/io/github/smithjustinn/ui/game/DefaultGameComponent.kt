@@ -106,11 +106,11 @@ class DefaultGameComponent(
                         isMusicEnabled = music,
                         isSoundEnabled = sound,
                         cardSettings =
-                            CardDisplaySettings(
-                                backTheme = cardBack,
-                                symbolTheme = cardSymbol,
-                                areSuitsMultiColored = multiColor,
-                            ),
+                        CardDisplaySettings(
+                            backTheme = cardBack,
+                            symbolTheme = cardSymbol,
+                            areSuitsMultiColored = multiColor,
+                        ),
                     )
                 }
             }.collect()
@@ -119,12 +119,7 @@ class DefaultGameComponent(
         startGame(pairCount, forceNewGame, mode, seed)
     }
 
-    private fun startGame(
-        pairCount: Int,
-        forceNewGame: Boolean,
-        mode: GameMode,
-        seed: Long?,
-    ) {
+    private fun startGame(pairCount: Int, forceNewGame: Boolean, mode: GameMode, seed: Long?) {
         scope.launch {
             try {
                 val savedGame = if (forceNewGame) null else appGraph.getSavedGameUseCase()
@@ -142,11 +137,7 @@ class DefaultGameComponent(
         }
     }
 
-    private suspend fun setupNewGame(
-        pairCount: Int,
-        mode: GameMode,
-        seed: Long?,
-    ) {
+    private suspend fun setupNewGame(pairCount: Int, mode: GameMode, seed: Long?) {
         val finalSeed =
             seed ?: if (mode == GameMode.DAILY_CHALLENGE) {
                 Clock.System.now().toEpochMilliseconds() / GameConstants.MILLIS_IN_DAY

@@ -29,17 +29,16 @@ interface AudioService {
     }
 
     companion object {
-        fun SoundEffect.toResource(): StringResource =
-            when (this) {
-                SoundEffect.FLIP -> Res.string.audio_flip
-                SoundEffect.MATCH -> Res.string.audio_match
-                SoundEffect.MISMATCH -> Res.string.audio_mismatch
-                SoundEffect.WIN -> Res.string.audio_win
-                SoundEffect.LOSE -> Res.string.audio_lose
-                SoundEffect.HIGH_SCORE -> Res.string.audio_highscore
-                SoundEffect.CLICK -> Res.string.audio_click
-                SoundEffect.DEAL -> Res.string.audio_deal
-            }
+        fun SoundEffect.toResource(): StringResource = when (this) {
+            SoundEffect.FLIP -> Res.string.audio_flip
+            SoundEffect.MATCH -> Res.string.audio_match
+            SoundEffect.MISMATCH -> Res.string.audio_mismatch
+            SoundEffect.WIN -> Res.string.audio_win
+            SoundEffect.LOSE -> Res.string.audio_lose
+            SoundEffect.HIGH_SCORE -> Res.string.audio_highscore
+            SoundEffect.CLICK -> Res.string.audio_click
+            SoundEffect.DEAL -> Res.string.audio_deal
+        }
 
         val MUSIC: StringResource = Res.string.audio_music
     }

@@ -31,6 +31,5 @@ object DaoModule {
 
     @Provides
     @SingleIn(AppScope::class)
-    fun provideDailyChallengeDao(database: AppDatabase): DailyChallengeDao =
-        database.dailyChallengeDao()
+    fun provideDailyChallengeDao(database: AppDatabase): DailyChallengeDao = database.dailyChallengeDao()
 }
