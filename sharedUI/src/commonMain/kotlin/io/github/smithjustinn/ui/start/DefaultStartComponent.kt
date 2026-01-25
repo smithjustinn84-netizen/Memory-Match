@@ -81,7 +81,7 @@ class DefaultStartComponent(
     private fun observeDailyChallengeStatus() {
         scope.launch {
             try {
-                val today = Clock.System.now().toEpochMilliseconds() / 86400000
+                val today = Clock.System.now().toEpochMilliseconds() / MILLIS_PER_DAY
 
                 dailyChallengeRepository.isChallengeCompleted(today).collect { isCompleted ->
                     _state.update { it.copy(isDailyChallengeCompleted = isCompleted) }
@@ -119,7 +119,7 @@ class DefaultStartComponent(
     override fun onDailyChallengeClick() {
         if (!state.value.isDailyChallengeCompleted) {
             // Use 8 pairs for Daily Challenge (standard difficulty)
-            onNavigateToGame(8, GameMode.DAILY_CHALLENGE, true)
+            onNavigateToGame(DAILY_CHALLENGE_PAIRS, GameMode.DAILY_CHALLENGE, true)
         }
     }
 
@@ -129,5 +129,10 @@ class DefaultStartComponent(
 
     override fun onStatsClick() {
         onNavigateToStats()
+    }
+
+    companion object {
+        private const val MILLIS_PER_DAY = 86_400_000L
+        private const val DAILY_CHALLENGE_PAIRS = 8
     }
 }
