@@ -47,63 +47,72 @@ fun LeaderboardSection(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+        LeaderboardHeader(level)
+        LeaderboardList(entries)
+    }
+}
+
+@Composable
+private fun LeaderboardHeader(level: DifficultyLevel) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = stringResource(level.nameRes).uppercase(),
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.ExtraBold,
+            color = NeonCyan,
+            letterSpacing = 1.sp,
+        )
+        Surface(
+            color = NeonCyan.copy(alpha = 0.15f),
+            shape = RoundedCornerShape(8.dp),
+            border = androidx.compose.foundation.BorderStroke(1.dp, NeonCyan.copy(alpha = 0.3f)),
         ) {
             Text(
-                text = stringResource(level.nameRes).uppercase(),
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.ExtraBold,
-                color = NeonCyan,
-                letterSpacing = 1.sp,
+                text = stringResource(Res.string.pairs_format, level.pairs),
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
             )
-            Surface(
-                color = NeonCyan.copy(alpha = 0.15f),
-                shape = RoundedCornerShape(8.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, NeonCyan.copy(alpha = 0.3f)),
+        }
+    }
+}
+
+@Composable
+private fun LeaderboardList(entries: ImmutableList<LeaderboardEntry>) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        color = InactiveBackground.copy(alpha = 0.4f),
+        border = androidx.compose.foundation.BorderStroke(
+            width = 1.dp,
+            color = Color.White.copy(alpha = 0.1f),
+        ),
+    ) {
+        if (entries.isEmpty()) {
+            Box(
+                modifier = Modifier.padding(32.dp),
+                contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    text = stringResource(Res.string.pairs_format, level.pairs),
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    text = stringResource(Res.string.no_stats_yet),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White.copy(alpha = 0.4f),
                 )
             }
-        }
-
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            color = InactiveBackground.copy(alpha = 0.4f),
-            border = androidx.compose.foundation.BorderStroke(
-                width = 1.dp,
-                color = Color.White.copy(alpha = 0.1f),
-            ),
-        ) {
-            if (entries.isEmpty()) {
-                Box(
-                    modifier = Modifier.padding(32.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = stringResource(Res.string.no_stats_yet),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.4f),
-                    )
-                }
-            } else {
-                Column(modifier = Modifier.padding(vertical = 8.dp)) {
-                    entries.forEachIndexed { index, entry ->
-                        LeaderboardRow(index + 1, entry)
-                        if (index < entries.size - 1) {
-                            HorizontalDivider(
-                                modifier = Modifier.padding(horizontal = 16.dp),
-                                color = Color.White.copy(alpha = 0.05f),
-                            )
-                        }
+        } else {
+            Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                entries.forEachIndexed { index, entry ->
+                    LeaderboardRow(index + 1, entry)
+                    if (index < entries.size - 1) {
+                        HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            color = Color.White.copy(alpha = 0.05f),
+                        )
                     }
                 }
             }
@@ -120,45 +129,7 @@ private fun LeaderboardRow(rank: Int, entry: LeaderboardEntry) {
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Surface(
-            modifier = Modifier.size(32.dp),
-            shape = CircleShape,
-            color = when (rank) {
-                1 -> GoldenYellow.copy(alpha = 0.2f)
-
-                // Gold
-                2 -> Silver.copy(alpha = 0.2f)
-
-                // Silver
-                3 -> Bronze.copy(alpha = 0.2f)
-
-                // Bronze
-                else -> Color.White.copy(alpha = 0.05f)
-            },
-            border = androidx.compose.foundation.BorderStroke(
-                width = 1.dp,
-                color = when (rank) {
-                    1 -> GoldenYellow.copy(alpha = 0.5f)
-                    2 -> Silver.copy(alpha = 0.5f)
-                    3 -> Bronze.copy(alpha = 0.5f)
-                    else -> Color.White.copy(alpha = 0.1f)
-                },
-            ),
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Text(
-                    text = rank.toString(),
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = when (rank) {
-                        1 -> GoldenYellow
-                        2 -> Silver
-                        3 -> Bronze
-                        else -> Color.White.copy(alpha = 0.6f)
-                    },
-                )
-            }
-        }
+        RankBadge(rank)
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
@@ -177,6 +148,43 @@ private fun LeaderboardRow(rank: Int, entry: LeaderboardEntry) {
             StatMiniItem(
                 label = stringResource(Res.string.stats_moves_header),
                 value = entry.moves.toString(),
+            )
+        }
+    }
+}
+
+@Composable
+private fun RankBadge(rank: Int) {
+    Surface(
+        modifier = Modifier.size(32.dp),
+        shape = CircleShape,
+        color = when (rank) {
+            1 -> GoldenYellow.copy(alpha = 0.2f)
+            2 -> Silver.copy(alpha = 0.2f)
+            3 -> Bronze.copy(alpha = 0.2f)
+            else -> Color.White.copy(alpha = 0.05f)
+        },
+        border = androidx.compose.foundation.BorderStroke(
+            width = 1.dp,
+            color = when (rank) {
+                1 -> GoldenYellow.copy(alpha = 0.5f)
+                2 -> Silver.copy(alpha = 0.5f)
+                3 -> Bronze.copy(alpha = 0.5f)
+                else -> Color.White.copy(alpha = 0.1f)
+            },
+        ),
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Text(
+                text = rank.toString(),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.ExtraBold,
+                color = when (rank) {
+                    1 -> GoldenYellow
+                    2 -> Silver
+                    3 -> Bronze
+                    else -> Color.White.copy(alpha = 0.6f)
+                },
             )
         }
     }

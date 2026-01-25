@@ -82,35 +82,51 @@ fun <T> NeonSegmentedControl(
                 .background(NeonCyan),
         )
 
-        // Labels Row
-        Row(modifier = Modifier.fillMaxSize()) {
-            items.forEachIndexed { index, item ->
-                val isSelected = index == selectedIndex
-                val textColor by animateColorAsState(
-                    targetValue = if (isSelected) Color.White else Color.White.copy(alpha = 0.5f),
-                    animationSpec = tween(durationMillis = 300),
-                    label = "textColor",
-                )
+        SegmentedControlLabels(
+            items = items,
+            selectedIndex = selectedIndex,
+            onItemSelected = onItemSelected,
+            labelProvider = labelProvider,
+            controlShape = controlShape,
+        )
+    }
+}
 
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                        .clip(controlShape)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            onClick = { onItemSelected(item) },
-                        ),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = labelProvider(item),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                        color = textColor,
-                    )
-                }
+@Composable
+private fun <T> SegmentedControlLabels(
+    items: List<T>,
+    selectedIndex: Int,
+    onItemSelected: (T) -> Unit,
+    labelProvider: @Composable (T) -> String,
+    controlShape: RoundedCornerShape,
+) {
+    Row(modifier = Modifier.fillMaxSize()) {
+        items.forEachIndexed { index, item ->
+            val isSelected = index == selectedIndex
+            val textColor by animateColorAsState(
+                targetValue = if (isSelected) Color.White else Color.White.copy(alpha = 0.5f),
+                animationSpec = tween(durationMillis = 300),
+                label = "textColor",
+            )
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .clip(controlShape)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = { onItemSelected(item) },
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = labelProvider(item),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                    color = textColor,
+                )
             }
         }
     }

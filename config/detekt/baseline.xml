@@ -3,16 +3,5 @@
   <ManuallySuppressedIssues/>
   <CurrentIssues>
     <ID>FunctionNaming:main.kt:fun MainViewController(): UIViewController</ID>
-    <ID>LongMethod:LeaderboardSection.kt:@Composable fun LeaderboardSection( level: DifficultyLevel, entries: ImmutableList&lt;LeaderboardEntry&gt;, modifier: Modifier = Modifier, )</ID>
-    <ID>LongMethod:LeaderboardSection.kt:@Composable private fun LeaderboardRow(rank: Int, entry: LeaderboardEntry)</ID>
-    <ID>LongMethod:NeonSegmentedControl.kt:@Composable fun &lt;T&gt; NeonSegmentedControl( items: List&lt;T&gt;, selectedItem: T, onItemSelected: (T) -&gt; Unit, labelProvider: @Composable (T) -&gt; String, modifier: Modifier = Modifier, )</ID>
-    <ID>LongMethod:PlayingCard.kt:@Composable fun PlayingCard( suit: Suit, rank: Rank, isFaceUp: Boolean, isMatched: Boolean = false, isRecentlyMatched: Boolean = false, isError: Boolean = false, modifier: Modifier = Modifier, backColor: Color = StartBackgroundTop, cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC, cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC, areSuitsMultiColored: Boolean = false, onClick: () -&gt; Unit = {}, )</ID>
-    <ID>LongMethod:PlayingCard.kt:@Composable private fun CardFace(rank: Rank, suit: Suit, suitColor: Color, theme: CardSymbolTheme)</ID>
-    <ID>LongMethod:ResultsCard.kt:@Composable fun ResultsCard( isWon: Boolean, score: Int, moves: Int, elapsedTimeSeconds: Long, scoreBreakdown: ScoreBreakdown, onPlayAgain: () -&gt; Unit, onShareReplay: () -&gt; Unit = {}, modifier: Modifier = Modifier, mode: GameMode = GameMode.STANDARD, onScoreTick: () -&gt; Unit = {}, )</ID>
-    <ID>LongMethod:SettingsContent.kt:@OptIn(ExperimentalMaterial3Api::class) @Composable fun SettingsContent(component: SettingsComponent, modifier: Modifier = Modifier)</ID>
-    <ID>LongMethod:StartContent.kt:@Composable fun StartContent(component: StartComponent, modifier: Modifier = Modifier)</ID>
-    <ID>LongMethod:StatsContent.kt:@OptIn(ExperimentalMaterial3Api::class) @Composable fun StatsContent(component: StatsComponent, modifier: Modifier = Modifier)</ID>
-    <ID>LongMethod:TimerDisplay.kt:@Composable fun TimerDisplay( time: Long, isLowTime: Boolean, isCriticalTime: Boolean, showTimeGain: Boolean, timeGainAmount: Int, showTimeLoss: Boolean, timeLossAmount: Long, isMegaBonus: Boolean, infiniteTransition: InfiniteTransition, modifier: Modifier = Modifier, compact: Boolean = false, minimal: Boolean = false, )</ID>
-    <ID>LongMethod:WalkthroughOverlay.kt:@Composable fun WalkthroughOverlay(step: Int, onNext: () -&gt; Unit, onDismiss: () -&gt; Unit, modifier: Modifier = Modifier)</ID>
   </CurrentIssues>
 </SmellBaseline>

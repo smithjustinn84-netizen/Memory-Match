@@ -18,6 +18,7 @@ import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.Clip
 import javax.sound.sampled.FloatControl
 import kotlin.math.log10
+import io.github.smithjustinn.services.AudioService.Companion.toResource
 
 @Inject
 class JvmAudioServiceImpl(private val logger: Logger, settingsRepository: SettingsRepository) : AudioService {
@@ -57,17 +58,8 @@ class JvmAudioServiceImpl(private val logger: Logger, settingsRepository: Settin
             .launchIn(scope)
 
         scope.launch {
-            val sounds = listOf(
-                AudioService.FLIP,
-                AudioService.MATCH,
-                AudioService.MISMATCH,
-                AudioService.WIN,
-                AudioService.LOSE,
-                AudioService.HIGH_SCORE,
-                AudioService.CLICK,
-                AudioService.DEAL,
-            )
-            sounds.forEach { resource ->
+            AudioService.SoundEffect.entries.forEach { effect ->
+                val resource = effect.toResource()
                 try {
                     val name = getString(resource)
                     val path = "$name.wav"
@@ -108,14 +100,9 @@ class JvmAudioServiceImpl(private val logger: Logger, settingsRepository: Settin
         clip.start()
     }
 
-    override fun playFlip() = playSound(AudioService.FLIP)
-    override fun playMatch() = playSound(AudioService.MATCH)
-    override fun playMismatch() = playSound(AudioService.MISMATCH)
-    override fun playWin() = playSound(AudioService.WIN)
-    override fun playLose() = playSound(AudioService.LOSE)
-    override fun playHighScore() = playSound(AudioService.HIGH_SCORE)
-    override fun playClick() = playSound(AudioService.CLICK)
-    override fun playDeal() = playSound(AudioService.DEAL)
+    override fun playEffect(effect: AudioService.SoundEffect) {
+        playSound(effect.toResource())
+    }
 
     override fun startMusic() {
         isMusicRequested = true

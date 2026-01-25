@@ -28,7 +28,7 @@ import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.random.Random
 
-private val BASE_CARD_WIDTH = 64.dp
+private val BOUNCING_CARD_WIDTH = 64.dp
 private val BASE_CARD_HEIGHT = 88.dp
 
 private const val POP_IN_DURATION = 0.4f
@@ -116,7 +116,7 @@ fun BouncingCardsOverlay(
         val widthPx = with(density) { maxWidth.toPx() }
         val heightPx = with(density) { maxHeight.toPx() }
 
-        val cardWidthPx = with(density) { BASE_CARD_WIDTH.toPx() }
+        val cardWidthPx = with(density) { BOUNCING_CARD_WIDTH.toPx() }
 
         // We use a list to track cards that are currently "in flight"
         val celebrationCards = remember { mutableStateListOf<CelebrationCard>() }
@@ -182,7 +182,7 @@ private fun CelebrationCardsLayer(celebrationCards: List<CelebrationCard>, setti
                     isMatched = true,
                     settings = settings,
                     modifier = Modifier
-                        .size(BASE_CARD_WIDTH, BASE_CARD_HEIGHT)
+                        .size(BOUNCING_CARD_WIDTH, BASE_CARD_HEIGHT)
                         .offset { IntOffset(cCard.x.roundToInt(), cCard.y.roundToInt()) }
                         .graphicsLayer {
                             rotationZ = cCard.rotation

@@ -7,7 +7,8 @@ import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.createGraph
 import io.github.smithjustinn.data.local.AppDatabase
-import io.github.smithjustinn.di.modules.DataModule
+import io.github.smithjustinn.di.modules.DaoModule
+import io.github.smithjustinn.di.modules.RepositoryModule
 import io.github.smithjustinn.services.AudioService
 import io.github.smithjustinn.services.HapticsService
 import io.github.smithjustinn.services.JvmAudioServiceImpl
@@ -18,14 +19,15 @@ import java.io.File
 @DependencyGraph(
     scope = AppScope::class,
     bindingContainers = [
-        DataModule::class,
+        DaoModule::class,
+        RepositoryModule::class,
     ],
 )
 interface JvmAppGraph : AppGraph {
     @Provides
     @SingleIn(AppScope::class)
     fun provideApplicationScope(): kotlinx.coroutines.CoroutineScope =
-        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.Main)
+        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + Dispatchers.Main)
 
     @Provides
     @SingleIn(AppScope::class)
@@ -39,10 +41,10 @@ interface JvmAppGraph : AppGraph {
     @SingleIn(AppScope::class)
     fun provideDatabase(): AppDatabase {
         val dbFile = File(System.getProperty("user.home"), ".memory_match.db")
-        return Room.databaseBuilder<AppDatabase>(
-            name = dbFile.absolutePath,
-        )
-            .setDriver(BundledSQLiteDriver())
+        return Room
+            .databaseBuilder<AppDatabase>(
+                name = dbFile.absolutePath,
+            ).setDriver(BundledSQLiteDriver())
             .setQueryCoroutineContext(Dispatchers.IO)
             .addMigrations(
                 AppDatabase.MIGRATION_1_2,
@@ -51,8 +53,7 @@ interface JvmAppGraph : AppGraph {
                 AppDatabase.MIGRATION_4_5,
                 AppDatabase.MIGRATION_5_6,
                 AppDatabase.MIGRATION_6_7,
-            )
-            .build()
+            ).build()
     }
 }
 

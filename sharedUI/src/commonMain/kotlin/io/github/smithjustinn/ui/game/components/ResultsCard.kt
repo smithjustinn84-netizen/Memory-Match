@@ -28,6 +28,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -78,9 +79,32 @@ fun ResultsCard(
         else -> Res.string.game_over
     }
 
+    // Animation Logic extracted
+    val animatedScore = rememberAnimatedScore(score, onScoreTick)
+    val scale = rememberResultsScale()
+
+    BoxWithConstraints(modifier = modifier.padding(horizontal = 24.dp)) {
+        val isCompactHeight = maxHeight < 400.dp
+
+        ResultsCardContent(
+            isCompactHeight = isCompactHeight,
+            scale = scale,
+            isWon = isWon,
+            titleRes = titleRes,
+            animatedScore = animatedScore,
+            elapsedTimeSeconds = elapsedTimeSeconds,
+            moves = moves,
+            scoreBreakdown = scoreBreakdown,
+            onPlayAgain = onPlayAgain,
+            onShareReplay = onShareReplay,
+        )
+    }
+}
+
+@Composable
+private fun rememberAnimatedScore(score: Int, onScoreTick: () -> Unit): androidx.compose.runtime.State<Float> {
     val animatedScore = remember { Animatable(0f) }
     var lastRoundedScore by remember { mutableStateOf(0) }
-
     val scoreTickHandler by rememberUpdatedState(onScoreTick)
 
     LaunchedEffect(score) {
@@ -89,7 +113,6 @@ fun ResultsCard(
             animationSpec = tween(durationMillis = 1500, easing = FastOutSlowInEasing),
         ) {
             val currentRounded = value.roundToInt()
-            // Throttle haptics: every 10 points if score is high, or every point if score is low
             val step = if (score > HIGH_SCORE_THRESHOLD) HIGH_SCORE_STEP else LOW_SCORE_STEP
             if (currentRounded != lastRoundedScore && (currentRounded % step == 0 || currentRounded == score)) {
                 scoreTickHandler()
@@ -97,7 +120,11 @@ fun ResultsCard(
             }
         }
     }
+    return remember(animatedScore) { derivedStateOf { animatedScore.value } }
+}
 
+@Composable
+private fun rememberResultsScale(): Float {
     val scale = remember { Animatable(INITIAL_SCALE) }
     LaunchedEffect(Unit) {
         scale.animateTo(
@@ -108,140 +135,181 @@ fun ResultsCard(
             ),
         )
     }
+    return scale.value
+}
 
-    BoxWithConstraints(modifier = modifier.padding(horizontal = 24.dp)) {
-        val isCompactHeight = maxHeight < 400.dp
+@Composable
+private fun ResultsCardContent(
+    isCompactHeight: Boolean,
+    scale: Float,
+    isWon: Boolean,
+    titleRes: org.jetbrains.compose.resources.StringResource,
+    animatedScore: androidx.compose.runtime.State<Float>,
+    elapsedTimeSeconds: Long,
+    moves: Int,
+    scoreBreakdown: ScoreBreakdown,
+    onPlayAgain: () -> Unit,
+    onShareReplay: () -> Unit,
+) {
+    Surface(
+        modifier = Modifier
+            .scale(scale)
+            .widthIn(max = 550.dp),
+        shape = RoundedCornerShape(24.dp),
+        color = MemoryMatchTheme.colors.inactiveBackground.copy(alpha = 0.8f),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.15f)),
+        shadowElevation = 16.dp,
+    ) {
+        val contentPadding = if (isCompactHeight) 12.dp else 24.dp
+        val verticalSpacing = if (isCompactHeight) 8.dp else 16.dp
+        val headerColor = if (isWon) MemoryMatchTheme.colors.neonCyan else MemoryMatchTheme.colors.tacticalRed
 
-        Surface(
+        Column(
             modifier = Modifier
-                .scale(scale.value)
-                .widthIn(max = 550.dp),
-            shape = RoundedCornerShape(24.dp),
-            color = MemoryMatchTheme.colors.inactiveBackground.copy(alpha = 0.8f),
-            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.15f)),
-            shadowElevation = 16.dp,
+                .fillMaxWidth()
+                .padding(contentPadding)
+                .then(if (isCompactHeight) Modifier.verticalScroll(rememberScrollState()) else Modifier),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(verticalSpacing),
         ) {
-            val contentPadding = if (isCompactHeight) 12.dp else 24.dp
-            val verticalSpacing = if (isCompactHeight) 8.dp else 16.dp
-            val headerColor = if (isWon) MemoryMatchTheme.colors.neonCyan else MemoryMatchTheme.colors.tacticalRed
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(contentPadding)
-                    .then(if (isCompactHeight) Modifier.verticalScroll(rememberScrollState()) else Modifier),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(verticalSpacing),
-            ) {
-                Text(
-                    text = stringResource(titleRes).uppercase(),
-                    style = if (isCompactHeight) {
-                        MaterialTheme.typography.headlineSmall
-                    } else {
-                        MaterialTheme.typography.headlineLarge.copy(
-                            fontWeight = FontWeight.Black,
-                            letterSpacing = 2.sp,
-                        )
-                    },
-                    color = headerColor,
-                    textAlign = TextAlign.Center,
-                )
-
-                if (isCompactHeight) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        ScoreBox(
-                            score = animatedScore.value.roundToInt(),
-                            elapsedTimeSeconds = elapsedTimeSeconds,
-                            moves = moves,
-                            modifier = Modifier.weight(1f),
-                            compact = true,
-                        )
-
-                        Button(
-                            onClick = onPlayAgain,
-                            modifier = Modifier.height(48.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = MemoryMatchTheme.colors.neonCyan),
-                        ) {
-                            Text(
-                                text = stringResource(Res.string.play_again).uppercase(),
-                                style = MaterialTheme.typography.labelLarge.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White,
-                                ),
-                            )
-                        }
-                    }
-
-                    OutlinedButton(
-                        onClick = onShareReplay,
-                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MemoryMatchTheme.colors.neonCyan),
-                        border = BorderStroke(1.dp, MemoryMatchTheme.colors.neonCyan),
-                    ) {
-                        Icon(imageVector = AppIcons.Share, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "SHARE REPLAY",
-                            style = MaterialTheme.typography.labelLarge.copy(
-                                fontWeight = FontWeight.Bold,
-                            ),
-                        )
-                    }
+            Text(
+                text = stringResource(titleRes).uppercase(),
+                style = if (isCompactHeight) {
+                    MaterialTheme.typography.headlineSmall
                 } else {
-                    ScoreBox(
-                        score = animatedScore.value.roundToInt(),
-                        elapsedTimeSeconds = elapsedTimeSeconds,
-                        moves = moves,
+                    MaterialTheme.typography.headlineLarge.copy(
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 2.sp,
                     )
+                },
+                color = headerColor,
+                textAlign = TextAlign.Center,
+            )
 
-                    ScoreBreakdownSection(scoreBreakdown = scoreBreakdown)
-
-                    Button(
-                        onClick = onPlayAgain,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = MemoryMatchTheme.colors.neonCyan),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                    ) {
-                        Text(
-                            text = stringResource(Res.string.play_again).uppercase(),
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Black,
-                                letterSpacing = 1.sp,
-                                color = Color.White,
-                            ),
-                        )
-                    }
-
-                    OutlinedButton(
-                        onClick = onShareReplay,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MemoryMatchTheme.colors.neonCyan),
-                        border = BorderStroke(1.dp, MemoryMatchTheme.colors.neonCyan),
-                    ) {
-                        Icon(imageVector = AppIcons.Share, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "SHARE REPLAY",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Black,
-                                letterSpacing = 1.sp,
-                            ),
-                        )
-                    }
-                }
+            if (isCompactHeight) {
+                CompactResultsContent(
+                    animatedScore = animatedScore.value.roundToInt(),
+                    elapsedTimeSeconds = elapsedTimeSeconds,
+                    moves = moves,
+                    onPlayAgain = onPlayAgain,
+                    onShareReplay = onShareReplay,
+                )
+            } else {
+                StandardResultsContent(
+                    animatedScore = animatedScore.value.roundToInt(),
+                    elapsedTimeSeconds = elapsedTimeSeconds,
+                    moves = moves,
+                    scoreBreakdown = scoreBreakdown,
+                    onPlayAgain = onPlayAgain,
+                    onShareReplay = onShareReplay,
+                )
             }
         }
+    }
+}
+
+@Composable
+private fun CompactResultsContent(
+    animatedScore: Int,
+    elapsedTimeSeconds: Long,
+    moves: Int,
+    onPlayAgain: () -> Unit,
+    onShareReplay: () -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        ScoreBox(
+            score = animatedScore,
+            elapsedTimeSeconds = elapsedTimeSeconds,
+            moves = moves,
+            modifier = Modifier.weight(1f),
+            compact = true,
+        )
+
+        Button(
+            onClick = onPlayAgain,
+            modifier = Modifier.height(48.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = MemoryMatchTheme.colors.neonCyan),
+        ) {
+            Text(
+                text = stringResource(Res.string.play_again).uppercase(),
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                ),
+            )
+        }
+    }
+
+    ResultsActionButtons(onShareReplay = onShareReplay, isCompact = true)
+}
+
+@Composable
+private fun StandardResultsContent(
+    animatedScore: Int,
+    elapsedTimeSeconds: Long,
+    moves: Int,
+    scoreBreakdown: ScoreBreakdown,
+    onPlayAgain: () -> Unit,
+    onShareReplay: () -> Unit,
+) {
+    ScoreBox(
+        score = animatedScore,
+        elapsedTimeSeconds = elapsedTimeSeconds,
+        moves = moves,
+    )
+
+    ScoreBreakdownSection(scoreBreakdown = scoreBreakdown)
+
+    Button(
+        onClick = onPlayAgain,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = MemoryMatchTheme.colors.neonCyan),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+    ) {
+        Text(
+            text = stringResource(Res.string.play_again).uppercase(),
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.Black,
+                letterSpacing = 1.sp,
+                color = Color.White,
+            ),
+        )
+    }
+
+    ResultsActionButtons(onShareReplay = onShareReplay, isCompact = false)
+}
+
+@Composable
+private fun ResultsActionButtons(onShareReplay: () -> Unit, isCompact: Boolean) {
+    OutlinedButton(
+        onClick = onShareReplay,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(if (isCompact) 48.dp else 56.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = MemoryMatchTheme.colors.neonCyan),
+        border = BorderStroke(1.dp, MemoryMatchTheme.colors.neonCyan),
+    ) {
+        Icon(imageVector = AppIcons.Share, contentDescription = null)
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = "SHARE REPLAY",
+            style = if (isCompact) {
+                MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+            } else {
+                MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Black,
+                    letterSpacing = 1.sp,
+                )
+            },
+        )
     }
 }

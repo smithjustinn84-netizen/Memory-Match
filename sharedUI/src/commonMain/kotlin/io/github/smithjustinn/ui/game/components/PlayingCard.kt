@@ -17,23 +17,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
@@ -45,14 +40,10 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.domain.models.CardDisplaySettings
-import io.github.smithjustinn.domain.models.CardSymbolTheme
 import io.github.smithjustinn.domain.models.Rank
 import io.github.smithjustinn.domain.models.Suit
 import io.github.smithjustinn.theme.ClubGreen
@@ -79,28 +70,27 @@ private const val CAMERA_DISTANCE_MULTIPLIER = 15f
 // Rotation angles (degrees)
 private const val DIAGONAL_ROTATION = 45f
 private const val HALF_ROTATION = 90f
-private const val TRAILING_ICON_ROTATION_DEGREES = 145f
-private const val FULL_ROTATION = 180f
+internal const val FULL_ROTATION = 180f
 
 // Alpha values for transparency
 private const val RIM_LIGHT_THRESHOLD = 0.1f
-private const val VERY_LOW_ALPHA = 0.15f
-private const val LOW_ALPHA = 0.2f
-private const val SUBTLE_ALPHA = 0.3f
-private const val MEDIUM_ALPHA = 0.4f
-private const val HALF_ALPHA = 0.5f
-private const val MODERATE_ALPHA = 0.6f
-private const val HIGH_ALPHA = 0.8f
+internal const val VERY_LOW_ALPHA = 0.15f
+internal const val LOW_ALPHA = 0.2f
+internal const val SUBTLE_ALPHA = 0.3f
+internal const val MEDIUM_ALPHA = 0.4f
+internal const val HALF_ALPHA = 0.5f
+internal const val MODERATE_ALPHA = 0.6f
+internal const val HIGH_ALPHA = 0.8f
 
 // Font size scaling factors
-private const val FONT_SIZE_SMALL = 10f
-private const val FONT_SIZE_MEDIUM = 14f
-private const val FONT_SIZE_LARGE = 16f
-private const val FONT_SIZE_TITLE = 24f
-private const val FONT_SIZE_DISPLAY = 48f
-private const val FONT_SIZE_HERO = 56f
-private const val FONT_SIZE_HUGE = 60f
-private const val BASE_CARD_WIDTH = 80f
+internal const val FONT_SIZE_SMALL = 10f
+internal const val FONT_SIZE_MEDIUM = 14f
+internal const val FONT_SIZE_LARGE = 16f
+internal const val FONT_SIZE_TITLE = 24f
+internal const val FONT_SIZE_DISPLAY = 48f
+internal const val FONT_SIZE_HERO = 56f
+internal const val FONT_SIZE_HUGE = 60f
+internal const val BASE_CARD_WIDTH = 80f
 
 // Size ratios and scaling
 private const val CARD_ASPECT_RATIO = 0.75f
@@ -151,10 +141,11 @@ fun PlayingCard(
     val suitColor = calculateSuitColor(suit, settings.areSuitsMultiColored)
     val matchedGlowAlpha by animateFloatAsState(
         targetValue = if (isRecentlyMatched) SUBTLE_ALPHA else 0f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(GLOW_ANIMATION_DURATION_MS),
-            repeatMode = RepeatMode.Reverse,
-        ),
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(GLOW_ANIMATION_DURATION_MS),
+                repeatMode = RepeatMode.Reverse,
+            ),
         label = "matchedGlow",
     )
 
@@ -198,46 +189,47 @@ private fun CardContainer(
     content: @Composable () -> Unit,
 ) {
     Box(
-        modifier = modifier
-            .widthIn(min = 60.dp)
-            .aspectRatio(CARD_ASPECT_RATIO)
-            .graphicsLayer {
-                rotationY = rotation
-                scaleX = scale
-                scaleY = scale
-                cameraDistance = CAMERA_DISTANCE_MULTIPLIER * density
-            }
-            .shadow(
-                elevation = if (isRecentlyMatched) {
-                    10.dp
-                } else if (isMatched) {
-                    2.dp
-                } else {
-                    6.dp
+        modifier =
+            modifier
+                .widthIn(min = 60.dp)
+                .aspectRatio(CARD_ASPECT_RATIO)
+                .graphicsLayer {
+                    rotationY = rotation
+                    scaleX = scale
+                    scaleY = scale
+                    cameraDistance = CAMERA_DISTANCE_MULTIPLIER * density
+                }.shadow(
+                    elevation =
+                        if (isRecentlyMatched) {
+                            10.dp
+                        } else if (isMatched) {
+                            2.dp
+                        } else {
+                            6.dp
+                        },
+                    shape = RoundedCornerShape(12.dp),
+                    clip = false,
+                    ambientColor = if (isRecentlyMatched) NeonCyan else Color.Black,
+                    spotColor = if (isRecentlyMatched) NeonCyan else Color.Black,
+                ).drawBehind {
+                    if (isRecentlyMatched) {
+                        drawCircle(
+                            color = NeonCyan.copy(alpha = matchedGlowAlpha),
+                            radius = size.maxDimension * GLOW_SIZE_MULTIPLIER,
+                            center = center,
+                        )
+                    }
                 },
-                shape = RoundedCornerShape(12.dp),
-                clip = false,
-                ambientColor = if (isRecentlyMatched) NeonCyan else Color.Black,
-                spotColor = if (isRecentlyMatched) NeonCyan else Color.Black,
-            )
-            .drawBehind {
-                if (isRecentlyMatched) {
-                    drawCircle(
-                        color = NeonCyan.copy(alpha = matchedGlowAlpha),
-                        radius = size.maxDimension * GLOW_SIZE_MULTIPLIER,
-                        center = center,
-                    )
-                }
-            },
     ) {
         Card(
             onClick = onClick,
             interactionSource = interactionSource,
             modifier = Modifier.fillMaxSize(),
             shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = if (rotation <= HALF_ROTATION) Color.White else backColor,
-            ),
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = if (rotation <= HALF_ROTATION) Color.White else backColor,
+                ),
             border = getCardBorder(rotation, isRecentlyMatched, isMatched, isError),
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
@@ -253,43 +245,52 @@ private fun getCardBorder(
     isRecentlyMatched: Boolean,
     isMatched: Boolean,
     isError: Boolean,
-): BorderStroke = if (rotation <= HALF_ROTATION) {
-    when {
-        isRecentlyMatched -> BorderStroke(2.dp, NeonCyan)
-        isMatched -> BorderStroke(1.dp, NeonCyan.copy(alpha = MEDIUM_ALPHA))
-        isError -> BorderStroke(3.dp, MaterialTheme.colorScheme.error)
-        else -> BorderStroke(1.dp, Color.LightGray.copy(alpha = HALF_ALPHA))
+): BorderStroke =
+    if (rotation <= HALF_ROTATION) {
+        when {
+            isRecentlyMatched -> BorderStroke(2.dp, NeonCyan)
+            isMatched -> BorderStroke(1.dp, NeonCyan.copy(alpha = MEDIUM_ALPHA))
+            isError -> BorderStroke(3.dp, MaterialTheme.colorScheme.error)
+            else -> BorderStroke(1.dp, Color.LightGray.copy(alpha = HALF_ALPHA))
+        }
+    } else {
+        val rimLightAlpha = (1f - (abs(rotation - HALF_ROTATION) / HALF_ROTATION)).coerceIn(0f, 1f)
+        val rimLightColor = Color.White.copy(alpha = rimLightAlpha * HIGH_ALPHA)
+        BorderStroke(
+            width = (2.dp + (rimLightAlpha * BORDER_SIZE_MULTIPLIER).dp),
+            color = if (rimLightAlpha > RIM_LIGHT_THRESHOLD) rimLightColor else Color.White.copy(alpha = SUBTLE_ALPHA),
+        )
     }
-} else {
-    val rimLightAlpha = (1f - (abs(rotation - HALF_ROTATION) / HALF_ROTATION)).coerceIn(0f, 1f)
-    val rimLightColor = Color.White.copy(alpha = rimLightAlpha * HIGH_ALPHA)
-    BorderStroke(
-        width = (2.dp + (rimLightAlpha * BORDER_SIZE_MULTIPLIER).dp),
-        color = if (rimLightAlpha > RIM_LIGHT_THRESHOLD) rimLightColor else Color.White.copy(alpha = SUBTLE_ALPHA),
-    )
-}
 
-private fun calculateSuitColor(suit: Suit, areSuitsMultiColored: Boolean): Color = if (areSuitsMultiColored) {
-    when (suit) {
-        Suit.Hearts -> HeartRed
-        Suit.Diamonds -> DiamondBlue
-        Suit.Clubs -> ClubGreen
-        Suit.Spades -> SpadeBlack
+private fun calculateSuitColor(
+    suit: Suit,
+    areSuitsMultiColored: Boolean,
+): Color =
+    if (areSuitsMultiColored) {
+        when (suit) {
+            Suit.Hearts -> HeartRed
+            Suit.Diamonds -> DiamondBlue
+            Suit.Clubs -> ClubGreen
+            Suit.Spades -> SpadeBlack
+        }
+    } else {
+        if (suit.isRed) HeartRed else SpadeBlack
     }
-} else {
-    if (suit.isRed) HeartRed else SpadeBlack
-}
 
 @Composable
-private fun CardBack(theme: CardBackTheme, backColor: Color, rotation: Float) {
+private fun CardBack(
+    theme: CardBackTheme,
+    backColor: Color,
+    rotation: Float,
+) {
     val rimLightAlpha = (1f - (abs(rotation - HALF_ROTATION) / HALF_ROTATION)).coerceIn(0f, 1f)
     val rimLightColor = Color.White.copy(alpha = rimLightAlpha * HIGH_ALPHA)
 
     Box(
         modifier =
-        Modifier
-            .fillMaxSize()
-            .graphicsLayer { rotationY = FULL_ROTATION },
+            Modifier
+                .fillMaxSize()
+                .graphicsLayer { rotationY = FULL_ROTATION },
     ) {
         when (theme) {
             CardBackTheme.GEOMETRIC -> GeometricCardBack(backColor)
@@ -301,152 +302,19 @@ private fun CardBack(theme: CardBackTheme, backColor: Color, rotation: Float) {
         if (rimLightAlpha > 0f) {
             Box(
                 modifier =
-                Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.horizontalGradient(
-                            colors =
-                            listOf(
-                                Color.Transparent,
-                                rimLightColor,
-                                Color.Transparent,
+                    Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.horizontalGradient(
+                                colors =
+                                    listOf(
+                                        Color.Transparent,
+                                        rimLightColor,
+                                        Color.Transparent,
+                                    ),
                             ),
                         ),
-                    ),
             )
-        }
-    }
-}
-
-@Composable
-private fun CardFace(rank: Rank, suit: Suit, suitColor: Color, theme: CardSymbolTheme) {
-    val density = LocalDensity.current
-    BoxWithConstraints(modifier = Modifier.fillMaxSize().padding(6.dp)) {
-        // Base scaling on the card width (maxWidth is a Dp value)
-        val baseSize = maxWidth
-        val fontScale = density.fontScale
-
-        // Helper to get size that ignores system font scaling
-        fun getFontSize(size: Float) = (size * (baseSize.value / BASE_CARD_WIDTH) / fontScale).sp
-
-        when (theme) {
-            CardSymbolTheme.CLASSIC -> {
-                // Top Left
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = rank.symbol,
-                        color = suitColor,
-                        style =
-                        MaterialTheme.typography.labelLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = getFontSize(FONT_SIZE_MEDIUM),
-                        ),
-                    )
-                    Text(
-                        text = suit.symbol,
-                        color = suitColor,
-                        style = MaterialTheme.typography.labelSmall.copy(fontSize = getFontSize(FONT_SIZE_SMALL)),
-                    )
-                }
-
-                // Center Suit
-                Text(
-                    text = suit.symbol,
-                    color = suitColor.copy(alpha = VERY_LOW_ALPHA),
-                    style = MaterialTheme.typography.displayLarge.copy(fontSize = getFontSize(FONT_SIZE_HUGE)),
-                    modifier = Modifier.align(Alignment.Center),
-                )
-
-                Text(
-                    text = rank.symbol,
-                    color = suitColor,
-                    style =
-                    MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = getFontSize(FONT_SIZE_TITLE),
-                    ),
-                    modifier = Modifier.align(Alignment.Center),
-                )
-
-                // Bottom Right
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.align(Alignment.BottomEnd).graphicsLayer { rotationZ = FULL_ROTATION },
-                ) {
-                    Text(
-                        text = rank.symbol,
-                        color = suitColor,
-                        style =
-                        MaterialTheme.typography.labelLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = getFontSize(FONT_SIZE_MEDIUM),
-                        ),
-                    )
-                    Text(
-                        text = suit.symbol,
-                        color = suitColor,
-                        style = MaterialTheme.typography.labelSmall.copy(fontSize = getFontSize(FONT_SIZE_SMALL)),
-                    )
-                }
-            }
-
-            CardSymbolTheme.MINIMAL -> {
-                // Large Rank in Center
-                Text(
-                    text = rank.symbol,
-                    color = suitColor,
-                    style =
-                    MaterialTheme.typography.displayLarge.copy(
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = getFontSize(FONT_SIZE_DISPLAY),
-                    ),
-                    modifier = Modifier.align(Alignment.Center),
-                )
-
-                // Small Suit in Corners
-                Text(
-                    text = suit.symbol,
-                    color = suitColor.copy(alpha = MODERATE_ALPHA),
-                    style = MaterialTheme.typography.titleMedium.copy(fontSize = getFontSize(FONT_SIZE_LARGE)),
-                    modifier = Modifier.align(Alignment.TopStart).padding(4.dp),
-                )
-
-                Text(
-                    text = suit.symbol,
-                    color = suitColor.copy(alpha = MODERATE_ALPHA),
-                    style = MaterialTheme.typography.titleMedium.copy(fontSize = getFontSize(FONT_SIZE_LARGE)),
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(4.dp)
-                        .graphicsLayer { rotationZ = FULL_ROTATION },
-                )
-            }
-
-            CardSymbolTheme.TEXT_ONLY -> {
-                // Just the rank, no suit symbols
-                Text(
-                    text = rank.symbol,
-                    color = suitColor,
-                    style =
-                    MaterialTheme.typography.displayLarge.copy(
-                        fontWeight = FontWeight.Black,
-                        fontSize = getFontSize(FONT_SIZE_HERO),
-                    ),
-                    modifier = Modifier.align(Alignment.Center),
-                )
-
-                // Suit name instead of symbol at bottom
-                Text(
-                    text = suit.name.lowercase().replaceFirstChar { it.uppercase() },
-                    color = suitColor.copy(alpha = HALF_ALPHA),
-                    style =
-                    MaterialTheme.typography.labelSmall.copy(
-                        fontSize = getFontSize(FONT_SIZE_SMALL),
-                        fontWeight = FontWeight.Medium,
-                    ),
-                    modifier = Modifier.align(Alignment.BottomCenter),
-                )
-            }
         }
     }
 }
@@ -458,29 +326,29 @@ fun ShimmerEffect() {
         initialValue = 0f,
         targetValue = SHIMMER_TRANSLATE_TARGET,
         animationSpec =
-        infiniteRepeatable(
-            animation = tween(SHIMMER_ANIMATION_DURATION_MS, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
-        ),
+            infiniteRepeatable(
+                animation = tween(SHIMMER_ANIMATION_DURATION_MS, easing = LinearEasing),
+                repeatMode = RepeatMode.Restart,
+            ),
     )
 
     val brush =
         Brush.linearGradient(
             colors =
-            listOf(
-                Color.White.copy(alpha = 0.0f),
-                NeonCyan.copy(alpha = MEDIUM_ALPHA),
-                Color.White.copy(alpha = 0.0f),
-            ),
+                listOf(
+                    Color.White.copy(alpha = 0.0f),
+                    NeonCyan.copy(alpha = MEDIUM_ALPHA),
+                    Color.White.copy(alpha = 0.0f),
+                ),
             start = Offset(translateAnim - SHIMMER_OFFSET, translateAnim - SHIMMER_OFFSET),
             end = Offset(translateAnim, translateAnim),
         )
 
     Box(
         modifier =
-        Modifier
-            .fillMaxSize()
-            .background(brush),
+            Modifier
+                .fillMaxSize()
+                .background(brush),
     )
 }
 
@@ -498,8 +366,8 @@ private fun GeometricCardBack(baseColor: Color) {
                         color = patternColor,
                         topLeft = Offset(x.toFloat(), y.toFloat()),
                         size =
-                        androidx.compose.ui.geometry
-                            .Size(step / HALF_DIVISOR, step / HALF_DIVISOR),
+                            androidx.compose.ui.geometry
+                                .Size(step / HALF_DIVISOR, step / HALF_DIVISOR),
                         style = Stroke(width = 1.dp.toPx()),
                     )
                 }
@@ -511,11 +379,11 @@ private fun GeometricCardBack(baseColor: Color) {
             color = Color.White.copy(alpha = SUBTLE_ALPHA),
             topLeft = Offset(8.dp.toPx(), 8.dp.toPx()),
             size =
-            androidx.compose.ui.geometry
-                .Size(size.width - 16.dp.toPx(), size.height - 16.dp.toPx()),
+                androidx.compose.ui.geometry
+                    .Size(size.width - 16.dp.toPx(), size.height - 16.dp.toPx()),
             cornerRadius =
-            androidx.compose.ui.geometry
-                .CornerRadius(8.dp.toPx()),
+                androidx.compose.ui.geometry
+                    .CornerRadius(8.dp.toPx()),
             style = Stroke(width = 1.dp.toPx()),
         )
     }
@@ -546,11 +414,11 @@ private fun ClassicCardBack(baseColor: Color) {
             color = Color.White,
             topLeft = Offset(4.dp.toPx(), 4.dp.toPx()),
             size =
-            androidx.compose.ui.geometry
-                .Size(size.width - 8.dp.toPx(), size.height - 8.dp.toPx()),
+                androidx.compose.ui.geometry
+                    .Size(size.width - 8.dp.toPx(), size.height - 8.dp.toPx()),
             cornerRadius =
-            androidx.compose.ui.geometry
-                .CornerRadius(6.dp.toPx()),
+                androidx.compose.ui.geometry
+                    .CornerRadius(6.dp.toPx()),
             style = Stroke(width = 3.dp.toPx()),
         )
     }
@@ -589,11 +457,11 @@ private fun PatternCardBack(baseColor: Color) {
             color = Color.White.copy(alpha = MEDIUM_ALPHA),
             topLeft = Offset(6.dp.toPx(), 6.dp.toPx()),
             size =
-            androidx.compose.ui.geometry
-                .Size(size.width - 12.dp.toPx(), size.height - 12.dp.toPx()),
+                androidx.compose.ui.geometry
+                    .Size(size.width - 12.dp.toPx(), size.height - 12.dp.toPx()),
             cornerRadius =
-            androidx.compose.ui.geometry
-                .CornerRadius(6.dp.toPx()),
+                androidx.compose.ui.geometry
+                    .CornerRadius(6.dp.toPx()),
             style = Stroke(width = 1.5.dp.toPx()),
         )
     }
