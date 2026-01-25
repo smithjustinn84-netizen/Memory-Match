@@ -10,6 +10,27 @@ plugins {
     alias(libs.plugins.room).apply(false)
     alias(libs.plugins.ksp).apply(false)
     alias(libs.plugins.spotless)
+    alias(libs.plugins.detekt)
+}
+
+detekt {
+    toolVersion = libs.versions.detekt.get()
+    
+    // Configure source directories for KMP
+    source.setFrom(
+        files(
+            "sharedUI/src/commonMain/kotlin",
+            "sharedUI/src/androidMain/kotlin",
+            "sharedUI/src/iosMain/kotlin",
+            "androidApp/src/main/kotlin",
+            "desktopApp/src/main/kotlin"
+        )
+    )
+    
+    config.setFrom("config/detekt/detekt.yml")
+    baseline.set(file("config/detekt/baseline.xml"))
+    buildUponDefaultConfig = true
+    parallel = true
 }
 
 subprojects {

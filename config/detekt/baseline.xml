@@ -1,0 +1,537 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ComplexCondition:DefaultGameComponent.kt:DefaultGameComponent$savedGame != null &amp;&amp; savedGame.first.pairCount == pairCount &amp;&amp; !savedGame.first.isGameOver &amp;&amp; savedGame.first.mode == mode</ID>
+    <ID>CyclomaticComplexMethod:GameContent.kt:@OptIn(ExperimentalMaterial3Api::class) @Composable fun GameContent(component: GameComponent, modifier: Modifier = Modifier)</ID>
+    <ID>CyclomaticComplexMethod:GameGrid.kt:@Composable fun GameGrid( cards: ImmutableList&lt;CardState&gt;, onCardClick: (Int) -&gt; Unit, isPeeking: Boolean = false, lastMatchedIds: ImmutableList&lt;Int&gt; = persistentListOf(), showComboExplosion: Boolean = false, cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC, cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC, areSuitsMultiColored: Boolean = false, )</ID>
+    <ID>CyclomaticComplexMethod:PlayingCard.kt:@Composable fun PlayingCard( suit: Suit, rank: Rank, isFaceUp: Boolean, isMatched: Boolean = false, isRecentlyMatched: Boolean = false, isError: Boolean = false, modifier: Modifier = Modifier, backColor: Color = StartBackgroundTop, cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC, cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC, areSuitsMultiColored: Boolean = false, onClick: () -&gt; Unit = {}, )</ID>
+    <ID>CyclomaticComplexMethod:TimerDisplay.kt:@Composable fun TimerDisplay( time: Long, isLowTime: Boolean, isCriticalTime: Boolean, showTimeGain: Boolean, timeGainAmount: Int, showTimeLoss: Boolean, timeLossAmount: Long, isMegaBonus: Boolean, infiniteTransition: InfiniteTransition, modifier: Modifier = Modifier, compact: Boolean = false, minimal: Boolean = false, )</ID>
+    <ID>FunctionNaming:AdaptiveDensity.kt:@Composable fun AdaptiveDensity(maxFontScale: Float = 1.15f, content: @Composable () -&gt; Unit)</ID>
+    <ID>FunctionNaming:App.kt:@OptIn(ExperimentalDecomposeApi::class) @Composable fun App(root: RootComponent, appGraph: AppGraph, onThemeChanged: @Composable (isDark: Boolean) -&gt; Unit = {})</ID>
+    <ID>FunctionNaming:AppActivity.kt:@Composable private fun ApplySystemBarTheme(isDark: Boolean)</ID>
+    <ID>FunctionNaming:BouncingCardsOverlay.kt:@Composable fun BouncingCardsOverlay( cards: List&lt;CardState&gt;, modifier: Modifier = Modifier, cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC, cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC, areSuitsMultiColored: Boolean = false, )</ID>
+    <ID>FunctionNaming:CardPreview.kt:@Composable fun AnimatedStar(modifier: Modifier = Modifier, delayMillis: Int = 0)</ID>
+    <ID>FunctionNaming:CardPreview.kt:@Composable fun CardPreview( modifier: Modifier = Modifier, cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC, cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC, )</ID>
+    <ID>FunctionNaming:CardPreviews.kt:@Preview(showBackground = true) @Composable fun PlayingCardFaceDownPreview()</ID>
+    <ID>FunctionNaming:CardPreviews.kt:@Preview(showBackground = true) @Composable fun PlayingCardFaceUpPreview()</ID>
+    <ID>FunctionNaming:ComboBadge.kt:@Composable fun ComboBadge( combo: Int, isMegaBonus: Boolean, isHeatMode: Boolean, infiniteTransition: InfiniteTransition, modifier: Modifier = Modifier, compact: Boolean = false, )</ID>
+    <ID>FunctionNaming:ConfettiEffect.kt:@Composable fun ConfettiEffect( modifier: Modifier = Modifier, particleCount: Int = 100, colors: List&lt;Color&gt; = listOf( ConfettiPink, ConfettiPurple, ConfettiBlue, BonusGreen, ConfettiYellow, ConfettiOrange, ), )</ID>
+    <ID>FunctionNaming:DifficultySelectionSection.kt:@Composable fun DifficultySelectionSection( state: DifficultyState, onDifficultySelected: (DifficultyLevel) -&gt; Unit, onModeSelected: (GameMode) -&gt; Unit, onStartGame: () -&gt; Unit, onResumeGame: () -&gt; Unit, onSettingsClick: () -&gt; Unit, onStatsClick: () -&gt; Unit, onDailyChallengeClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:DifficultySelectionSection.kt:@Composable fun NeonStyleButton( text: String, onClick: () -&gt; Unit, modifier: Modifier = Modifier, isPrimary: Boolean = true, leadingIcon: androidx.compose.ui.graphics.vector.ImageVector? = null, trailingIcon: androidx.compose.ui.graphics.vector.ImageVector? = null, )</ID>
+    <ID>FunctionNaming:ExplosionEffect.kt:@Composable fun ExplosionEffect( modifier: Modifier = Modifier, particleCount: Int = 30, colors: List&lt;Color&gt; = listOf(Color.Yellow, Color.Red, Color.Cyan, Color.Magenta, Color.White), centerOverride: Offset? = null, )</ID>
+    <ID>FunctionNaming:GameContent.kt:@OptIn(ExperimentalMaterial3Api::class) @Composable fun GameContent(component: GameComponent, modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:GameGrid.kt:@Composable fun GameGrid( cards: ImmutableList&lt;CardState&gt;, onCardClick: (Int) -&gt; Unit, isPeeking: Boolean = false, lastMatchedIds: ImmutableList&lt;Int&gt; = persistentListOf(), showComboExplosion: Boolean = false, cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC, cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC, areSuitsMultiColored: Boolean = false, )</ID>
+    <ID>FunctionNaming:GameSnackbars.kt:@Composable fun MatchCommentSnackbar(matchComment: MatchComment?, modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:GameSnackbars.kt:@Composable fun NewHighScoreSnackbar(modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:GameTopBar.kt:@Composable fun GameTopBar( time: Long, onBackClick: () -&gt; Unit, onRestartClick: () -&gt; Unit, modifier: Modifier = Modifier, mode: GameMode = GameMode.STANDARD, maxTime: Long = 0, showTimeGain: Boolean = false, timeGainAmount: Int = 0, showTimeLoss: Boolean = false, timeLossAmount: Long = 0, isMegaBonus: Boolean = false, compact: Boolean = false, isAudioEnabled: Boolean = true, onMuteClick: () -&gt; Unit = {}, )</ID>
+    <ID>FunctionNaming:GameTopBar.kt:@Composable private fun BackButton(onClick: () -&gt; Unit, modifier: Modifier = Modifier, compact: Boolean = false)</ID>
+    <ID>FunctionNaming:GameTopBar.kt:@Composable private fun MuteButton( isAudioEnabled: Boolean, onClick: () -&gt; Unit, modifier: Modifier = Modifier, compact: Boolean = false, )</ID>
+    <ID>FunctionNaming:GameTopBar.kt:@Composable private fun RestartButton(onClick: () -&gt; Unit, modifier: Modifier = Modifier, compact: Boolean = false)</ID>
+    <ID>FunctionNaming:GameTopBar.kt:@Composable private fun TimeProgressBar( time: Long, maxTime: Long, isLowTime: Boolean, modifier: Modifier = Modifier, compact: Boolean = false, )</ID>
+    <ID>FunctionNaming:LeaderboardSection.kt:@Composable fun LeaderboardSection( level: DifficultyLevel, entries: ImmutableList&lt;LeaderboardEntry&gt;, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:LeaderboardSection.kt:@Composable private fun LeaderboardRow(rank: Int, entry: LeaderboardEntry)</ID>
+    <ID>FunctionNaming:LeaderboardSection.kt:@Composable private fun StatMiniItem(label: String, value: String)</ID>
+    <ID>FunctionNaming:ModeSelector.kt:@Composable fun ModeSelector(selectedMode: GameMode, onModeSelected: (GameMode) -&gt; Unit, modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:NeonSegmentedControl.kt:@Composable fun &lt;T&gt; NeonSegmentedControl( items: List&lt;T&gt;, selectedItem: T, onItemSelected: (T) -&gt; Unit, labelProvider: @Composable (T) -&gt; String, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:PeekCountdownOverlay.kt:@Composable fun PeekCountdownOverlay(countdown: Int, modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:PlayingCard.kt:@Composable fun PlayingCard( suit: Suit, rank: Rank, isFaceUp: Boolean, isMatched: Boolean = false, isRecentlyMatched: Boolean = false, isError: Boolean = false, modifier: Modifier = Modifier, backColor: Color = StartBackgroundTop, cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC, cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC, areSuitsMultiColored: Boolean = false, onClick: () -&gt; Unit = {}, )</ID>
+    <ID>FunctionNaming:PlayingCard.kt:@Composable fun ShimmerEffect()</ID>
+    <ID>FunctionNaming:PlayingCard.kt:@Composable private fun CardFace(rank: Rank, suit: Suit, suitColor: Color, theme: CardSymbolTheme)</ID>
+    <ID>FunctionNaming:PlayingCard.kt:@Composable private fun ClassicCardBack(baseColor: Color)</ID>
+    <ID>FunctionNaming:PlayingCard.kt:@Composable private fun GeometricCardBack(baseColor: Color)</ID>
+    <ID>FunctionNaming:PlayingCard.kt:@Composable private fun PatternCardBack(baseColor: Color)</ID>
+    <ID>FunctionNaming:ResultsCard.kt:@Composable fun ResultsCard( isWon: Boolean, score: Int, moves: Int, elapsedTimeSeconds: Long, scoreBreakdown: ScoreBreakdown, onPlayAgain: () -&gt; Unit, onShareReplay: () -&gt; Unit = {}, modifier: Modifier = Modifier, mode: GameMode = GameMode.STANDARD, onScoreTick: () -&gt; Unit = {}, )</ID>
+    <ID>FunctionNaming:ScoreBox.kt:@Composable fun ScoreBox( score: Int, elapsedTimeSeconds: Long, moves: Int, modifier: Modifier = Modifier, compact: Boolean = false, )</ID>
+    <ID>FunctionNaming:ScoreBox.kt:@Composable private fun StatItem(label: String, color: Color, modifier: Modifier = Modifier, compact: Boolean = false)</ID>
+    <ID>FunctionNaming:ScoreBreakdownSection.kt:@Composable fun ScoreBreakdownSection(scoreBreakdown: ScoreBreakdown, modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:ScoreBreakdownSection.kt:@Composable private fun BreakdownRow(label: String, value: String, color: Color, modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:SettingsContent.kt:@Composable private fun &lt;T&gt; ThemeSelector( title: String, options: List&lt;T&gt;, selected: T, onSelect: (T) -&gt; Unit, labelProvider: @Composable (T) -&gt; String, )</ID>
+    <ID>FunctionNaming:SettingsContent.kt:@Composable private fun SettingsCard(title: String? = null, content: @Composable ColumnScope.() -&gt; Unit)</ID>
+    <ID>FunctionNaming:SettingsContent.kt:@Composable private fun SettingsToggle( title: String, description: String, checked: Boolean, onCheckedChange: (Boolean) -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:SettingsContent.kt:@Composable private fun VolumeSlider(value: Float, onValueChange: (Float) -&gt; Unit, modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:SettingsContent.kt:@OptIn(ExperimentalMaterial3Api::class) @Composable fun SettingsContent(component: SettingsComponent, modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:StartContent.kt:@Composable fun StartContent(component: StartComponent, modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:StartHeader.kt:@Composable fun StartHeader( modifier: Modifier = Modifier, cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC, cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC, )</ID>
+    <ID>FunctionNaming:StatsContent.kt:@OptIn(ExperimentalMaterial3Api::class) @Composable fun StatsContent(component: StatsComponent, modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:Theme.kt:@Composable fun AppTheme(onThemeChanged: @Composable (isDark: Boolean) -&gt; Unit = {}, content: @Composable () -&gt; Unit)</ID>
+    <ID>FunctionNaming:TimerDisplay.kt:@Composable fun TimerDisplay( time: Long, isLowTime: Boolean, isCriticalTime: Boolean, showTimeGain: Boolean, timeGainAmount: Int, showTimeLoss: Boolean, timeLossAmount: Long, isMegaBonus: Boolean, infiniteTransition: InfiniteTransition, modifier: Modifier = Modifier, compact: Boolean = false, minimal: Boolean = false, )</ID>
+    <ID>FunctionNaming:WalkthroughOverlay.kt:@Composable fun WalkthroughOverlay(step: Int, onNext: () -&gt; Unit, onDismiss: () -&gt; Unit, modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:main.kt:@Composable private fun ApplySystemBarTheme(isDark: Boolean)</ID>
+    <ID>FunctionNaming:main.kt:fun MainViewController(): UIViewController</ID>
+    <ID>LongMethod:BouncingCardsOverlay.kt:@Composable fun BouncingCardsOverlay( cards: List&lt;CardState&gt;, modifier: Modifier = Modifier, cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC, cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC, areSuitsMultiColored: Boolean = false, )</ID>
+    <ID>LongMethod:CardPreview.kt:@Composable fun AnimatedStar(modifier: Modifier = Modifier, delayMillis: Int = 0)</ID>
+    <ID>LongMethod:CardPreview.kt:@Composable fun CardPreview( modifier: Modifier = Modifier, cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC, cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC, )</ID>
+    <ID>LongMethod:DefaultGameComponent.kt:DefaultGameComponent$private fun startGame(pairCount: Int, forceNewGame: Boolean, mode: GameMode, seed: Long?)</ID>
+    <ID>LongMethod:DifficultySelectionSection.kt:@Composable fun DifficultySelectionSection( state: DifficultyState, onDifficultySelected: (DifficultyLevel) -&gt; Unit, onModeSelected: (GameMode) -&gt; Unit, onStartGame: () -&gt; Unit, onResumeGame: () -&gt; Unit, onSettingsClick: () -&gt; Unit, onStatsClick: () -&gt; Unit, onDailyChallengeClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>LongMethod:DifficultySelectionSection.kt:@Composable fun NeonStyleButton( text: String, onClick: () -&gt; Unit, modifier: Modifier = Modifier, isPrimary: Boolean = true, leadingIcon: androidx.compose.ui.graphics.vector.ImageVector? = null, trailingIcon: androidx.compose.ui.graphics.vector.ImageVector? = null, )</ID>
+    <ID>LongMethod:GameContent.kt:@OptIn(ExperimentalMaterial3Api::class) @Composable fun GameContent(component: GameComponent, modifier: Modifier = Modifier)</ID>
+    <ID>LongMethod:GameGrid.kt:@Composable fun GameGrid( cards: ImmutableList&lt;CardState&gt;, onCardClick: (Int) -&gt; Unit, isPeeking: Boolean = false, lastMatchedIds: ImmutableList&lt;Int&gt; = persistentListOf(), showComboExplosion: Boolean = false, cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC, cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC, areSuitsMultiColored: Boolean = false, )</ID>
+    <ID>LongMethod:GameSnackbars.kt:@Composable fun MatchCommentSnackbar(matchComment: MatchComment?, modifier: Modifier = Modifier)</ID>
+    <ID>LongMethod:LeaderboardSection.kt:@Composable fun LeaderboardSection( level: DifficultyLevel, entries: ImmutableList&lt;LeaderboardEntry&gt;, modifier: Modifier = Modifier, )</ID>
+    <ID>LongMethod:LeaderboardSection.kt:@Composable private fun LeaderboardRow(rank: Int, entry: LeaderboardEntry)</ID>
+    <ID>LongMethod:NeonSegmentedControl.kt:@Composable fun &lt;T&gt; NeonSegmentedControl( items: List&lt;T&gt;, selectedItem: T, onItemSelected: (T) -&gt; Unit, labelProvider: @Composable (T) -&gt; String, modifier: Modifier = Modifier, )</ID>
+    <ID>LongMethod:PlayingCard.kt:@Composable fun PlayingCard( suit: Suit, rank: Rank, isFaceUp: Boolean, isMatched: Boolean = false, isRecentlyMatched: Boolean = false, isError: Boolean = false, modifier: Modifier = Modifier, backColor: Color = StartBackgroundTop, cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC, cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC, areSuitsMultiColored: Boolean = false, onClick: () -&gt; Unit = {}, )</ID>
+    <ID>LongMethod:PlayingCard.kt:@Composable private fun CardFace(rank: Rank, suit: Suit, suitColor: Color, theme: CardSymbolTheme)</ID>
+    <ID>LongMethod:ResultsCard.kt:@Composable fun ResultsCard( isWon: Boolean, score: Int, moves: Int, elapsedTimeSeconds: Long, scoreBreakdown: ScoreBreakdown, onPlayAgain: () -&gt; Unit, onShareReplay: () -&gt; Unit = {}, modifier: Modifier = Modifier, mode: GameMode = GameMode.STANDARD, onScoreTick: () -&gt; Unit = {}, )</ID>
+    <ID>LongMethod:SettingsContent.kt:@OptIn(ExperimentalMaterial3Api::class) @Composable fun SettingsContent(component: SettingsComponent, modifier: Modifier = Modifier)</ID>
+    <ID>LongMethod:StartContent.kt:@Composable fun StartContent(component: StartComponent, modifier: Modifier = Modifier)</ID>
+    <ID>LongMethod:StatsContent.kt:@OptIn(ExperimentalMaterial3Api::class) @Composable fun StatsContent(component: StatsComponent, modifier: Modifier = Modifier)</ID>
+    <ID>LongMethod:TimerDisplay.kt:@Composable fun TimerDisplay( time: Long, isLowTime: Boolean, isCriticalTime: Boolean, showTimeGain: Boolean, timeGainAmount: Int, showTimeLoss: Boolean, timeLossAmount: Long, isMegaBonus: Boolean, infiniteTransition: InfiniteTransition, modifier: Modifier = Modifier, compact: Boolean = false, minimal: Boolean = false, )</ID>
+    <ID>LongMethod:WalkthroughOverlay.kt:@Composable fun WalkthroughOverlay(step: Int, onNext: () -&gt; Unit, onDismiss: () -&gt; Unit, modifier: Modifier = Modifier)</ID>
+    <ID>MagicNumber:AndroidAudioServiceImpl.kt:AndroidAudioServiceImpl$10</ID>
+    <ID>MagicNumber:AndroidHapticsServiceImpl.kt:AndroidHapticsServiceImpl$10</ID>
+    <ID>MagicNumber:AndroidHapticsServiceImpl.kt:AndroidHapticsServiceImpl$100</ID>
+    <ID>MagicNumber:AndroidHapticsServiceImpl.kt:AndroidHapticsServiceImpl$150</ID>
+    <ID>MagicNumber:AndroidHapticsServiceImpl.kt:AndroidHapticsServiceImpl$200</ID>
+    <ID>MagicNumber:AndroidHapticsServiceImpl.kt:AndroidHapticsServiceImpl$255</ID>
+    <ID>MagicNumber:AndroidHapticsServiceImpl.kt:AndroidHapticsServiceImpl$50</ID>
+    <ID>MagicNumber:AppDatabase.kt:AppDatabase.Companion.&lt;no name provided&gt;$3</ID>
+    <ID>MagicNumber:AppDatabase.kt:AppDatabase.Companion.&lt;no name provided&gt;$4</ID>
+    <ID>MagicNumber:AppDatabase.kt:AppDatabase.Companion.&lt;no name provided&gt;$5</ID>
+    <ID>MagicNumber:AppDatabase.kt:AppDatabase.Companion.&lt;no name provided&gt;$6</ID>
+    <ID>MagicNumber:AppDatabase.kt:AppDatabase.Companion.&lt;no name provided&gt;$7</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.02f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.03f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.04f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.05f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.06f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.07f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.08f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.09f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.12f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.14f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.17f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.18f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.21f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.22f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.23f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.24f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.29f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.2f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.31f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.32f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.36f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.37f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.38f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.3f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.41f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.43f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.44f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.46f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.47f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.48f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.52f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.54f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.56f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.57f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.59f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.5f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.61f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.62f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.63f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.64f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.65f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.67f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.69f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.73f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.76f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.77f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.79f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.7f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.81f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.82f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.86f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.89f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.91f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.93f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.94f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.95f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.96f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$0.9f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.02f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.03f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.13f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.18f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.1f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.25f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.31f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.34f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.38f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.42f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.44f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.48f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.51f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.57f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.58f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.5f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.61f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.62f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.66f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.77f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.78f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.81f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.82f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.92f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.93f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$1.96f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$10.0f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$10.55f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$10.86f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$11.0f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$11.66f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$12.0f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$12.7f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$12.94f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$12f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$13.0f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$13.41f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$13.42f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$13.5f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$14.0f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$14.21f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$14.91f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$15.0f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$15.5f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$16.08f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$16.0f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$16.2f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$16.5f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$17.0f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$17.65f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$18.0f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$18.59f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$19.0f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$19.14f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$19.73f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$2.01f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$2.03f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$2.04f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$2.06f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$2.08f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$2.0f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$2.11f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$2.21f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$2.25f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$2.33f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$2.35f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$2.39f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$2.45f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$2.54f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$2.55f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$2.5f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$2.63f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$2.64f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$2.69f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$2.74f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$2.89f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$2.92f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$2.99f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$20.0f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$20.1f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$20.63f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$21.0f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$21.55f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$22.0f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$22.66f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$24.0f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$3.01f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$3.04f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$3.0f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$3.14f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$3.23f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$3.29f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$3.31f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$3.32f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$3.54f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$3.57f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$3.58f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$3.5f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$3.69f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$3.73f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$3.84f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$3.89f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$4.01f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$4.02f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$4.03f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$4.0f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$4.11f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$4.16f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$4.22f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$4.25f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$4.27f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$4.28f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$4.42f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$4.49f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$4.9f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$5.0f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$5.41f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$5.65f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$5.85f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$6.09f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$6.0f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$6.35f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$6.71f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$6.73f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$6.79f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$6.84f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$7.05f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$7.0f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$7.12f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$7.5f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$7.73f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$7.83f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$7.86f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$7.99f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$8.04f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$8.05f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$8.0f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$8.13f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$8.18f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$8.34f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$8.77f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$8.87f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$8.91f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$9.0f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$9.31f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$9.45f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$9.81f</ID>
+    <ID>MagicNumber:AppIcons.kt:AppIcons$9.91f</ID>
+    <ID>MagicNumber:BouncingCardsOverlay.kt:130f</ID>
+    <ID>MagicNumber:BouncingCardsOverlay.kt:180f</ID>
+    <ID>MagicNumber:BouncingCardsOverlay.kt:1_000_000_000f</ID>
+    <ID>MagicNumber:BouncingCardsOverlay.kt:20f</ID>
+    <ID>MagicNumber:BouncingCardsOverlay.kt:24</ID>
+    <ID>MagicNumber:BouncingCardsOverlay.kt:80f</ID>
+    <ID>MagicNumber:BouncingCardsOverlay.kt:CelebrationCard$0.02f</ID>
+    <ID>MagicNumber:BouncingCardsOverlay.kt:CelebrationCard$0.4f</ID>
+    <ID>MagicNumber:BouncingCardsOverlay.kt:CelebrationCard$200f</ID>
+    <ID>MagicNumber:BouncingCardsOverlay.kt:CelebrationCard$5.0f</ID>
+    <ID>MagicNumber:CardPreview.kt:1000</ID>
+    <ID>MagicNumber:CardPreview.kt:10f</ID>
+    <ID>MagicNumber:CardPreview.kt:1200</ID>
+    <ID>MagicNumber:CardPreview.kt:12f</ID>
+    <ID>MagicNumber:CardPreview.kt:1500</ID>
+    <ID>MagicNumber:CardPreview.kt:200</ID>
+    <ID>MagicNumber:CardPreview.kt:2000</ID>
+    <ID>MagicNumber:CardPreview.kt:2500</ID>
+    <ID>MagicNumber:CardPreview.kt:3000</ID>
+    <ID>MagicNumber:CardPreview.kt:500</ID>
+    <ID>MagicNumber:CardPreview.kt:55</ID>
+    <ID>MagicNumber:CardPreview.kt:800</ID>
+    <ID>MagicNumber:CardPreview.kt:8000</ID>
+    <ID>MagicNumber:Color.kt:0xFF000000</ID>
+    <ID>MagicNumber:Color.kt:0xFF001A33</ID>
+    <ID>MagicNumber:Color.kt:0xFF00344C</ID>
+    <ID>MagicNumber:Color.kt:0xFF003739</ID>
+    <ID>MagicNumber:Color.kt:0xFF003D5C</ID>
+    <ID>MagicNumber:Color.kt:0xFF00F0FF</ID>
+    <ID>MagicNumber:Color.kt:0xFF064C6B</ID>
+    <ID>MagicNumber:Color.kt:0xFF0A1128</ID>
+    <ID>MagicNumber:Color.kt:0xFF0C0F0F</ID>
+    <ID>MagicNumber:Color.kt:0xFF121414</ID>
+    <ID>MagicNumber:Color.kt:0xFF141E3C</ID>
+    <ID>MagicNumber:Color.kt:0xFF183153</ID>
+    <ID>MagicNumber:Color.kt:0xFF1976D2</ID>
+    <ID>MagicNumber:Color.kt:0xFF1A1C1C</ID>
+    <ID>MagicNumber:Color.kt:0xFF1A4E50</ID>
+    <ID>MagicNumber:Color.kt:0xFF1E2020</ID>
+    <ID>MagicNumber:Color.kt:0xFF1E2A4F</ID>
+    <ID>MagicNumber:Color.kt:0xFF1E3A8A</ID>
+    <ID>MagicNumber:Color.kt:0xFF212121</ID>
+    <ID>MagicNumber:Color.kt:0xFF2196F3</ID>
+    <ID>MagicNumber:Color.kt:0xFF282A2B</ID>
+    <ID>MagicNumber:Color.kt:0xFF2B6485</ID>
+    <ID>MagicNumber:Color.kt:0xFF2D8EFF</ID>
+    <ID>MagicNumber:Color.kt:0xFF2F3131</ID>
+    <ID>MagicNumber:Color.kt:0xFF30476A</ID>
+    <ID>MagicNumber:Color.kt:0xFF333535</ID>
+    <ID>MagicNumber:Color.kt:0xFF356668</ID>
+    <ID>MagicNumber:Color.kt:0xFF37393A</ID>
+    <ID>MagicNumber:Color.kt:0xFF388E3C</ID>
+    <ID>MagicNumber:Color.kt:0xFF404941</ID>
+    <ID>MagicNumber:Color.kt:0xFF410007</ID>
+    <ID>MagicNumber:Color.kt:0xFF485F84</ID>
+    <ID>MagicNumber:Color.kt:0xFF4CAF50</ID>
+    <ID>MagicNumber:Color.kt:0xFF60A5FA</ID>
+    <ID>MagicNumber:Color.kt:0xFF680011</ID>
+    <ID>MagicNumber:Color.kt:0xFF717970</ID>
+    <ID>MagicNumber:Color.kt:0xFF8A9389</ID>
+    <ID>MagicNumber:Color.kt:0xFF92001C</ID>
+    <ID>MagicNumber:Color.kt:0xFF98CDF2</ID>
+    <ID>MagicNumber:Color.kt:0xFF9C27B0</ID>
+    <ID>MagicNumber:Color.kt:0xFF9ECFD1</ID>
+    <ID>MagicNumber:Color.kt:0xFFB0C4DE</ID>
+    <ID>MagicNumber:Color.kt:0xFFB0C7F1</ID>
+    <ID>MagicNumber:Color.kt:0xFFB9ECEE</ID>
+    <ID>MagicNumber:Color.kt:0xFFBB152C</ID>
+    <ID>MagicNumber:Color.kt:0xFFC084FC</ID>
+    <ID>MagicNumber:Color.kt:0xFFC0C0C0</ID>
+    <ID>MagicNumber:Color.kt:0xFFC0C9BE</ID>
+    <ID>MagicNumber:Color.kt:0xFFC7E7FF</ID>
+    <ID>MagicNumber:Color.kt:0xFFCD7F32</ID>
+    <ID>MagicNumber:Color.kt:0xFFD32F2F</ID>
+    <ID>MagicNumber:Color.kt:0xFFD5E3FF</ID>
+    <ID>MagicNumber:Color.kt:0xFFDADADA</ID>
+    <ID>MagicNumber:Color.kt:0xFFDCE5D9</ID>
+    <ID>MagicNumber:Color.kt:0xFFE2E2E2</ID>
+    <ID>MagicNumber:Color.kt:0xFFE8E8E8</ID>
+    <ID>MagicNumber:Color.kt:0xFFE91E63</ID>
+    <ID>MagicNumber:Color.kt:0xFFEEEEEE</ID>
+    <ID>MagicNumber:Color.kt:0xFFF0F1F1</ID>
+    <ID>MagicNumber:Color.kt:0xFFF3F3F4</ID>
+    <ID>MagicNumber:Color.kt:0xFFF9F9F9</ID>
+    <ID>MagicNumber:Color.kt:0xFFFF9800</ID>
+    <ID>MagicNumber:Color.kt:0xFFFFB3B1</ID>
+    <ID>MagicNumber:Color.kt:0xFFFFD700</ID>
+    <ID>MagicNumber:Color.kt:0xFFFFDAD8</ID>
+    <ID>MagicNumber:Color.kt:0xFFFFEB3B</ID>
+    <ID>MagicNumber:Color.kt:0xFFFFFFFF</ID>
+    <ID>MagicNumber:ComboBadge.kt:400</ID>
+    <ID>MagicNumber:ConfettiEffect.kt:Particle$0.01f</ID>
+    <ID>MagicNumber:ConfettiEffect.kt:Particle$0.2f</ID>
+    <ID>MagicNumber:ConfettiEffect.kt:Particle$0.5f</ID>
+    <ID>MagicNumber:ConfettiEffect.kt:Particle$20f</ID>
+    <ID>MagicNumber:ConfettiEffect.kt:Particle$360f</ID>
+    <ID>MagicNumber:DefaultGameComponent.kt:DefaultGameComponent$1000</ID>
+    <ID>MagicNumber:DefaultGameComponent.kt:DefaultGameComponent$1500</ID>
+    <ID>MagicNumber:DefaultGameComponent.kt:DefaultGameComponent$2500</ID>
+    <ID>MagicNumber:DefaultGameComponent.kt:DefaultGameComponent$3</ID>
+    <ID>MagicNumber:DefaultGameComponent.kt:DefaultGameComponent$50</ID>
+    <ID>MagicNumber:DefaultGameComponent.kt:DefaultGameComponent$500</ID>
+    <ID>MagicNumber:DefaultGameComponent.kt:DefaultGameComponent$5L</ID>
+    <ID>MagicNumber:DefaultGameComponent.kt:DefaultGameComponent$86400000</ID>
+    <ID>MagicNumber:DefaultSettingsComponent.kt:DefaultSettingsComponent$5000</ID>
+    <ID>MagicNumber:DefaultStartComponent.kt:DefaultStartComponent$8</ID>
+    <ID>MagicNumber:DefaultStartComponent.kt:DefaultStartComponent$86400000</ID>
+    <ID>MagicNumber:DifficultySelectionSection.kt:145f</ID>
+    <ID>MagicNumber:ExplosionEffect.kt:1000</ID>
+    <ID>MagicNumber:ExplosionEffect.kt:100f</ID>
+    <ID>MagicNumber:ExplosionEffect.kt:15f</ID>
+    <ID>MagicNumber:ExplosionEffect.kt:50f</ID>
+    <ID>MagicNumber:ExplosionEffect.kt:5f</ID>
+    <ID>MagicNumber:GameGrid.kt:0.75f</ID>
+    <ID>MagicNumber:GameGrid.kt:10</ID>
+    <ID>MagicNumber:GameGrid.kt:12</ID>
+    <ID>MagicNumber:GameGrid.kt:20</ID>
+    <ID>MagicNumber:GameGrid.kt:24</ID>
+    <ID>MagicNumber:GameGrid.kt:3</ID>
+    <ID>MagicNumber:GameGrid.kt:4</ID>
+    <ID>MagicNumber:GameGrid.kt:6</ID>
+    <ID>MagicNumber:GameGrid.kt:7</ID>
+    <ID>MagicNumber:GameGrid.kt:8</ID>
+    <ID>MagicNumber:GameTopBar.kt:10</ID>
+    <ID>MagicNumber:GameTopBar.kt:5</ID>
+    <ID>MagicNumber:MemoryGameLogic.kt:MemoryGameLogic$10</ID>
+    <ID>MagicNumber:MemoryGameLogic.kt:MemoryGameLogic$12</ID>
+    <ID>MagicNumber:MemoryGameLogic.kt:MemoryGameLogic$14</ID>
+    <ID>MagicNumber:MemoryGameLogic.kt:MemoryGameLogic$16</ID>
+    <ID>MagicNumber:MemoryGameLogic.kt:MemoryGameLogic$25L</ID>
+    <ID>MagicNumber:MemoryGameLogic.kt:MemoryGameLogic$3</ID>
+    <ID>MagicNumber:MemoryGameLogic.kt:MemoryGameLogic$35L</ID>
+    <ID>MagicNumber:MemoryGameLogic.kt:MemoryGameLogic$4</ID>
+    <ID>MagicNumber:MemoryGameLogic.kt:MemoryGameLogic$45L</ID>
+    <ID>MagicNumber:MemoryGameLogic.kt:MemoryGameLogic$55L</ID>
+    <ID>MagicNumber:MemoryGameLogic.kt:MemoryGameLogic$6</ID>
+    <ID>MagicNumber:MemoryGameLogic.kt:MemoryGameLogic$65L</ID>
+    <ID>MagicNumber:MemoryGameLogic.kt:MemoryGameLogic$75L</ID>
+    <ID>MagicNumber:MemoryGameLogic.kt:MemoryGameLogic$8</ID>
+    <ID>MagicNumber:PlayingCard.kt:0.75f</ID>
+    <ID>MagicNumber:PlayingCard.kt:1000</ID>
+    <ID>MagicNumber:PlayingCard.kt:10f</ID>
+    <ID>MagicNumber:PlayingCard.kt:14f</ID>
+    <ID>MagicNumber:PlayingCard.kt:1500</ID>
+    <ID>MagicNumber:PlayingCard.kt:15f</ID>
+    <ID>MagicNumber:PlayingCard.kt:16f</ID>
+    <ID>MagicNumber:PlayingCard.kt:180f</ID>
+    <ID>MagicNumber:PlayingCard.kt:24f</ID>
+    <ID>MagicNumber:PlayingCard.kt:3</ID>
+    <ID>MagicNumber:PlayingCard.kt:45f</ID>
+    <ID>MagicNumber:PlayingCard.kt:48f</ID>
+    <ID>MagicNumber:PlayingCard.kt:50</ID>
+    <ID>MagicNumber:PlayingCard.kt:500f</ID>
+    <ID>MagicNumber:PlayingCard.kt:56f</ID>
+    <ID>MagicNumber:PlayingCard.kt:60f</ID>
+    <ID>MagicNumber:PlayingCard.kt:80f</ID>
+    <ID>MagicNumber:PlayingCard.kt:90f</ID>
+    <ID>MagicNumber:ResultsCard.kt:0.8f</ID>
+    <ID>MagicNumber:ResultsCard.kt:10</ID>
+    <ID>MagicNumber:ResultsCard.kt:100</ID>
+    <ID>MagicNumber:RootComponent.kt:DefaultRootComponent$8</ID>
+    <ID>MagicNumber:TimerDisplay.kt:500</ID>
+    <ID>MagicNumber:main.kt:700</ID>
+    <ID>MagicNumber:main.kt:900</ID>
+    <ID>MatchingDeclarationName:Logger.kt:LoggingContainer</ID>
+    <ID>MatchingDeclarationName:StartModels.kt:DifficultyState</ID>
+    <ID>MaxLineLength:AppDatabase.kt:AppDatabase.Companion.&lt;no name provided&gt;$"CREATE TABLE IF NOT EXISTS daily_challenges (date INTEGER NOT NULL, isCompleted INTEGER NOT NULL, score INTEGER NOT NULL, timeSeconds INTEGER NOT NULL, moves INTEGER NOT NULL, PRIMARY KEY(date))"</ID>
+    <ID>MaxLineLength:LeaderboardDao.kt:LeaderboardDao$"SELECT * FROM leaderboard WHERE pairCount = :pairCount AND gameMode = :gameMode ORDER BY score DESC, timeSeconds ASC LIMIT 10"</ID>
+    <ID>ReturnCount:MemoryGameLogic.kt:MemoryGameLogic$fun flipCard(state: MemoryGameState, cardId: Int): Pair&lt;MemoryGameState, GameDomainEvent?&gt;</ID>
+    <ID>ReturnCount:RootComponent.kt:private fun String.getQueryParameter(key: String): String?</ID>
+    <ID>TooGenericExceptionCaught:AndroidAudioServiceImpl.kt:AndroidAudioServiceImpl$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ClearSavedGameUseCase.kt:ClearSavedGameUseCase$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:DefaultGameComponent.kt:DefaultGameComponent$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:DefaultStartComponent.kt:DefaultStartComponent$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:GameStateRepositoryImpl.kt:GameStateRepositoryImpl$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:GameStatsRepositoryImpl.kt:GameStatsRepositoryImpl$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:GetSavedGameUseCase.kt:GetSavedGameUseCase$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:IosAudioServiceImpl.kt:IosAudioServiceImpl$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:LeaderboardRepositoryImpl.kt:LeaderboardRepositoryImpl$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:RootComponent.kt:DefaultRootComponent$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SaveGameResultUseCase.kt:SaveGameResultUseCase$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SaveGameStateUseCase.kt:SaveGameStateUseCase$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SettingsRepositoryImpl.kt:SettingsRepositoryImpl$e: Exception</ID>
+    <ID>TooManyFunctions:AndroidAudioServiceImpl.kt:AndroidAudioServiceImpl : AudioService</ID>
+    <ID>TooManyFunctions:DataModule.kt:DataModule</ID>
+    <ID>TooManyFunctions:DefaultGameComponent.kt:DefaultGameComponent : GameComponentComponentContext</ID>
+    <ID>TooManyFunctions:IosAudioServiceImpl.kt:IosAudioServiceImpl : AudioService</ID>
+    <ID>WildcardImport:AppDatabase.kt:import androidx.room.*</ID>
+    <ID>WildcardImport:AppGraph.kt:import io.github.smithjustinn.domain.usecases.game.*</ID>
+    <ID>WildcardImport:AppGraph.kt:import io.github.smithjustinn.domain.usecases.stats.*</ID>
+    <ID>WildcardImport:AppIcons.kt:import io.github.smithjustinn.theme.*</ID>
+    <ID>WildcardImport:BouncingCardsOverlay.kt:import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:BouncingCardsOverlay.kt:import kotlin.math.*</ID>
+    <ID>WildcardImport:CardPreview.kt:import io.github.smithjustinn.theme.*</ID>
+    <ID>WildcardImport:ConfettiEffect.kt:import io.github.smithjustinn.theme.*</ID>
+    <ID>WildcardImport:DefaultGameComponent.kt:import kotlinx.coroutines.flow.*</ID>
+    <ID>WildcardImport:DefaultSettingsComponent.kt:import kotlinx.coroutines.*</ID>
+    <ID>WildcardImport:DefaultSettingsComponent.kt:import kotlinx.coroutines.flow.*</ID>
+    <ID>WildcardImport:DefaultStatsComponent.kt:import kotlinx.coroutines.*</ID>
+    <ID>WildcardImport:DefaultStatsComponent.kt:import kotlinx.coroutines.flow.*</ID>
+    <ID>WildcardImport:DifficultySelectionSection.kt:import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:DifficultySelectionSection.kt:import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:DifficultySelectionSection.kt:import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:DifficultySelectionSection.kt:import io.github.smithjustinn.theme.*</ID>
+    <ID>WildcardImport:DifficultySelectionSection.kt:import memory_match.sharedui.generated.resources.*</ID>
+    <ID>WildcardImport:ExplosionEffect.kt:import androidx.compose.animation.core.*</ID>
+    <ID>WildcardImport:ExplosionEffect.kt:import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:GameGrid.kt:import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:GameGrid.kt:import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:GameSnackbars.kt:import androidx.compose.animation.*</ID>
+    <ID>WildcardImport:GameSnackbars.kt:import androidx.compose.animation.core.*</ID>
+    <ID>WildcardImport:GameSnackbars.kt:import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:GameSnackbars.kt:import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:GameSnackbars.kt:import io.github.smithjustinn.theme.*</ID>
+    <ID>WildcardImport:LeaderboardSection.kt:import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:LeaderboardSection.kt:import io.github.smithjustinn.theme.*</ID>
+    <ID>WildcardImport:MemoryGameLogic.kt:import io.github.smithjustinn.domain.models.*</ID>
+    <ID>WildcardImport:MemoryGameLogic.kt:import memory_match.sharedui.generated.resources.*</ID>
+    <ID>WildcardImport:ModeSelector.kt:import memory_match.sharedui.generated.resources.*</ID>
+    <ID>WildcardImport:NeonSegmentedControl.kt:import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:NeonSegmentedControl.kt:import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:PeekCountdownOverlay.kt:import androidx.compose.animation.*</ID>
+    <ID>WildcardImport:PeekCountdownOverlay.kt:import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:PlayingCard.kt:import io.github.smithjustinn.theme.*</ID>
+    <ID>WildcardImport:ScoreBreakdownSection.kt:import io.github.smithjustinn.theme.*</ID>
+    <ID>WildcardImport:SettingsContent.kt:import memory_match.sharedui.generated.resources.*</ID>
+    <ID>WildcardImport:StatsContent.kt:import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:StatsContent.kt:import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:StatsContent.kt:import memory_match.sharedui.generated.resources.*</ID>
+    <ID>WildcardImport:Theme.kt:import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:TimerDisplay.kt:import androidx.compose.animation.*</ID>
+    <ID>WildcardImport:TimerDisplay.kt:import androidx.compose.animation.core.*</ID>
+    <ID>WildcardImport:TimerDisplay.kt:import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:TimerDisplay.kt:import io.github.smithjustinn.theme.*</ID>
+    <ID>WildcardImport:WalkthroughOverlay.kt:import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:WalkthroughOverlay.kt:import memory_match.sharedui.generated.resources.*</ID>
+  </CurrentIssues>
+</SmellBaseline>

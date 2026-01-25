@@ -175,6 +175,26 @@ Alternatively, run specific module tests:
 
 ---
 
+## 🔍 Static Analysis (Detekt)
+
+We use **Detekt** to maintain high code quality and enforce Kotlin-specific best practices across all KMP modules. Detekt helps identify code smells, potential bugs, and complexity issues early in the development cycle.
+
+### 🚀 Usage Commands
+
+| Command                           | Description                                                       |
+| :-------------------------------- | :---------------------------------------------------------------- |
+| `./gradlew detekt`                | Runs analysis on all source sets and generates reports.           |
+| `./gradlew detekt --auto-correct` | Automatically fixes minor linting and formatting issues.          |
+| `./gradlew detektBaseline`        | Generates or updates the baseline file to ignore existing issues. |
+| `./gradlew detektMain`            | Runs analysis specifically on the main source sets.               |
+
+### 📊 Configuration & Reports
+- **Config File**: Located at `config/detekt/detekt.yml`. This file defines the rules and severity levels.
+- **Reports**: Generated in `build/reports/detekt/` in HTML, XML, SARIF, and Markdown formats.
+- **Baselines**: Issues recorded in `config/detekt/baseline.xml` are suppressed, allowing you to focus on new technical debt.
+
+---
+
 ## 🤖 AI-Agentic Development
 
 This repository is **Agent-Ready**, designed to be seamlessly navigated and extended by AI coding assistants.
