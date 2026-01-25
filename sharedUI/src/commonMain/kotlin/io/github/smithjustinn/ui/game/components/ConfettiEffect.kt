@@ -94,8 +94,7 @@ fun ConfettiEffect(
     Canvas(modifier = modifier.fillMaxSize()) {
         // Reading frameState here triggers redraw of the Canvas on every frame
         // without recomposing the entire ConfettiEffect composable.
-        @Suppress("UNUSED_VARIABLE")
-        val frame = frameState.longValue
+        val _frame = frameState.longValue
 
         val canvasCenter = center
         particles.forEach { p ->

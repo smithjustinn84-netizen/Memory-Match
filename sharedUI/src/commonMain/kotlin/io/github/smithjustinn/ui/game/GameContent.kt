@@ -52,7 +52,6 @@ fun GameContent(component: GameComponent, modifier: Modifier = Modifier) {
     val state by component.state.collectAsState()
     val audioService = graph.audioService
     val hapticsService = graph.hapticsService
-    @Suppress("DEPRECATION")
     val clipboardManager = LocalClipboardManager.current
     val scope = rememberCoroutineScope()
 

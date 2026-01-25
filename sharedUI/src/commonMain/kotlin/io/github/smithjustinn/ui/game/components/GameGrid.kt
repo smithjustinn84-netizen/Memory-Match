@@ -107,26 +107,26 @@ fun GameGrid(
                     val spacing = if (isCompactHeight) 6.dp else 12.dp
                     val hPadding = if (isWide) 32.dp else 16.dp
                     val vPadding = if (isCompactHeight) 16.dp else 32.dp // Total vertical padding/margin
-                    
+
                     val availableWidth = screenWidth - (hPadding * 2)
                     val availableHeight = screenHeight - vPadding
-                    
+
                     val cols = when {
                         cards.size <= 12 -> 3
                         cards.size <= 20 -> 4
                         else -> 4
                     }
                     val rows = ceil(cards.size.toFloat() / cols).toInt()
-                    
+
                     // Calculate max possible size that fits both dimensions
                     val maxW = (availableWidth - (spacing * (cols - 1))) / cols
                     val maxH = (availableHeight - (spacing * (rows - 1))) / rows
-                    
+
                     // Convert height to width equivalent (3:4 ratio)
                     val wFromH = maxH * 0.75f
                     val finalCardWidth = minOf(maxW, wFromH).coerceAtLeast(60.dp)
                     val calculatedWidth = (finalCardWidth * cols) + (spacing * (cols - 1)) + (hPadding * 2)
-                    
+
                     GridCells.Fixed(cols) to calculatedWidth.coerceAtMost(screenWidth)
                 }
             }

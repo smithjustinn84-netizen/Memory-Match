@@ -169,7 +169,7 @@ class DefaultGameComponent(
 
                     // Wait a frame to ensure settings have been collected
                     delay(50)
-                    
+
                     val currentState = _state.value
                     if (currentState.showWalkthrough) {
                         // Walkthrough will handle starting the timer
