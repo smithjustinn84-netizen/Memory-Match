@@ -55,6 +55,11 @@ import memory_match.sharedui.generated.resources.times_up
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
 
+private const val HIGH_SCORE_THRESHOLD = 100
+private const val HIGH_SCORE_STEP = 10
+private const val LOW_SCORE_STEP = 1
+private const val INITIAL_SCALE = 0.8f
+
 @Composable
 fun ResultsCard(
     isWon: Boolean,
@@ -87,7 +92,7 @@ fun ResultsCard(
         ) {
             val currentRounded = value.roundToInt()
             // Throttle haptics: every 10 points if score is high, or every point if score is low
-            val step = if (score > 100) 10 else 1
+            val step = if (score > HIGH_SCORE_THRESHOLD) HIGH_SCORE_STEP else LOW_SCORE_STEP
             if (currentRounded != lastRoundedScore && (currentRounded % step == 0 || currentRounded == score)) {
                 scoreTickHandler()
                 lastRoundedScore = currentRounded
@@ -95,7 +100,7 @@ fun ResultsCard(
         }
     }
 
-    val scale = remember { Animatable(0.8f) }
+    val scale = remember { Animatable(INITIAL_SCALE) }
     LaunchedEffect(Unit) {
         scale.animateTo(
             targetValue = 1f,

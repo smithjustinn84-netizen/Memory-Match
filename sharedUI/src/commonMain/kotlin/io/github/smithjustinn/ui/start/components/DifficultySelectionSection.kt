@@ -51,6 +51,8 @@ import memory_match.sharedui.generated.resources.settings
 import memory_match.sharedui.generated.resources.start
 import org.jetbrains.compose.resources.stringResource
 
+private const val TRAILING_ICON_ROTATION = 145f
+
 /**
  * DifficultySelectionSection
  */
@@ -271,7 +273,7 @@ fun NeonStyleButton(
                         imageVector = trailingIcon,
                         contentDescription = null,
                         tint = Color.White,
-                        modifier = Modifier.size(18.dp).graphicsLayer { rotationZ = 145f },
+                        modifier = Modifier.size(18.dp).graphicsLayer { rotationZ = TRAILING_ICON_ROTATION },
                     )
                 }
             }

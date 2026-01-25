@@ -20,11 +20,6 @@
     <ID>LongMethod:StatsContent.kt:@OptIn(ExperimentalMaterial3Api::class) @Composable fun StatsContent(component: StatsComponent, modifier: Modifier = Modifier)</ID>
     <ID>LongMethod:TimerDisplay.kt:@Composable fun TimerDisplay( time: Long, isLowTime: Boolean, isCriticalTime: Boolean, showTimeGain: Boolean, timeGainAmount: Int, showTimeLoss: Boolean, timeLossAmount: Long, isMegaBonus: Boolean, infiniteTransition: InfiniteTransition, modifier: Modifier = Modifier, compact: Boolean = false, minimal: Boolean = false, )</ID>
     <ID>LongMethod:WalkthroughOverlay.kt:@Composable fun WalkthroughOverlay(step: Int, onNext: () -&gt; Unit, onDismiss: () -&gt; Unit, modifier: Modifier = Modifier)</ID>
-    <ID>MagicNumber:AppDatabase.kt:AppDatabase.Companion.&lt;no name provided&gt;$3</ID>
-    <ID>MagicNumber:AppDatabase.kt:AppDatabase.Companion.&lt;no name provided&gt;$4</ID>
-    <ID>MagicNumber:AppDatabase.kt:AppDatabase.Companion.&lt;no name provided&gt;$5</ID>
-    <ID>MagicNumber:AppDatabase.kt:AppDatabase.Companion.&lt;no name provided&gt;$6</ID>
-    <ID>MagicNumber:AppDatabase.kt:AppDatabase.Companion.&lt;no name provided&gt;$7</ID>
     <ID>MagicNumber:BouncingCardsOverlay.kt:180f</ID>
     <ID>MagicNumber:CardPreview.kt:1000</ID>
     <ID>MagicNumber:CardPreview.kt:1200</ID>
@@ -99,76 +94,9 @@
     <ID>MagicNumber:Color.kt:0xFFFFDAD8</ID>
     <ID>MagicNumber:Color.kt:0xFFFFEB3B</ID>
     <ID>MagicNumber:Color.kt:0xFFFFFFFF</ID>
-    <ID>MagicNumber:ComboBadge.kt:400</ID>
-    <ID>MagicNumber:ConfettiEffect.kt:Particle$0.01f</ID>
-    <ID>MagicNumber:ConfettiEffect.kt:Particle$0.2f</ID>
-    <ID>MagicNumber:ConfettiEffect.kt:Particle$0.5f</ID>
-    <ID>MagicNumber:ConfettiEffect.kt:Particle$20f</ID>
-    <ID>MagicNumber:ConfettiEffect.kt:Particle$360f</ID>
-    <ID>MagicNumber:DefaultGameComponent.kt:DefaultGameComponent$3</ID>
-    <ID>MagicNumber:DefaultGameComponent.kt:DefaultGameComponent$5L</ID>
-    <ID>MagicNumber:DefaultSettingsComponent.kt:DefaultSettingsComponent$5000</ID>
-    <ID>MagicNumber:DefaultStartComponent.kt:DefaultStartComponent$8</ID>
-    <ID>MagicNumber:DefaultStartComponent.kt:DefaultStartComponent$86400000</ID>
-    <ID>MagicNumber:DifficultySelectionSection.kt:145f</ID>
-    <ID>MagicNumber:ExplosionEffect.kt:1000</ID>
-    <ID>MagicNumber:ExplosionEffect.kt:100f</ID>
-    <ID>MagicNumber:ExplosionEffect.kt:15f</ID>
-    <ID>MagicNumber:ExplosionEffect.kt:50f</ID>
-    <ID>MagicNumber:ExplosionEffect.kt:5f</ID>
-    <ID>MagicNumber:GameGrid.kt:0.75f</ID>
-    <ID>MagicNumber:GameGrid.kt:10</ID>
-    <ID>MagicNumber:GameGrid.kt:12</ID>
-    <ID>MagicNumber:GameGrid.kt:20</ID>
-    <ID>MagicNumber:GameGrid.kt:24</ID>
-    <ID>MagicNumber:GameGrid.kt:3</ID>
-    <ID>MagicNumber:GameGrid.kt:4</ID>
-    <ID>MagicNumber:GameGrid.kt:6</ID>
-    <ID>MagicNumber:GameGrid.kt:7</ID>
-    <ID>MagicNumber:GameGrid.kt:8</ID>
-    <ID>MagicNumber:GameTopBar.kt:10</ID>
-    <ID>MagicNumber:GameTopBar.kt:5</ID>
-    <ID>MagicNumber:PlayingCard.kt:0.75f</ID>
-    <ID>MagicNumber:PlayingCard.kt:1000</ID>
-    <ID>MagicNumber:PlayingCard.kt:10f</ID>
-    <ID>MagicNumber:PlayingCard.kt:14f</ID>
-    <ID>MagicNumber:PlayingCard.kt:1500</ID>
-    <ID>MagicNumber:PlayingCard.kt:15f</ID>
-    <ID>MagicNumber:PlayingCard.kt:16f</ID>
-    <ID>MagicNumber:PlayingCard.kt:180f</ID>
-    <ID>MagicNumber:PlayingCard.kt:24f</ID>
-    <ID>MagicNumber:PlayingCard.kt:3</ID>
-    <ID>MagicNumber:PlayingCard.kt:45f</ID>
-    <ID>MagicNumber:PlayingCard.kt:48f</ID>
-    <ID>MagicNumber:PlayingCard.kt:50</ID>
-    <ID>MagicNumber:PlayingCard.kt:500f</ID>
-    <ID>MagicNumber:PlayingCard.kt:56f</ID>
-    <ID>MagicNumber:PlayingCard.kt:60f</ID>
-    <ID>MagicNumber:PlayingCard.kt:80f</ID>
-    <ID>MagicNumber:PlayingCard.kt:90f</ID>
-    <ID>MagicNumber:ResultsCard.kt:0.8f</ID>
-    <ID>MagicNumber:ResultsCard.kt:10</ID>
-    <ID>MagicNumber:ResultsCard.kt:100</ID>
-    <ID>MagicNumber:RootComponent.kt:DefaultRootComponent$8</ID>
-    <ID>MagicNumber:TimerDisplay.kt:500</ID>
-    <ID>MagicNumber:main.kt:700</ID>
-    <ID>MagicNumber:main.kt:900</ID>
     <ID>MaxLineLength:AppDatabase.kt:AppDatabase.Companion.&lt;no name provided&gt;$"CREATE TABLE IF NOT EXISTS daily_challenges (date INTEGER NOT NULL, isCompleted INTEGER NOT NULL, score INTEGER NOT NULL, timeSeconds INTEGER NOT NULL, moves INTEGER NOT NULL, PRIMARY KEY(date))"</ID>
     <ID>MaxLineLength:LeaderboardDao.kt:LeaderboardDao$"SELECT * FROM leaderboard WHERE pairCount = :pairCount AND gameMode = :gameMode ORDER BY score DESC, timeSeconds ASC LIMIT 10"</ID>
     <ID>ReturnCount:RootComponent.kt:private fun String.getQueryParameter(key: String): String?</ID>
-    <ID>TooGenericExceptionCaught:AndroidAudioServiceImpl.kt:AndroidAudioServiceImpl$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:ClearSavedGameUseCase.kt:ClearSavedGameUseCase$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:DefaultGameComponent.kt:DefaultGameComponent$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:DefaultStartComponent.kt:DefaultStartComponent$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:GameStateRepositoryImpl.kt:GameStateRepositoryImpl$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:GameStatsRepositoryImpl.kt:GameStatsRepositoryImpl$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:GetSavedGameUseCase.kt:GetSavedGameUseCase$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:IosAudioServiceImpl.kt:IosAudioServiceImpl$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:LeaderboardRepositoryImpl.kt:LeaderboardRepositoryImpl$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:RootComponent.kt:DefaultRootComponent$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:SaveGameResultUseCase.kt:SaveGameResultUseCase$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:SaveGameStateUseCase.kt:SaveGameStateUseCase$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:SettingsRepositoryImpl.kt:SettingsRepositoryImpl$e: Exception</ID>
     <ID>TooManyFunctions:AndroidAudioServiceImpl.kt:AndroidAudioServiceImpl : AudioService</ID>
     <ID>TooManyFunctions:DataModule.kt:DataModule</ID>
     <ID>TooManyFunctions:DefaultGameComponent.kt:DefaultGameComponent : GameComponentComponentContext</ID>

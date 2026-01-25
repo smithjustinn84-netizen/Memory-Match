@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 
+private const val SUBSCRIPTION_TIMEOUT_MS = 5000L
+
 class DefaultSettingsComponent(
     componentContext: ComponentContext,
     appGraph: AppGraph,
@@ -68,7 +70,7 @@ class DefaultSettingsComponent(
         )
     }.stateIn(
         scope = scope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = SharingStarted.WhileSubscribed(SUBSCRIPTION_TIMEOUT_MS),
         initialValue = SettingsState(),
     )
 

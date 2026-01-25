@@ -40,6 +40,9 @@ import io.github.smithjustinn.theme.NeonCyan
 import io.github.smithjustinn.theme.TacticalRed
 import io.github.smithjustinn.utils.formatTime
 
+private const val COLOR_TRANSITION_DURATION_MS = 500
+private const val PULSE_SCALE_TARGET = 1.15f
+
 data class TimerState(
     val time: Long,
     val isLowTime: Boolean,
@@ -123,7 +126,7 @@ private fun animateTimerColor(
     
     val color by animateColorAsState(
         targetValue = targetValue,
-        animationSpec = tween(durationMillis = if (showTimeGain || showTimeLoss) 100 else 500),
+        animationSpec = tween(durationMillis = if (showTimeGain || showTimeLoss) 100 else COLOR_TRANSITION_DURATION_MS),
     )
     
     return color
@@ -137,9 +140,9 @@ private fun calculateTimerScale(
 ): Float {
     val infinitePulseScale by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = 1.15f,
+        targetValue = PULSE_SCALE_TARGET,
         animationSpec = infiniteRepeatable(
-            animation = tween(500, easing = LinearEasing),
+            animation = tween(COLOR_TRANSITION_DURATION_MS, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse,
         ),
     )

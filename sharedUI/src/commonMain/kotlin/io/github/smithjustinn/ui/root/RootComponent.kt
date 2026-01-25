@@ -21,6 +21,8 @@ import io.github.smithjustinn.utils.componentScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
+private const val DEFAULT_PAIR_COUNT = 8
+
 interface RootComponent {
     val childStack: Value<ChildStack<*, Child>>
     val backHandler: com.arkivanov.essenty.backhandler.BackHandler
@@ -76,7 +78,7 @@ class DefaultRootComponent(componentContext: ComponentContext, private val appGr
             val seedStr = url.getQueryParameter("seed")
 
             val mode = modeStr?.let { GameMode.valueOf(it) } ?: GameMode.STANDARD
-            val pairs = pairsStr?.toIntOrNull() ?: 8
+            val pairs = pairsStr?.toIntOrNull() ?: DEFAULT_PAIR_COUNT
             val seed = seedStr?.toLongOrNull()
 
             @OptIn(com.arkivanov.decompose.DelicateDecomposeApi::class)
