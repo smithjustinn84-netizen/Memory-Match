@@ -1,3 +1,8 @@
+---
+trigger: glob
+globs: ["**/*.kt"]
+---
+
 # 🪵 Logging Standards
 
 ## Primary Rule: Use Kermit Logger

@@ -1,3 +1,8 @@
+---
+trigger: glob
+globs: ["**/*.kt"]
+---
+
 # 🛠 Linting & Code Smell Standards
 
 Expert instructions for maintaining code quality, formatting, and static analysis standards in the Memory Match project using **Spotless** and **Detekt**.

@@ -1,6 +1,6 @@
 ---
 trigger: glob
-globs: ["**/gradle.properties"]
+globs: ["**/gradle.properties", "**/*.gradle.kts", "**/*.toml"]
 ---
 
 # 🐘 Gradle 2026 Best Practices

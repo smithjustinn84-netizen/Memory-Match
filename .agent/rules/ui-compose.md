@@ -1,6 +1,6 @@
 ---
 trigger: glob
-globs: ["**/*.kt"]
+globs: ["**/*UI.kt", "**/*Screen.kt", "**/*Component.kt", "**/*Content.kt", "**/ui/**/*.kt"]
 ---
 
 # 🎨 Compose UI

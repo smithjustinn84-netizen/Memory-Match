@@ -1,5 +1,6 @@
 ---
-trigger: model_decision
+trigger: glob
+globs: ["**/*Database.kt", "**/*Dao.kt", "**/*Entity.kt", "**/*Schema*"]
 description: Metro DI & Room Integration
 ---
 

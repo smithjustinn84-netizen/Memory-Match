@@ -34,6 +34,7 @@ Before generating code, you **MUST** align with:
 ## 🚫 Prohibited Patterns (The "Kill List")
 - `viewModelScope` -> Use `componentScope` (Decompose lifecycle scope).
 - `java.*` / `android.*` in shared code -> Use `kotlinx.*` or `expect/actual`.
+- `expect/actual` for complex logic -> Use `interface` + DI instead.
 - Hardcoded Strings -> Use `Res.string.my_key`.
 - `!!` -> Use `requireNotNull` or `?.`.
 - Logic in UI -> Move to `Component` or `UseCase`.

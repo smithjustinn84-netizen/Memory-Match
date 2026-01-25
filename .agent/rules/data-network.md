@@ -1,5 +1,6 @@
 ---
-trigger: model_decision
+trigger: glob
+globs: ["**/*Network*", "**/*Service*", "**/*Repository*", "**/*Api*"]
 description: Network Standards (Ktor 3.0)
 ---
 
