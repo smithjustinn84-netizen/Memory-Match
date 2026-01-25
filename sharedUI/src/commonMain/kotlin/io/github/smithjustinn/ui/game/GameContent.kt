@@ -28,10 +28,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.di.LocalAppGraph
-import io.github.smithjustinn.theme.HeatBackgroundBottom
-import io.github.smithjustinn.theme.HeatBackgroundTop
-import io.github.smithjustinn.theme.StartBackgroundBottom
-import io.github.smithjustinn.theme.StartBackgroundTop
+import io.github.smithjustinn.theme.MemoryMatchTheme
 import io.github.smithjustinn.ui.components.AdaptiveDensity
 import io.github.smithjustinn.ui.game.components.BouncingCardsOverlay
 import io.github.smithjustinn.ui.game.components.ComboBadge
@@ -235,11 +232,19 @@ private fun BoxScope.GameResultsOverlay(
 @Composable
 private fun GameBackground(isHeatMode: Boolean) {
     val backgroundTopColor by animateColorAsState(
-        targetValue = if (isHeatMode) HeatBackgroundTop else StartBackgroundTop,
+        targetValue = if (isHeatMode) {
+            MemoryMatchTheme.colors.heatBackgroundTop
+        } else {
+            MemoryMatchTheme.colors.startBackgroundTop
+        },
         animationSpec = tween(durationMillis = 800),
     )
     val backgroundBottomColor by animateColorAsState(
-        targetValue = if (isHeatMode) HeatBackgroundBottom else StartBackgroundBottom,
+        targetValue = if (isHeatMode) {
+            MemoryMatchTheme.colors.heatBackgroundBottom
+        } else {
+            MemoryMatchTheme.colors.startBackgroundBottom
+        },
         animationSpec = tween(durationMillis = 800),
     )
 

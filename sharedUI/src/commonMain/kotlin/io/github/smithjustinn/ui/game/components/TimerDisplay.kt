@@ -33,11 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.smithjustinn.theme.BonusGreen
-import io.github.smithjustinn.theme.GoldenYellow
-import io.github.smithjustinn.theme.InactiveBackground
-import io.github.smithjustinn.theme.NeonCyan
-import io.github.smithjustinn.theme.TacticalRed
+import io.github.smithjustinn.theme.MemoryMatchTheme
 import io.github.smithjustinn.utils.formatTime
 
 private const val COLOR_TRANSITION_DURATION_MS = 500
@@ -116,12 +112,12 @@ private fun animateTimerColor(
     minimal: Boolean,
 ): Color {
     val targetValue = when {
-        showTimeLoss -> TacticalRed
-        showTimeGain && isMegaBonus -> GoldenYellow
-        showTimeGain -> BonusGreen
-        isLowTime -> TacticalRed
+        showTimeLoss -> MemoryMatchTheme.colors.tacticalRed
+        showTimeGain && isMegaBonus -> MemoryMatchTheme.colors.goldenYellow
+        showTimeGain -> MemoryMatchTheme.colors.bonusGreen
+        isLowTime -> MemoryMatchTheme.colors.tacticalRed
         minimal -> Color.White
-        else -> NeonCyan
+        else -> MemoryMatchTheme.colors.neonCyan
     }
     
     val color by animateColorAsState(
@@ -197,7 +193,7 @@ private fun MinimalTimerDisplay(
             Text(
                 text = "+${timeGainAmount}s",
                 style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
-                color = if (isMegaBonus) GoldenYellow else BonusGreen,
+                color = if (isMegaBonus) MemoryMatchTheme.colors.goldenYellow else MemoryMatchTheme.colors.bonusGreen,
                 fontWeight = FontWeight.Black,
                 modifier = Modifier.padding(start = 4.dp),
             )
@@ -221,11 +217,11 @@ private fun StandardTimerDisplay(
 ) {
     Surface(
         shape = RoundedCornerShape(if (compact) 16.dp else 24.dp),
-        color = InactiveBackground.copy(alpha = 0.4f),
+        color = MemoryMatchTheme.colors.inactiveBackground.copy(alpha = 0.4f),
         border = BorderStroke(
             width = 1.dp,
             color = if (isLowTime || showTimeLoss) {
-                TacticalRed.copy(alpha = 0.5f)
+                MemoryMatchTheme.colors.tacticalRed.copy(alpha = 0.5f)
             } else {
                 Color.White.copy(alpha = 0.15f)
             },
@@ -286,7 +282,7 @@ private fun TimeGainIndicator(
             } else {
                 MaterialTheme.typography.labelLarge
             },
-            color = if (isMegaBonus) GoldenYellow else BonusGreen,
+            color = if (isMegaBonus) MemoryMatchTheme.colors.goldenYellow else MemoryMatchTheme.colors.bonusGreen,
             fontWeight = FontWeight.Black,
             modifier = Modifier.padding(start = 6.dp),
         )
@@ -311,7 +307,7 @@ private fun TimeLossIndicator(
             } else {
                 MaterialTheme.typography.labelLarge
             },
-            color = TacticalRed,
+            color = MemoryMatchTheme.colors.tacticalRed,
             fontWeight = FontWeight.Black,
             modifier = Modifier.padding(start = 6.dp),
         )

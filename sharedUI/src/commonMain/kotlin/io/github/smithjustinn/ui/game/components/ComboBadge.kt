@@ -25,10 +25,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.smithjustinn.theme.GoldenYellow
-import io.github.smithjustinn.theme.HeatGlowPrimary
-import io.github.smithjustinn.theme.InactiveBackground
-import io.github.smithjustinn.theme.NeonCyan
+import io.github.smithjustinn.theme.MemoryMatchTheme
 import memory_match.sharedui.generated.resources.Res
 import memory_match.sharedui.generated.resources.combo_format
 import org.jetbrains.compose.resources.stringResource
@@ -62,14 +59,14 @@ fun ComboBadge(
         )
 
         val badgeColor = when {
-            isHeatMode -> HeatGlowPrimary
-            isMegaBonus -> GoldenYellow
-            else -> NeonCyan
+            isHeatMode -> MemoryMatchTheme.colors.heatGlowPrimary
+            isMegaBonus -> MemoryMatchTheme.colors.goldenYellow
+            else -> MemoryMatchTheme.colors.neonCyan
         }
         val tacticalShape = CutCornerShape(topStart = 8.dp, bottomEnd = 8.dp)
 
         Surface(
-            color = InactiveBackground.copy(alpha = 0.6f),
+            color = MemoryMatchTheme.colors.inactiveBackground.copy(alpha = 0.6f),
             shape = tacticalShape,
             border = BorderStroke(BORDER_WIDTH.dp, badgeColor),
             modifier = Modifier

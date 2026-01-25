@@ -43,9 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.ScoreBreakdown
-import io.github.smithjustinn.theme.InactiveBackground
-import io.github.smithjustinn.theme.NeonCyan
-import io.github.smithjustinn.theme.TacticalRed
+import io.github.smithjustinn.theme.MemoryMatchTheme
 import io.github.smithjustinn.ui.components.AppIcons
 import memory_match.sharedui.generated.resources.Res
 import memory_match.sharedui.generated.resources.game_complete
@@ -119,13 +117,13 @@ fun ResultsCard(
                 .scale(scale.value)
                 .widthIn(max = 550.dp),
             shape = RoundedCornerShape(24.dp),
-            color = InactiveBackground.copy(alpha = 0.8f),
+            color = MemoryMatchTheme.colors.inactiveBackground.copy(alpha = 0.8f),
             border = BorderStroke(1.dp, Color.White.copy(alpha = 0.15f)),
             shadowElevation = 16.dp,
         ) {
             val contentPadding = if (isCompactHeight) 12.dp else 24.dp
             val verticalSpacing = if (isCompactHeight) 8.dp else 16.dp
-            val headerColor = if (isWon) NeonCyan else TacticalRed
+            val headerColor = if (isWon) MemoryMatchTheme.colors.neonCyan else MemoryMatchTheme.colors.tacticalRed
 
             Column(
                 modifier = Modifier
@@ -167,7 +165,7 @@ fun ResultsCard(
                             onClick = onPlayAgain,
                             modifier = Modifier.height(48.dp),
                             shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = NeonCyan),
+                            colors = ButtonDefaults.buttonColors(containerColor = MemoryMatchTheme.colors.neonCyan),
                         ) {
                             Text(
                                 text = stringResource(Res.string.play_again).uppercase(),
@@ -183,8 +181,8 @@ fun ResultsCard(
                         onClick = onShareReplay,
                         modifier = Modifier.fillMaxWidth().height(48.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = NeonCyan),
-                        border = BorderStroke(1.dp, NeonCyan),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MemoryMatchTheme.colors.neonCyan),
+                        border = BorderStroke(1.dp, MemoryMatchTheme.colors.neonCyan),
                     ) {
                         Icon(imageVector = AppIcons.Share, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
@@ -210,7 +208,7 @@ fun ResultsCard(
                             .fillMaxWidth()
                             .height(56.dp),
                         shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = NeonCyan),
+                        colors = ButtonDefaults.buttonColors(containerColor = MemoryMatchTheme.colors.neonCyan),
                         elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                     ) {
                         Text(
@@ -229,8 +227,8 @@ fun ResultsCard(
                             .fillMaxWidth()
                             .height(56.dp),
                         shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = NeonCyan),
-                        border = BorderStroke(1.dp, NeonCyan),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MemoryMatchTheme.colors.neonCyan),
+                        border = BorderStroke(1.dp, MemoryMatchTheme.colors.neonCyan),
                     ) {
                         Icon(imageVector = AppIcons.Share, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
