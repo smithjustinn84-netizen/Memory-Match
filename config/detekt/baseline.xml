@@ -232,31 +232,5 @@
     <ID>TooManyFunctions:DataModule.kt:DataModule</ID>
     <ID>TooManyFunctions:DefaultGameComponent.kt:DefaultGameComponent : GameComponentComponentContext</ID>
     <ID>TooManyFunctions:IosAudioServiceImpl.kt:IosAudioServiceImpl : AudioService</ID>
-    <ID>WildcardImport:DefaultSettingsComponent.kt:import kotlinx.coroutines.*</ID>
-    <ID>WildcardImport:DefaultSettingsComponent.kt:import kotlinx.coroutines.flow.*</ID>
-    <ID>WildcardImport:DefaultStatsComponent.kt:import kotlinx.coroutines.*</ID>
-    <ID>WildcardImport:DefaultStatsComponent.kt:import kotlinx.coroutines.flow.*</ID>
-    <ID>WildcardImport:ExplosionEffect.kt:import androidx.compose.animation.core.*</ID>
-    <ID>WildcardImport:ExplosionEffect.kt:import androidx.compose.runtime.*</ID>
-    <ID>WildcardImport:LeaderboardSection.kt:import androidx.compose.foundation.layout.*</ID>
-    <ID>WildcardImport:LeaderboardSection.kt:import io.github.smithjustinn.theme.*</ID>
-    <ID>WildcardImport:ModeSelector.kt:import memory_match.sharedui.generated.resources.*</ID>
-    <ID>WildcardImport:NeonSegmentedControl.kt:import androidx.compose.foundation.layout.*</ID>
-    <ID>WildcardImport:NeonSegmentedControl.kt:import androidx.compose.runtime.*</ID>
-    <ID>WildcardImport:PeekCountdownOverlay.kt:import androidx.compose.animation.*</ID>
-    <ID>WildcardImport:PeekCountdownOverlay.kt:import androidx.compose.foundation.layout.*</ID>
-    <ID>WildcardImport:PlayingCard.kt:import io.github.smithjustinn.theme.*</ID>
-    <ID>WildcardImport:ScoreBreakdownSection.kt:import io.github.smithjustinn.theme.*</ID>
-    <ID>WildcardImport:SettingsContent.kt:import memory_match.sharedui.generated.resources.*</ID>
-    <ID>WildcardImport:StatsContent.kt:import androidx.compose.foundation.layout.*</ID>
-    <ID>WildcardImport:StatsContent.kt:import androidx.compose.material3.*</ID>
-    <ID>WildcardImport:StatsContent.kt:import memory_match.sharedui.generated.resources.*</ID>
-    <ID>WildcardImport:Theme.kt:import androidx.compose.runtime.*</ID>
-    <ID>WildcardImport:TimerDisplay.kt:import androidx.compose.animation.*</ID>
-    <ID>WildcardImport:TimerDisplay.kt:import androidx.compose.animation.core.*</ID>
-    <ID>WildcardImport:TimerDisplay.kt:import androidx.compose.foundation.layout.*</ID>
-    <ID>WildcardImport:TimerDisplay.kt:import io.github.smithjustinn.theme.*</ID>
-    <ID>WildcardImport:WalkthroughOverlay.kt:import androidx.compose.foundation.layout.*</ID>
-    <ID>WildcardImport:WalkthroughOverlay.kt:import memory_match.sharedui.generated.resources.*</ID>
   </CurrentIssues>
 </SmellBaseline>

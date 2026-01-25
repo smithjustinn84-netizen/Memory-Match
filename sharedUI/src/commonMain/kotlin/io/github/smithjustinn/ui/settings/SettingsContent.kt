@@ -53,7 +53,24 @@ import io.github.smithjustinn.theme.StartBackgroundBottom
 import io.github.smithjustinn.theme.StartBackgroundTop
 import io.github.smithjustinn.ui.components.AppIcons
 import io.github.smithjustinn.ui.components.NeonSegmentedControl
-import memory_match.sharedui.generated.resources.*
+import memory_match.sharedui.generated.resources.Res
+import memory_match.sharedui.generated.resources.back_content_description
+import memory_match.sharedui.generated.resources.settings
+import memory_match.sharedui.generated.resources.settings_appearance
+import memory_match.sharedui.generated.resources.settings_card_back_style
+import memory_match.sharedui.generated.resources.settings_enable_peek
+import memory_match.sharedui.generated.resources.settings_enable_peek_desc
+import memory_match.sharedui.generated.resources.settings_four_color_deck
+import memory_match.sharedui.generated.resources.settings_four_color_deck_desc
+import memory_match.sharedui.generated.resources.settings_game_music
+import memory_match.sharedui.generated.resources.settings_game_music_desc
+import memory_match.sharedui.generated.resources.settings_gameplay_audio
+import memory_match.sharedui.generated.resources.settings_reset
+import memory_match.sharedui.generated.resources.settings_reset_walkthrough
+import memory_match.sharedui.generated.resources.settings_reset_walkthrough_desc
+import memory_match.sharedui.generated.resources.settings_sound_effects
+import memory_match.sharedui.generated.resources.settings_sound_effects_desc
+import memory_match.sharedui.generated.resources.settings_symbol_style
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
