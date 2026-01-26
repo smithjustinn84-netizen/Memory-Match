@@ -101,7 +101,7 @@ subprojects {
                 .setEditorConfigPath(rootProject.file(".editorconfig"))
                 // Add Compose-specific rules for ktlint
                 .customRuleSets(
-                    listOf("io.nlopez.compose.rules:ktlint:0.4.22")
+                    listOf(libs.compose.rules.get().toString())
                 )
 
             trimTrailingWhitespace()
