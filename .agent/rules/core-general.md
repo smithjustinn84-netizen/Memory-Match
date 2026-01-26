@@ -16,7 +16,7 @@ Before generating code, you **MUST** align with:
 
 ## 1. Tech Stack Overview
 - **UI**: Compose Multiplatform 1.10+
-- **DI**: Metro (Compiler Plugin)
+- **DI**: Koin
 - **Nav**: Decompose
 - **DB**: Room (KMP)
 - **Network**: Ktor 3.x

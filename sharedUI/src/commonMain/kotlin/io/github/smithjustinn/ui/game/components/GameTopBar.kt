@@ -34,15 +34,15 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.domain.models.GameMode
+import io.github.smithjustinn.resources.Res
+import io.github.smithjustinn.resources.back_content_description
+import io.github.smithjustinn.resources.mute_content_description
+import io.github.smithjustinn.resources.restart_content_description
+import io.github.smithjustinn.resources.unmute_content_description
 import io.github.smithjustinn.theme.InactiveBackground
 import io.github.smithjustinn.theme.NeonCyan
 import io.github.smithjustinn.theme.TacticalRed
 import io.github.smithjustinn.ui.components.AppIcons
-import memory_match.sharedui.generated.resources.Res
-import memory_match.sharedui.generated.resources.back_content_description
-import memory_match.sharedui.generated.resources.mute_content_description
-import memory_match.sharedui.generated.resources.restart_content_description
-import memory_match.sharedui.generated.resources.unmute_content_description
 import org.jetbrains.compose.resources.stringResource
 
 @Composable

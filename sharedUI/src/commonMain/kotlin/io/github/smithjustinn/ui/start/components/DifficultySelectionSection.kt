@@ -33,22 +33,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.domain.models.DifficultyLevel
 import io.github.smithjustinn.domain.models.GameMode
+import io.github.smithjustinn.resources.Res
+import io.github.smithjustinn.resources.daily_challenge
+import io.github.smithjustinn.resources.daily_challenge_completed
+import io.github.smithjustinn.resources.game_mode
+import io.github.smithjustinn.resources.leaderboard
+import io.github.smithjustinn.resources.mode_standard
+import io.github.smithjustinn.resources.mode_time_attack
+import io.github.smithjustinn.resources.resume_game
+import io.github.smithjustinn.resources.select_difficulty
+import io.github.smithjustinn.resources.settings
+import io.github.smithjustinn.resources.start
 import io.github.smithjustinn.theme.InactiveBackground
 import io.github.smithjustinn.theme.NeonCyan
 import io.github.smithjustinn.ui.components.AppIcons
 import io.github.smithjustinn.ui.components.NeonSegmentedControl
 import io.github.smithjustinn.ui.start.DifficultyState
-import memory_match.sharedui.generated.resources.Res
-import memory_match.sharedui.generated.resources.daily_challenge
-import memory_match.sharedui.generated.resources.daily_challenge_completed
-import memory_match.sharedui.generated.resources.game_mode
-import memory_match.sharedui.generated.resources.leaderboard
-import memory_match.sharedui.generated.resources.mode_standard
-import memory_match.sharedui.generated.resources.mode_time_attack
-import memory_match.sharedui.generated.resources.resume_game
-import memory_match.sharedui.generated.resources.select_difficulty
-import memory_match.sharedui.generated.resources.settings
-import memory_match.sharedui.generated.resources.start
 import org.jetbrains.compose.resources.stringResource
 
 private const val TRAILING_ICON_ROTATION = 145f

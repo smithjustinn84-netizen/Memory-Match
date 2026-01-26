@@ -37,14 +37,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.domain.models.MatchComment
+import io.github.smithjustinn.resources.Res
+import io.github.smithjustinn.resources.new_high_score
 import io.github.smithjustinn.theme.GoldenYellow
 import io.github.smithjustinn.theme.LightGreyBlue
 import io.github.smithjustinn.theme.NeonCyan
 import io.github.smithjustinn.theme.StartBackgroundBottom
 import io.github.smithjustinn.theme.StartBackgroundTop
 import io.github.smithjustinn.ui.components.AppIcons
-import memory_match.sharedui.generated.resources.Res
-import memory_match.sharedui.generated.resources.new_high_score
 import org.jetbrains.compose.resources.stringResource
 
 @Composable

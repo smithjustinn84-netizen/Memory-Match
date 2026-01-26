@@ -17,10 +17,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.domain.models.CardDisplaySettings
+import io.github.smithjustinn.resources.Res
+import io.github.smithjustinn.resources.app_name
 import io.github.smithjustinn.theme.LightPurple
 import io.github.smithjustinn.theme.SoftBlue
-import memory_match.sharedui.generated.resources.Res
-import memory_match.sharedui.generated.resources.app_name
 import org.jetbrains.compose.resources.stringResource
 
 /**

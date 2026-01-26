@@ -10,12 +10,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.domain.models.GameMode
+import io.github.smithjustinn.resources.Res
+import io.github.smithjustinn.resources.daily_challenge
+import io.github.smithjustinn.resources.game_mode
+import io.github.smithjustinn.resources.mode_standard
+import io.github.smithjustinn.resources.mode_time_attack
 import io.github.smithjustinn.ui.components.NeonSegmentedControl
-import memory_match.sharedui.generated.resources.Res
-import memory_match.sharedui.generated.resources.daily_challenge
-import memory_match.sharedui.generated.resources.game_mode
-import memory_match.sharedui.generated.resources.mode_standard
-import memory_match.sharedui.generated.resources.mode_time_attack
 import org.jetbrains.compose.resources.stringResource
 
 @Composable

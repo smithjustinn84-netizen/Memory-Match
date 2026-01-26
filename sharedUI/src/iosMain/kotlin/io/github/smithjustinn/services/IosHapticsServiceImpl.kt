@@ -1,12 +1,10 @@
 package io.github.smithjustinn.services
 
-import dev.zacsweers.metro.Inject
 import platform.UIKit.UIImpactFeedbackGenerator
 import platform.UIKit.UIImpactFeedbackStyle
 import platform.UIKit.UINotificationFeedbackGenerator
 import platform.UIKit.UINotificationFeedbackType
 
-@Inject
 class IosHapticsServiceImpl : HapticsService {
     override fun vibrateMatch() {
         val generator = UIImpactFeedbackGenerator(UIImpactFeedbackStyle.UIImpactFeedbackStyleMedium)

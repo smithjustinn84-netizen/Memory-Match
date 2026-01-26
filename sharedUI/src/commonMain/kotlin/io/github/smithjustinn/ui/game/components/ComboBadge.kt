@@ -25,9 +25,9 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.smithjustinn.resources.Res
+import io.github.smithjustinn.resources.combo_format
 import io.github.smithjustinn.theme.MemoryMatchTheme
-import memory_match.sharedui.generated.resources.Res
-import memory_match.sharedui.generated.resources.combo_format
 import org.jetbrains.compose.resources.stringResource
 
 @Composable

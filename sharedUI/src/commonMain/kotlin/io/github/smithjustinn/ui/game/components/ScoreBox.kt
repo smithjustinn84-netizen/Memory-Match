@@ -18,13 +18,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.smithjustinn.resources.Res
+import io.github.smithjustinn.resources.final_score_label
+import io.github.smithjustinn.resources.moves_label
+import io.github.smithjustinn.resources.time_label
 import io.github.smithjustinn.theme.InactiveBackground
 import io.github.smithjustinn.theme.NeonCyan
 import io.github.smithjustinn.utils.formatTime
-import memory_match.sharedui.generated.resources.Res
-import memory_match.sharedui.generated.resources.final_score_label
-import memory_match.sharedui.generated.resources.moves_label
-import memory_match.sharedui.generated.resources.time_label
 import org.jetbrains.compose.resources.stringResource
 
 @Composable

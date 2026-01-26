@@ -22,6 +22,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.domain.models.DifficultyLevel
 import io.github.smithjustinn.domain.models.LeaderboardEntry
+import io.github.smithjustinn.resources.Res
+import io.github.smithjustinn.resources.no_stats_yet
+import io.github.smithjustinn.resources.pairs_format
+import io.github.smithjustinn.resources.score_label
+import io.github.smithjustinn.resources.stats_moves_header
+import io.github.smithjustinn.resources.stats_time_header
 import io.github.smithjustinn.theme.Bronze
 import io.github.smithjustinn.theme.GoldenYellow
 import io.github.smithjustinn.theme.InactiveBackground
@@ -29,12 +35,6 @@ import io.github.smithjustinn.theme.NeonCyan
 import io.github.smithjustinn.theme.Silver
 import io.github.smithjustinn.utils.formatTime
 import kotlinx.collections.immutable.ImmutableList
-import memory_match.sharedui.generated.resources.Res
-import memory_match.sharedui.generated.resources.no_stats_yet
-import memory_match.sharedui.generated.resources.pairs_format
-import memory_match.sharedui.generated.resources.score_label
-import memory_match.sharedui.generated.resources.stats_moves_header
-import memory_match.sharedui.generated.resources.stats_time_header
 import org.jetbrains.compose.resources.stringResource
 
 @Composable

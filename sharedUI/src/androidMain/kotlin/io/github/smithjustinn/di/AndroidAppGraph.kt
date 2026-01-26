@@ -1,72 +1,17 @@
 package io.github.smithjustinn.di
 
 import android.app.Application
-import android.content.Context
-import androidx.room.Room
-import androidx.sqlite.driver.bundled.BundledSQLiteDriver
-import dev.zacsweers.metro.DependencyGraph
-import dev.zacsweers.metro.Provides
-import dev.zacsweers.metro.SingleIn
-import dev.zacsweers.metro.createGraphFactory
-import io.github.smithjustinn.data.local.AppDatabase
-import io.github.smithjustinn.di.modules.DaoModule
-import io.github.smithjustinn.di.modules.RepositoryModule
-import io.github.smithjustinn.services.AndroidAudioServiceImpl
-import io.github.smithjustinn.services.AndroidHapticsServiceImpl
-import io.github.smithjustinn.services.AudioService
-import io.github.smithjustinn.services.HapticsService
-import kotlinx.coroutines.Dispatchers
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
 
-@DependencyGraph(
-    scope = AppScope::class,
-    bindingContainers = [
-        DaoModule::class,
-        RepositoryModule::class,
-    ],
-)
-interface AndroidAppGraph : AppGraph {
-    @Provides
-    @SingleIn(AppScope::class)
-    fun provideApplicationScope(): kotlinx.coroutines.CoroutineScope =
-        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + Dispatchers.Main)
-
-    @Provides fun provideApplicationContext(application: Application): Context = application
-
-    @DependencyGraph.Factory
-    fun interface Factory {
-        fun create(
-            @Provides application: Application,
-        ): AndroidAppGraph
+/**
+ * Android-specific implementation of the dependency graph.
+ * Refactored to use Koin for initialization and dependency management.
+ */
+fun createAndroidGraph(application: Application): AppGraph {
+    initKoin(androidUiModule) {
+        androidLogger()
+        androidContext(application)
     }
-
-    @Provides
-    @SingleIn(AppScope::class)
-    fun provideHapticsService(impl: AndroidHapticsServiceImpl): HapticsService = impl
-
-    @Provides
-    @SingleIn(AppScope::class)
-    fun provideAudioService(impl: AndroidAudioServiceImpl): AudioService = impl
-
-    @Provides
-    @SingleIn(AppScope::class)
-    fun provideDatabase(context: Context): AppDatabase {
-        val dbFile = context.getDatabasePath("memory_match.db")
-        return Room
-            .databaseBuilder<AppDatabase>(
-                context = context,
-                name = dbFile.absolutePath,
-            ).setDriver(BundledSQLiteDriver())
-            .setQueryCoroutineContext(Dispatchers.IO)
-            .addMigrations(
-                AppDatabase.MIGRATION_1_2,
-                AppDatabase.MIGRATION_2_3,
-                AppDatabase.MIGRATION_3_4,
-                AppDatabase.MIGRATION_4_5,
-                AppDatabase.MIGRATION_5_6,
-                AppDatabase.MIGRATION_6_7,
-            ).build()
-    }
+    return KoinAppGraph()
 }
-
-fun createAndroidGraph(application: Application): AppGraph =
-    createGraphFactory<AndroidAppGraph.Factory>().create(application)
