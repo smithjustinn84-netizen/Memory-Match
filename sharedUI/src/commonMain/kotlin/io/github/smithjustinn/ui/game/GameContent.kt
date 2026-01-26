@@ -33,6 +33,7 @@ import io.github.smithjustinn.theme.MemoryMatchTheme
 import io.github.smithjustinn.ui.components.AdaptiveDensity
 import io.github.smithjustinn.ui.game.components.BouncingCardsOverlay
 import io.github.smithjustinn.ui.game.components.ComboBadge
+import io.github.smithjustinn.ui.game.components.ComboBadgeState
 import io.github.smithjustinn.ui.game.components.ConfettiEffect
 import io.github.smithjustinn.ui.game.components.GameGrid
 import io.github.smithjustinn.ui.game.components.GameTopBar
@@ -365,9 +366,12 @@ private fun BoxScope.GameHUD(
 ) {
     if (state.game.comboMultiplier > 1) {
         ComboBadge(
-            combo = state.game.comboMultiplier,
-            isMegaBonus = state.isMegaBonus,
-            isHeatMode = state.isHeatMode,
+            state =
+                ComboBadgeState(
+                    combo = state.game.comboMultiplier,
+                    isMegaBonus = state.isMegaBonus,
+                    isHeatMode = state.isHeatMode,
+                ),
             infiniteTransition = rememberInfiniteTransition(),
             modifier =
                 Modifier

@@ -32,15 +32,13 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ComboBadge(
-    combo: Int,
-    isMegaBonus: Boolean,
-    isHeatMode: Boolean,
+    state: ComboBadgeState,
     infiniteTransition: InfiniteTransition,
     modifier: Modifier = Modifier,
     compact: Boolean = false,
 ) {
     AnimatedVisibility(
-        visible = combo > 1,
+        visible = state.combo > 1,
         enter = fadeIn() + scaleIn(),
         exit = fadeOut() + scaleOut(),
         modifier = modifier,
@@ -48,7 +46,7 @@ fun ComboBadge(
         val comboPulseScale by infiniteTransition.animateFloat(
             initialValue = 1f,
             targetValue =
-                if (isHeatMode) {
+                if (state.isHeatMode) {
                     if (compact) 1.08f else 1.15f
                 } else {
                     if (compact) 1.05f else 1.1f
@@ -60,51 +58,71 @@ fun ComboBadge(
                 ),
         )
 
-        val badgeColor =
-            when {
-                isHeatMode -> MemoryMatchTheme.colors.heatGlowPrimary
-                isMegaBonus -> MemoryMatchTheme.colors.goldenYellow
-                else -> MemoryMatchTheme.colors.neonCyan
-            }
-        val tacticalShape = CutCornerShape(topStart = 8.dp, bottomEnd = 8.dp)
-
-        Surface(
-            color = MemoryMatchTheme.colors.inactiveBackground.copy(alpha = 0.6f),
-            shape = tacticalShape,
-            border = BorderStroke(BORDER_WIDTH.dp, badgeColor),
-            modifier =
-                Modifier
-                    .scale(comboPulseScale)
-                    .shadow(
-                        elevation =
-                            if (isHeatMode) {
-                                if (compact) 10.dp else 18.dp
-                            } else {
-                                if (compact) 6.dp else 12.dp
-                            },
-                        shape = tacticalShape,
-                        ambientColor = badgeColor,
-                        spotColor = badgeColor,
-                    ),
-        ) {
-            Text(
-                text = stringResource(Res.string.combo_format, combo).uppercase(),
-                modifier =
-                    Modifier.padding(
-                        horizontal = if (compact) 8.dp else 12.dp,
-                        vertical = if (compact) 2.dp else 4.dp,
-                    ),
-                style =
-                    MaterialTheme.typography.labelLarge.copy(
-                        fontWeight = FontWeight.Black,
-                        fontSize = if (compact) 12.sp else 16.sp,
-                        letterSpacing = 1.sp,
-                    ),
-                color = badgeColor,
-            )
-        }
+        ComboBadgeContent(
+            state = state,
+            compact = compact,
+            pulseScale = comboPulseScale,
+        )
     }
 }
+
+@Composable
+private fun ComboBadgeContent(
+    state: ComboBadgeState,
+    compact: Boolean,
+    pulseScale: Float,
+    modifier: Modifier = Modifier,
+) {
+    val badgeColor =
+        when {
+            state.isHeatMode -> MemoryMatchTheme.colors.heatGlowPrimary
+            state.isMegaBonus -> MemoryMatchTheme.colors.goldenYellow
+            else -> MemoryMatchTheme.colors.neonCyan
+        }
+    val tacticalShape = CutCornerShape(topStart = 8.dp, bottomEnd = 8.dp)
+
+    Surface(
+        color = MemoryMatchTheme.colors.inactiveBackground.copy(alpha = 0.6f),
+        shape = tacticalShape,
+        border = BorderStroke(BORDER_WIDTH.dp, badgeColor),
+        modifier =
+            modifier
+                .scale(pulseScale)
+                .shadow(
+                    elevation =
+                        if (state.isHeatMode) {
+                            if (compact) 10.dp else 18.dp
+                        } else {
+                            if (compact) 6.dp else 12.dp
+                        },
+                    shape = tacticalShape,
+                    ambientColor = badgeColor,
+                    spotColor = badgeColor,
+                ),
+    ) {
+        Text(
+            text = stringResource(Res.string.combo_format, state.combo).uppercase(),
+            modifier =
+                Modifier.padding(
+                    horizontal = if (compact) 8.dp else 12.dp,
+                    vertical = if (compact) 2.dp else 4.dp,
+                ),
+            style =
+                MaterialTheme.typography.labelLarge.copy(
+                    fontWeight = FontWeight.Black,
+                    fontSize = if (compact) 12.sp else 16.sp,
+                    letterSpacing = 1.sp,
+                ),
+            color = badgeColor,
+        )
+    }
+}
+
+data class ComboBadgeState(
+    val combo: Int,
+    val isMegaBonus: Boolean,
+    val isHeatMode: Boolean,
+)
 
 private const val COMBO_ANIMATION_DURATION_MS = 400
 private const val BORDER_WIDTH = 1.5
