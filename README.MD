@@ -57,11 +57,13 @@ Success breeds intensity. By matching multiple pairs in quick succession, you bu
 *   **Rewards**: High combos in Time Attack grant massive "Mega Bonus" time gains, essential for high-score runs.
 
 ### ✨ Key Features
+*   **Interactive Walkthrough**: A seamless, step-by-step introduction for new players, ensuring they understand the "Heat" mechanics and game objectives from the very first flip.
+*   **Game Results & Analytics**: Receive a comprehensive breakdown of your performance after every match, including accuracy percentages, match speed, and combo efficiency.
+*   **Visual Polish & Dynamics**: Experience high-fidelity animations with the **Bouncing Cards Overlay**, dynamic **Confetti Celebrations**, and particle-based flip effects.
 *   **Customizable Aesthetics**: Choose from diverse **Card Back Themes** (Geometric, Minimal, Tactical) and **Symbol Sets** (Classic, Modern, Abstract).
-*   **Advanced Visual Effects**: Integrated particle systems for high-combo explosions and cascading celebratory confetti upon victory.
-*   **Professional Haptics**: Platform-native haptic feedback (iOS Taptic Engine / Android Vibrator) calibrated for specific game events.
+*   **Platform-Native Haptics**: Professional haptic feedback (iOS Taptic Engine / Android Vibrator) calibrated for specific game events, from card flips to "Heat" activation.
 *   **State Persistence**: Your progress is automatically saved locally using **Room KMP**, allowing you to resume any game exactly where you left off.
-*   **Deep-Linked Replays**: Share specific game configurations with friends via deep links (`memorymatch://game?seed=...`). Every game generates a unique seed that can be shared to replay the exact same card layout.
+*   **Deep-Linked Replays**: Share specific game configurations via deep links (`memorymatch://game?seed=...`). Every game generates a unique seed for sharing exact card layouts.
 *   **Comprehensive Stats**: Track your best scores, fastest times, and total moves across all difficulty levels and game modes.
 
 ---
@@ -127,17 +129,17 @@ We use a **Component-Based MVVM** pattern powered by **Decompose**, ensuring str
 
 ## 🛠 Tech Stack (2026 Standard)
 
-| Layer             | Technology                | Version       | Key Benefit                                         |
-| :---------------- | :------------------------ | :------------ | :-------------------------------------------------- |
-| **Language**      | **Kotlin**                | 2.3.0         | K2 Mode, Context Parameters, Multi-dollar strings   |
-| **UI**            | **Compose Multiplatform** | 1.10.0        | Adaptive layouts, Shared Resources, Skiko Rendering |
-| **Collections**   | **Immutable Collections** | 0.4.0         | Strong Skipping support for Compose performance     |
-| **DI**            | **Metro**                 | 0.9.4         | Compile-time safe, Zero-reflection, KMP-native      |
-| **Navigation**    | **Decompose**             | 3.4.0         | Lifecycle-aware, platform-agnostic navigation       |
-| **Persistence**   | **Room (KMP)**            | 2.8.4         | Type-safe SQLite, Bundled Drivers                   |
-| **Networking**    | **Ktor**                  | 3.3.3         | CIO Engine, Type-safe Content Negotiation           |
-| **Image Loading** | **Coil3**                 | 3.3.0         | Multiplatform-first image pipeline                  |
-| Testing           | **Turbine + Mokkery**     | 1.2.1 / 3.1.1 | Flow-first testing, KSP-based mocking               |
+| Layer             | Technology                | Version     | Key Benefit                                         |
+| :---------------- | :------------------------ | :---------- | :-------------------------------------------------- |
+| **Language**      | **Kotlin**                | 2.3.0       | K2 Mode, Context Parameters, Multi-dollar strings   |
+| **UI**            | **Compose Multiplatform** | 1.10.0      | Adaptive layouts, Shared Resources, Skiko Rendering |
+| **Collections**   | **Immutable Collections** | 0.5.0       | Optimized Strong Skipping support for Compose       |
+| **DI**            | **Metro**                 | 0.10.0-beta | Compile-time safe, Zero-reflection, KMP-native      |
+| **Navigation**    | **Decompose**             | 3.4.0       | Lifecycle-aware, platform-agnostic navigation       |
+| **Persistence**   | **Room (KMP)**            | 2.8.4       | Type-safe SQLite, Bundled Drivers                   |
+| **Networking**    | **Ktor**                  | 3.x         | Multi-platform asynchronous client                  |
+| **Image Loading** | **Coil3**                 | 3.x         | Multiplatform-first image pipeline                  |
+| Testing           | **Turbine + Mokkery**     | 1.2.1 / 3.x | Flow-first testing, KSP-based mocking               |
 
 ---
 
