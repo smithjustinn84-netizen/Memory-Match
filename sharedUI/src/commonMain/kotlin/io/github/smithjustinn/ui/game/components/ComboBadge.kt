@@ -118,11 +118,5 @@ private fun ComboBadgeContent(
     }
 }
 
-data class ComboBadgeState(
-    val combo: Int,
-    val isMegaBonus: Boolean,
-    val isHeatMode: Boolean,
-)
-
 private const val COMBO_ANIMATION_DURATION_MS = 400
 private const val BORDER_WIDTH = 1.5
