@@ -6,7 +6,6 @@ plugins {
     alias(libs.plugins.android.kmp.library).apply(false)
     alias(libs.plugins.kotlin.jvm).apply(false)
     alias(libs.plugins.kotlinx.serialization).apply(false)
-    alias(libs.plugins.metro).apply(false)
     alias(libs.plugins.room).apply(false)
     alias(libs.plugins.ksp).apply(false)
     alias(libs.plugins.spotless)
@@ -15,6 +14,8 @@ plugins {
 }
 
 dependencies {
+    kover(project(":shared:core"))
+    kover(project(":shared:data"))
     kover(project(":sharedUI"))
 }
 
@@ -54,7 +55,8 @@ kover {
                     
                     // DI patterns
                     "*.di.*",
-                    "*MetroFactory*",
+                    "*Koin*",
+                    "*KoinComponent*",
                     
                     // Resource classes
                     "Res",
@@ -106,9 +108,9 @@ detekt {
     // Configure source directories for KMP
     source.setFrom(
         files(
+            "shared/core/src/commonMain/kotlin",
+            "shared/data/src/commonMain/kotlin",
             "sharedUI/src/commonMain/kotlin",
-            "sharedUI/src/androidMain/kotlin",
-            "sharedUI/src/iosMain/kotlin",
             "androidApp/src/main/kotlin",
             "desktopApp/src/main/kotlin",
         ),

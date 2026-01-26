@@ -7,9 +7,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import androidx.annotation.RequiresPermission
-import dev.zacsweers.metro.Inject
 
-@Inject
 class AndroidHapticsServiceImpl(
     private val context: Context,
 ) : HapticsService {

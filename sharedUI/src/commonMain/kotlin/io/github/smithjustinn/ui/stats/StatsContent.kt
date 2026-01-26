@@ -30,15 +30,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.di.LocalAppGraph
+import io.github.smithjustinn.resources.Res
+import io.github.smithjustinn.resources.back_content_description
+import io.github.smithjustinn.resources.high_scores
 import io.github.smithjustinn.services.AudioService
 import io.github.smithjustinn.theme.StartBackgroundBottom
 import io.github.smithjustinn.theme.StartBackgroundTop
 import io.github.smithjustinn.ui.components.AppIcons
 import io.github.smithjustinn.ui.stats.components.LeaderboardSection
 import io.github.smithjustinn.ui.stats.components.ModeSelector
-import memory_match.sharedui.generated.resources.Res
-import memory_match.sharedui.generated.resources.back_content_description
-import memory_match.sharedui.generated.resources.high_scores
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)

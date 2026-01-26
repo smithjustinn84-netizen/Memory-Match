@@ -5,8 +5,8 @@ import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.media.SoundPool
 import co.touchlab.kermit.Logger
-import dev.zacsweers.metro.Inject
 import io.github.smithjustinn.domain.repositories.SettingsRepository
+import io.github.smithjustinn.resources.Res
 import io.github.smithjustinn.services.AudioService.Companion.toResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import memory_match.sharedui.generated.resources.Res
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
@@ -22,7 +21,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.ConcurrentHashMap
 
-@Inject
 class AndroidAudioServiceImpl(
     private val context: Context,
     private val logger: Logger,

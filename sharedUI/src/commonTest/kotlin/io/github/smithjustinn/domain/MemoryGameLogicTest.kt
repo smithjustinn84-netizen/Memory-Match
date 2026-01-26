@@ -1,9 +1,20 @@
 package io.github.smithjustinn.domain
 
-import io.github.smithjustinn.domain.models.*
+import io.github.smithjustinn.domain.models.GameDomainEvent
+import io.github.smithjustinn.domain.models.GameMode
+import io.github.smithjustinn.resources.Res
+import io.github.smithjustinn.resources.comment_boom
+import io.github.smithjustinn.resources.comment_eagle_eyes
+import io.github.smithjustinn.resources.comment_great_find
+import io.github.smithjustinn.resources.comment_halfway
+import io.github.smithjustinn.resources.comment_keep_it_up
+import io.github.smithjustinn.resources.comment_on_a_roll
+import io.github.smithjustinn.resources.comment_one_more
+import io.github.smithjustinn.resources.comment_photographic
+import io.github.smithjustinn.resources.comment_sharp
+import io.github.smithjustinn.resources.comment_you_got_it
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import memory_match.sharedui.generated.resources.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

@@ -1,4 +1,3 @@
-import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
@@ -8,15 +7,8 @@ plugins {
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.android.kmp.library)
     alias(libs.plugins.kotlinx.serialization)
-    alias(libs.plugins.metro)
-    alias(libs.plugins.room)
-    alias(libs.plugins.ksp)
     alias(libs.plugins.mokkery)
     alias(libs.plugins.kover)
-}
-
-ksp {
-    arg("mokkery.stubs.allowConcreteClassInstantiation", "true")
 }
 
 kotlin {
@@ -40,17 +32,16 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            api(project(":shared:core"))
+            api(project(":shared:data"))
             api(libs.bundles.compose.ui)
             api(libs.kermit)
-            implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.kotlinx.collections.immutable)
-            implementation(libs.bundles.ktor.common)
             api(libs.decompose)
             api(libs.decompose.extensions.compose)
-            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.collections.immutable)
             implementation(libs.bundles.coil)
-            implementation(libs.kotlinx.datetime)
-            implementation(libs.bundles.room)
+            api(libs.bundles.koin)
+            api(libs.koin.compose.viewmodel)
         }
 
         commonTest.dependencies {
@@ -59,6 +50,7 @@ kotlin {
         }
 
         androidMain.dependencies {
+            implementation(libs.koin.android)
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.ktor.client.okhttp)
         }
@@ -89,18 +81,4 @@ kotlin {
 
 dependencies {
     androidRuntimeClasspath(libs.compose.ui.tooling)
-}
-
-room {
-    schemaDirectory("$projectDir/schemas")
-}
-
-dependencies {
-    with(libs.room.compiler) {
-        add("kspAndroid", this)
-        add("kspJvm", this)
-        add("kspIosX64", this)
-        add("kspIosArm64", this)
-        add("kspIosSimulatorArm64", this)
-    }
 }

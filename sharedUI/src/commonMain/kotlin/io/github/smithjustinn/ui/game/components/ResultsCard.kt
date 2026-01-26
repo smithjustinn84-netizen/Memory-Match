@@ -44,13 +44,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.ScoreBreakdown
+import io.github.smithjustinn.resources.Res
+import io.github.smithjustinn.resources.game_complete
+import io.github.smithjustinn.resources.game_over
+import io.github.smithjustinn.resources.play_again
+import io.github.smithjustinn.resources.times_up
 import io.github.smithjustinn.theme.MemoryMatchTheme
 import io.github.smithjustinn.ui.components.AppIcons
-import memory_match.sharedui.generated.resources.Res
-import memory_match.sharedui.generated.resources.game_complete
-import memory_match.sharedui.generated.resources.game_over
-import memory_match.sharedui.generated.resources.play_again
-import memory_match.sharedui.generated.resources.times_up
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
 

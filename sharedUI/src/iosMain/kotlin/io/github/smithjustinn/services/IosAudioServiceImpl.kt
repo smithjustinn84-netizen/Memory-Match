@@ -1,8 +1,8 @@
 package io.github.smithjustinn.services
 
 import co.touchlab.kermit.Logger
-import dev.zacsweers.metro.Inject
 import io.github.smithjustinn.domain.repositories.SettingsRepository
+import io.github.smithjustinn.resources.Res
 import io.github.smithjustinn.services.AudioService.Companion.toResource
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -14,7 +14,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import memory_match.sharedui.generated.resources.Res
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
 import platform.AVFAudio.AVAudioPlayer
@@ -25,7 +24,6 @@ import platform.Foundation.NSData
 import platform.Foundation.create
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-@Inject
 class IosAudioServiceImpl(
     private val logger: Logger,
     settingsRepository: SettingsRepository,

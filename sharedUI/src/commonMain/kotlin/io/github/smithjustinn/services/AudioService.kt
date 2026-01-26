@@ -1,15 +1,15 @@
 package io.github.smithjustinn.services
 
-import memory_match.sharedui.generated.resources.Res
-import memory_match.sharedui.generated.resources.audio_click
-import memory_match.sharedui.generated.resources.audio_deal
-import memory_match.sharedui.generated.resources.audio_flip
-import memory_match.sharedui.generated.resources.audio_highscore
-import memory_match.sharedui.generated.resources.audio_lose
-import memory_match.sharedui.generated.resources.audio_match
-import memory_match.sharedui.generated.resources.audio_mismatch
-import memory_match.sharedui.generated.resources.audio_music
-import memory_match.sharedui.generated.resources.audio_win
+import io.github.smithjustinn.resources.Res
+import io.github.smithjustinn.resources.audio_click
+import io.github.smithjustinn.resources.audio_deal
+import io.github.smithjustinn.resources.audio_flip
+import io.github.smithjustinn.resources.audio_highscore
+import io.github.smithjustinn.resources.audio_lose
+import io.github.smithjustinn.resources.audio_match
+import io.github.smithjustinn.resources.audio_mismatch
+import io.github.smithjustinn.resources.audio_music
+import io.github.smithjustinn.resources.audio_win
 import org.jetbrains.compose.resources.StringResource
 
 interface AudioService {

@@ -1,15 +1,14 @@
 package io.github.smithjustinn.services
 
 import co.touchlab.kermit.Logger
-import dev.zacsweers.metro.Inject
 import io.github.smithjustinn.domain.repositories.SettingsRepository
+import io.github.smithjustinn.resources.Res
 import io.github.smithjustinn.services.AudioService.Companion.toResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import memory_match.sharedui.generated.resources.Res
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
 import java.io.BufferedInputStream
@@ -20,7 +19,6 @@ import javax.sound.sampled.Clip
 import javax.sound.sampled.FloatControl
 import kotlin.math.log10
 
-@Inject
 class JvmAudioServiceImpl(
     private val logger: Logger,
     settingsRepository: SettingsRepository,

@@ -134,7 +134,7 @@ We use a **Component-Based MVVM** pattern powered by **Decompose**, ensuring str
 | **Language**      | **Kotlin**                | 2.3.0       | K2 Mode, Context Parameters, Multi-dollar strings   |
 | **UI**            | **Compose Multiplatform** | 1.10.0      | Adaptive layouts, Shared Resources, Skiko Rendering |
 | **Collections**   | **Immutable Collections** | 0.5.0       | Optimized Strong Skipping support for Compose       |
-| **DI**            | **Metro**                 | 0.10.0-beta | Compile-time safe, Zero-reflection, KMP-native      |
+| **DI**            | **Koin**                  | 4.0.2       | Pragmatic, stable, KMP-native                       |
 | **Navigation**    | **Decompose**             | 3.4.0       | Lifecycle-aware, platform-agnostic navigation       |
 | **Persistence**   | **Room (KMP)**            | 2.8.4       | Type-safe SQLite, Bundled Drivers                   |
 | **Networking**    | **Ktor**                  | 3.x         | Multi-platform asynchronous client                  |
