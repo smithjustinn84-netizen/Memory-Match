@@ -34,8 +34,6 @@
     <string name="difficulty_casual">Casual Player</string>
     <string name="difficulty_master">Memory Master</string>
     <string name="difficulty_shark">Card Shark</string>
-    <string name="difficulty_grandmaster">Grandmaster</string>
-    <string name="difficulty_elephant">Elephant Brain</string>
 
     <string name="best_score_label">Best: %1$d</string>
     <string name="best_time_label">Best: %1$s</string>

@@ -3,14 +3,15 @@ package io.github.smithjustinn.domain
 import io.github.smithjustinn.domain.models.GameDomainEvent
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.resources.Res
+import io.github.smithjustinn.resources.comment_bad_beat
 import io.github.smithjustinn.resources.comment_boom
 import io.github.smithjustinn.resources.comment_eagle_eyes
+import io.github.smithjustinn.resources.comment_full_house
 import io.github.smithjustinn.resources.comment_great_find
-import io.github.smithjustinn.resources.comment_halfway
-import io.github.smithjustinn.resources.comment_keep_it_up
 import io.github.smithjustinn.resources.comment_on_a_roll
 import io.github.smithjustinn.resources.comment_one_more
 import io.github.smithjustinn.resources.comment_photographic
+import io.github.smithjustinn.resources.comment_pot_odds
 import io.github.smithjustinn.resources.comment_sharp
 import io.github.smithjustinn.resources.comment_you_got_it
 import kotlinx.collections.immutable.persistentListOf
@@ -208,8 +209,7 @@ class MemoryGameLogicTest {
         assertEquals(35L, MemoryGameLogic.calculateInitialTime(8))
         assertEquals(45L, MemoryGameLogic.calculateInitialTime(10))
         assertEquals(55L, MemoryGameLogic.calculateInitialTime(12))
-        assertEquals(65L, MemoryGameLogic.calculateInitialTime(14))
-        assertEquals(75L, MemoryGameLogic.calculateInitialTime(16))
+        assertEquals(55L, MemoryGameLogic.calculateInitialTime(12))
     }
 
     @Test
@@ -339,7 +339,7 @@ class MemoryGameLogicTest {
         var (s2, _) = MemoryGameLogic.flipCard(s1, p2c2.id)
 
         // matchesFound should be 2. Total 4. Halfway.
-        assertEquals(Res.string.comment_halfway, s2.matchComment?.res)
+        assertEquals(Res.string.comment_pot_odds, s2.matchComment?.res)
 
         // 2. One More: matchesFound == totalPairs - 1
         // Total 4. Need 3 matches.
@@ -385,7 +385,7 @@ class MemoryGameLogicTest {
                 .values
                 .toList()
         s1 = MemoryGameLogic.flipCard(state, pairs3[0][0].id).first
-        s2 = MemoryGameLogic.flipCard(s1, pairs3[0][1].id).first
+        MemoryGameLogic.flipCard(s1, pairs3[0][1].id).first
         // moves=1. matches=1. 1 <= 2.
 
         // So to hit Photographic we need matches > 1, not halfway, not one more.
@@ -451,7 +451,8 @@ class MemoryGameLogicTest {
                 Res.string.comment_eagle_eyes,
                 Res.string.comment_sharp,
                 Res.string.comment_on_a_roll,
-                Res.string.comment_keep_it_up,
+                Res.string.comment_full_house,
+                Res.string.comment_bad_beat,
             )
         assertTrue(randomComments.contains(s2.matchComment?.res))
     }

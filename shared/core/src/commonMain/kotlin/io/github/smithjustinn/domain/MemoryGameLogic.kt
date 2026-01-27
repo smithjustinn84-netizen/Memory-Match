@@ -302,12 +302,6 @@ object MemoryGameLogic {
             DIFF_LEVEL_12 -> INITIAL_TIME_12
 
             // Shark
-            DIFF_LEVEL_14 -> INITIAL_TIME_14
-
-            // Grandmaster
-            DIFF_LEVEL_16 -> INITIAL_TIME_16
-
-            // Elephant
             else -> (pairCount * TIME_PER_PAIR_FALLBACK).toLong()
         }
 
@@ -324,14 +318,10 @@ object MemoryGameLogic {
     private const val DIFF_LEVEL_8 = 8
     private const val DIFF_LEVEL_10 = 10
     private const val DIFF_LEVEL_12 = 12
-    private const val DIFF_LEVEL_14 = 14
-    private const val DIFF_LEVEL_16 = 16
     private const val INITIAL_TIME_6 = 25L
     private const val INITIAL_TIME_8 = 35L
     private const val INITIAL_TIME_10 = 45L
     private const val INITIAL_TIME_12 = 55L
-    private const val INITIAL_TIME_14 = 65L
-    private const val INITIAL_TIME_16 = 75L
     private const val TIME_PER_PAIR_FALLBACK = 4
     private const val BASE_TIME_GAIN = 3
     private const val COMBO_TIME_GAIN_FACTOR = 1
