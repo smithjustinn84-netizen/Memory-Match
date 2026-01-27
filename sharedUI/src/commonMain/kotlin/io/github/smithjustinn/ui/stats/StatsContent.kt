@@ -34,8 +34,6 @@ import io.github.smithjustinn.resources.Res
 import io.github.smithjustinn.resources.back_content_description
 import io.github.smithjustinn.resources.high_scores
 import io.github.smithjustinn.services.AudioService
-import io.github.smithjustinn.theme.StartBackgroundBottom
-import io.github.smithjustinn.theme.StartBackgroundTop
 import io.github.smithjustinn.ui.components.AppIcons
 import io.github.smithjustinn.ui.stats.components.LeaderboardSection
 import io.github.smithjustinn.ui.stats.components.ModeSelector
@@ -65,8 +63,14 @@ fun StatsContent(
                 .fillMaxSize()
                 .background(
                     brush =
-                        Brush.verticalGradient(
-                            colors = listOf(StartBackgroundTop, StartBackgroundBottom),
+                        Brush.radialGradient(
+                            colors =
+                                listOf(
+                                    io.github.smithjustinn.theme.FeltGreenTop,
+                                    io.github.smithjustinn.theme.FeltGreenBottom,
+                                ),
+                            center = androidx.compose.ui.geometry.Offset.Unspecified,
+                            radius = 1000f,
                         ),
                 ),
     ) {
@@ -92,7 +96,7 @@ private fun StatsMainContent(
                 modifier =
                     Modifier
                         .fillMaxSize()
-                        .widthIn(max = 800.dp)
+                        .widthIn(max = 600.dp)
                         .align(Alignment.TopCenter),
             ) {
                 ModeSelector(
@@ -110,7 +114,7 @@ private fun StatsMainContent(
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp),
                 ) {
                     items(state.difficultyLeaderboards) { (level, entries) ->
                         LeaderboardSection(level, entries)
@@ -131,7 +135,10 @@ private fun StatsTopBar(
         title = {
             Text(
                 text = stringResource(Res.string.high_scores),
-                style = MaterialTheme.typography.titleLarge,
+                style =
+                    MaterialTheme.typography.titleLarge.copy(
+                        fontFamily = androidx.compose.ui.text.font.FontFamily.Serif,
+                    ),
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
             )
@@ -145,7 +152,7 @@ private fun StatsTopBar(
                 Icon(
                     imageVector = AppIcons.ArrowBack,
                     contentDescription = stringResource(Res.string.back_content_description),
-                    tint = Color.White,
+                    tint = io.github.smithjustinn.theme.GoldenYellow,
                 )
             }
         },

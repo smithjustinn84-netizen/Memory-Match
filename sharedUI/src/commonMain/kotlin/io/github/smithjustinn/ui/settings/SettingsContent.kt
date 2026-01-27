@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -27,7 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -67,6 +64,7 @@ import io.github.smithjustinn.resources.settings_sound_effects_desc
 import io.github.smithjustinn.resources.settings_symbol_style
 import io.github.smithjustinn.services.AudioService
 import io.github.smithjustinn.theme.InactiveBackground
+import io.github.smithjustinn.ui.components.AppCard
 import io.github.smithjustinn.ui.components.AppIcons
 import io.github.smithjustinn.ui.components.PillSegmentedControl
 import org.jetbrains.compose.resources.stringResource
@@ -170,7 +168,7 @@ private fun SettingsAppearanceSection(
     audioService: AudioService,
     component: SettingsComponent,
 ) {
-    SettingsCard(title = stringResource(Res.string.settings_appearance)) {
+    AppCard(title = stringResource(Res.string.settings_appearance)) {
         ThemeSelector(
             title = stringResource(Res.string.settings_card_back_style),
             options = CardBackTheme.entries,
@@ -222,7 +220,7 @@ private fun SettingsAudioSection(
     audioService: AudioService,
     component: SettingsComponent,
 ) {
-    SettingsCard(title = stringResource(Res.string.settings_gameplay_audio)) {
+    AppCard(title = stringResource(Res.string.settings_gameplay_audio)) {
         SettingsToggle(
             title = stringResource(Res.string.settings_sound_effects),
             description = stringResource(Res.string.settings_sound_effects_desc),
@@ -285,7 +283,7 @@ private fun SettingsResetSection(
     audioService: AudioService,
     component: SettingsComponent,
 ) {
-    SettingsCard {
+    AppCard {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -389,39 +387,6 @@ private fun VolumeSlider(
             color = Color.White.copy(alpha = 0.6f),
             modifier = Modifier.width(32.dp),
         )
-    }
-}
-
-@Composable
-private fun SettingsCard(
-    title: String? = null,
-    content: @Composable ColumnScope.() -> Unit,
-) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp), // Sharper corners for a "wooden" feel
-        color = Color.Black.copy(alpha = 0.3f), // Recessed felt look
-        border =
-            androidx.compose.foundation.BorderStroke(
-                width = 1.dp,
-                color =
-                    io.github.smithjustinn.theme.GoldenYellow
-                        .copy(alpha = 0.2f),
-                // Brass-like inlay border
-            ),
-    ) {
-        Column(modifier = Modifier.padding(20.dp)) {
-            if (title != null) {
-                Text(
-                    text = title.uppercase(),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = io.github.smithjustinn.theme.GoldenYellow,
-                    fontWeight = FontWeight.ExtraBold,
-                    modifier = Modifier.padding(bottom = 16.dp),
-                )
-            }
-            content()
-        }
     }
 }
 
