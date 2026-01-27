@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -21,8 +22,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.di.LocalAppGraph
 import io.github.smithjustinn.services.AudioService
-import io.github.smithjustinn.theme.StartBackgroundBottom
-import io.github.smithjustinn.theme.StartBackgroundTop
 import io.github.smithjustinn.ui.start.components.DifficultySelectionSection
 import io.github.smithjustinn.ui.start.components.StartHeader
 
@@ -41,68 +40,67 @@ fun StartContent(
                 .fillMaxSize()
                 .background(
                     brush =
-                        Brush.verticalGradient(
-                            colors = listOf(StartBackgroundTop, StartBackgroundBottom),
+                        Brush.radialGradient(
+                            colors =
+                                listOf(
+                                    io.github.smithjustinn.theme.FeltGreenTop,
+                                    io.github.smithjustinn.theme.FeltGreenBottom,
+                                ),
+                            center = androidx.compose.ui.geometry.Offset.Unspecified,
+                            radius = 1000f, // Broad spread for the "tabletop" look
                         ),
                 ),
     ) {
-        StartMainContent(state, component, audioService)
-    }
-}
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .statusBarsPadding()
+                    .navigationBarsPadding()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp, vertical = 32.dp)
+                    .widthIn(max = 600.dp)
+                    .align(Alignment.TopCenter),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top,
+        ) {
+            StartHeader(
+                settings = state.cardSettings,
+            )
 
-@Composable
-private fun StartMainContent(
-    state: DifficultyState,
-    component: StartComponent,
-    audioService: AudioService,
-) {
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .statusBarsPadding()
-                .navigationBarsPadding()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top,
-    ) {
-        StartHeader(
-            settings = state.cardSettings,
-        )
+            Spacer(modifier = Modifier.height(48.dp))
 
-        Spacer(modifier = Modifier.height(48.dp))
-
-        DifficultySelectionSection(
-            state = state,
-            onDifficultySelected = { level ->
-                audioService.playEffect(AudioService.SoundEffect.CLICK)
-                component.onDifficultySelected(level)
-            },
-            onModeSelected = { mode ->
-                audioService.playEffect(AudioService.SoundEffect.CLICK)
-                component.onModeSelected(mode)
-            },
-            onStartGame = {
-                audioService.playEffect(AudioService.SoundEffect.CLICK)
-                component.onStartGame()
-            },
-            onResumeGame = {
-                audioService.playEffect(AudioService.SoundEffect.CLICK)
-                component.onResumeGame()
-            },
-            onSettingsClick = {
-                audioService.playEffect(AudioService.SoundEffect.CLICK)
-                component.onSettingsClick()
-            },
-            onStatsClick = {
-                audioService.playEffect(AudioService.SoundEffect.CLICK)
-                component.onStatsClick()
-            },
-            onDailyChallengeClick = {
-                audioService.playEffect(AudioService.SoundEffect.CLICK)
-                component.onDailyChallengeClick()
-            },
-        )
+            DifficultySelectionSection(
+                state = state,
+                onDifficultySelected = { level ->
+                    audioService.playEffect(AudioService.SoundEffect.CLICK)
+                    component.onDifficultySelected(level)
+                },
+                onModeSelected = { mode ->
+                    audioService.playEffect(AudioService.SoundEffect.CLICK)
+                    component.onModeSelected(mode)
+                },
+                onStartGame = {
+                    audioService.playEffect(AudioService.SoundEffect.CLICK)
+                    component.onStartGame()
+                },
+                onResumeGame = {
+                    audioService.playEffect(AudioService.SoundEffect.CLICK)
+                    component.onResumeGame()
+                },
+                onSettingsClick = {
+                    audioService.playEffect(AudioService.SoundEffect.CLICK)
+                    component.onSettingsClick()
+                },
+                onStatsClick = {
+                    audioService.playEffect(AudioService.SoundEffect.CLICK)
+                    component.onStatsClick()
+                },
+                onDailyChallengeClick = {
+                    audioService.playEffect(AudioService.SoundEffect.CLICK)
+                    component.onDailyChallengeClick()
+                },
+            )
+        }
     }
 }
