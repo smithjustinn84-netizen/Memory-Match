@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="screenshots/Hero.png" width="100%" alt="Memory Match Hero Banner">
+  <img src="screenshots/hero.jpg" width="100%" alt="Memory Match Hero Banner">
 </p>
 
 # 🧩 Memory-Match
@@ -28,14 +28,14 @@ Memory-Match is not just a game; it's a reference implementation for **Clean Arc
 ## 📸 Experience the UI
 
 <p align="center">
-  <img src="screenshots/Screenshot_20260119_133903.png" width="180" alt="Screen 1">
-  <img src="screenshots/Screenshot_20260119_133921.png" width="180" alt="Screen 2">
-  <img src="screenshots/Screenshot_20260119_133936.png" width="180" alt="Screen 3">
+  <img src="screenshots/Screenshot_20260126_221943.png" width="180" alt="Screen 1">
+  <img src="screenshots/Screenshot_20260126_221954.png" width="180" alt="Screen 2">
+  <img src="screenshots/Screenshot_20260126_222019.png" width="180" alt="Screen 3">
 </p>
 <p align="center">
-  <img src="screenshots/Screenshot_20260119_134035.png" width="180" alt="Screen 4">
-  <img src="screenshots/Screenshot_20260119_134138.png" width="180" alt="Screen 5">
-  <img src="screenshots/Screenshot_20260119_134420.png" width="180" alt="Screen 6">
+  <img src="screenshots/Screenshot_20260126_222045.png" width="180" alt="Screen 4">
+  <img src="screenshots/Screenshot_20260126_222104.png" width="180" alt="Screen 5">
+  <img src="screenshots/Screenshot_20260126_222122.png" width="180" alt="Screen 6">
 </p>
 
 ---
