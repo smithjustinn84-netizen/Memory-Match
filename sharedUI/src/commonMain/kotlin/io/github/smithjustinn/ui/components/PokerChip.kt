@@ -1,6 +1,7 @@
 package io.github.smithjustinn.ui.components
 
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -17,11 +18,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -35,7 +39,7 @@ fun PokerChip(
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    size: Dp = 64.dp,
+    chipSize: Dp = 64.dp,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -43,16 +47,26 @@ fun PokerChip(
     val elevation by animateDpAsState(
         targetValue =
             if (isPressed) {
-                PokerTheme.spacing.extraSmall
+                2.dp
             } else if (isSelected) {
-                PokerTheme.spacing.small
+                12.dp
             } else {
-                PokerTheme.spacing.extraSmall
+                4.dp
             },
         label = "chipElevation",
     )
 
-    val scale = if (isSelected) SCALE_SELECTED else SCALE_DEFAULT
+    val scale by animateFloatAsState(
+        targetValue = if (isSelected) SCALE_SELECTED else SCALE_DEFAULT,
+        label = "chipScale",
+    )
+
+    val glowAlpha by animateFloatAsState(
+        targetValue = if (isSelected) 0.5f else 0f,
+        label = "chipGlowAlpha",
+    )
+
+    val glowColor = PokerTheme.colors.goldenYellow
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -62,8 +76,27 @@ fun PokerChip(
             contentAlignment = Alignment.Center,
             modifier =
                 Modifier
-                    .size(size * scale)
-                    .shadow(elevation, CircleShape)
+                    .size(chipSize)
+                    .graphicsLayer {
+                        scaleX = scale
+                        scaleY = scale
+                    }.drawBehind {
+                        if (glowAlpha > 0f) {
+                            drawCircle(
+                                brush =
+                                    Brush.radialGradient(
+                                        colors =
+                                            listOf(
+                                                glowColor.copy(alpha = glowAlpha),
+                                                Color.Transparent,
+                                            ),
+                                        center = center,
+                                        radius = size.minDimension * 0.8f,
+                                    ),
+                                radius = size.minDimension * 0.8f,
+                            )
+                        }
+                    }.shadow(elevation, CircleShape)
                     .clickable(
                         interactionSource = interactionSource,
                         indication = null,
@@ -94,8 +127,8 @@ private fun ChipFace(
     modifier: Modifier = Modifier,
 ) {
     Canvas(modifier = modifier) {
-        val radius = this.size.minDimension / 2
-        val center = Offset(this.size.width / 2, this.size.height / 2)
+        val radius = size.minDimension / 2
+        val center = Offset(size.width / 2, size.height / 2)
 
         // 1. Base Chip Color
         drawCircle(
