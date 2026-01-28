@@ -60,9 +60,23 @@ fun ScoreBreakdownSection(
 
             BreakdownRow(
                 label = stringResource(Res.string.score_match_points),
-                value = scoreBreakdown.matchPoints.toString(),
+                value = scoreBreakdown.basePoints.toString(),
                 color = Color.White,
             )
+            if (scoreBreakdown.comboBonus > 0) {
+                BreakdownRow(
+                    label = "COMBO BONUS",
+                    value = "+${scoreBreakdown.comboBonus}",
+                    color = BonusColor,
+                )
+            }
+            if (scoreBreakdown.doubleDownBonus > 0) {
+                BreakdownRow(
+                    label = "DOUBLE OR NOTHING",
+                    value = "+${scoreBreakdown.doubleDownBonus}",
+                    color = BonusColor,
+                )
+            }
             BreakdownRow(
                 label = stringResource(Res.string.score_time_bonus),
                 value = if (scoreBreakdown.timeBonus > 0) "+${scoreBreakdown.timeBonus}" else "0",

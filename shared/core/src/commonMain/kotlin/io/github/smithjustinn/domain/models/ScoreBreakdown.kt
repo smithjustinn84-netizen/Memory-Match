@@ -7,7 +7,9 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class ScoreBreakdown(
-    val matchPoints: Int = 0,
+    val basePoints: Int = 0,
+    val comboBonus: Int = 0,
+    val doubleDownBonus: Int = 0,
     val timeBonus: Int = 0,
     val moveBonus: Int = 0,
     val totalScore: Int = 0,

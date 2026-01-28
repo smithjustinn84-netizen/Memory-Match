@@ -140,11 +140,12 @@ object MemoryGameLogic {
                 }.toImmutableList()
 
         val config = state.config
-        // Quadratic Scoring: Rewards high combos significantly more
-        // Example: 1x=20, 2x=420, 3x=920, 4x=1620
         val comboFactor = state.comboMultiplier * state.comboMultiplier
-        val basePoints = config.baseMatchPoints + comboFactor * config.comboBonusPoints
-        val pointsEarned = if (state.isDoubleDownActive) basePoints * 2 else basePoints
+        val matchBasePoints = config.baseMatchPoints
+        val matchComboBonus = comboFactor * config.comboBonusPoints
+        val matchPoints = matchBasePoints + matchComboBonus
+        val matchDoubleDownBonus = if (state.isDoubleDownActive) matchPoints else 0
+        val pointsEarned = matchPoints + matchDoubleDownBonus
 
         val isWon = newCards.all { it.isMatched }
         val matchesFound = newCards.count { it.isMatched } / 2
@@ -159,6 +160,9 @@ object MemoryGameLogic {
                 isGameOver = isWon,
                 moves = moves,
                 score = state.score + pointsEarned,
+                totalBasePoints = state.totalBasePoints + matchBasePoints,
+                totalComboBonus = state.totalComboBonus + matchComboBonus,
+                totalDoubleDownBonus = state.totalDoubleDownBonus + matchDoubleDownBonus,
                 comboMultiplier = if (state.isDoubleDownActive) 1 else state.comboMultiplier + 1,
                 isDoubleDownActive = false,
                 matchComment = comment,
@@ -244,7 +248,9 @@ object MemoryGameLogic {
             score = totalScore,
             scoreBreakdown =
                 ScoreBreakdown(
-                    matchPoints = state.score,
+                    basePoints = state.totalBasePoints,
+                    comboBonus = state.totalComboBonus,
+                    doubleDownBonus = state.totalDoubleDownBonus,
                     timeBonus = timeBonus,
                     moveBonus = moveBonus,
                     totalScore = totalScore,

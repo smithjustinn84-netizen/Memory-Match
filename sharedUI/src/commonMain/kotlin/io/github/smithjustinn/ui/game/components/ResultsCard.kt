@@ -215,7 +215,13 @@ private fun PayoutSection(
     elapsedTimeSeconds: Long,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        PayoutRow("Base Match Pts", scoreBreakdown.matchPoints)
+        PayoutRow("Base Match Pts", scoreBreakdown.basePoints)
+        if (scoreBreakdown.comboBonus > 0) {
+            PayoutRow("Combo Bonus", scoreBreakdown.comboBonus)
+        }
+        if (scoreBreakdown.doubleDownBonus > 0) {
+            PayoutRow("Double Or Nothing", scoreBreakdown.doubleDownBonus)
+        }
         PayoutRow("Time Bonus", scoreBreakdown.timeBonus)
         PayoutRow("Move Efficiency", scoreBreakdown.moveBonus)
 
