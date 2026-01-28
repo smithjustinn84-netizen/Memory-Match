@@ -295,7 +295,7 @@ object MemoryGameLogic {
         when (pairCount) {
             DIFF_LEVEL_6 -> INITIAL_TIME_6
 
-            // Toddler
+            // Tourist
             DIFF_LEVEL_8 -> INITIAL_TIME_8
 
             // Casual
