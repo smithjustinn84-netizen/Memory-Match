@@ -11,6 +11,76 @@ import androidx.compose.ui.unit.dp
 
 @Suppress("ktlint:standard:backing-property-naming", "MagicNumber")
 object AppIcons {
+    private var _casinoChip: ImageVector? = null
+    val CasinoChip: ImageVector
+        get() {
+            _casinoChip?.let { return it }
+            return ImageVector
+                .Builder(
+                    name = "CasinoChip",
+                    defaultWidth = 24.0.dp,
+                    defaultHeight = 24.0.dp,
+                    viewportWidth = 24.0f,
+                    viewportHeight = 24.0f,
+                ).apply {
+                    // 1. The Outer Ring (Rim)
+                    path(fill = SolidColor(Color.Black)) {
+                        moveTo(12.0f, 2.0f)
+                        curveTo(6.48f, 2.0f, 2.0f, 6.48f, 2.0f, 12.0f)
+                        reflectiveCurveToRelative(4.48f, 10.0f, 10.0f, 10.0f)
+                        reflectiveCurveToRelative(10.0f, -4.48f, 10.0f, -10.0f)
+                        reflectiveCurveTo(17.52f, 2.0f, 12.0f, 2.0f)
+                        close()
+                        // Create the "Ring" effect by cutting out the inner circle
+                        moveTo(12.0f, 20.0f)
+                        curveToRelative(-4.41f, 0.0f, -8.0f, -3.59f, -8.0f, -8.0f)
+                        reflectiveCurveToRelative(3.59f, -8.0f, 8.0f, -8.0f)
+                        reflectiveCurveToRelative(8.0f, 3.59f, 8.0f, 8.0f)
+                        reflectiveCurveToRelative(-3.59f, 8.0f, -8.0f, 8.0f)
+                        close()
+                    }
+
+                    // 2. The 4 Cardinal "Spots" (Classic Poker Chip Detail)
+                    path(fill = SolidColor(Color.Black)) {
+                        // Top Spot
+                        moveTo(11.0f, 2.0f)
+                        horizontalLineToRelative(2.0f)
+                        verticalLineToRelative(4.0f)
+                        horizontalLineToRelative(-2.0f)
+                        close()
+                        // Bottom Spot
+                        moveTo(11.0f, 18.0f)
+                        horizontalLineToRelative(2.0f)
+                        verticalLineToRelative(4.0f)
+                        horizontalLineToRelative(-2.0f)
+                        close()
+                        // Left Spot
+                        moveTo(2.0f, 11.0f)
+                        horizontalLineToRelative(4.0f)
+                        verticalLineToRelative(2.0f)
+                        horizontalLineTo(2.0f)
+                        close()
+                        // Right Spot
+                        moveTo(18.0f, 11.0f)
+                        horizontalLineToRelative(4.0f)
+                        verticalLineToRelative(2.0f)
+                        horizontalLineToRelative(-4.0f)
+                        close()
+                    }
+
+                    // 3. The Inner Face
+                    path(fill = SolidColor(Color.Black)) {
+                        moveTo(12.0f, 7.0f)
+                        curveToRelative(-2.76f, 0.0f, -5.0f, 2.24f, -5.0f, 5.0f)
+                        reflectiveCurveToRelative(2.24f, 5.0f, 5.0f, 5.0f)
+                        reflectiveCurveToRelative(5.0f, -2.24f, 5.0f, -5.0f)
+                        reflectiveCurveToRelative(-2.24f, -5.0f, -5.0f, -5.0f)
+                        close()
+                    }
+                }.build()
+                .also { _casinoChip = it }
+        }
+
     private var _arrowBack: ImageVector? = null
     val ArrowBack: ImageVector
         get() {
