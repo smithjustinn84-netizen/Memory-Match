@@ -55,7 +55,10 @@ fun GameTopBar(
     onScorePositioned: (androidx.compose.ui.geometry.Offset) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    WoodenDashboard(modifier = modifier) {
+    WoodenDashboard(
+        modifier = modifier,
+        isHeatMode = state.isHeatMode,
+    ) {
         val isTimeAttack = state.mode == GameMode.TIME_ATTACK
 
         Column(

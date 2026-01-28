@@ -140,7 +140,10 @@ object MemoryGameLogic {
                 }.toImmutableList()
 
         val config = state.config
-        val pointsEarned = config.baseMatchPoints + (state.comboMultiplier - 1) * config.comboBonusPoints
+        // Quadratic Scoring: Rewards high combos significantly more
+        // Example: 1x=20, 2x=420, 3x=920, 4x=1620
+        val comboFactor = state.comboMultiplier * state.comboMultiplier
+        val pointsEarned = config.baseMatchPoints + comboFactor * config.comboBonusPoints
 
         val isWon = newCards.all { it.isMatched }
         val matchesFound = newCards.count { it.isMatched } / 2
@@ -307,7 +310,8 @@ object MemoryGameLogic {
 
     fun calculateTimeGain(comboMultiplier: Int): Int {
         val baseGain = BASE_TIME_GAIN
-        val comboBonus = (comboMultiplier - 1) * COMBO_TIME_GAIN_FACTOR
+        // Steeper time reward: +2s per combo level instead of +1s
+        val comboBonus = (comboMultiplier - 1) * 2 
         return baseGain + comboBonus
     }
 
@@ -324,7 +328,5 @@ object MemoryGameLogic {
     private const val INITIAL_TIME_12 = 55L
     private const val TIME_PER_PAIR_FALLBACK = 4
     private const val BASE_TIME_GAIN = 3
-    private const val COMBO_TIME_GAIN_FACTOR = 1
-
     const val TIME_PENALTY_MISMATCH = 2L
 }

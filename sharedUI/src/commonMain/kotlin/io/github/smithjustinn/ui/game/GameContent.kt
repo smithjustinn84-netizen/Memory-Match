@@ -1,7 +1,10 @@
 package io.github.smithjustinn.ui.game
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -26,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
@@ -44,9 +48,12 @@ import io.github.smithjustinn.ui.game.components.GameTopBarState
 import io.github.smithjustinn.ui.game.components.GridCardState
 import io.github.smithjustinn.ui.game.components.GridSettings
 import io.github.smithjustinn.ui.game.components.NewHighScoreSnackbar
+import io.github.smithjustinn.ui.game.components.ParticleEmbers
 import io.github.smithjustinn.ui.game.components.PeekCountdownOverlay
 import io.github.smithjustinn.ui.game.components.ResultsCard
+import io.github.smithjustinn.ui.game.components.SteamEffect
 import io.github.smithjustinn.ui.game.components.WalkthroughOverlay
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,7 +67,36 @@ fun GameContent(
     GameEventHandler(component)
 
     AdaptiveDensity {
-        BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+        val shakeOffset = remember { Animatable(0f) }
+        var showSteam by remember { mutableStateOf(false) }
+        var lastHeatMode by remember { mutableStateOf(state.isHeatMode) }
+        
+        LaunchedEffect(state.isHeatMode) {
+            if (lastHeatMode && !state.isHeatMode) {
+                // LOST HEAT MODE -> SHAKE + STEAM
+                showSteam = true
+                launch {
+                   // Quick double shake
+                   shakeOffset.animateTo(20f, spring(stiffness = Spring.StiffnessHigh))
+                   shakeOffset.animateTo(-20f, spring(stiffness = Spring.StiffnessHigh))
+                   shakeOffset.animateTo(10f, spring(stiffness = Spring.StiffnessHigh))
+                   shakeOffset.animateTo(0f, spring(stiffness = Spring.StiffnessMedium))
+                }
+                launch {
+                    delay(1200) // Duration of steam effect
+                    showSteam = false
+                }
+            }
+            lastHeatMode = state.isHeatMode
+        }
+
+        BoxWithConstraints(
+            modifier = modifier
+                .fillMaxSize()
+                .graphicsLayer {
+                    translationX = shakeOffset.value
+                }
+        ) {
             val isLandscape = maxWidth > maxHeight
             val isCompactHeight = maxHeight < 500.dp
             val useCompactUI = isLandscape && isCompactHeight
@@ -72,6 +108,12 @@ fun GameContent(
                     component = component,
                     useCompactUI = useCompactUI,
                 )
+                
+                // Embers overlay - Foreground
+                ParticleEmbers(isHeatMode = state.isHeatMode)
+                
+                // Steam Cool Down Effect
+                SteamEffect(isVisible = showSteam)
             }
         }
     }
@@ -306,6 +348,7 @@ private fun GameMainScreen(
                             state.game.mode == io.github.smithjustinn.domain.models.GameMode.TIME_ATTACK &&
                                 state.elapsedTimeSeconds <= GameTopBarState.CRITICAL_TIME_THRESHOLD_SEC,
                         score = state.game.score,
+                        isHeatMode = state.isHeatMode,
                     ),
                 onBackClick = {
                     audioService.playEffect(AudioService.SoundEffect.CLICK)
