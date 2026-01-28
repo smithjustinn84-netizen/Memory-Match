@@ -64,13 +64,30 @@ fun GameContent(
 ) {
     val state by component.state.collectAsState()
 
-    GameEventHandler(component)
+    val scope = rememberCoroutineScope()
+    val shakeOffset = remember { Animatable(0f) }
+    var showSteam by remember { mutableStateOf(false) }
+    var lastHeatMode by remember { mutableStateOf(state.isHeatMode) }
+
+    GameEventHandler(
+        component = component,
+        onTheNuts = {
+             // Re-use steam/shake effect for The Nuts
+             showSteam = true
+             scope.launch {
+               shakeOffset.animateTo(20f, spring(stiffness = Spring.StiffnessHigh))
+               shakeOffset.animateTo(-20f, spring(stiffness = Spring.StiffnessHigh))
+               shakeOffset.animateTo(10f, spring(stiffness = Spring.StiffnessHigh))
+               shakeOffset.animateTo(0f, spring(stiffness = Spring.StiffnessMedium))
+             }
+             scope.launch {
+                 delay(1200)
+                 showSteam = false
+             }
+        }
+    )
 
     AdaptiveDensity {
-        val shakeOffset = remember { Animatable(0f) }
-        var showSteam by remember { mutableStateOf(false) }
-        var lastHeatMode by remember { mutableStateOf(state.isHeatMode) }
-        
         LaunchedEffect(state.isHeatMode) {
             if (lastHeatMode && !state.isHeatMode) {
                 // LOST HEAT MODE -> SHAKE + STEAM
@@ -120,7 +137,10 @@ fun GameContent(
 }
 
 @Composable
-private fun GameEventHandler(component: GameComponent) {
+private fun GameEventHandler(
+    component: GameComponent,
+    onTheNuts: () -> Unit,
+) {
     val graph = LocalAppGraph.current
     val audioService = graph.audioService
     val hapticsService = graph.hapticsService
@@ -139,6 +159,11 @@ private fun GameEventHandler(component: GameComponent) {
 
                 GameUiEvent.PlayMismatch -> {
                     audioService.playEffect(AudioService.SoundEffect.MISMATCH)
+                }
+
+                GameUiEvent.PlayTheNuts -> {
+                    audioService.playEffect(AudioService.SoundEffect.THE_NUTS)
+                    onTheNuts()
                 }
 
                 GameUiEvent.PlayWin -> {

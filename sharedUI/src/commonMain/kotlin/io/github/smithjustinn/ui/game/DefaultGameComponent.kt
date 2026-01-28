@@ -198,6 +198,15 @@ class DefaultGameComponent(
                     )
                 }
 
+                GameDomainEvent.TheNutsAchieved -> {
+                    _events.tryEmit(GameUiEvent.PlayTheNuts)
+                    feedbackHandler.handleMatchSuccess(
+                        newState = newState,
+                        isHeatMode = currentState.isHeatMode,
+                        isNowInHeatMode = newState.comboMultiplier >= newState.config.heatModeThreshold,
+                    )
+                }
+
                 GameDomainEvent.MatchFailure -> {
                     feedbackHandler.handleMatchFailure(newState, false)
                 }

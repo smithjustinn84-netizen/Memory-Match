@@ -24,6 +24,7 @@ interface AudioService {
         FLIP,
         MATCH,
         MISMATCH,
+        THE_NUTS,
         WIN,
         LOSE,
         HIGH_SCORE,
@@ -38,6 +39,7 @@ interface AudioService {
                 SoundEffect.FLIP -> Res.string.audio_flip
                 SoundEffect.MATCH -> Res.string.audio_match
                 SoundEffect.MISMATCH -> Res.string.audio_mismatch
+                SoundEffect.THE_NUTS -> Res.string.audio_win // Placeholder until custom sound added
                 SoundEffect.WIN -> Res.string.audio_win
                 SoundEffect.LOSE -> Res.string.audio_lose
                 SoundEffect.HIGH_SCORE -> Res.string.audio_highscore

@@ -163,7 +163,13 @@ object MemoryGameLogic {
                 lastMatchedIds = persistentListOf(first.id, second.id),
             )
 
-        return newState to if (isWon) GameDomainEvent.GameWon else GameDomainEvent.MatchSuccess
+        val event = when {
+            isWon -> GameDomainEvent.GameWon
+            state.comboMultiplier > config.theNutsThreshold -> GameDomainEvent.TheNutsAchieved
+            else -> GameDomainEvent.MatchSuccess
+        }
+
+        return newState to event
     }
 
     private fun handleMatchFailure(

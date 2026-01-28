@@ -8,6 +8,8 @@ sealed class GameDomainEvent {
 
     data object MatchSuccess : GameDomainEvent()
 
+    data object TheNutsAchieved : GameDomainEvent()
+
     data object MatchFailure : GameDomainEvent()
 
     data object GameWon : GameDomainEvent()

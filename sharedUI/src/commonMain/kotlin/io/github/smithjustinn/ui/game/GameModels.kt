@@ -34,6 +34,8 @@ sealed class GameUiEvent {
 
     data object PlayMismatch : GameUiEvent()
 
+    data object PlayTheNuts : GameUiEvent()
+
     data object PlayWin : GameUiEvent()
 
     data object PlayLose : GameUiEvent()
