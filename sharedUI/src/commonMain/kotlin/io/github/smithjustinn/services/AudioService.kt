@@ -9,6 +9,7 @@ import io.github.smithjustinn.resources.audio_lose
 import io.github.smithjustinn.resources.audio_match
 import io.github.smithjustinn.resources.audio_mismatch
 import io.github.smithjustinn.resources.audio_music
+import io.github.smithjustinn.resources.audio_plink
 import io.github.smithjustinn.resources.audio_win
 import org.jetbrains.compose.resources.StringResource
 
@@ -28,6 +29,7 @@ interface AudioService {
         HIGH_SCORE,
         CLICK,
         DEAL,
+        PLINK,
     }
 
     companion object {
@@ -41,6 +43,7 @@ interface AudioService {
                 SoundEffect.HIGH_SCORE -> Res.string.audio_highscore
                 SoundEffect.CLICK -> Res.string.audio_click
                 SoundEffect.DEAL -> Res.string.audio_deal
+                SoundEffect.PLINK -> Res.string.audio_plink
             }
 
         val MUSIC: StringResource = Res.string.audio_music

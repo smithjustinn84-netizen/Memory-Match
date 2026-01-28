@@ -43,7 +43,6 @@ fun StartContent(
     val graph = LocalAppGraph.current
     val audioService = graph.audioService
     val colors = PokerTheme.colors
-    val spacing = PokerTheme.spacing
 
     Box(
         modifier =
@@ -65,7 +64,7 @@ fun StartContent(
         StartScreenLayout(
             state = state,
             onDifficultySelected = { level ->
-                audioService.playEffect(AudioService.SoundEffect.CLICK)
+                audioService.playEffect(AudioService.SoundEffect.PLINK)
                 component.onDifficultySelected(level)
             },
             onModeSelected = { mode ->
