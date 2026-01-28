@@ -92,6 +92,7 @@ fun GameGrid(
     gridCardState: GridCardState,
     settings: GridSettings,
     onCardClick: (Int) -> Unit,
+    scorePositionInRoot: Offset = Offset.Zero,
 ) {
     val cardLayouts = remember { mutableStateMapOf<Int, CardLayoutInfo>() }
     var gridPosition by remember { mutableStateOf(Offset.Zero) }
@@ -152,6 +153,38 @@ fun GameGrid(
             cardLayouts = cardLayouts,
             gridPosition = gridPosition,
         )
+
+        ScoreFlyingGridEffect(
+            lastMatchedIds = gridCardState.lastMatchedIds,
+            cardLayouts = cardLayouts,
+            gridPosition = gridPosition,
+            scorePositionInRoot = scorePositionInRoot,
+        )
+    }
+}
+
+@Composable
+private fun ScoreFlyingGridEffect(
+    lastMatchedIds: kotlinx.collections.immutable.ImmutableList<Int>,
+    cardLayouts: Map<Int, CardLayoutInfo>,
+    gridPosition: Offset,
+    scorePositionInRoot: Offset,
+) {
+    if (lastMatchedIds.isNotEmpty() && scorePositionInRoot != Offset.Zero) {
+        val matchPositions = lastMatchedIds.mapNotNull { id ->
+            cardLayouts[id]?.let { info ->
+                info.position - gridPosition + Offset(info.size.width / 2, info.size.height / 2)
+            }
+        }
+        
+        if (matchPositions.isNotEmpty()) {
+            val relativeTarget = scorePositionInRoot - gridPosition
+            ScoreFlyingEffect(
+                matchPositions = matchPositions,
+                targetPosition = relativeTarget,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
     }
 }
 

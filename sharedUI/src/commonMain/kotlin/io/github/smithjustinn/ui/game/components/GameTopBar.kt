@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,7 +31,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.resources.Res
 import io.github.smithjustinn.resources.back_content_description
@@ -47,39 +52,43 @@ fun GameTopBar(
     onBackClick: () -> Unit,
     onRestartClick: () -> Unit,
     onMuteClick: () -> Unit,
+    onScorePositioned: (androidx.compose.ui.geometry.Offset) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    val isTimeAttack = state.mode == GameMode.TIME_ATTACK
+    WoodenDashboard(modifier = modifier) {
+        val isTimeAttack = state.mode == GameMode.TIME_ATTACK
 
-    Column(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .windowInsetsPadding(
-                    WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
-                ).padding(
-                    horizontal = if (state.compact) PokerTheme.spacing.medium else PokerTheme.spacing.large,
-                    vertical = if (state.compact) PokerTheme.spacing.small else PokerTheme.spacing.medium,
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .windowInsetsPadding(
+                        WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+                    ).padding(
+                        horizontal = if (state.compact) PokerTheme.spacing.medium else PokerTheme.spacing.large,
+                        vertical = if (state.compact) PokerTheme.spacing.extraSmall else PokerTheme.spacing.small,
+                    ),
+            verticalArrangement =
+                Arrangement.spacedBy(
+                    if (state.compact) PokerTheme.spacing.extraSmall else PokerTheme.spacing.small,
                 ),
-        verticalArrangement =
-            Arrangement.spacedBy(
-                if (state.compact) PokerTheme.spacing.small else PokerTheme.spacing.medium,
-            ),
-    ) {
-        TopBarMainRow(
-            state = state,
-            onBackClick = onBackClick,
-            onRestartClick = onRestartClick,
-            onMuteClick = onMuteClick,
-        )
-
-        if (isTimeAttack && state.maxTime > 0) {
-            TimeProgressBar(
-                time = state.time,
-                maxTime = state.maxTime,
-                isLowTime = state.isLowTime,
-                compact = state.compact,
+        ) {
+            TopBarMainRow(
+                state = state,
+                onBackClick = onBackClick,
+                onRestartClick = onRestartClick,
+                onMuteClick = onMuteClick,
+                onScorePositioned = onScorePositioned,
             )
+
+            if (isTimeAttack && state.maxTime > 0) {
+                TimeProgressBar(
+                    time = state.time,
+                    maxTime = state.maxTime,
+                    isLowTime = state.isLowTime,
+                    compact = state.compact,
+                )
+            }
         }
     }
 }
@@ -90,6 +99,7 @@ private fun TopBarMainRow(
     onBackClick: () -> Unit,
     onRestartClick: () -> Unit,
     onMuteClick: () -> Unit,
+    onScorePositioned: (androidx.compose.ui.geometry.Offset) -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -118,6 +128,15 @@ private fun TopBarMainRow(
                     isMegaBonus = state.isMegaBonus,
                 ),
             layout = if (state.compact) TimerLayout.COMPACT else TimerLayout.STANDARD,
+        )
+
+        PotScoreDisplay(
+            score = state.score,
+            compact = state.compact,
+            modifier =
+                Modifier.onGloballyPositioned { coords ->
+                    onScorePositioned(coords.positionInRoot())
+                },
         )
 
         ControlButtons(
@@ -151,6 +170,50 @@ private fun ControlButtons(
 }
 
 @Composable
+private fun PotScoreDisplay(
+    score: Int,
+    compact: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        shape =
+            androidx.compose.foundation.shape
+                .RoundedCornerShape(if (compact) 12.dp else 16.dp),
+        color = Color.Black.copy(alpha = 0.3f), // Glassmorphism-lite on wood
+        border = androidx.compose.foundation.BorderStroke(1.dp, PokerTheme.colors.brass.copy(alpha = 0.3f)),
+        modifier = modifier.height(if (compact) 36.dp else 44.dp),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = if (compact) 12.dp else 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(if (compact) 4.dp else 8.dp),
+        ) {
+            androidx.compose.material3.Text(
+                text = "POT", // Casino terminology
+                style =
+                    androidx.compose.material3.MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.Black,
+                        letterSpacing = 1.sp,
+                        fontFamily = androidx.compose.ui.text.font.FontFamily.Serif,
+                    ),
+                color = PokerTheme.colors.brass.copy(alpha = 0.7f),
+            )
+
+            androidx.compose.material3.Text(
+                text = score.toString(),
+                style =
+                    androidx.compose.material3.MaterialTheme.typography.titleLarge.copy(
+                        fontSize = if (compact) 16.sp else 20.sp,
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.Black,
+                        fontFamily = androidx.compose.ui.text.font.FontFamily.Serif,
+                    ),
+                color = PokerTheme.colors.brass,
+            )
+        }
+    }
+}
+
+@Composable
 private fun BackButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -173,12 +236,12 @@ private fun BackButton(
     ) {
         Box(contentAlignment = Alignment.Center) {
             // Dashed border effect (simplified for icon button)
-            androidx.compose.foundation.Canvas(modifier = Modifier.matchParentSize()) {
+            Canvas(modifier = Modifier.matchParentSize()) {
                 val strokeWidth = size.toPx() * STROKE_WIDTH_FACTOR
                 drawCircle(
                     color = Color.White,
                     style =
-                        androidx.compose.ui.graphics.drawscope.Stroke(
+                        Stroke(
                             width = strokeWidth,
                             pathEffect =
                                 androidx.compose.ui.graphics.PathEffect

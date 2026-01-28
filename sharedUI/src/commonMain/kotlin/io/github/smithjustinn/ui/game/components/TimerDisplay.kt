@@ -102,7 +102,7 @@ private fun animateTimerColor(
             showTimeGain -> PokerTheme.colors.bonusGreen
             isLowTime -> PokerTheme.colors.tacticalRed
             minimal -> Color.White
-            else -> PokerTheme.colors.goldenYellow
+            else -> PokerTheme.colors.brass
         }
 
     val color by animateColorAsState(

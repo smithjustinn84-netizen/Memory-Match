@@ -28,6 +28,7 @@ data class AppColors(
     val pillSelected: Color,
     val pillUnselected: Color,
     val hudBackground: Color,
+    val brass: Color,
 )
 
 internal val LightAppColors =
@@ -52,6 +53,7 @@ internal val LightAppColors =
         pillSelected = Color(0xFFF5F5DC),
         pillUnselected = Color(0xFF1B4D3E),
         hudBackground = Color(0xCC000000),
+        brass = Brass,
     )
 
 internal val DarkAppColors =

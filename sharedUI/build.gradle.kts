@@ -40,6 +40,7 @@ kotlin {
             api(libs.decompose)
             api(libs.decompose.extensions.compose)
             implementation(libs.kotlinx.collections.immutable)
+            implementation(libs.kotlinx.datetime)
             implementation(libs.bundles.coil)
             api(libs.bundles.koin)
             api(libs.koin.compose.viewmodel)

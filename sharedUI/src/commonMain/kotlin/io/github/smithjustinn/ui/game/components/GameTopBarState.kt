@@ -15,6 +15,7 @@ data class GameTopBarState(
     val isAudioEnabled: Boolean = true,
     val isLowTime: Boolean = false,
     val isCriticalTime: Boolean = false,
+    val score: Int = 0,
 ) {
     companion object {
         const val LOW_TIME_THRESHOLD_SEC = 10

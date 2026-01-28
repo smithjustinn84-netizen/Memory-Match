@@ -19,7 +19,10 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -276,6 +279,8 @@ private fun GameMainScreen(
 ) {
     val graph = LocalAppGraph.current
     val audioService = graph.audioService
+    // Using fully qualified name to avoid import conflicts, standard Compose Offset
+    var scorePosition by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
 
     Scaffold(
         containerColor = Color.Transparent,
@@ -301,6 +306,7 @@ private fun GameMainScreen(
                         isCriticalTime =
                             state.game.mode == io.github.smithjustinn.domain.models.GameMode.TIME_ATTACK &&
                                 state.elapsedTimeSeconds <= GameTopBarState.CRITICAL_TIME_THRESHOLD_SEC,
+                        score = state.game.score,
                     ),
                 onBackClick = {
                     audioService.playEffect(AudioService.SoundEffect.CLICK)
@@ -315,6 +321,7 @@ private fun GameMainScreen(
                     audioService.playEffect(AudioService.SoundEffect.CLICK)
                     component.onToggleAudio()
                 },
+                onScorePositioned = { scorePosition = it },
             )
         },
     ) { paddingValues ->
@@ -322,6 +329,7 @@ private fun GameMainScreen(
             state = state,
             component = component,
             useCompactUI = useCompactUI,
+            scorePosition = scorePosition,
             modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
         )
     }
@@ -332,6 +340,7 @@ private fun GameMainContent(
     state: GameUIState,
     component: GameComponent,
     useCompactUI: Boolean,
+    scorePosition: androidx.compose.ui.geometry.Offset,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -348,6 +357,7 @@ private fun GameMainContent(
                     showComboExplosion = state.showComboExplosion,
                 ),
             onCardClick = { cardId -> component.onFlipCard(cardId) },
+            scorePositionInRoot = scorePosition,
         )
 
         GameHUD(state = state, useCompactUI = useCompactUI)
