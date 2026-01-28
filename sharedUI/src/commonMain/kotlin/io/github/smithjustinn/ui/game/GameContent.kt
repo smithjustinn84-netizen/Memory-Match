@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,12 +37,12 @@ import io.github.smithjustinn.ui.game.components.CardFountainOverlay
 import io.github.smithjustinn.ui.game.components.ComboBadge
 import io.github.smithjustinn.ui.game.components.ComboBadgeState
 import io.github.smithjustinn.ui.game.components.ConfettiEffect
+import io.github.smithjustinn.ui.game.components.DealerSpeechBubble
 import io.github.smithjustinn.ui.game.components.GameGrid
 import io.github.smithjustinn.ui.game.components.GameTopBar
 import io.github.smithjustinn.ui.game.components.GameTopBarState
 import io.github.smithjustinn.ui.game.components.GridCardState
 import io.github.smithjustinn.ui.game.components.GridSettings
-import io.github.smithjustinn.ui.game.components.MatchCommentSnackbar
 import io.github.smithjustinn.ui.game.components.NewHighScoreSnackbar
 import io.github.smithjustinn.ui.game.components.PeekCountdownOverlay
 import io.github.smithjustinn.ui.game.components.ResultsCard
@@ -392,18 +391,13 @@ private fun BoxScope.GameHUD(
         )
     }
 
-    MatchCommentSnackbar(
+    DealerSpeechBubble(
         matchComment = state.game.matchComment,
         modifier =
             Modifier
-                .align(if (useCompactUI) Alignment.TopCenter else Alignment.BottomCenter)
-                .navigationBarsPadding()
-                .padding(
-                    bottom = if (useCompactUI) PokerTheme.spacing.none else PokerTheme.spacing.extraLarge,
-                    top = if (useCompactUI) PokerTheme.spacing.small else PokerTheme.spacing.none,
-                    start = PokerTheme.spacing.medium,
-                    end = PokerTheme.spacing.medium,
-                ).widthIn(max = 600.dp),
+                .align(Alignment.TopCenter)
+                .padding(top = 80.dp) // Below TopBar approximately
+                .widthIn(max = 600.dp),
     )
 }
 
