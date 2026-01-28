@@ -314,7 +314,7 @@ private fun CardContainer(
                     scaleX = visuals.scale
                     scaleY = visuals.scale
                     cameraDistance = CAMERA_DISTANCE_MULTIPLIER * density
-                    alpha = if (visuals.visualState.isMatched) HIGH_ALPHA else 1f
+                    alpha = 1f
                 }.drawBehind {
                     if (visuals.visualState.isRecentlyMatched) {
                         drawCircle(
