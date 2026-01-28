@@ -1,8 +1,9 @@
 package io.github.smithjustinn.ui.start.components
 
-import androidx.compose.animation.core.EaseInOutSine
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -14,7 +15,11 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -34,6 +39,7 @@ import io.github.smithjustinn.ui.game.components.PlayingCard
 // Card Preview Layout & Animation Durations
 private const val CARD_ROTATION_DURATION = 3000
 private const val CARD_FLOAT_DURATION = 2500
+private const val CARD_FAN_DURATION = 1000
 private const val CARD_SPACING = -55
 private const val CARD_WIDTH = 110
 private const val BASE_ROTATION = 12f
@@ -96,6 +102,17 @@ fun CardPreview(
     modifier: Modifier = Modifier,
     settings: CardDisplaySettings = CardDisplaySettings(),
 ) {
+    var isFanned by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        isFanned = true
+    }
+
+    val fanMultiplier by animateFloatAsState(
+        targetValue = if (isFanned) 1f else 0f,
+        animationSpec = tween(CARD_FAN_DURATION, easing = FastOutSlowInEasing),
+        label = "fan_multiplier",
+    )
+
     val infiniteTransition = rememberInfiniteTransition(label = "card_preview_anim")
 
     val rotation by infiniteTransition.animateFloat(
@@ -103,7 +120,7 @@ fun CardPreview(
         targetValue = CARD_MAX_ROTATION_Z,
         animationSpec =
             infiniteRepeatable(
-                animation = tween(CARD_ROTATION_DURATION, easing = EaseInOutSine),
+                animation = tween(CARD_ROTATION_DURATION, easing = androidx.compose.animation.core.EaseInOutSine),
                 repeatMode = RepeatMode.Reverse,
             ),
         label = "rotation",
@@ -114,7 +131,7 @@ fun CardPreview(
         targetValue = CARD_MAX_FLOAT_OFFSET,
         animationSpec =
             infiniteRepeatable(
-                animation = tween(CARD_FLOAT_DURATION, easing = EaseInOutSine),
+                animation = tween(CARD_FLOAT_DURATION, easing = androidx.compose.animation.core.EaseInOutSine),
                 repeatMode = RepeatMode.Reverse,
             ),
         label = "float",
@@ -125,7 +142,7 @@ fun CardPreview(
         contentAlignment = Alignment.Center,
     ) {
         BackgroundGlow()
-        CardStack(floatOffset, rotation, settings)
+        CardStack(floatOffset, rotation, fanMultiplier, settings)
         StarsLayer()
     }
 }
@@ -157,6 +174,7 @@ private fun BackgroundGlow() {
 private fun CardStack(
     floatOffset: Float,
     rotation: Float,
+    fanMultiplier: Float,
     settings: CardDisplaySettings,
 ) {
     Row(
@@ -164,8 +182,8 @@ private fun CardStack(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.offset(y = floatOffset.dp),
     ) {
-        PreviewCard(Suit.Hearts, -BASE_ROTATION + rotation, CARD_FRONT_Z_INDEX, settings)
-        PreviewCard(Suit.Spades, BASE_ROTATION - rotation, CARD_BACK_Z_INDEX, settings, CARD_TRANSLATION_Y)
+        PreviewCard(Suit.Hearts, (-BASE_ROTATION * fanMultiplier) + rotation, CARD_FRONT_Z_INDEX, settings)
+        PreviewCard(Suit.Spades, (BASE_ROTATION * fanMultiplier) - rotation, CARD_BACK_Z_INDEX, settings, CARD_TRANSLATION_Y)
     }
 }
 
