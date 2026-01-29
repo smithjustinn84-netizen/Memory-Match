@@ -2,6 +2,10 @@ package io.github.smithjustinn
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
@@ -15,6 +19,7 @@ import io.github.smithjustinn.theme.AppTheme
 import io.github.smithjustinn.ui.game.GameContent
 import io.github.smithjustinn.ui.root.RootComponent
 import io.github.smithjustinn.ui.settings.SettingsContent
+import io.github.smithjustinn.ui.splash.SplashScreen
 import io.github.smithjustinn.ui.start.StartContent
 import io.github.smithjustinn.ui.stats.StatsContent
 
@@ -25,21 +30,27 @@ fun App(
     appGraph: AppGraph,
     onThemeChanged: @Composable (isDark: Boolean) -> Unit = {},
 ) = AppTheme(onThemeChanged) {
-    CompositionLocalProvider(LocalAppGraph provides appGraph) {
-        Children(
-            stack = root.childStack,
-            animation =
-                predictiveBackAnimation(
-                    backHandler = root.backHandler,
-                    fallbackAnimation = stackAnimation(slide() + fade()),
-                    onBack = root::pop,
-                ),
-        ) {
-            when (val child = it.instance) {
-                is RootComponent.Child.Start -> StartContent(child.component)
-                is RootComponent.Child.Game -> GameContent(child.component)
-                is RootComponent.Child.Settings -> SettingsContent(child.component)
-                is RootComponent.Child.Stats -> StatsContent(child.component)
+    var showSplash by remember { mutableStateOf(true) }
+
+    if (showSplash) {
+        SplashScreen(onDataLoaded = { showSplash = false })
+    } else {
+        CompositionLocalProvider(LocalAppGraph provides appGraph) {
+            Children(
+                stack = root.childStack,
+                animation =
+                    predictiveBackAnimation(
+                        backHandler = root.backHandler,
+                        fallbackAnimation = stackAnimation(slide() + fade()),
+                        onBack = root::pop,
+                    ),
+            ) {
+                when (val child = it.instance) {
+                    is RootComponent.Child.Start -> StartContent(child.component)
+                    is RootComponent.Child.Game -> GameContent(child.component)
+                    is RootComponent.Child.Settings -> SettingsContent(child.component)
+                    is RootComponent.Child.Stats -> StatsContent(child.component)
+                }
             }
         }
     }

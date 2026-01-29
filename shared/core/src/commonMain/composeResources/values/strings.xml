@@ -128,4 +128,6 @@
     <string name="audio_plink">plink</string>
     <string name="audio_music">music</string>
     <string name="audio_nuts">nuts</string>
+    <string name="splash_title">MEMORY MATCH</string>
+    <string name="splash_dealing_cards">Dealing Cards...</string>
 </resources>
