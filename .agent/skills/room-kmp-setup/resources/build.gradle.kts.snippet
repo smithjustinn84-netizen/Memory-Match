@@ -1,0 +1,18 @@
+plugins {
+    alias(libs.plugins.room)
+    alias(libs.plugins.ksp)
+}
+
+room {
+    schemaDirectory("\$projectDir/schemas")
+}
+
+dependencies {
+    with(libs.room.compiler) {
+        add("kspAndroid", this)
+        add("kspJvm", this)
+        add("kspIosX64", this)
+        add("kspIosArm64", this)
+        add("kspIosSimulatorArm64", this)
+    }
+}
