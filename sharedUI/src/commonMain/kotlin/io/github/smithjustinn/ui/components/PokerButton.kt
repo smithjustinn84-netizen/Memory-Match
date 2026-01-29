@@ -59,11 +59,14 @@ fun PokerButton(
     val finalContainerColor = if (isPrimary) PokerTheme.colors.goldenYellow else containerColor
     val finalContentColor = if (isPrimary) PokerTheme.colors.feltGreenDark else contentColor
     val shadowElevation = if (isPrimary) 8.dp else PokerTheme.spacing.extraSmall
-    val border = if (isPrimary) {
-        BorderStroke(2.dp, PokerTheme.colors.goldenYellow.copy(alpha = 0.5f))
-    } else null
+    val border =
+        if (isPrimary) {
+            BorderStroke(2.dp, PokerTheme.colors.goldenYellow.copy(alpha = 0.5f))
+        } else {
+            null
+        }
 
-     Box(
+    Box(
         modifier =
             modifier
                 .height(56.dp)

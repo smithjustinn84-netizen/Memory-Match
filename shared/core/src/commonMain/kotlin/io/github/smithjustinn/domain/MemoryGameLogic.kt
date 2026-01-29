@@ -154,13 +154,14 @@ object MemoryGameLogic {
         val comment = generateMatchComment(moves, matchesFound, state.pairCount, state.comboMultiplier, config)
 
         val preDoubleScore = state.score + pointsEarned
-        val finalScore = if (isWon && state.isDoubleDownActive) {
-            preDoubleScore * 2
-        } else {
-            preDoubleScore
-        }
+        val finalScore =
+            if (isWon && state.isDoubleDownActive) {
+                preDoubleScore * 2
+            } else {
+                preDoubleScore
+            }
         val ddBonus = finalScore - preDoubleScore
-        
+
         val newState =
             state.copy(
                 cards = newCards,

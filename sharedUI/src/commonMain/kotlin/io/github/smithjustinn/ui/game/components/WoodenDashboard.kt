@@ -29,15 +29,16 @@ fun WoodenDashboard(
 ) {
     val colors = PokerTheme.colors
     val spacing = PokerTheme.spacing
-    
+
     val infiniteTransition = rememberInfiniteTransition()
     val glowAlpha by infiniteTransition.animateFloat(
         initialValue = 0.5f, // Higher min opacity
-        targetValue = 1.0f,  // Max opacity
-        animationSpec = infiniteRepeatable(
-            animation = tween(800, easing = LinearEasing), // Faster pulse
-            repeatMode = RepeatMode.Reverse
-        )
+        targetValue = 1.0f, // Max opacity
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(800, easing = LinearEasing), // Faster pulse
+                repeatMode = RepeatMode.Reverse,
+            ),
     )
 
     Box(
@@ -49,30 +50,34 @@ fun WoodenDashboard(
                     // Heat Mode Glow
                     if (isHeatMode) {
                         drawRect(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    colors.tacticalRed.copy(alpha = glowAlpha),
-                                    colors.tacticalRed.copy(alpha = 0.2f),
-                                    Color.Transparent
+                            brush =
+                                Brush.verticalGradient(
+                                    colors =
+                                        listOf(
+                                            colors.tacticalRed.copy(alpha = glowAlpha),
+                                            colors.tacticalRed.copy(alpha = 0.2f),
+                                            Color.Transparent,
+                                        ),
+                                    startY = 0f,
+                                    endY = size.height * 0.8f, // Covers more height
                                 ),
-                                startY = 0f,
-                                endY = size.height * 0.8f // Covers more height
-                            ),
-                            blendMode = BlendMode.Screen // Screen allows for a nice additive glow effect
+                            blendMode = BlendMode.Screen, // Screen allows for a nice additive glow effect
                         )
-                        
+
                         // Extra bottom rim glow
                         drawLine(
-                            brush = Brush.horizontalGradient(
-                                colors = listOf(
-                                    Color.Transparent,
-                                    colors.goldenYellow.copy(alpha = glowAlpha * 0.8f),
-                                    Color.Transparent
-                                )
-                            ),
+                            brush =
+                                Brush.horizontalGradient(
+                                    colors =
+                                        listOf(
+                                            Color.Transparent,
+                                            colors.goldenYellow.copy(alpha = glowAlpha * 0.8f),
+                                            Color.Transparent,
+                                        ),
+                                ),
                             start = Offset(0f, size.height),
                             end = Offset(size.width, size.height),
-                            strokeWidth = 4.dp.toPx()
+                            strokeWidth = 4.dp.toPx(),
                         )
                     }
 

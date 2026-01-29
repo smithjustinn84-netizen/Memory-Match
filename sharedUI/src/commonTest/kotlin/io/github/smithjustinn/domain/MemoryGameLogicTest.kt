@@ -255,7 +255,7 @@ class MemoryGameLogicTest {
         // But the test asserted 1?
         // Let's verify Logic Failure: comboMultiplier = 0.
         // Line 44 in Core Test expects 0.
-        // This test expected 1? Maybe it thought 1 is min? 
+        // This test expected 1? Maybe it thought 1 is min?
         // Logic says 0. So assertion '1' on line 254 was prob wrong or I misread.
         // Wait, if it resets to 1 in old logic?
         // Old Logic: comboMultiplier = 0.
@@ -263,7 +263,7 @@ class MemoryGameLogicTest {
         // If test expects 1, maybe it thinks min is 1.
         // But Logic says 0.
         // I should set it to expect 0.
-        
+
         val (s3, _) = MemoryGameLogic.flipCard(s2, card3.id)
         val (s4, _) = MemoryGameLogic.flipCard(s3, card4.id)
 

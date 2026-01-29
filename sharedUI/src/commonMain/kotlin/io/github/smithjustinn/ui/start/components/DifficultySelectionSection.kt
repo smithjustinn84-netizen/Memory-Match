@@ -18,7 +18,6 @@ import io.github.smithjustinn.domain.models.DifficultyLevel
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.resources.Res
 import io.github.smithjustinn.resources.daily_challenge
-import io.github.smithjustinn.resources.daily_challenge_completed
 import io.github.smithjustinn.resources.game_mode
 import io.github.smithjustinn.resources.mode_standard
 import io.github.smithjustinn.resources.mode_time_attack
@@ -143,7 +142,6 @@ private fun ModeSelector(
     }
 }
 
-
 @Composable
 private fun PrimaryActionButtons(
     state: DifficultyState,
@@ -184,7 +182,6 @@ private fun PrimaryActionButtons(
         }
     }
 }
-
 
 private const val PAIRS_EASY = 6
 private const val PAIRS_MEDIUM = 8

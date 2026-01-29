@@ -39,9 +39,9 @@ private class EmberParticle(
         y = height + size // Start just below screen
         life = 0f
         // Significantly increased life to allow reaching top of screen
-        // At speed ~3px/frame and 60fps, 300 frames = 900px rise. 
+        // At speed ~3px/frame and 60fps, 300 frames = 900px rise.
         // Need more for full screen (approx 2000px height on devices)
-        maxLife = Random.nextFloat() * 200f + 300f 
+        maxLife = Random.nextFloat() * 200f + 300f
         alpha = 0f
         drift = (Random.nextFloat() - 0.5f) * 0.5f
     }

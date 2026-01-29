@@ -171,18 +171,19 @@ private fun ScoreFlyingGridEffect(
     scorePositionInRoot: Offset,
 ) {
     if (lastMatchedIds.isNotEmpty() && scorePositionInRoot != Offset.Zero) {
-        val matchPositions = lastMatchedIds.mapNotNull { id ->
-            cardLayouts[id]?.let { info ->
-                info.position - gridPosition + Offset(info.size.width / 2, info.size.height / 2)
+        val matchPositions =
+            lastMatchedIds.mapNotNull { id ->
+                cardLayouts[id]?.let { info ->
+                    info.position - gridPosition + Offset(info.size.width / 2, info.size.height / 2)
+                }
             }
-        }
-        
+
         if (matchPositions.isNotEmpty()) {
             val relativeTarget = scorePositionInRoot - gridPosition
             ScoreFlyingEffect(
                 matchPositions = matchPositions,
                 targetPosition = relativeTarget,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             )
         }
     }
@@ -217,16 +218,16 @@ private fun GridContent(
     ) {
         itemsIndexed(gridCardState.cards, key = { _, card -> card.id }) { index, card ->
             val layoutInfo = cardLayouts[card.id]
-            
+
             // Calculate fan-out effect (player's hand)
             val totalCards = gridCardState.cards.size
             val fanAngleMax = 30f // Total fan spread angle
             val fanSpreadMax = 120f // Horizontal spread distance
             val relativeIndex = (index.toFloat() / (totalCards - 1).coerceAtLeast(1)) - 0.5f // -0.5 to 0.5
-            
+
             val fanRotation = relativeIndex * fanAngleMax
             val fanSpreadX = relativeIndex * fanSpreadMax
-            
+
             val muckTarget =
                 with(density) {
                     Offset(
@@ -234,13 +235,14 @@ private fun GridContent(
                         screenHeight.toPx() - 20.dp.toPx(),
                     )
                 }
-            
-            val muckTargetOffset = layoutInfo?.let { info ->
-                IntOffset(
-                    (muckTarget.x - (info.position.x - gridPosition.x) - info.size.width / 2).toInt(),
-                    (muckTarget.y - (info.position.y - gridPosition.y) - info.size.height / 2).toInt()
-                )
-            } ?: IntOffset(0, 1000)
+
+            val muckTargetOffset =
+                layoutInfo?.let { info ->
+                    IntOffset(
+                        (muckTarget.x - (info.position.x - gridPosition.x) - info.size.width / 2).toInt(),
+                        (muckTarget.y - (info.position.y - gridPosition.y) - info.size.height / 2).toInt(),
+                    )
+                } ?: IntOffset(0, 1000)
 
             PlayingCard(
                 content =

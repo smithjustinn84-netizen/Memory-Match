@@ -27,5 +27,3 @@ fun StartHeader(
         )
     }
 }
-
-

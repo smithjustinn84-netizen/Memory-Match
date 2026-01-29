@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -145,6 +146,7 @@ private fun GameEventHandler(
     component: GameComponent,
     onTheNuts: () -> Unit,
 ) {
+    val currentOnTheNuts by rememberUpdatedState(onTheNuts)
     val graph = LocalAppGraph.current
     val audioService = graph.audioService
     val hapticsService = graph.hapticsService
@@ -167,7 +169,7 @@ private fun GameEventHandler(
 
                 GameUiEvent.PlayTheNuts -> {
                     audioService.playEffect(AudioService.SoundEffect.THE_NUTS)
-                    onTheNuts()
+                    currentOnTheNuts()
                 }
 
                 GameUiEvent.PlayWin -> {

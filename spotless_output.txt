@@ -1,0 +1,50 @@
+Reusing configuration cache.
+> Task :spotlessApply UP-TO-DATE
+> Task :spotlessInternalRegisterDependencies UP-TO-DATE
+> Task :androidApp:spotlessKotlinGradle UP-TO-DATE
+> Task :sharedUI:spotlessKotlinGradle UP-TO-DATE
+> Task :desktopApp:spotlessKotlinGradle UP-TO-DATE
+> Task :shared:spotlessKotlinGradle UP-TO-DATE
+> Task :shared:spotlessKotlinGradleApply UP-TO-DATE
+> Task :androidApp:spotlessKotlinGradleApply UP-TO-DATE
+> Task :androidApp:spotlessKotlin UP-TO-DATE
+> Task :sharedUI:spotlessKotlinGradleApply UP-TO-DATE
+> Task :androidApp:spotlessKotlinApply UP-TO-DATE
+> Task :androidApp:spotlessApply UP-TO-DATE
+> Task :desktopApp:spotlessKotlinGradleApply UP-TO-DATE
+> Task :shared:data:spotlessKotlinGradle UP-TO-DATE
+> Task :desktopApp:spotlessKotlin UP-TO-DATE
+> Task :shared:data:spotlessKotlin UP-TO-DATE
+> Task :shared:core:spotlessKotlinGradle UP-TO-DATE
+> Task :shared:data:spotlessKotlinGradleApply UP-TO-DATE
+> Task :desktopApp:spotlessKotlinApply UP-TO-DATE
+> Task :desktopApp:spotlessApply UP-TO-DATE
+> Task :shared:core:spotlessKotlinGradleApply UP-TO-DATE
+> Task :shared:data:spotlessKotlinApply UP-TO-DATE
+> Task :shared:data:spotlessApply UP-TO-DATE
+> Task :shared:core:spotlessKotlin UP-TO-DATE
+> Task :shared:core:spotlessKotlinApply UP-TO-DATE
+> Task :shared:core:spotlessApply UP-TO-DATE
+> Task :shared:spotlessKotlin UP-TO-DATE
+> Task :shared:spotlessKotlinApply UP-TO-DATE
+> Task :shared:spotlessApply UP-TO-DATE
+> Task :sharedUI:spotlessKotlin UP-TO-DATE
+> Task :sharedUI:spotlessKotlinApply FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':sharedUI:spotlessKotlinApply'.
+> There were 1 lint error(s), they must be fixed or suppressed.
+  src/commonMain/kotlin/io/github/smithjustinn/ui/game/GameContent.kt:L146 ktlint(compose:lambda-param-in-effect) Lambda parameters in a @Composable that are referenced directly inside of restarting effects can cause issues or unpredictable behavior. (...)
+  Resolve these lints or suppress with `suppressLintsFor`
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to generate a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 697ms
+25 actionable tasks: 1 executed, 24 up-to-date
+Configuration cache entry reused.

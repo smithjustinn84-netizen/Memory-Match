@@ -21,15 +21,18 @@ private class SteamParticle(
     var alpha = 0f
     var life = 0f
     var maxLife = 0f
-    
-    fun reset(width: Float, height: Float) {
+
+    fun reset(
+        width: Float,
+        height: Float,
+    ) {
         x = Random.nextFloat() * width
         y = height + Random.nextFloat() * 100f // Start below
         life = 0f
         maxLife = Random.nextFloat() * 60f + 30f // Short burst
         alpha = Random.nextFloat() * 0.4f + 0.2f
     }
-    
+
     fun update() {
         y -= speed
         life += 1f
@@ -45,15 +48,16 @@ fun SteamEffect(
 ) {
     if (!isVisible) return
 
-    val particles = remember { 
-        List(particleCount) {
-             SteamParticle(
-                size = Random.nextFloat() * 20f + 10f, // Large puffs
-                speed = Random.nextFloat() * 8f + 4f   // Fast rising
-            )
+    val particles =
+        remember {
+            List(particleCount) {
+                SteamParticle(
+                    size = Random.nextFloat() * 20f + 10f, // Large puffs
+                    speed = Random.nextFloat() * 8f + 4f, // Fast rising
+                )
+            }
         }
-    }
-    
+
     val frameState = remember { mutableLongStateOf(0L) }
 
     LaunchedEffect(isVisible) {
@@ -70,21 +74,21 @@ fun SteamEffect(
 
     Canvas(modifier = modifier.fillMaxSize()) {
         val frame = frameState.longValue // Trigger redraw
-        
+
         particles.forEach { p ->
-             if (p.life == 0f && p.y == 0f) {
-                 p.reset(size.width, size.height)
-             }
-             
-             if (p.alpha > 0f) {
-                 p.update()
-                 
-                 drawCircle(
-                     color = Color.White.copy(alpha = p.alpha.coerceIn(0f, 1f)),
-                     radius = p.size,
-                     center = Offset(p.x, p.y)
-                 )
-             }
+            if (p.life == 0f && p.y == 0f) {
+                p.reset(size.width, size.height)
+            }
+
+            if (p.alpha > 0f) {
+                p.update()
+
+                drawCircle(
+                    color = Color.White.copy(alpha = p.alpha.coerceIn(0f, 1f)),
+                    radius = p.size,
+                    center = Offset(p.x, p.y),
+                )
+            }
         }
     }
 }

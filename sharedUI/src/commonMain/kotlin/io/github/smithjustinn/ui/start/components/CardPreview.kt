@@ -183,7 +183,13 @@ private fun CardStack(
         modifier = Modifier.offset(y = floatOffset.dp),
     ) {
         PreviewCard(Suit.Hearts, (-BASE_ROTATION * fanMultiplier) + rotation, CARD_FRONT_Z_INDEX, settings)
-        PreviewCard(Suit.Spades, (BASE_ROTATION * fanMultiplier) - rotation, CARD_BACK_Z_INDEX, settings, CARD_TRANSLATION_Y)
+        PreviewCard(
+            Suit.Spades,
+            (BASE_ROTATION * fanMultiplier) - rotation,
+            CARD_BACK_Z_INDEX,
+            settings,
+            CARD_TRANSLATION_Y,
+        )
     }
 }
 

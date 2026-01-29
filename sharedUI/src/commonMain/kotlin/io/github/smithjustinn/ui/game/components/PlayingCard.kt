@@ -4,8 +4,8 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -337,8 +337,14 @@ private fun CardContainer(
                             elevation = visuals.shadowElevation,
                             shape = RoundedCornerShape(12.dp),
                             clip = false,
-                            ambientColor = (if (visuals.visualState.isRecentlyMatched) glowColor else Color.Black).copy(alpha = 0.2f),
-                            spotColor = (if (visuals.visualState.isRecentlyMatched) glowColor else Color.Black).copy(alpha = 0.4f),
+                            ambientColor =
+                                (if (visuals.visualState.isRecentlyMatched) glowColor else Color.Black).copy(
+                                    alpha = 0.2f,
+                                ),
+                            spotColor =
+                                (if (visuals.visualState.isRecentlyMatched) glowColor else Color.Black).copy(
+                                    alpha = 0.4f,
+                                ),
                         ),
             )
         }

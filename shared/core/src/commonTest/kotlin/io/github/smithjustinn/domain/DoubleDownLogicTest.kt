@@ -14,14 +14,15 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class DoubleDownLogicTest {
-
     private val defaultConfig = ScoringConfig()
 
     @Test
     fun `activateDoubleDown should FAIL if unmatched pairs less than 3`() {
         // Arrange: Create state with only 2 pairs
-        val state = MemoryGameLogic.createInitialState(pairCount = 2, config = defaultConfig)
-            .copy(comboMultiplier = defaultConfig.heatModeThreshold) // Heat Mode ready
+        val state =
+            MemoryGameLogic
+                .createInitialState(pairCount = 2, config = defaultConfig)
+                .copy(comboMultiplier = defaultConfig.heatModeThreshold) // Heat Mode ready
 
         // Act
         val result = MemoryGameLogic.activateDoubleDown(state)
@@ -33,8 +34,10 @@ class DoubleDownLogicTest {
     @Test
     fun `activateDoubleDown should SUCCEED if unmatched pairs greater or equal to 3`() {
         // Arrange: Create state with 3 pairs
-        val state = MemoryGameLogic.createInitialState(pairCount = 3, config = defaultConfig)
-            .copy(comboMultiplier = defaultConfig.heatModeThreshold) // Heat Mode ready
+        val state =
+            MemoryGameLogic
+                .createInitialState(pairCount = 3, config = defaultConfig)
+                .copy(comboMultiplier = defaultConfig.heatModeThreshold) // Heat Mode ready
 
         // Act
         val result = MemoryGameLogic.activateDoubleDown(state)
@@ -46,9 +49,11 @@ class DoubleDownLogicTest {
     @Test
     fun `handleMatchFailure while Double Down active should causes Game Over and Zero Score`() {
         // Arrange
-        var state = MemoryGameLogic.createInitialState(pairCount = 4, config = defaultConfig)
-            .copy(comboMultiplier = defaultConfig.heatModeThreshold)
-        
+        var state =
+            MemoryGameLogic
+                .createInitialState(pairCount = 4, config = defaultConfig)
+                .copy(comboMultiplier = defaultConfig.heatModeThreshold)
+
         state = MemoryGameLogic.activateDoubleDown(state)
         assertTrue(state.isDoubleDownActive)
 
@@ -58,7 +63,7 @@ class DoubleDownLogicTest {
 
         // Start flip
         val (flippedState, _) = MemoryGameLogic.flipCard(state, card1.id)
-        
+
         // Act: Flip mismatch
         val (finalState, event) = MemoryGameLogic.flipCard(flippedState, card2.id)
 
@@ -78,22 +83,23 @@ class DoubleDownLogicTest {
         val card1 = CardState(0, Suit.Hearts, Rank.Ace)
         val card2 = CardState(1, Suit.Hearts, Rank.Ace)
         val cards = listOf(card1, card2).toImmutableList()
-        
+
         val startScore = 1000
         val basePoints = 100
-        val comboBonus = 50 
-        // Logic: (1000 + (100 + (combofactor * 50))) * 2 
+        val comboBonus = 50
+        // Logic: (1000 + (100 + (combofactor * 50))) * 2
         // Let's set combo to 0 for simplicity or mimic logic
-        
-        val state = MemoryGameState(
-            cards = cards,
-            pairCount = 1,
-            config = defaultConfig,
-            mode = GameMode.STANDARD,
-            score = startScore,
-            isDoubleDownActive = true,
-            comboMultiplier = 3
-        )
+
+        val state =
+            MemoryGameState(
+                cards = cards,
+                pairCount = 1,
+                config = defaultConfig,
+                mode = GameMode.STANDARD,
+                score = startScore,
+                isDoubleDownActive = true,
+                comboMultiplier = 3,
+            )
 
         // Act: Match the final pair
         val (flippedState, _) = MemoryGameLogic.flipCard(state, card1.id)
@@ -101,14 +107,18 @@ class DoubleDownLogicTest {
 
         // Assert
         assertTrue(finalState.isGameWon)
-        
+
         // Calculate Expected
         val comboFactor = 3 * 3 // 9
         val matchPoints = basePoints + (comboFactor * comboBonus) // 100 + 450 = 550
         val preDoubleScore = startScore + matchPoints // 1550
         val expectedScore = preDoubleScore * 2 // 3100
-        
-        assertEquals(expectedScore, finalState.score, "Score should be doubled on win: Expected $expectedScore but got ${finalState.score}")
+
+        assertEquals(
+            expectedScore,
+            finalState.score,
+            "Score should be doubled on win: Expected $expectedScore but got ${finalState.score}",
+        )
         assertFalse(finalState.isDoubleDownActive, "Double Down should deactivate after win")
     }
 }
