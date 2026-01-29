@@ -39,7 +39,6 @@ kover {
                     "memory_match.**"
                 )
                 
-                // Annotation-based exclusions (Best Practice for Compose)
                 annotatedBy(
                     "androidx.compose.ui.tooling.preview.Preview",
                     "androidx.compose.runtime.Composable"  // Exclude all @Composable functions
@@ -81,7 +80,11 @@ kover {
                     "*Mock*",
                     
                     // Platform-specific expect/actual
-                    "*PlatformUtils*"
+                    "*PlatformUtils*",
+                    
+                    // Serialization
+                    "*${'$'}${'$'}serializer",
+                    "*Serializer"
                 )
             }
         }
