@@ -56,8 +56,6 @@ private const val CHIP_DASH_OFF = 20f
 private const val CHIP_FONT_SIZE_COMPACT = 10
 private const val CHIP_FONT_SIZE_NORMAL = 14
 
-
-
 @Composable
 fun ComboBadge(
     state: ComboBadgeState,
@@ -73,14 +71,16 @@ fun ComboBadge(
     ) {
         val comboPulseScale by infiniteTransition.animateFloat(
             initialValue = 1f,
-            targetValue = when {
-                state.isHeatMode -> if (compact) PULSE_SCALE_HEAT_COMPACT else PULSE_SCALE_HEAT
-                else -> if (compact) PULSE_SCALE_DEFAULT_COMPACT else PULSE_SCALE_DEFAULT
-            },
-            animationSpec = infiniteRepeatable(
-                animation = tween(COMBO_ANIMATION_DURATION_MS, easing = FastOutSlowInEasing),
-                repeatMode = RepeatMode.Reverse,
-            ),
+            targetValue =
+                when {
+                    state.isHeatMode -> if (compact) PULSE_SCALE_HEAT_COMPACT else PULSE_SCALE_HEAT
+                    else -> if (compact) PULSE_SCALE_DEFAULT_COMPACT else PULSE_SCALE_DEFAULT
+                },
+            animationSpec =
+                infiniteRepeatable(
+                    animation = tween(COMBO_ANIMATION_DURATION_MS, easing = FastOutSlowInEasing),
+                    repeatMode = RepeatMode.Reverse,
+                ),
             label = "comboPulse",
         )
 
@@ -123,14 +123,15 @@ private fun ComboBadgeContent(
             ChipVisual(
                 color = badgeColor,
                 chipSize = chipSize,
-                modifier = Modifier
-                    .padding(bottom = yOffset.coerceAtLeast(0.dp))
-                    .shadow(
-                        elevation = (index + 1).dp,
-                        shape = CircleShape,
-                        ambientColor = Color.Black.copy(alpha = CHIP_SHADOW_ALPHA),
-                        spotColor = Color.Black.copy(alpha = CHIP_SHADOW_ALPHA),
-                    ),
+                modifier =
+                    Modifier
+                        .padding(bottom = yOffset.coerceAtLeast(0.dp))
+                        .shadow(
+                            elevation = (index + 1).dp,
+                            shape = CircleShape,
+                            ambientColor = Color.Black.copy(alpha = CHIP_SHADOW_ALPHA),
+                            spotColor = Color.Black.copy(alpha = CHIP_SHADOW_ALPHA),
+                        ),
             )
         }
 
@@ -142,20 +143,22 @@ private fun ComboBadgeContent(
             ChipVisual(
                 color = badgeColor,
                 chipSize = chipSize,
-                modifier = Modifier.shadow(
-                    elevation = (chipCount + 1).dp,
-                    shape = CircleShape,
-                    ambientColor = Color.Black,
-                    spotColor = Color.Black,
-                ),
+                modifier =
+                    Modifier.shadow(
+                        elevation = (chipCount + 1).dp,
+                        shape = CircleShape,
+                        ambientColor = Color.Black,
+                        spotColor = Color.Black,
+                    ),
             )
 
             Text(
                 text = "${state.combo}x",
-                style = PokerTheme.typography.labelLarge.copy(
-                    fontWeight = FontWeight.Black,
-                    fontSize = if (compact) CHIP_FONT_SIZE_COMPACT.sp else CHIP_FONT_SIZE_NORMAL.sp,
-                ),
+                style =
+                    PokerTheme.typography.labelLarge.copy(
+                        fontWeight = FontWeight.Black,
+                        fontSize = if (compact) CHIP_FONT_SIZE_COMPACT.sp else CHIP_FONT_SIZE_NORMAL.sp,
+                    ),
                 color = Color.White,
             )
         }
@@ -184,13 +187,15 @@ private fun ChipVisual(
             color = Color.White.copy(alpha = CHIP_RING_ALPHA),
             center = center,
             radius = radius * CHIP_RING_RADIUS_FACTOR,
-            style = Stroke(
-                width = radius * CHIP_RING_WIDTH_FACTOR,
-                pathEffect = PathEffect.dashPathEffect(
-                    intervals = floatArrayOf(CHIP_DASH_ON, CHIP_DASH_OFF),
-                    phase = 0f,
+            style =
+                Stroke(
+                    width = radius * CHIP_RING_WIDTH_FACTOR,
+                    pathEffect =
+                        PathEffect.dashPathEffect(
+                            intervals = floatArrayOf(CHIP_DASH_ON, CHIP_DASH_OFF),
+                            phase = 0f,
+                        ),
                 ),
-            ),
         )
 
         // 3. Inner Circle border

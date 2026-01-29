@@ -186,7 +186,6 @@ private fun CardContentSelectors(
     }
 }
 
-
 private const val MATCHED_SCALE = 0.4f
 private const val PULSE_SCALE = 1.05f
 private const val DEFAULT_SCALE = 1f

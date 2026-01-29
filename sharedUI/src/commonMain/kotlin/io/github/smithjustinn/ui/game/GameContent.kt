@@ -29,8 +29,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.di.LocalAppGraph
+import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.services.AudioService
 import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.components.AdaptiveDensity
@@ -49,15 +49,9 @@ import io.github.smithjustinn.ui.game.components.WalkthroughOverlay
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-private const val SHAKE_MAX_OFFSET = 20f
-private const val SHAKE_MID_OFFSET = 10f
 private const val SHAKE_RESET_OFFSET = 0f
 private const val STEAM_DURATION_MS = 1200
-private const val HEAT_TRANSITION_DURATION_MS = 800
 private const val COMPACT_HEIGHT_THRESHOLD_DP = 500
-private const val SNACKBAR_TOP_PADDING_DP = 16
-private const val SNACKBAR_MAX_WIDTH_DP = 500
-private const val RESULTS_MAX_WIDTH_DP = 550
 private const val DOUBLE_DOWN_BOTTOM_PADDING_DP = 100
 private const val SPEECH_BUBBLE_TOP_PADDING_DP = 80
 

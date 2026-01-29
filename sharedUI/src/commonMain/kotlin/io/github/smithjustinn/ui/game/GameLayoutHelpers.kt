@@ -1,11 +1,11 @@
 package io.github.smithjustinn.ui.game
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,22 +48,23 @@ fun GameBackground(isHeatMode: Boolean) {
     val backgroundTopColor by animateColorAsState(
         targetValue = if (isHeatMode) colors.heatBackgroundTop else colors.feltGreen,
         animationSpec = tween(durationMillis = HEAT_TRANSITION_DURATION_MS),
-        label = "backgroundTop"
+        label = "backgroundTop",
     )
     val backgroundBottomColor by animateColorAsState(
         targetValue = if (isHeatMode) colors.heatBackgroundBottom else colors.feltGreenDark,
         animationSpec = tween(durationMillis = HEAT_TRANSITION_DURATION_MS),
-        label = "backgroundBottom"
+        label = "backgroundBottom",
     )
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(backgroundTopColor, backgroundBottomColor),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(backgroundTopColor, backgroundBottomColor),
+                    ),
                 ),
-            ),
     )
 }
 
@@ -73,9 +75,10 @@ fun GameGameOverOverlay(
     useCompactUI: Boolean,
 ) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = BLACK_OVERLAY_ALPHA)),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = BLACK_OVERLAY_ALPHA)),
     ) {
         if (state.game.isGameWon) {
             GameWonOverlay(state)
@@ -99,14 +102,14 @@ private fun BoxScope.GameWonOverlay(state: GameUIState) {
 
     if (state.isNewHighScore) {
         NewHighScoreSnackbar(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(
-                    top = SNACKBAR_TOP_PADDING.dp,
-                    start = SNACKBAR_HORIZONTAL_PADDING.dp,
-                    end = SNACKBAR_HORIZONTAL_PADDING.dp
-                )
-                .widthIn(max = SNACKBAR_MAX_WIDTH.dp),
+            modifier =
+                Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(
+                        top = SNACKBAR_TOP_PADDING.dp,
+                        start = SNACKBAR_HORIZONTAL_PADDING.dp,
+                        end = SNACKBAR_HORIZONTAL_PADDING.dp,
+                    ).widthIn(max = SNACKBAR_MAX_WIDTH.dp),
         )
     }
 }
@@ -145,12 +148,13 @@ private fun BoxScope.GameResultsOverlay(
             hapticsService.vibrateMatch()
         },
         onScoreTick = { hapticsService.vibrateTick() },
-        modifier = Modifier
-            .align(Alignment.Center)
-            .widthIn(max = RESULTS_MAX_WIDTH.dp)
-            .padding(
-                vertical = if (useCompactUI) PokerTheme.spacing.small else PokerTheme.spacing.large,
-            ),
+        modifier =
+            Modifier
+                .align(Alignment.Center)
+                .widthIn(max = RESULTS_MAX_WIDTH.dp)
+                .padding(
+                    vertical = if (useCompactUI) PokerTheme.spacing.small else PokerTheme.spacing.large,
+                ),
         mode = state.game.mode,
     )
 }
@@ -160,10 +164,11 @@ fun HeatModeTransitionHandler(
     isHeatMode: Boolean,
     onHeatLost: () -> Unit,
 ) {
+    val currentOnHeatLost by rememberUpdatedState(onHeatLost)
     var lastHeatMode by remember { mutableStateOf(isHeatMode) }
     LaunchedEffect(isHeatMode) {
         if (lastHeatMode && !isHeatMode) {
-            onHeatLost()
+            currentOnHeatLost()
         }
         lastHeatMode = isHeatMode
     }

@@ -307,15 +307,14 @@ object MemoryGameLogic {
     /**
      * Calculates the initial time for Time Attack mode based on the pair count.
      */
-    fun calculateInitialTime(pairCount: Int): Long {
-        return when (pairCount) {
+    fun calculateInitialTime(pairCount: Int): Long =
+        when (pairCount) {
             DIFF_LEVEL_6 -> INITIAL_TIME_6
             DIFF_LEVEL_8 -> INITIAL_TIME_8
             DIFF_LEVEL_10 -> INITIAL_TIME_10
             DIFF_LEVEL_12 -> INITIAL_TIME_12
             else -> (pairCount * TIME_PER_PAIR_FALLBACK).toLong()
         }
-    }
 
     /**
      * Logic for calculating time gain based on combo.
