@@ -61,6 +61,6 @@ class MemoryGameLogicTest {
         // Score: Base(100) * 2 = 200
         assertEquals(200, finalState.score, "Score should be doubled on match")
         assertFalse(finalState.isDoubleDownActive, "Double Down should be reset after match")
-        assertEquals(1, finalState.comboMultiplier, "Combo should reset to 1 after successful Double Down match")
+        assertEquals(2, finalState.comboMultiplier, "Combo should increment after successful Double Down match")
     }
 }

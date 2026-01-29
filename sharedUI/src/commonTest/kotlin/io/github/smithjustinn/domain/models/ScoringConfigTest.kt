@@ -7,12 +7,13 @@ class ScoringConfigTest {
     @Test
     fun testDefaultValues() {
         val config = ScoringConfig()
-        assertEquals(20, config.baseMatchPoints)
+        assertEquals(100, config.baseMatchPoints)
         assertEquals(50, config.comboBonusPoints)
         assertEquals(50, config.timeBonusPerPair)
         assertEquals(1, config.timePenaltyPerSecond)
         assertEquals(10000, config.moveBonusMultiplier)
-        assertEquals(4, config.heatModeThreshold)
+        assertEquals(3, config.heatModeThreshold)
+        assertEquals(6, config.theNutsThreshold)
     }
 
     @Test

@@ -163,7 +163,7 @@ object MemoryGameLogic {
                 totalBasePoints = state.totalBasePoints + matchBasePoints,
                 totalComboBonus = state.totalComboBonus + matchComboBonus,
                 totalDoubleDownBonus = state.totalDoubleDownBonus + matchDoubleDownBonus,
-                comboMultiplier = if (state.isDoubleDownActive) 1 else state.comboMultiplier + 1,
+                comboMultiplier = state.comboMultiplier + 1,
                 isDoubleDownActive = false,
                 matchComment = comment,
                 lastMatchedIds = persistentListOf(first.id, second.id),
