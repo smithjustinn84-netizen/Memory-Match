@@ -29,6 +29,7 @@ data class MemoryGameState(
     val totalDoubleDownBonus: Int = 0,
     val comboMultiplier: Int = 0,
     val isDoubleDownActive: Boolean = false,
+    val isBusted: Boolean = false,
     @Transient val matchComment: MatchComment? = null,
     val config: ScoringConfig = ScoringConfig(),
     val scoreBreakdown: ScoreBreakdown = ScoreBreakdown(),

@@ -55,6 +55,10 @@ Success breeds intensity. By matching multiple pairs in quick succession, you bu
 *   **Visual Transformation**: The UI shifts to an electric neon color palette with smooth animated background transitions.
 *   **Tactile Feedback**: Haptics become significantly more pronounced, making every match feel explosive.
 *   **Rewards**: High combos in Time Attack grant massive "Mega Bonus" time gains, essential for high-score runs.
+*   **All-In Double Down**: Activate specific "Doubling" mode to gamble your entire game.
+    *   **The Risk**: Instant Game Over on any mismatch.
+    *   **The Reward**: 2x Score Multiplier if you clear the board.
+    *   **Constraint**: Requires 3+ pairs to activate.
 
 ### ✨ Key Features
 *   **Interactive Walkthrough**: A seamless, step-by-step introduction for new players, ensuring they understand the "Heat" mechanics and game objectives from the very first flip.

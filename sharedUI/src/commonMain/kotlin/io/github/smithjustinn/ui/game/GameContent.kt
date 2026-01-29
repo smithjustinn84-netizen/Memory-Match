@@ -275,6 +275,7 @@ private fun BoxScope.GameResultsOverlay(
 
     ResultsCard(
         isWon = state.game.isGameWon,
+        isBusted = state.game.isBusted,
         score = state.game.score,
         moves = state.game.moves,
         elapsedTimeSeconds = state.elapsedTimeSeconds,

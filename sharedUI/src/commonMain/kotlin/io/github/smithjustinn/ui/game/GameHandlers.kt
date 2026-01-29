@@ -253,6 +253,7 @@ internal class GameLifecycleHandler(
                 isPeeking = false,
                 showTimeGain = false,
                 showTimeLoss = false,
+                hasUsedDoubleDownPeek = false,
             )
         }
         timerHandler.startTimer(savedGame.first.mode)
@@ -284,6 +285,7 @@ internal class GameLifecycleHandler(
                 isPeeking = false,
                 showTimeGain = false,
                 showTimeLoss = false,
+                hasUsedDoubleDownPeek = false,
             )
         }
 

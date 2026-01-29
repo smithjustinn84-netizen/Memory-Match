@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.ScoreBreakdown
 import io.github.smithjustinn.resources.Res
+import io.github.smithjustinn.resources.busted
 import io.github.smithjustinn.resources.game_complete
 import io.github.smithjustinn.resources.game_over
 import io.github.smithjustinn.resources.play_again
@@ -78,6 +79,7 @@ private val ReceiptAccentColor = Color(0xFF8B0000) // Dark Red for key elements
 @Composable
 fun ResultsCard(
     isWon: Boolean,
+    isBusted: Boolean = false,
     score: Int,
     moves: Int,
     elapsedTimeSeconds: Long,
@@ -91,6 +93,7 @@ fun ResultsCard(
     val isTimeAttack = mode == GameMode.TIME_ATTACK
     val titleRes =
         when {
+            isBusted -> Res.string.busted
             isWon -> Res.string.game_complete
             isTimeAttack -> Res.string.times_up
             else -> Res.string.game_over

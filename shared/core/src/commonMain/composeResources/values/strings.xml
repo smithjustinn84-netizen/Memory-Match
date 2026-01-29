@@ -28,6 +28,7 @@
     <string name="time_label">Time: %1$s</string>
     <string name="moves_label">Moves: %1$d</string>
     <string name="game_over">Game Over</string>
+    <string name="busted">BUSTED!</string>
     <string name="times_up">"Time's Up!"</string>
 
     <string name="difficulty_tourist">The Tourist</string>

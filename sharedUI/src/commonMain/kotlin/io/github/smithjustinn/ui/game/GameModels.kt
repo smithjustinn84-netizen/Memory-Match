@@ -25,6 +25,7 @@ data class GameUIState(
     val isHeatMode: Boolean = false,
     val showWalkthrough: Boolean = false,
     val walkthroughStep: Int = 0,
+    val hasUsedDoubleDownPeek: Boolean = false,
 )
 
 sealed class GameUiEvent {

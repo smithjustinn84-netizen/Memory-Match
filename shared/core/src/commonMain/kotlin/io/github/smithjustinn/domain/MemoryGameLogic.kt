@@ -144,8 +144,7 @@ object MemoryGameLogic {
         val matchBasePoints = config.baseMatchPoints
         val matchComboBonus = comboFactor * config.comboBonusPoints
         val matchPoints = matchBasePoints + matchComboBonus
-        val matchDoubleDownBonus = if (state.isDoubleDownActive) matchPoints else 0
-        val pointsEarned = matchPoints + matchDoubleDownBonus
+        val pointsEarned = matchPoints
 
         val isWon = newCards.all { it.isMatched }
         val matchesFound = newCards.count { it.isMatched } / 2
@@ -153,18 +152,26 @@ object MemoryGameLogic {
 
         val comment = generateMatchComment(moves, matchesFound, state.pairCount, state.comboMultiplier, config)
 
+        val preDoubleScore = state.score + pointsEarned
+        val finalScore = if (isWon && state.isDoubleDownActive) {
+            preDoubleScore * 2
+        } else {
+            preDoubleScore
+        }
+        val ddBonus = finalScore - preDoubleScore
+        
         val newState =
             state.copy(
                 cards = newCards,
                 isGameWon = isWon,
                 isGameOver = isWon,
                 moves = moves,
-                score = state.score + pointsEarned,
+                score = finalScore,
                 totalBasePoints = state.totalBasePoints + matchBasePoints,
                 totalComboBonus = state.totalComboBonus + matchComboBonus,
-                totalDoubleDownBonus = state.totalDoubleDownBonus + matchDoubleDownBonus,
+                totalDoubleDownBonus = ddBonus,
                 comboMultiplier = state.comboMultiplier + 1,
-                isDoubleDownActive = false,
+                isDoubleDownActive = state.isDoubleDownActive && !isWon, // Deactivate on win
                 matchComment = comment,
                 lastMatchedIds = persistentListOf(first.id, second.id),
             )
@@ -184,13 +191,32 @@ object MemoryGameLogic {
         first: CardState,
         second: CardState,
     ): Pair<MemoryGameState, GameDomainEvent?> {
+        // All-In Rule: Mismatch while Double Down is active results in Game Over and 0 Score
+        if (state.isDoubleDownActive) {
+            return state.copy(
+                score = 0,
+                isGameOver = true,
+                isGameWon = false,
+                isDoubleDownActive = false,
+                isBusted = true, // BUSTED!
+                cards =
+                    state.cards
+                        .map { card ->
+                            if (card.id == first.id || card.id == second.id) {
+                                card.copy(isError = true)
+                            } else {
+                                card
+                            }
+                        }.toImmutableList(),
+                lastMatchedIds = persistentListOf(first.id, second.id), // Show the error
+            ) to GameDomainEvent.GameOver
+        }
+
         val newState =
             state.copy(
                 moves = state.moves + 1,
                 comboMultiplier = 0,
-                score =
-                    (state.score - if (state.isDoubleDownActive) state.config.doubleDownPenalty else 0)
-                        .coerceAtLeast(0),
+                score = state.score.coerceAtLeast(0),
                 isDoubleDownActive = false,
                 cards =
                     state.cards
@@ -335,12 +361,19 @@ object MemoryGameLogic {
         return baseGain + comboBonus
     }
 
-    fun activateDoubleDown(state: MemoryGameState): MemoryGameState =
-        if (state.comboMultiplier >= state.config.heatModeThreshold && !state.isDoubleDownActive) {
+    fun activateDoubleDown(state: MemoryGameState): MemoryGameState {
+        val unmatchedPairs = state.cards.count { !it.isMatched } / 2
+        // Restriction: Must have at least 3 pairs remaining to activate
+        return if (
+            state.comboMultiplier >= state.config.heatModeThreshold &&
+            !state.isDoubleDownActive &&
+            unmatchedPairs >= 3
+        ) {
             state.copy(isDoubleDownActive = true)
         } else {
             state
         }
+    }
 
     private const val TIME_ATTACK_BONUS_MULTIPLIER = 10
     private const val DIFF_LEVEL_6 = 6
