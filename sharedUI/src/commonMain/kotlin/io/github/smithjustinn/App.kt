@@ -12,6 +12,11 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.predictiveBackAnimation
 import com.arkivanov.decompose.extensions.compose.stack.animation.slide
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import io.github.smithjustinn.di.AppGraph
 import io.github.smithjustinn.di.LocalAppGraph
@@ -32,24 +37,33 @@ fun App(
 ) = AppTheme(onThemeChanged) {
     var showSplash by remember { mutableStateOf(true) }
 
-    if (showSplash) {
-        SplashScreen(onDataLoaded = { showSplash = false })
-    } else {
-        CompositionLocalProvider(LocalAppGraph provides appGraph) {
-            Children(
-                stack = root.childStack,
-                animation =
-                    predictiveBackAnimation(
-                        backHandler = root.backHandler,
-                        fallbackAnimation = stackAnimation(slide() + fade()),
-                        onBack = root::pop,
-                    ),
-            ) {
-                when (val child = it.instance) {
-                    is RootComponent.Child.Start -> StartContent(child.component)
-                    is RootComponent.Child.Game -> GameContent(child.component)
-                    is RootComponent.Child.Settings -> SettingsContent(child.component)
-                    is RootComponent.Child.Stats -> StatsContent(child.component)
+    AnimatedContent(
+        targetState = showSplash,
+        transitionSpec = {
+            fadeIn(animationSpec = tween(1000)) togetherWith
+                fadeOut(animationSpec = tween(1000))
+        },
+        label = "SplashTransition",
+    ) { show ->
+        if (show) {
+            SplashScreen(onDataLoaded = { showSplash = false })
+        } else {
+            CompositionLocalProvider(LocalAppGraph provides appGraph) {
+                Children(
+                    stack = root.childStack,
+                    animation =
+                        predictiveBackAnimation(
+                            backHandler = root.backHandler,
+                            fallbackAnimation = stackAnimation(slide() + fade()),
+                            onBack = root::pop,
+                        ),
+                ) {
+                    when (val child = it.instance) {
+                        is RootComponent.Child.Start -> StartContent(child.component)
+                        is RootComponent.Child.Game -> GameContent(child.component)
+                        is RootComponent.Child.Settings -> SettingsContent(child.component)
+                        is RootComponent.Child.Stats -> StatsContent(child.component)
+                    }
                 }
             }
         }
