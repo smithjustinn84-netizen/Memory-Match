@@ -12,6 +12,7 @@ internal val SoftBlue = Color(0xFF60A5FA)
 internal val BonusGreen = Color(0xFF4CAF50)
 
 // Poker Felt Colors
+internal val FeltGreenCenter = Color(0xFF119E5E)
 internal val FeltGreenTop = Color(0xFF0A5C36)
 internal val FeltGreenBottom = Color(0xFF073B24)
 

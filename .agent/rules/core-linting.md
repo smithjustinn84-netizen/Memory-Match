@@ -40,6 +40,8 @@ Detekt identifies potential bugs and "code smells" that affect maintainability.
 - **Generic Exceptions**: Never catch `Exception` or `Throwable` without a specific reason.
 - **Swallowed Exceptions**: Never leave catch blocks empty. Provide a log or a `TODO`.
 - **Return Count**: Max 2 return statements per function (excluding guards/lambdas).
+- **Unused Parameter**: Remove unused function parameters. If a parameter is required by an interface but unused, rename it to `_`.
+- **Forbidden Comment**: `TODO` comments are strictly flagged. Use `FIXME` for critical issues or ensure `TODO`s are tracked (e.g., `// TODO(JIRA-123): ...`).
 
 ## 🚀 Enforcement Protocol
 When working on the codebase:

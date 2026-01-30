@@ -8,7 +8,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -63,44 +62,83 @@ fun PokerChip(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
     ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier =
-                Modifier
-                    .size(chipSize)
-                    .graphicsLayer {
-                        scaleX = scale
-                        scaleY = scale
-                    }.drawBehind {
-                        if (glowAlpha > 0f) {
-                            drawCircle(
-                                brush =
-                                    Brush.radialGradient(
-                                        colors = listOf(glowColor.copy(alpha = glowAlpha), Color.Transparent),
-                                        center = center,
-                                        radius = size.minDimension * GLOW_RADIUS_FACTOR,
-                                    ),
-                                radius = size.minDimension * GLOW_RADIUS_FACTOR,
-                            )
-                        }
-                    }.shadow(elevation, CircleShape)
-                    .clickable(
-                        interactionSource = interactionSource,
-                        indication = null,
-                        onClick = onClick,
-                    ),
-        ) {
-            ChipFace(
-                contentColor = contentColor,
-                modifier = Modifier.matchParentSize(),
-            )
-        }
-
-        Spacer(modifier = Modifier.height(LABEL_SPACING_DP.dp))
-
-        PokerChipLabel(
+        PokerChipContent(
+            chipSize = chipSize,
+            scale = scale,
+            glowAlpha = glowAlpha,
+            glowColor = glowColor,
+            elevation = elevation,
+            interactionSource = interactionSource,
+            onClick = onClick,
+            contentColor = contentColor,
             text = text,
             isSelected = isSelected,
+        )
+    }
+}
+
+@Composable
+private fun PokerChipContent(
+    chipSize: Dp,
+    scale: Float,
+    glowAlpha: Float,
+    glowColor: Color,
+    elevation: Dp,
+    interactionSource: MutableInteractionSource,
+    onClick: () -> Unit,
+    contentColor: Color,
+    text: String,
+    isSelected: Boolean,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier =
+            Modifier
+                .size(chipSize)
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                }.drawBehind {
+                    if (glowAlpha > 0f) {
+                        drawCircle(
+                            brush =
+                                Brush.radialGradient(
+                                    colors = listOf(glowColor.copy(alpha = glowAlpha), Color.Transparent),
+                                    center = center,
+                                    radius = size.minDimension * GLOW_RADIUS_FACTOR,
+                                ),
+                            radius = size.minDimension * GLOW_RADIUS_FACTOR,
+                        )
+                    }
+                }.shadow(elevation, CircleShape)
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                    onClick = onClick,
+                ),
+    ) {
+        ChipFace(
+            contentColor = contentColor,
+            modifier = Modifier.matchParentSize(),
+        )
+
+        // Value Text on Chip
+        Text(
+            text = text,
+            style =
+                PokerTheme.typography.titleMedium.copy(
+                    fontSize = if (isSelected) 20.sp else 16.sp,
+                    fontWeight = FontWeight.Black,
+                    shadow =
+                        androidx.compose.ui.graphics.Shadow(
+                            color = Color.Black.copy(alpha = 0.5f),
+                            offset =
+                                androidx.compose.ui.geometry
+                                    .Offset(1f, 1f),
+                            blurRadius = 2f,
+                        ),
+                ),
+            color = Color.White,
         )
     }
 }

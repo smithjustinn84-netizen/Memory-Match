@@ -1,5 +1,11 @@
 package io.github.smithjustinn.ui.start
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,12 +24,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.di.LocalAppGraph
 import io.github.smithjustinn.domain.models.DifficultyLevel
@@ -34,6 +43,7 @@ import io.github.smithjustinn.ui.components.AppCard
 import io.github.smithjustinn.ui.components.AppIcons
 import io.github.smithjustinn.ui.start.components.DifficultySelectionSection
 import io.github.smithjustinn.ui.start.components.StartHeader
+import kotlinx.coroutines.launch
 
 @Composable
 fun StartContent(
@@ -54,11 +64,12 @@ fun StartContent(
                         Brush.radialGradient(
                             colors =
                                 listOf(
+                                    colors.feltGreenCenter,
                                     colors.feltGreen,
                                     colors.feltGreenDark,
                                 ),
                             center = androidx.compose.ui.geometry.Offset.Unspecified,
-                            radius = Float.POSITIVE_INFINITY, // Smoother radial falloff
+                            radius = Float.POSITIVE_INFINITY,
                         ),
                 ),
     ) {
@@ -92,7 +103,7 @@ fun StartContent(
                 audioService.playEffect(AudioService.SoundEffect.CLICK)
                 component.onDailyChallengeClick()
             },
-            modifier = Modifier.fillMaxSize(), // Fill so we can align icons to top-right
+            modifier = Modifier.fillMaxSize(),
         )
     }
 }
@@ -106,6 +117,10 @@ private const val START_HEADER_SPACER_HEIGHT_DP = 64
 private const val DEALER_TRAY_MAX_WIDTH_DP = 600
 private const val MAIN_CONTENT_BOTTOM_SPACER_WEIGHT = 0.5f
 private const val RADIAL_FALLOFF_RADIUS = Float.POSITIVE_INFINITY
+private const val HEADER_ANIMATION_DURATION = 800
+private const val CONTENT_ANIMATION_DURATION = 600
+private const val CONTENT_ANIMATION_DELAY = 200
+private const val CONTENT_INITIAL_OFFSET_Y = 100f
 
 @Composable
 private fun StartScreenLayout(
@@ -121,6 +136,12 @@ private fun StartScreenLayout(
 ) {
     val spacing = PokerTheme.spacing
 
+    // Animation States
+    val animations = rememberEntranceAnimations()
+    val headerAlpha = animations.headerAlpha
+    val contentAlpha = animations.contentAlpha
+    val contentOffsetY = animations.contentOffsetY
+
     Box(
         modifier =
             modifier
@@ -128,11 +149,14 @@ private fun StartScreenLayout(
                 .statusBarsPadding()
                 .navigationBarsPadding(),
     ) {
+        val headerModifier = Modifier.graphicsLayer { alpha = headerAlpha.value }
+
         StartTopActions(
             state = state,
             onDailyChallengeClick = onDailyChallengeClick,
             onStatsClick = onStatsClick,
             onSettingsClick = onSettingsClick,
+            modifier = headerModifier,
         )
 
         StartMainContent(
@@ -141,6 +165,12 @@ private fun StartScreenLayout(
             onModeSelected = onModeSelected,
             onStartGame = onStartGame,
             onResumeGame = onResumeGame,
+            modifier =
+                Modifier
+                    .graphicsLayer {
+                        alpha = contentAlpha.value
+                        translationY = contentOffsetY.value
+                    },
         )
     }
 }
@@ -151,13 +181,14 @@ private fun BoxScope.StartTopActions(
     onDailyChallengeClick: () -> Unit,
     onStatsClick: () -> Unit,
     onSettingsClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val spacing = PokerTheme.spacing
 
     // Top Start Action Row (Daily Challenge)
     Row(
         modifier =
-            Modifier
+            modifier
                 .align(Alignment.TopStart)
                 .padding(spacing.medium),
     ) {
@@ -200,12 +231,13 @@ private fun BoxScope.StartMainContent(
     onModeSelected: (GameMode) -> Unit,
     onStartGame: () -> Unit,
     onResumeGame: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val spacing = PokerTheme.spacing
 
     Column(
         modifier =
-            Modifier
+            modifier
                 .fillMaxSize()
                 .padding(horizontal = spacing.large),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -272,3 +304,46 @@ private fun MedallionIcon(
         }
     }
 }
+
+@Composable
+private fun rememberEntranceAnimations(): StartEntranceAnimations {
+    val headerAlpha = remember { Animatable(0f) }
+    val contentAlpha = remember { Animatable(0f) }
+    val contentOffsetY = remember { Animatable(CONTENT_INITIAL_OFFSET_Y) }
+
+    LaunchedEffect(Unit) {
+        // Sequence animations
+        headerAlpha.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(durationMillis = HEADER_ANIMATION_DURATION, easing = LinearOutSlowInEasing),
+        )
+
+        launch {
+            contentAlpha.animateTo(
+                targetValue = 1f,
+                animationSpec =
+                    tween(
+                        durationMillis = CONTENT_ANIMATION_DURATION,
+                        delayMillis = CONTENT_ANIMATION_DELAY,
+                    ),
+            )
+        }
+        launch {
+            contentOffsetY.animateTo(
+                targetValue = 0f,
+                animationSpec =
+                    spring(
+                        dampingRatio = Spring.DampingRatioLowBouncy,
+                        stiffness = Spring.StiffnessLow,
+                    ),
+            )
+        }
+    }
+    return StartEntranceAnimations(headerAlpha, contentAlpha, contentOffsetY)
+}
+
+private data class StartEntranceAnimations(
+    val headerAlpha: Animatable<Float, AnimationVector1D>,
+    val contentAlpha: Animatable<Float, AnimationVector1D>,
+    val contentOffsetY: Animatable<Float, AnimationVector1D>,
+)

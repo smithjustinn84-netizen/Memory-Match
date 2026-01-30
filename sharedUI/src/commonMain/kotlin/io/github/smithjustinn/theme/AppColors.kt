@@ -24,6 +24,7 @@ data class AppColors(
     // Refined Poker Theme Colors
     val feltGreen: Color,
     val feltGreenDark: Color,
+    val feltGreenCenter: Color,
     val oakWood: Color,
     val pillSelected: Color,
     val pillUnselected: Color,
@@ -49,6 +50,7 @@ internal val LightAppColors =
         heatBackgroundBottom = HeatBackgroundBottom,
         feltGreen = FeltGreenTop,
         feltGreenDark = FeltGreenBottom,
+        feltGreenCenter = FeltGreenCenter,
         oakWood = Color(0xFF4E2C1C),
         pillSelected = Color(0xFFF5F5DC),
         pillUnselected = Color(0xFF1B4D3E),
