@@ -55,6 +55,7 @@ fun PokerChip(
     val elevation = chipAnimations.elevation
     val scale = chipAnimations.scale
     val glowAlpha = chipAnimations.glowAlpha
+    val glimmerBrush = if (isSelected) rememberGlimmerBrush() else null
 
     val glowColor = PokerTheme.colors.goldenYellow
 
@@ -73,6 +74,7 @@ fun PokerChip(
             contentColor = contentColor,
             text = text,
             isSelected = isSelected,
+            glimmerBrush = glimmerBrush,
         )
     }
 }
@@ -89,6 +91,7 @@ private fun PokerChipContent(
     contentColor: Color,
     text: String,
     isSelected: Boolean,
+    glimmerBrush: Brush?,
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -130,15 +133,20 @@ private fun PokerChipContent(
                     fontSize = if (isSelected) 20.sp else 16.sp,
                     fontWeight = FontWeight.Black,
                     shadow =
-                        androidx.compose.ui.graphics.Shadow(
-                            color = Color.Black.copy(alpha = 0.5f),
-                            offset =
-                                androidx.compose.ui.geometry
-                                    .Offset(1f, 1f),
-                            blurRadius = 2f,
-                        ),
+                        if (glimmerBrush == null) {
+                            androidx.compose.ui.graphics.Shadow(
+                                color = Color.Black.copy(alpha = 0.5f),
+                                offset =
+                                    androidx.compose.ui.geometry
+                                        .Offset(1f, 1f),
+                                blurRadius = 2f,
+                            )
+                        } else {
+                            null
+                        },
+                    brush = glimmerBrush,
                 ),
-            color = Color.White,
+            color = if (glimmerBrush != null) Color.White else Color.White,
         )
     }
 }

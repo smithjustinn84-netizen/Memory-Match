@@ -30,6 +30,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -41,6 +43,7 @@ import io.github.smithjustinn.services.AudioService
 import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.components.AppCard
 import io.github.smithjustinn.ui.components.AppIcons
+import io.github.smithjustinn.ui.components.rememberGlimmerBrush
 import io.github.smithjustinn.ui.start.components.DifficultySelectionSection
 import io.github.smithjustinn.ui.start.components.StartHeader
 import kotlinx.coroutines.launch
@@ -213,10 +216,12 @@ private fun BoxScope.StartTopActions(
         MedallionIcon(
             icon = AppIcons.Trophy,
             onClick = onStatsClick,
+            applyGlimmer = true,
         )
         MedallionIcon(
             icon = AppIcons.Settings,
             onClick = onSettingsClick,
+            applyGlimmer = true,
         )
     }
 }
@@ -277,8 +282,10 @@ private fun MedallionIcon(
     modifier: Modifier = Modifier,
     backgroundColor: Color = Color.Black.copy(alpha = MEDALLION_BG_ALPHA),
     tint: Color = PokerTheme.colors.goldenYellow,
+    applyGlimmer: Boolean = false,
 ) {
     val colors = PokerTheme.colors
+    val glimmerBrush = if (applyGlimmer) rememberGlimmerBrush() else null
 
     Surface(
         onClick = onClick,
@@ -295,8 +302,24 @@ private fun MedallionIcon(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = tint,
-                modifier = Modifier.size(MEDALLION_ICON_SIZE_DP.dp),
+                tint = if (applyGlimmer) Color.White else tint,
+                modifier =
+                    Modifier
+                        .size(MEDALLION_ICON_SIZE_DP.dp)
+                        .then(
+                            if (applyGlimmer && glimmerBrush != null) {
+                                Modifier
+                                    .graphicsLayer(alpha = 0.99f)
+                                    .drawWithCache {
+                                        onDrawWithContent {
+                                            drawContent()
+                                            drawRect(brush = glimmerBrush, blendMode = BlendMode.SrcIn)
+                                        }
+                                    }
+                            } else {
+                                Modifier
+                            },
+                        ),
             )
         }
     }

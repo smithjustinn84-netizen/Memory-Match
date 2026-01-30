@@ -162,6 +162,7 @@ private fun PrimaryActionButtons(
                 trailingIcon = AppIcons.ArrowBack,
                 isPrimary = true,
                 isPulsing = true,
+                applyGlimmer = true,
             )
 
             PokerButton(
@@ -178,6 +179,7 @@ private fun PrimaryActionButtons(
                 modifier = Modifier.fillMaxWidth(),
                 isPrimary = true,
                 isPulsing = true,
+                applyGlimmer = true,
             )
         }
     }

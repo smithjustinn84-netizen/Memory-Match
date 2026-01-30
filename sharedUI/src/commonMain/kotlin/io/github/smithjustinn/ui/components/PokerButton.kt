@@ -52,6 +52,7 @@ fun PokerButton(
     contentColor: Color = PokerTheme.colors.goldenYellow,
     isPrimary: Boolean = false,
     isPulsing: Boolean = false,
+    applyGlimmer: Boolean = false,
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "poker_button_pulse")
     val scale by infiniteTransition.animateFloat(
@@ -93,6 +94,7 @@ fun PokerButton(
             leadingIcon = leadingIcon,
             trailingIcon = trailingIcon,
             contentColor = finalContentColor,
+            applyGlimmer = applyGlimmer,
         )
     }
 }
@@ -103,7 +105,10 @@ private fun ButtonContent(
     leadingIcon: ImageVector?,
     trailingIcon: ImageVector?,
     contentColor: Color,
+    applyGlimmer: Boolean,
 ) {
+    val glimmerBrush = if (applyGlimmer) rememberGlimmerBrush() else null
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -119,9 +124,24 @@ private fun ButtonContent(
 
         Text(
             text = text.uppercase(),
-            style = PokerTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = contentColor,
+            style =
+                PokerTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    brush = glimmerBrush,
+                    shadow =
+                        if (applyGlimmer) {
+                            androidx.compose.ui.graphics.Shadow(
+                                color = Color.Black.copy(alpha = 0.3f),
+                                offset =
+                                    androidx.compose.ui.geometry
+                                        .Offset(2f, 2f),
+                                blurRadius = 4f,
+                            )
+                        } else {
+                            null
+                        },
+                ),
+            color = if (applyGlimmer) Color.White else contentColor, // Brush overrides color, but fallback is needed
             maxLines = 1,
             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f, fill = false),

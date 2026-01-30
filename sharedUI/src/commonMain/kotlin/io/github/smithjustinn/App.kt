@@ -1,5 +1,10 @@
 package io.github.smithjustinn
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -12,11 +17,6 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.predictiveBackAnimation
 import com.arkivanov.decompose.extensions.compose.stack.animation.slide
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import io.github.smithjustinn.di.AppGraph
 import io.github.smithjustinn.di.LocalAppGraph
@@ -27,6 +27,8 @@ import io.github.smithjustinn.ui.settings.SettingsContent
 import io.github.smithjustinn.ui.splash.SplashScreen
 import io.github.smithjustinn.ui.start.StartContent
 import io.github.smithjustinn.ui.stats.StatsContent
+
+private const val SPLASH_ANIMATION_DURATION = 1000
 
 @OptIn(ExperimentalDecomposeApi::class)
 @Composable
@@ -40,8 +42,8 @@ fun App(
     AnimatedContent(
         targetState = showSplash,
         transitionSpec = {
-            fadeIn(animationSpec = tween(1000)) togetherWith
-                fadeOut(animationSpec = tween(1000))
+            fadeIn(animationSpec = tween(SPLASH_ANIMATION_DURATION)) togetherWith
+                fadeOut(animationSpec = tween(SPLASH_ANIMATION_DURATION))
         },
         label = "SplashTransition",
     ) { show ->
