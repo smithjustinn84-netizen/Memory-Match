@@ -35,6 +35,7 @@ import io.github.smithjustinn.theme.FeltGreenBottom
 import io.github.smithjustinn.theme.FeltGreenTop
 import io.github.smithjustinn.theme.GoldenYellow
 import io.github.smithjustinn.ui.components.GlimmerText
+import io.github.smithjustinn.ui.components.pokerBackground
 import io.github.smithjustinn.ui.components.rememberGlimmerBrush
 import io.github.smithjustinn.ui.start.components.CardPreview
 import kotlinx.coroutines.delay
@@ -60,19 +61,7 @@ fun SplashScreen(onDataLoaded: () -> Unit) {
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(
-                    brush =
-                        Brush.radialGradient(
-                            colors =
-                                listOf(
-                                    GoldenYellow.copy(alpha = 0.15f),
-                                    FeltGreenTop,
-                                    FeltGreenBottom,
-                                ),
-                            center = Offset.Unspecified, // Defaults to center
-                            radius = Float.POSITIVE_INFINITY, // Fill nicely
-                        ),
-                ),
+                .pokerBackground(),
         contentAlignment = Alignment.Center,
     ) {
         AnimatedVisibility(
