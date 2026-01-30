@@ -10,16 +10,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -55,8 +51,8 @@ fun GameTopBar(
     onScorePositioned: (androidx.compose.ui.geometry.Offset) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    WoodenDashboard(
-        modifier = modifier,
+    GlassDashboard(
+        modifier = modifier.statusBarsPadding(),
         isHeatMode = state.isHeatMode,
     ) {
         val isTimeAttack = state.mode == GameMode.TIME_ATTACK
@@ -65,9 +61,7 @@ fun GameTopBar(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .windowInsetsPadding(
-                        WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
-                    ).padding(
+                    .padding(
                         horizontal = if (state.compact) PokerTheme.spacing.medium else PokerTheme.spacing.large,
                         vertical = if (state.compact) PokerTheme.spacing.extraSmall else PokerTheme.spacing.small,
                     ),

@@ -35,6 +35,7 @@ import io.github.smithjustinn.theme.FeltGreenBottom
 import io.github.smithjustinn.theme.FeltGreenTop
 import io.github.smithjustinn.theme.GoldenYellow
 import io.github.smithjustinn.ui.components.GlimmerText
+import io.github.smithjustinn.ui.components.rememberGlimmerBrush
 import io.github.smithjustinn.ui.start.components.CardPreview
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
@@ -96,11 +97,12 @@ fun SplashScreen(onDataLoaded: () -> Unit) {
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Subtle Loading Text
+                val glimmerBrush = rememberGlimmerBrush()
                 Text(
                     text = stringResource(Res.string.splash_dealing_cards),
                     style =
                         MaterialTheme.typography.bodyMedium.copy(
-                            color = GoldenYellow.copy(alpha = 0.8f),
+                            brush = glimmerBrush,
                             fontWeight = FontWeight.Medium,
                         ),
                 )

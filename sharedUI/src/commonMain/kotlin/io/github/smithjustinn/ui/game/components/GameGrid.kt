@@ -1,5 +1,10 @@
 package io.github.smithjustinn.ui.game.components
 
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -30,6 +35,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PointMode
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
@@ -485,37 +491,59 @@ private const val MAX_GRID_COLS_WIDE = 12
 
 private const val CARD_ASPECT_RATIO = 0.75f
 private const val CENTER_OFFSET_FRACTION = 0.5f
-private const val ROTATION_180_DEGREES = 180f
-private const val FELT_RADIAL_CENTER_FRACTION = 0.0f
-private const val FELT_RADIAL_CENTER_FOCUS_FRACTION = 0.8f
-private const val FELT_RADIAL_RADIUS_MULTIPLIER = 1.2f
 private const val FELT_TEXTURE_SEED = 42
 private const val FELT_TEXTURE_POINT_COUNT = 1000
-private const val FELT_TEXTURE_ALPHA = 0.15f
-private const val WOOD_BORDER_ALPHA = 0.4f
-private const val WOOD_HIGHLIGHT_ALPHA = 0.2f
 
 @Composable
 private fun GridBackground(modifier: Modifier = Modifier) {
     val colors = PokerTheme.colors
     val spacing = PokerTheme.spacing
 
+    // Dynamic Spotlight Animation
+    val infiniteTransition = rememberInfiniteTransition(label = "spotlight")
+    val spotlightX by infiniteTransition.animateFloat(
+        initialValue = 0.2f,
+        targetValue = 0.8f,
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(durationMillis = 15000, easing = androidx.compose.animation.core.FastOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
+        label = "spotlightX",
+    )
+
     Box(
         modifier =
             modifier.drawBehind {
-                // 1. Intense Felt with "Spotlight" lighting
+                // 1. Premium Felt Background (Base)
+                drawRect(color = colors.background)
+
+                // 2. Dynamic Spotlight (Drifting)
+                val spotlightCenter = Offset(size.width * spotlightX, size.height * 0.3f)
                 drawRect(
                     brush =
                         Brush.radialGradient(
-                            FELT_RADIAL_CENTER_FRACTION to colors.feltGreen,
-                            FELT_RADIAL_CENTER_FOCUS_FRACTION to colors.feltGreen, // Sustained center color
-                            1.0f to colors.feltGreenDark, // Sharper falloff
-                            center = center.copy(y = 0f),
-                            radius = size.maxDimension * FELT_RADIAL_RADIUS_MULTIPLIER,
+                            colors =
+                                listOf(
+                                    colors.feltGreenCenter.copy(alpha = 0.6f),
+                                    Color.Transparent,
+                                ),
+                            center = spotlightCenter,
+                            radius = size.maxDimension * 0.9f,
                         ),
                 )
 
-                // 2. Tactile Felt Texture using drawPoints for better visibility
+                // 3. Vignette (Dark edges)
+                drawRect(
+                    brush =
+                        Brush.radialGradient(
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.8f)),
+                            center = center,
+                            radius = size.maxDimension * 0.8f,
+                        ),
+                )
+
+                // 4. Subtle Noise Texture (Grain)
                 val random = Random(FELT_TEXTURE_SEED)
                 val points =
                     List(FELT_TEXTURE_POINT_COUNT) {
@@ -524,35 +552,28 @@ private fun GridBackground(modifier: Modifier = Modifier) {
                 drawPoints(
                     points = points,
                     pointMode = PointMode.Points,
-                    color = Color.Black.copy(alpha = FELT_TEXTURE_ALPHA),
+                    color = Color.White.copy(alpha = 0.03f),
                     strokeWidth = 2f,
                 )
 
-                // 3. Wood Border with Pronounced Bevel Effect
+                // 5. Casino Table Border (Glassy/Metallic)
                 val strokeWidth = spacing.medium.toPx()
-                val bevelWidth = spacing.extraSmall.toPx()
 
-                // Outer Shadow (Ambient Occlusion)
+                // Chrome/Glass Rim
                 drawRect(
-                    color = Color.Black.copy(alpha = WOOD_BORDER_ALPHA),
-                    style = Stroke(width = strokeWidth + bevelWidth),
-                )
-
-                // The Wood ("Racetrack")
-                drawRect(
-                    color = colors.oakWood,
+                    color = Color.White.copy(alpha = 0.1f),
                     style = Stroke(width = strokeWidth),
                 )
 
-                // Inner Highlight (Direct Reflection)
+                // Inner Table Shadow
                 drawRect(
-                    color = Color.White.copy(alpha = WOOD_HIGHLIGHT_ALPHA),
-                    style = Stroke(width = 2.dp.toPx()),
-                    topLeft = Offset(strokeWidth / 2, strokeWidth / 2),
+                    color = Color.Black.copy(alpha = 0.5f),
+                    style = Stroke(width = spacing.small.toPx()),
+                    topLeft = Offset(strokeWidth, strokeWidth),
                     size =
                         size.copy(
-                            width = (size.width - strokeWidth).coerceAtLeast(0f),
-                            height = (size.height - strokeWidth).coerceAtLeast(0f),
+                            width = size.width - strokeWidth * 2,
+                            height = size.height - strokeWidth * 2,
                         ),
                 )
             },

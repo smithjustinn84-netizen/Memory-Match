@@ -17,8 +17,8 @@ import io.github.smithjustinn.domain.models.Suit
 import io.github.smithjustinn.theme.PokerTheme
 import kotlin.math.abs
 
-private const val SHADOW_AMBIENT_ALPHA = 0.2f
-private const val SHADOW_SPOT_ALPHA = 0.4f
+private const val SHADOW_AMBIENT_ALPHA = 0.3f
+private const val SHADOW_SPOT_ALPHA = 0.6f
 private const val CORNER_RADIUS_DP = 12
 private const val RIM_LIGHT_THRESHOLD = 0.1f
 private const val BORDER_SIZE_MULTIPLIER = 2f
@@ -32,7 +32,7 @@ fun CardShadowLayer(
     if (elevation <= 0.dp) return
 
     val glowColor = PokerTheme.colors.goldenYellow
-    val baseShadowColor = if (isRecentlyMatched) glowColor else Color.Black
+    val baseShadowColor = if (isRecentlyMatched) glowColor else PokerTheme.colors.tableShadow
 
     Box(
         modifier =

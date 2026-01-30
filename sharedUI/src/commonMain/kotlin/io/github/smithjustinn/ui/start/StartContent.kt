@@ -68,6 +68,7 @@ fun StartContent(
                             colors =
                                 listOf(
                                     colors.feltGreenCenter,
+                                    colors.feltGreenTop,
                                     colors.feltGreen,
                                     colors.feltGreenDark,
                                 ),
@@ -201,7 +202,7 @@ private fun BoxScope.StartTopActions(
                 } else {
                     Color.Black.copy(alpha = MEDALLION_BG_ALPHA)
                 },
-            tint = if (state.isDailyChallengeCompleted) PokerTheme.colors.goldenYellow else Color.White,
+            tint = if (state.isDailyChallengeCompleted) PokerTheme.colors.goldenYellow else PokerTheme.colors.bronze,
         )
     }
 
@@ -217,6 +218,7 @@ private fun BoxScope.StartTopActions(
             icon = AppIcons.Trophy,
             onClick = onStatsClick,
             applyGlimmer = true,
+            tint = PokerTheme.colors.silver,
         )
         MedallionIcon(
             icon = AppIcons.Settings,
