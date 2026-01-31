@@ -3,37 +3,31 @@ package io.github.smithjustinn.domain
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
 import io.github.smithjustinn.utils.CoroutineDispatchers
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class GameStateMachineTest {
-
-    private val testDispatcher = StandardTestDispatcher()
-    private val testScope = TestScope(testDispatcher)
-    private val dispatchers = CoroutineDispatchers(
-        main = testDispatcher,
-        mainImmediate = testDispatcher,
-        io = testDispatcher,
-        default = testDispatcher
-    )
+    private val testDispatchers =
+        CoroutineDispatchers(
+            main = Dispatchers.Default,
+            mainImmediate = Dispatchers.Default,
+            io = Dispatchers.Default,
+            default = Dispatchers.Default,
+        )
 
     @Test
-    fun `initial state is correct`() = testScope.runTest {
+    fun `initial state is correct`() {
         val initialState = MemoryGameState(mode = GameMode.TIME_ATTACK)
-        val machine = GameStateMachine(
-            scope = testScope,
-            dispatchers = dispatchers,
-            initialState = initialState,
-            initialTimeSeconds = 60,
-            timeProvider = { 1000L },
-            onSaveState = { _, _ -> }
-        )
+        val machine =
+            GameStateMachine(
+                scope = CoroutineScope(Dispatchers.Default),
+                dispatchers = testDispatchers,
+                initialState = initialState,
+                initialTimeSeconds = 60,
+                onSaveState = { _, _ -> },
+            )
 
         assertEquals(initialState, machine.state.value)
     }

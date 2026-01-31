@@ -6,7 +6,6 @@ import io.github.smithjustinn.domain.models.MemoryGameState
 import io.github.smithjustinn.utils.CoroutineDispatchers
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,12 +20,12 @@ import kotlinx.coroutines.launch
  * Encapsulates the state transitions and side effects of the Memory Game.
  * This effectively replaces the scattered logic in `GameComponent` handlers.
  */
+@Suppress("TooManyFunctions") // State machine with dedicated handlers for each action
 class GameStateMachine(
     private val scope: CoroutineScope,
     private val dispatchers: CoroutineDispatchers,
     private val initialState: MemoryGameState,
     private val initialTimeSeconds: Long,
-    private val timeProvider: () -> Long,
     private val onSaveState: (MemoryGameState, Long) -> Unit,
 ) {
     private val _state = MutableStateFlow(initialState)
@@ -37,8 +36,8 @@ class GameStateMachine(
     private val _effects = MutableSharedFlow<GameEffect>(extraBufferCapacity = 64)
     val effects: SharedFlow<GameEffect> = _effects.asSharedFlow()
 
-    private var timerJob: Job? = null
-    private var peekJob: Job? = null
+    private val gameTimer = GameTimer(scope, dispatchers) { dispatch(GameAction.Tick) }
+    private var peekJob: kotlinx.coroutines.Job? = null
 
     init {
         // Initial save
@@ -50,69 +49,49 @@ class GameStateMachine(
 
         when (action) {
             is GameAction.StartGame -> {
-                handleStartGame(action)
+                if (action.gameState != null) _state.update { action.gameState }
+                startTimer()
             }
-
-            is GameAction.FlipCard -> {
-                handleFlipCard(action)
-            }
-
-            is GameAction.DoubleDown -> {
-                handleDoubleDown()
-            }
-
-            is GameAction.ProcessMismatch -> {
-                handleProcessMismatch()
-            }
-
-            is GameAction.ScanCards -> {
-                handleScanCards(action)
-            }
-
-            is GameAction.Tick -> {
-                handleTick()
-            }
-
-            is GameAction.Restart -> { /* Handled by UI usually, but we can reset state here if needed */ }
+            is GameAction.FlipCard -> handleFlipCard(action)
+            is GameAction.DoubleDown -> handleDoubleDown()
+            is GameAction.ProcessMismatch -> handleProcessMismatch()
+            is GameAction.ScanCards -> handleScanCards(action)
+            is GameAction.Tick -> handleTick()
+            is GameAction.Restart -> { /* Handled by UI */ }
         }
     }
 
-    private fun handleStartGame(action: GameAction.StartGame) {
-        if (action.gameState != null) {
-            // Resume
-            _state.update { action.gameState }
-        }
-        startTimer()
-    }
-
+    @Suppress("CyclomaticComplexMethod") // Dispatches effects based on game domain events
     private fun handleFlipCard(action: GameAction.FlipCard) {
         val currentState = _state.value
-        if (currentState.isGameOver) return
-
-        // Prevent flipping if 2 cards are already face up and unmatched (waiting for mismatch process)
-        // Or if peeking
         val faceUpUnmatched = currentState.cards.filter { it.isFaceUp && !it.isMatched }
-        if (faceUpUnmatched.size >= 2) return
+
+        // Guard: Skip if game over or 2 cards already face up
+        if (currentState.isGameOver || faceUpUnmatched.size >= 2) return
 
         val (newState, event) = MemoryGameLogic.flipCard(currentState, action.cardId)
-
         if (newState === currentState && event == null) return
 
         updateState(newState)
 
         when (event) {
-            GameDomainEvent.CardFlipped -> {
-                emitEffect(GameEffect.PlayFlipSound)
-            }
+            GameDomainEvent.CardFlipped -> emitEffect(GameEffect.PlayFlipSound)
 
-            GameDomainEvent.MatchSuccess -> {
+            GameDomainEvent.MatchSuccess, GameDomainEvent.TheNutsAchieved -> {
                 emitEffect(GameEffect.PlayFlipSound)
-                handleMatchSuccess(newState, event)
-            }
-
-            GameDomainEvent.TheNutsAchieved -> {
-                emitEffect(GameEffect.PlayFlipSound)
-                handleMatchSuccess(newState, event)
+                emitEffect(GameEffect.VibrateMatch)
+                emitEffect(GameEffect.PlayMatchSound)
+                if (event == GameDomainEvent.TheNutsAchieved) {
+                    emitEffect(GameEffect.PlayTheNutsSound)
+                } else if (newState.comboMultiplier >= newState.config.heatModeThreshold) {
+                    emitEffect(GameEffect.VibrateHeat)
+                }
+                if (newState.mode == GameMode.TIME_ATTACK) {
+                    val bonus = TimeAttackLogic.calculateTimeGain(newState.comboMultiplier - 1)
+                    internalTimeSeconds += bonus
+                    emitEffect(GameEffect.TimerUpdate(internalTimeSeconds))
+                    emitEffect(GameEffect.TimeGain(bonus.toInt()))
+                }
             }
 
             GameDomainEvent.MatchFailure -> {
@@ -126,45 +105,19 @@ class GameStateMachine(
             GameDomainEvent.GameWon -> {
                 emitEffect(GameEffect.PlayFlipSound)
                 stopTimer()
-
                 val finalState = MemoryGameLogic.applyFinalBonuses(newState, internalTimeSeconds)
                 updateState(finalState)
-
                 emitEffect(GameEffect.PlayWinSound)
                 emitEffect(GameEffect.VibrateMatch)
                 emitEffect(GameEffect.GameWon(finalState))
             }
 
             GameDomainEvent.GameOver -> {
-                // e.g. Busted in High Roller
                 stopTimer()
                 emitEffect(GameEffect.PlayLoseSound)
             }
 
             null -> {}
-        }
-    }
-
-    private fun handleMatchSuccess(
-        newState: MemoryGameState,
-        event: GameDomainEvent,
-    ) {
-        val isHeatMode = newState.comboMultiplier >= newState.config.heatModeThreshold
-
-        emitEffect(GameEffect.VibrateMatch)
-        emitEffect(GameEffect.PlayMatchSound)
-
-        if (event == GameDomainEvent.TheNutsAchieved) {
-            emitEffect(GameEffect.PlayTheNutsSound)
-        } else if (isHeatMode) {
-            emitEffect(GameEffect.VibrateHeat)
-        }
-
-        if (newState.mode == GameMode.TIME_ATTACK) {
-            val bonus = TimeAttackLogic.calculateTimeGain(newState.comboMultiplier - 1)
-            internalTimeSeconds += bonus
-            emitEffect(GameEffect.TimerUpdate(internalTimeSeconds))
-            emitEffect(GameEffect.TimeGain(bonus.toInt()))
         }
     }
 
@@ -185,27 +138,17 @@ class GameStateMachine(
             emitEffect(GameEffect.TimerUpdate(internalTimeSeconds))
             emitEffect(GameEffect.TimeLoss(penalty.toInt()))
             if (internalTimeSeconds == 0L) {
-                handleTimeExpired()
+                stopTimer()
+                emitEffect(GameEffect.VibrateWarning)
+                emitEffect(GameEffect.PlayLoseSound)
+                updateState(_state.value.copy(isGameOver = true, isGameWon = false, score = 0))
+                emitEffect(GameEffect.GameOver)
                 return
             }
         }
 
         val newState = MemoryGameLogic.resetErrorCards(currentState)
         updateState(newState)
-    }
-
-    private fun handleTimeExpired() {
-        stopTimer()
-        emitEffect(GameEffect.VibrateWarning)
-        emitEffect(GameEffect.PlayLoseSound)
-        val newState =
-            _state.value.copy(
-                isGameOver = true,
-                isGameWon = false,
-                score = 0,
-            )
-        updateState(newState)
-        emitEffect(GameEffect.GameOver)
     }
 
     private fun handleScanCards(action: GameAction.ScanCards) {
@@ -220,12 +163,8 @@ class GameStateMachine(
                                     if (!it.isMatched) it.copy(isFaceUp = true) else it
                                 }.toImmutableList(),
                     )
-                // Do not save peek state
                 _state.update { peekState }
-
                 delay(action.durationMs)
-
-                // Restore
                 _state.update { s ->
                     s.copy(
                         cards =
@@ -247,8 +186,12 @@ class GameStateMachine(
             emitEffect(GameEffect.TimerUpdate(internalTimeSeconds))
 
             if (internalTimeSeconds <= 0) {
-                handleTimeExpired()
-            } else if (internalTimeSeconds <= 5) {
+                stopTimer()
+                emitEffect(GameEffect.VibrateWarning)
+                emitEffect(GameEffect.PlayLoseSound)
+                updateState(_state.value.copy(isGameOver = true, isGameWon = false, score = 0))
+                emitEffect(GameEffect.GameOver)
+            } else if (internalTimeSeconds <= LOW_TIME_WARNING_THRESHOLD) {
                 emitEffect(GameEffect.VibrateTick)
             }
         } else {
@@ -257,33 +200,20 @@ class GameStateMachine(
         }
     }
 
-    fun startTimer() {
-        stopTimer()
-        timerJob =
-            scope.launch(dispatchers.default) {
-                val startTime = timeProvider()
-                while (true) {
-                    delay(1000)
-                    dispatch(GameAction.Tick)
-                }
-            }
-    }
+    fun startTimer() = gameTimer.start()
 
-    fun stopTimer() {
-        timerJob?.cancel()
-    }
+    fun stopTimer() = gameTimer.stop()
 
-    private fun updateState(newState: MemoryGameState) {
+    private inline fun updateState(newState: MemoryGameState) {
         _state.value = newState
         onSaveState(newState, internalTimeSeconds)
     }
 
-    private fun emitEffect(effect: GameEffect) {
-        _effects.tryEmit(effect)
-    }
+    private inline fun emitEffect(effect: GameEffect) = _effects.tryEmit(effect)
 
     companion object {
         const val MISMATCH_DELAY_MS = 1000L
+        private const val LOW_TIME_WARNING_THRESHOLD = 5L
     }
 }
 

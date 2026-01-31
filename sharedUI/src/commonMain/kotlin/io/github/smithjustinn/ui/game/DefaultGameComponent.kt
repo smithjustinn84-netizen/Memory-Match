@@ -1,7 +1,6 @@
 package io.github.smithjustinn.ui.game
 
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.essenty.lifecycle.doOnDestroy
 import io.github.smithjustinn.data.local.CircuitStatsEntity
 import io.github.smithjustinn.di.AppGraph
 import io.github.smithjustinn.domain.GameAction
@@ -14,6 +13,7 @@ import io.github.smithjustinn.domain.models.CircuitStage
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
 import io.github.smithjustinn.utils.componentScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -93,97 +93,112 @@ class DefaultGameComponent(
     private fun startGame(args: GameArgs) {
         scope.launch {
             try {
-                // Load Stats
-                launch {
-                    appGraph.getGameStatsUseCase(args.pairCount).collect { stats ->
-                        _state.update {
-                            it.copy(
-                                bestScore = stats?.bestScore ?: 0,
-                                bestTimeSeconds = stats?.bestTimeSeconds ?: 0,
-                            )
-                        }
-                    }
-                }
-
-                // Initialize Game Logic
-                val savedGame = if (args.forceNewGame) null else appGraph.getSavedGameUseCase()
-                val (initialState, initialTime) = if (savedGame != null && isSavedGameValid(savedGame, args.pairCount, args.mode)) {
-                    savedGame
-                } else {
-                    setupNewGame(args.pairCount, args.mode, args.seed) to if (args.mode == GameMode.TIME_ATTACK) TimeAttackLogic.calculateInitialTime(args.pairCount) else 0L
-                }
-                
-                // Set initial UI state
-                _state.update {
-                    it.copy(
-                        game = initialState,
-                        elapsedTimeSeconds = initialTime,
-                        maxTimeSeconds = if (args.mode == GameMode.TIME_ATTACK) TimeAttackLogic.calculateInitialTime(args.pairCount) else 0L,
-                        isHeatMode = initialState.comboMultiplier >= initialState.config.heatModeThreshold
-                    )
-                }
-
-                // Initialize State Machine
-                gameStateMachine = GameStateMachine(
-                    scope = scope,
-                    dispatchers = dispatchers,
-                    initialState = initialState,
-                    initialTimeSeconds = initialTime,
-                    timeProvider = { Clock.System.now().toEpochMilliseconds() },
-                    onSaveState = { state, time ->
-                         saveGame(state, time)
-                    }
-                ).also { machine ->
-                    // Collect State
-                    launch {
-                        machine.state.collectLatest { gameState ->
-                             _state.update { it.copy(game = gameState) }
-                        }
-                    }
-                    
-                    // Collect Effects
-                    launch {
-                        machine.effects.collect { effect ->
-                            handleEffect(effect)
-                        }
-                    }
-                }
-                
-                // Handle Start Sequence (Peek vs Timer)
-                val currentState = _state.value
-                when {
-                    currentState.showWalkthrough -> { /* Walkthrough handles it */ }
-                    currentState.isPeekFeatureEnabled -> {
-                         // We could dispatch a ScanCards action here or let UI handle "Peeking" state.
-                         // But for now, let's replicate old behavior: Peek then Start.
-                         // Old behavior: 
-                         // 1. Set isPeeking = true, countdown = 3
-                         // 2. Wait
-                         // 3. Start Timer
-                         
-                         // We can dispatch ScanCards(3000) but that just flips cards.
-                         // It doesn't do the countdown UI.
-                         // Let's implement the countdown UI logic here (it's UI logic) then Start Timer.
-                         launch {
-                             _state.update { it.copy(isPeeking = true, peekCountdown = GameConstants.PEEK_DURATION_SECONDS) }
-                             for (i in GameConstants.PEEK_DURATION_SECONDS downTo 1) {
-                                 _state.update { it.copy(peekCountdown = i) }
-                                 _events.tryEmit(GameUiEvent.VibrateTick)
-                                 delay(1000)
-                             }
-                             _state.update { it.copy(isPeeking = false, peekCountdown = 0) }
-                             _events.emit(GameUiEvent.PlayFlip) // Sound indicating start
-                             gameStateMachine?.dispatch(GameAction.StartGame())
-                         }
-                    }
-                    else -> {
-                        gameStateMachine?.dispatch(GameAction.StartGame())
-                    }
-                }
-
-            } catch (e: Exception) {
+                loadGameStats(args.pairCount)
+                val (initialState, initialTime) = initializeGameState(args)
+                setupUIState(initialState, initialTime, args)
+                startStateMachine(initialState, initialTime)
+                handleGameStartSequence()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: IllegalStateException) {
                 appGraph.logger.e(e) { "Error starting game" }
             }
+        }
+    }
+
+    private fun loadGameStats(pairCount: Int) {
+        scope.launch {
+            appGraph.getGameStatsUseCase(pairCount).collect { stats ->
+                _state.update {
+                    it.copy(
+                        bestScore = stats?.bestScore ?: 0,
+                        bestTimeSeconds = stats?.bestTimeSeconds ?: 0,
+                    )
+                }
+            }
+        }
+    }
+
+    private suspend fun initializeGameState(args: GameArgs): Pair<MemoryGameState, Long> {
+        val savedGame = if (args.forceNewGame) null else appGraph.getSavedGameUseCase()
+        return if (savedGame != null && isSavedGameValid(savedGame, args.pairCount, args.mode)) {
+            savedGame
+        } else {
+            val newState = setupNewGame(args.pairCount, args.mode, args.seed)
+            val initialTime =
+                if (args.mode == GameMode.TIME_ATTACK) {
+                    TimeAttackLogic.calculateInitialTime(args.pairCount)
+                } else {
+                    0L
+                }
+            newState to initialTime
+        }
+    }
+
+    private fun setupUIState(
+        initialState: MemoryGameState,
+        initialTime: Long,
+        args: GameArgs,
+    ) {
+        val maxTime =
+            if (args.mode == GameMode.TIME_ATTACK) {
+                TimeAttackLogic.calculateInitialTime(args.pairCount)
+            } else {
+                0L
+            }
+        _state.update {
+            it.copy(
+                game = initialState,
+                elapsedTimeSeconds = initialTime,
+                maxTimeSeconds = maxTime,
+                isHeatMode = initialState.comboMultiplier >= initialState.config.heatModeThreshold,
+            )
+        }
+    }
+
+    private fun startStateMachine(
+        initialState: MemoryGameState,
+        initialTime: Long,
+    ) {
+        gameStateMachine =
+            GameStateMachine(
+                scope = scope,
+                dispatchers = dispatchers,
+                initialState = initialState,
+                initialTimeSeconds = initialTime,
+                onSaveState = { state, time -> saveGame(state, time) },
+            ).also { machine ->
+                scope.launch {
+                    machine.state.collectLatest { gameState ->
+                        _state.update { it.copy(game = gameState) }
+                    }
+                }
+                scope.launch { machine.effects.collect { effect -> handleEffect(effect) } }
+            }
+    }
+
+    private fun handleGameStartSequence() {
+        val currentState = _state.value
+        when {
+            currentState.showWalkthrough -> { /* Walkthrough handles it */ }
+            currentState.isPeekFeatureEnabled -> startPeekSequence()
+            else -> gameStateMachine?.dispatch(GameAction.StartGame())
+        }
+    }
+
+    private fun startPeekSequence() {
+        scope.launch {
+            _state.update {
+                it.copy(isPeeking = true, peekCountdown = GameConstants.PEEK_DURATION_SECONDS)
+            }
+            for (i in GameConstants.PEEK_DURATION_SECONDS downTo 1) {
+                _state.update { it.copy(peekCountdown = i) }
+                _events.tryEmit(GameUiEvent.VibrateTick)
+                delay(GameConstants.PEEK_COUNTDOWN_DELAY_MS)
+            }
+            _state.update { it.copy(isPeeking = false, peekCountdown = 0) }
+            _events.emit(GameUiEvent.PlayFlip)
+            gameStateMachine?.dispatch(GameAction.StartGame())
         }
     }
 
@@ -231,66 +246,80 @@ class DefaultGameComponent(
                 )
             }
         }
-        
+
         _events.tryEmit(GameUiEvent.PlayDeal)
         return initialState
     }
-    
+
     private fun handleEffect(effect: GameEffect) {
+        // Handle simple event mappings first
+        effectToEventMap[effect]?.let { event ->
+            _events.tryEmit(event)
+            return
+        }
+
+        // Handle complex effects that need additional logic
         when (effect) {
-             is GameEffect.TimerUpdate -> {
-                 _state.update { it.copy(elapsedTimeSeconds = effect.seconds) }
-             }
-             is GameEffect.TimeGain -> {
-                 _state.update { 
-                     it.copy(
-                         showTimeGain = true, 
-                         timeGainAmount = effect.amount,
-                         isMegaBonus = _state.value.game.comboMultiplier >= GameConstants.MEGA_BONUS_THRESHOLD,
-                         isHeatMode = true // Usually gained in heat mode
-                     ) 
-                 }
-                 scope.launch {
-                     delay(GameConstants.UI_FEEDBACK_DURATION_MS)
-                     _state.update { it.copy(showTimeGain = false) }
-                 }
-             }
-             is GameEffect.TimeLoss -> {
-                 _state.update { it.copy(showTimeLoss = true, timeLossAmount = effect.amount.toLong()) }
-                 scope.launch {
-                     delay(GameConstants.UI_FEEDBACK_DURATION_MS)
-                     _state.update { it.copy(showTimeLoss = false) }
-                 }
-                 _events.tryEmit(GameUiEvent.VibrateMismatch) // Also vibrate on time loss
-             }
-             GameEffect.PlayFlipSound -> _events.tryEmit(GameUiEvent.PlayFlip)
-             GameEffect.PlayMatchSound -> {
-                 _events.tryEmit(GameUiEvent.PlayMatch)
-                 // Check for combo explosion
-                 if (_state.value.game.comboMultiplier > 2) {
-                     scope.launch {
-                         _state.update { it.copy(showComboExplosion = true) }
-                         delay(GameConstants.COMBO_EXPLOSION_DURATION_MS)
-                         _state.update { it.copy(showComboExplosion = false) }
-                     }
-                 }
-             }
-             GameEffect.PlayTheNutsSound -> _events.tryEmit(GameUiEvent.PlayTheNuts)
-             GameEffect.PlayWinSound -> _events.tryEmit(GameUiEvent.PlayWin) // Usually high score checked later
-             GameEffect.PlayLoseSound -> _events.tryEmit(GameUiEvent.PlayLose)
-             GameEffect.VibrateMatch -> _events.tryEmit(GameUiEvent.VibrateMatch)
-             GameEffect.VibrateMismatch -> _events.tryEmit(GameUiEvent.VibrateMismatch)
-             GameEffect.VibrateHeat -> _events.tryEmit(GameUiEvent.VibrateHeat)
-             GameEffect.VibrateWarning -> _events.tryEmit(GameUiEvent.VibrateWarning)
-             GameEffect.VibrateTick -> _events.tryEmit(GameUiEvent.VibrateTick)
-             GameEffect.PlayMismatch -> _events.tryEmit(GameUiEvent.PlayMismatch)
-             GameEffect.GameOver -> {
-                 // Game over cleanup logic
-                 handleGameLost()
-             }
-             is GameEffect.GameWon -> {
-                 handleGameWon(effect.finalState)
-             }
+            is GameEffect.TimerUpdate -> handleTimerUpdate(effect)
+            is GameEffect.TimeGain -> handleTimeGain(effect)
+            is GameEffect.TimeLoss -> handleTimeLoss(effect)
+            GameEffect.PlayMatchSound -> handleMatchSound()
+            GameEffect.GameOver -> handleGameLost()
+            is GameEffect.GameWon -> handleGameWon(effect.finalState)
+            else -> { /* Already handled by effectToEventMap */ }
+        }
+    }
+
+    private val effectToEventMap =
+        mapOf(
+            GameEffect.PlayFlipSound to GameUiEvent.PlayFlip,
+            GameEffect.PlayTheNutsSound to GameUiEvent.PlayTheNuts,
+            GameEffect.PlayWinSound to GameUiEvent.PlayWin,
+            GameEffect.PlayLoseSound to GameUiEvent.PlayLose,
+            GameEffect.PlayMismatch to GameUiEvent.PlayMismatch,
+            GameEffect.VibrateMatch to GameUiEvent.VibrateMatch,
+            GameEffect.VibrateMismatch to GameUiEvent.VibrateMismatch,
+            GameEffect.VibrateHeat to GameUiEvent.VibrateHeat,
+            GameEffect.VibrateWarning to GameUiEvent.VibrateWarning,
+            GameEffect.VibrateTick to GameUiEvent.VibrateTick,
+        )
+
+    private fun handleTimerUpdate(effect: GameEffect.TimerUpdate) {
+        _state.update { it.copy(elapsedTimeSeconds = effect.seconds) }
+    }
+
+    private fun handleTimeGain(effect: GameEffect.TimeGain) {
+        _state.update {
+            it.copy(
+                showTimeGain = true,
+                timeGainAmount = effect.amount,
+                isMegaBonus = _state.value.game.comboMultiplier >= GameConstants.MEGA_BONUS_THRESHOLD,
+                isHeatMode = true,
+            )
+        }
+        scope.launch {
+            delay(GameConstants.UI_FEEDBACK_DURATION_MS)
+            _state.update { it.copy(showTimeGain = false) }
+        }
+    }
+
+    private fun handleTimeLoss(effect: GameEffect.TimeLoss) {
+        _state.update { it.copy(showTimeLoss = true, timeLossAmount = effect.amount.toLong()) }
+        scope.launch {
+            delay(GameConstants.UI_FEEDBACK_DURATION_MS)
+            _state.update { it.copy(showTimeLoss = false) }
+        }
+        _events.tryEmit(GameUiEvent.VibrateMismatch)
+    }
+
+    private fun handleMatchSound() {
+        _events.tryEmit(GameUiEvent.PlayMatch)
+        if (_state.value.game.comboMultiplier > GameConstants.COMBO_EXPLOSION_THRESHOLD) {
+            scope.launch {
+                _state.update { it.copy(showComboExplosion = true) }
+                delay(GameConstants.COMBO_EXPLOSION_DURATION_MS)
+                _state.update { it.copy(showComboExplosion = false) }
+            }
         }
     }
 
@@ -299,19 +328,19 @@ class DefaultGameComponent(
         if (currentState.isPeeking || currentState.game.isGameOver || currentState.showWalkthrough) return
         gameStateMachine?.dispatch(GameAction.FlipCard(cardId))
     }
-    
+
     override fun onDoubleDown() {
         if (!_state.value.isHeatMode) return
-        
+
         // UI Check for eligibility to avoid unnecessary dispatch?
         val game = _state.value.game
         val unmatchedPairs = game.cards.count { !it.isMatched } / 2
         if (unmatchedPairs < MemoryGameLogic.MIN_PAIRS_FOR_DOUBLE_DOWN) return
 
         if (!game.isDoubleDownActive && !_state.value.hasUsedDoubleDownPeek) {
-             _state.update { it.copy(hasUsedDoubleDownPeek = true) }
+            _state.update { it.copy(hasUsedDoubleDownPeek = true) }
         }
-        
+
         gameStateMachine?.dispatch(GameAction.DoubleDown)
     }
 
@@ -319,9 +348,9 @@ class DefaultGameComponent(
         val isNewHigh = wonState.score > _state.value.bestScore
 
         if (isNewHigh) {
-             _events.tryEmit(GameUiEvent.PlayHighScore)
+            _events.tryEmit(GameUiEvent.PlayHighScore)
         }
-        
+
         _state.update { it.copy(game = wonState, isNewHighScore = isNewHigh) }
 
         scope.launch {
@@ -342,7 +371,7 @@ class DefaultGameComponent(
     private fun handleGameLost() {
         // Game Over logic already mostly handled by state update in Machine
         // Helper to clear save
-         scope.launch {
+        scope.launch {
             val game = _state.value.game
             if (game.mode == GameMode.HIGH_ROLLER && game.isBusted) {
                 game.seed?.let { seed -> appGraph.appDatabase.circuitStatsDao().deactivateRun(seed.toString()) }
@@ -410,16 +439,7 @@ class DefaultGameComponent(
                 _state.update { it.copy(showWalkthrough = false) }
                 appGraph.settingsRepository.setWalkthroughCompleted(true)
                 if (appGraph.settingsRepository.isPeekEnabled.first()) {
-                    // Start Peek logic
-                    _state.update { it.copy(isPeeking = true, peekCountdown = GameConstants.PEEK_DURATION_SECONDS) }
-                     for (i in GameConstants.PEEK_DURATION_SECONDS downTo 1) {
-                         _state.update { it.copy(peekCountdown = i) }
-                         _events.tryEmit(GameUiEvent.VibrateTick)
-                         delay(1000)
-                     }
-                     _state.update { it.copy(isPeeking = false, peekCountdown = 0) }
-                     _events.emit(GameUiEvent.PlayFlip)
-                     gameStateMachine?.dispatch(GameAction.StartGame())
+                    startPeekSequence()
                 } else {
                     gameStateMachine?.dispatch(GameAction.StartGame())
                 }
@@ -435,7 +455,7 @@ class DefaultGameComponent(
     ) {
         onCycleStage.invoke(nextStage, bankedScore)
     }
-    
+
     private fun isSavedGameValid(
         savedGame: Pair<MemoryGameState, Long>,
         pairCount: Int,
@@ -444,8 +464,11 @@ class DefaultGameComponent(
         savedGame.first.pairCount == pairCount &&
             !savedGame.first.isGameOver &&
             savedGame.first.mode == mode
-            
-    private fun saveGame(game: MemoryGameState, time: Long) {
+
+    private fun saveGame(
+        game: MemoryGameState,
+        time: Long,
+    ) {
         appGraph.applicationScope.launch(appGraph.coroutineDispatchers.io) {
             if (!game.isGameOver && game.cards.isNotEmpty()) {
                 appGraph.saveGameStateUseCase(game, time)

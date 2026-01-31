@@ -100,8 +100,6 @@ class GameComponentTest : BaseComponentTest() {
             verifySuspend { context.gameStateRepository.saveGameState(any(), any()) }
         }
 
-
-
     @Test
     fun `timer counts down in Time Attack mode`() =
         runTest { lifecycle ->
@@ -143,7 +141,6 @@ class GameComponentTest : BaseComponentTest() {
             testDispatcher.scheduler.advanceTimeBy(1000)
             testDispatcher.scheduler.runCurrent()
             assertEquals(1, component.state.value.peekCountdown)
-
 
             // Peek finished
             testDispatcher.scheduler.advanceTimeBy(1000)
@@ -270,27 +267,27 @@ class GameComponentTest : BaseComponentTest() {
             // Verify state
             assertTrue(component.state.value.isHeatMode)
             assertFalse(component.state.value.isDoubleDownAvailable)
-            
+
             // Try enabling double down (should fail)
             component.onDoubleDown()
             testDispatcher.scheduler.runCurrent()
             assertFalse(component.state.value.game.isDoubleDownActive)
 
             // Now with enough pairs
-             val moreCards =
+            val moreCards =
                 cards +
                     listOf(
                         CardState(id = 7, suit = Suit.Spades, rank = Rank.Four),
                         CardState(id = 8, suit = Suit.Spades, rank = Rank.Four),
                     )
             val gameWithMorePairs = gameWithHighCombo.copy(cards = moreCards.toImmutableList(), pairCount = 4)
-            
+
             everySuspend { context.gameStateRepository.getSavedGameState() } returns
                 (gameWithMorePairs to 0L)
-            
+
             val component2 = createComponent(lifecycle, forceNewGame = false, pairCount = 4)
             testDispatcher.scheduler.runCurrent()
-            
+
             assertTrue(component2.state.value.isDoubleDownAvailable)
             component2.onDoubleDown()
             testDispatcher.scheduler.runCurrent()
