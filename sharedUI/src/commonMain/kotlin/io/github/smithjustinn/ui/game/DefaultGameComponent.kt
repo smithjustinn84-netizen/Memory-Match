@@ -94,10 +94,10 @@ class DefaultGameComponent(
         scope.launch {
             try {
                 loadGameStats(args.pairCount)
-                val (initialState, initialTime) = initializeGameState(args)
-                setupUIState(initialState, initialTime, args)
-                startStateMachine(initialState, initialTime)
-                handleGameStartSequence()
+                val initResult = initializeGameState(args)
+                setupUIState(initResult.state, initResult.initialTime, args)
+                startStateMachine(initResult.state, initResult.initialTime)
+                handleGameStartSequence(initResult.isResumed)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: IllegalStateException) {
@@ -119,10 +119,10 @@ class DefaultGameComponent(
         }
     }
 
-    private suspend fun initializeGameState(args: GameArgs): Pair<MemoryGameState, Long> {
+    private suspend fun initializeGameState(args: GameArgs): GameInitResult {
         val savedGame = if (args.forceNewGame) null else appGraph.getSavedGameUseCase()
         return if (savedGame != null && isSavedGameValid(savedGame, args.pairCount, args.mode)) {
-            savedGame
+            GameInitResult(savedGame.first, savedGame.second, isResumed = true)
         } else {
             val newState = setupNewGame(args.pairCount, args.mode, args.seed)
             val initialTime =
@@ -131,7 +131,7 @@ class DefaultGameComponent(
                 } else {
                     0L
                 }
-            newState to initialTime
+            GameInitResult(newState, initialTime, isResumed = false)
         }
     }
 
@@ -177,11 +177,11 @@ class DefaultGameComponent(
             }
     }
 
-    private fun handleGameStartSequence() {
+    private fun handleGameStartSequence(isResumed: Boolean) {
         val currentState = _state.value
         when {
             currentState.showWalkthrough -> { /* Walkthrough handles it */ }
-            currentState.isPeekFeatureEnabled -> startPeekSequence()
+            currentState.isPeekFeatureEnabled && !isResumed -> startPeekSequence()
             else -> gameStateMachine?.dispatch(GameAction.StartGame())
         }
     }
@@ -483,4 +483,10 @@ class DefaultGameComponent(
             }
         }
     }
+
+    private data class GameInitResult(
+        val state: MemoryGameState,
+        val initialTime: Long,
+        val isResumed: Boolean,
+    )
 }
