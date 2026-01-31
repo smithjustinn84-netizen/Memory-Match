@@ -81,38 +81,40 @@ fun GameGameOverOverlay(
                 .background(Color.Black.copy(alpha = BLACK_OVERLAY_ALPHA)),
     ) {
         if (state.game.isGameWon) {
-            GameWonOverlay(state)
+            // Background celebration
+            CardFountainOverlay(
+                cards = state.game.cards,
+                settings = state.cardSettings,
+            )
         }
 
+        // Main content
         GameResultsOverlay(
             state = state,
             component = component,
             useCompactUI = useCompactUI,
         )
+
+        if (state.game.isGameWon) {
+            // Foreground celebration
+            ConfettiEffect()
+
+            if (state.isNewHighScore) {
+                NewHighScoreSnackbar(
+                    modifier =
+                        Modifier
+                            .align(Alignment.TopCenter)
+                            .padding(
+                                top = SNACKBAR_TOP_PADDING.dp,
+                                start = SNACKBAR_HORIZONTAL_PADDING.dp,
+                                end = SNACKBAR_HORIZONTAL_PADDING.dp,
+                            ).widthIn(max = SNACKBAR_MAX_WIDTH.dp),
+                )
+            }
+        }
     }
 }
 
-@Composable
-private fun BoxScope.GameWonOverlay(state: GameUIState) {
-    CardFountainOverlay(
-        cards = state.game.cards,
-        settings = state.cardSettings,
-    )
-    ConfettiEffect()
-
-    if (state.isNewHighScore) {
-        NewHighScoreSnackbar(
-            modifier =
-                Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(
-                        top = SNACKBAR_TOP_PADDING.dp,
-                        start = SNACKBAR_HORIZONTAL_PADDING.dp,
-                        end = SNACKBAR_HORIZONTAL_PADDING.dp,
-                    ).widthIn(max = SNACKBAR_MAX_WIDTH.dp),
-        )
-    }
-}
 
 @Composable
 private fun BoxScope.GameResultsOverlay(
