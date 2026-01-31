@@ -41,7 +41,3 @@ fun StartHeader(
         )
     }
 }
-
-private const val TITLE_SHADOW_ALPHA = 0.5f
-private const val TITLE_SHADOW_OFFSET = 4f
-private const val TITLE_SHADOW_BLUR = 8f

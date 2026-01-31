@@ -36,10 +36,6 @@ private const val ELEVATION_SELECTED = 12
 private const val ELEVATION_DEFAULT = 4
 private const val GLOW_ALPHA_SELECTED = 0.5f
 private const val GLOW_RADIUS_FACTOR = 0.8f
-private const val LABEL_SPACING_DP = 8
-private const val LABEL_ALPHA_DEFAULT = 0.7f
-private const val FONT_SIZE_SELECTED = 14
-private const val FONT_SIZE_DEFAULT = 12
 
 @Composable
 fun PokerChip(
@@ -149,20 +145,6 @@ private fun PokerChipContent(
             color = if (glimmerBrush != null) Color.White else Color.White,
         )
     }
-}
-
-@Composable
-private fun PokerChipLabel(
-    text: String,
-    isSelected: Boolean,
-) {
-    Text(
-        text = text,
-        style = PokerTheme.typography.labelMedium,
-        color = if (isSelected) PokerTheme.colors.goldenYellow else Color.White.copy(alpha = LABEL_ALPHA_DEFAULT),
-        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-        fontSize = if (isSelected) FONT_SIZE_SELECTED.sp else FONT_SIZE_DEFAULT.sp,
-    )
 }
 
 @Composable

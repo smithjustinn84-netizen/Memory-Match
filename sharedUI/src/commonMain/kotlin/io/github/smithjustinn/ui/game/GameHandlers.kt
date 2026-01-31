@@ -1,7 +1,7 @@
 package io.github.smithjustinn.ui.game
 
 import io.github.smithjustinn.di.AppGraph
-import io.github.smithjustinn.domain.MemoryGameLogic
+import io.github.smithjustinn.domain.TimeAttackLogic
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
 import kotlinx.collections.immutable.persistentListOf
@@ -128,7 +128,7 @@ internal class GameFeedbackHandler(
         }
 
         if (newState.mode == GameMode.TIME_ATTACK) {
-            val totalTimeGain = MemoryGameLogic.calculateTimeGain(newState.comboMultiplier - 1)
+            val totalTimeGain = TimeAttackLogic.calculateTimeGain(newState.comboMultiplier - 1)
             val isMega = newState.comboMultiplier >= GameConstants.MEGA_BONUS_THRESHOLD
 
             state.update {
@@ -163,7 +163,7 @@ internal class GameFeedbackHandler(
 
         var isGameOver = false
         if (newState.mode == GameMode.TIME_ATTACK && !isResuming) {
-            val penalty = MemoryGameLogic.TIME_PENALTY_MISMATCH
+            val penalty = TimeAttackLogic.TIME_PENALTY_MISMATCH
             state.update {
                 val newTime = (it.elapsedTimeSeconds - penalty).coerceAtLeast(0)
                 if (newTime == 0L) isGameOver = true
@@ -238,7 +238,7 @@ internal class GameLifecycleHandler(
     fun resumeExistingGame(savedGame: Pair<MemoryGameState, Long>) {
         val initialTime =
             if (savedGame.first.mode == GameMode.TIME_ATTACK) {
-                MemoryGameLogic.calculateInitialTime(savedGame.first.pairCount)
+                TimeAttackLogic.calculateInitialTime(savedGame.first.pairCount)
             } else {
                 0L
             }
@@ -270,7 +270,7 @@ internal class GameLifecycleHandler(
     ) {
         val initialTime =
             if (mode == GameMode.TIME_ATTACK) {
-                MemoryGameLogic.calculateInitialTime(pairCount)
+                TimeAttackLogic.calculateInitialTime(pairCount)
             } else {
                 0L
             }

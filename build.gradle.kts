@@ -14,6 +14,7 @@ plugins {
 }
 
 dependencies {
+    detektPlugins(libs.detekt.compose.rules)
     kover(project(":shared:core"))
     kover(project(":shared:data"))
     kover(project(":sharedUI"))
@@ -120,7 +121,7 @@ detekt {
     )
 
     config.setFrom("config/detekt/detekt.yml")
-    baseline.set(file("config/detekt/baseline.xml"))
+    baseline = file("config/detekt/baseline.xml")
     buildUponDefaultConfig = true
     parallel = true
 }

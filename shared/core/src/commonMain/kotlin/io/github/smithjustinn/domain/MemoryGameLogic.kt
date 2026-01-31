@@ -151,7 +151,14 @@ object MemoryGameLogic {
         val isWon = matchesFound == state.pairCount
         val moves = state.moves + 1
 
-        val comment = generateMatchComment(moves, matchesFound, state.pairCount, state.comboMultiplier, config)
+        val comment =
+            GameCommentGenerator.generateMatchComment(
+                moves,
+                matchesFound,
+                state.pairCount,
+                state.comboMultiplier,
+                config,
+            )
 
         val preDoubleScore = state.score + pointsEarned
         val finalScore =
@@ -287,6 +294,31 @@ object MemoryGameLogic {
     }
 
     private const val TIME_ATTACK_BONUS_MULTIPLIER = 10
+    const val MIN_PAIRS_FOR_DOUBLE_DOWN = 3
+    const val TIME_PENALTY_MISMATCH = 2L
+
+    /**
+     * Activates Double Down if requirements are met.
+     */
+    fun activateDoubleDown(state: MemoryGameState): MemoryGameState {
+        val unmatchedPairs = state.cards.count { !it.isMatched } / 2
+        val isEligible =
+            state.comboMultiplier >= state.config.heatModeThreshold &&
+                !state.isDoubleDownActive &&
+                unmatchedPairs >= MIN_PAIRS_FOR_DOUBLE_DOWN
+
+        return if (isEligible) {
+            state.copy(isDoubleDownActive = true)
+        } else {
+            state
+        }
+    }
+}
+
+/**
+ * Logic specific to Time Attack mode.
+ */
+object TimeAttackLogic {
     private const val DIFF_LEVEL_6 = 6
     private const val DIFF_LEVEL_8 = 8
     private const val DIFF_LEVEL_10 = 10
@@ -298,11 +330,6 @@ object MemoryGameLogic {
     private const val TIME_PER_PAIR_FALLBACK = 4
     private const val BASE_TIME_GAIN = 3
     private const val COMBO_TIME_BONUS_MULTIPLIER = 2
-    const val MIN_PAIRS_FOR_DOUBLE_DOWN = 3
-    private const val MOVES_PER_MATCH_THRESHOLD = 2
-    private const val POT_ODDS_DIVISOR = 2
-    private const val ONE_MORE_REMAINING = 1
-    const val TIME_PENALTY_MISMATCH = 2L
 
     /**
      * Calculates the initial time for Time Attack mode based on the pair count.
@@ -324,25 +351,17 @@ object MemoryGameLogic {
         val comboBonus = (comboMultiplier - 1) * COMBO_TIME_BONUS_MULTIPLIER
         return baseGain + comboBonus
     }
+}
 
-    /**
-     * Activates Double Down if requirements are met.
-     */
-    fun activateDoubleDown(state: MemoryGameState): MemoryGameState {
-        val unmatchedPairs = state.cards.count { !it.isMatched } / 2
-        val isEligible =
-            state.comboMultiplier >= state.config.heatModeThreshold &&
-                !state.isDoubleDownActive &&
-                unmatchedPairs >= MIN_PAIRS_FOR_DOUBLE_DOWN
+/**
+ * Generates comments based on game events.
+ */
+object GameCommentGenerator {
+    private const val POT_ODDS_DIVISOR = 2
+    private const val MOVES_PER_MATCH_THRESHOLD = 2
+    private const val ONE_MORE_REMAINING = 1
 
-        return if (isEligible) {
-            state.copy(isDoubleDownActive = true)
-        } else {
-            state
-        }
-    }
-
-    private fun generateMatchComment(
+    fun generateMatchComment(
         moves: Int,
         matchesFound: Int,
         totalPairs: Int,

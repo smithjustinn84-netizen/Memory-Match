@@ -48,6 +48,7 @@ fun DealerSpeechBubble(
 
 @Composable
 private fun SpeechBubbleContent(matchComment: MatchComment) {
+    @Suppress("SpreadOperator")
     val commentText = stringResource(matchComment.res, *matchComment.args.toTypedArray())
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {

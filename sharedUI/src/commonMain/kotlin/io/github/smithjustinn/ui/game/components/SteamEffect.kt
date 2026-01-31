@@ -84,7 +84,7 @@ fun SteamEffect(
     }
 
     Canvas(modifier = modifier.fillMaxSize()) {
-        val frame = frameState.longValue // Trigger redraw
+        frameState.longValue // Trigger redraw
 
         particles.forEach { p ->
             if (p.life == 0f && p.y == 0f) {

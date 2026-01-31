@@ -11,7 +11,7 @@ import io.github.smithjustinn.ui.game.components.PlayingCard
 
 @Preview(showBackground = true)
 @Composable
-private fun PlayingCardFaceUpPreview() {
+internal fun PlayingCardFaceUpPreview() {
     PlayingCard(
         content =
             CardContent(
@@ -24,7 +24,7 @@ private fun PlayingCardFaceUpPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun PlayingCardFaceDownPreview() {
+internal fun PlayingCardFaceDownPreview() {
     PlayingCard(
         content =
             CardContent(

@@ -64,7 +64,6 @@ private val ReceiptPaperColor = Color(0xFFFDFBF7)
 private val ReceiptInkColor = Color(0xFF2B2B2B)
 private val ReceiptAccentColor = Color(0xFF8B0000) // Dark Red for key elements
 
-private const val SCORE_TICK_DURATION_MS = 1500
 private const val COMPACT_HEIGHT_THRESHOLD_DP = 450
 private const val BARCODE_BAR_COUNT = 40
 private const val BARCODE_THICKNESS_MODULO = 3

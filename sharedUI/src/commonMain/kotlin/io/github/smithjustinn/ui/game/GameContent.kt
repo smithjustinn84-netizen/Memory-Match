@@ -151,62 +151,7 @@ private fun GameEventHandler(
     LaunchedEffect(Unit) {
         audioService.startMusic()
         component.events.collect { event ->
-            when (event) {
-                GameUiEvent.PlayFlip -> {
-                    audioService.playEffect(AudioService.SoundEffect.FLIP)
-                }
-
-                GameUiEvent.PlayMatch -> {
-                    audioService.playEffect(AudioService.SoundEffect.MATCH)
-                }
-
-                GameUiEvent.PlayMismatch -> {
-                    audioService.playEffect(AudioService.SoundEffect.MISMATCH)
-                }
-
-                GameUiEvent.PlayTheNuts -> {
-                    audioService.playEffect(AudioService.SoundEffect.THE_NUTS)
-                    currentOnTheNuts()
-                }
-
-                GameUiEvent.PlayWin -> {
-                    audioService.stopMusic()
-                    audioService.playEffect(AudioService.SoundEffect.WIN)
-                }
-
-                GameUiEvent.PlayLose -> {
-                    audioService.stopMusic()
-                    audioService.playEffect(AudioService.SoundEffect.LOSE)
-                }
-
-                GameUiEvent.PlayHighScore -> {
-                    audioService.playEffect(AudioService.SoundEffect.HIGH_SCORE)
-                }
-
-                GameUiEvent.PlayDeal -> {
-                    audioService.playEffect(AudioService.SoundEffect.DEAL)
-                }
-
-                GameUiEvent.VibrateMatch -> {
-                    hapticsService.vibrateMatch()
-                }
-
-                GameUiEvent.VibrateMismatch -> {
-                    hapticsService.vibrateMismatch()
-                }
-
-                GameUiEvent.VibrateTick -> {
-                    hapticsService.vibrateTick()
-                }
-
-                GameUiEvent.VibrateWarning -> {
-                    hapticsService.vibrateWarning()
-                }
-
-                GameUiEvent.VibrateHeat -> {
-                    hapticsService.vibrateHeat()
-                }
-            }
+            handleGameEvent(event, audioService, hapticsService, currentOnTheNuts)
         }
     }
 
@@ -214,6 +159,38 @@ private fun GameEventHandler(
         onDispose {
             audioService.stopMusic()
         }
+    }
+}
+
+private fun handleGameEvent(
+    event: GameUiEvent,
+    audioService: AudioService,
+    hapticsService: io.github.smithjustinn.services.HapticsService,
+    onTheNuts: () -> Unit,
+) {
+    when (event) {
+        GameUiEvent.PlayFlip -> audioService.playEffect(AudioService.SoundEffect.FLIP)
+        GameUiEvent.PlayMatch -> audioService.playEffect(AudioService.SoundEffect.MATCH)
+        GameUiEvent.PlayMismatch -> audioService.playEffect(AudioService.SoundEffect.MISMATCH)
+        GameUiEvent.PlayTheNuts -> {
+            audioService.playEffect(AudioService.SoundEffect.THE_NUTS)
+            onTheNuts()
+        }
+        GameUiEvent.PlayWin -> {
+            audioService.stopMusic()
+            audioService.playEffect(AudioService.SoundEffect.WIN)
+        }
+        GameUiEvent.PlayLose -> {
+            audioService.stopMusic()
+            audioService.playEffect(AudioService.SoundEffect.LOSE)
+        }
+        GameUiEvent.PlayHighScore -> audioService.playEffect(AudioService.SoundEffect.HIGH_SCORE)
+        GameUiEvent.PlayDeal -> audioService.playEffect(AudioService.SoundEffect.DEAL)
+        GameUiEvent.VibrateMatch -> hapticsService.vibrateMatch()
+        GameUiEvent.VibrateMismatch -> hapticsService.vibrateMismatch()
+        GameUiEvent.VibrateTick -> hapticsService.vibrateTick()
+        GameUiEvent.VibrateWarning -> hapticsService.vibrateWarning()
+        GameUiEvent.VibrateHeat -> hapticsService.vibrateHeat()
     }
 }
 

@@ -2,6 +2,5 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>FunctionNaming:main.kt:fun MainViewController(): UIViewController</ID>
   </CurrentIssues>
 </SmellBaseline>
