@@ -39,6 +39,4 @@ inline fun gameStateMachine(
     state: MemoryGameState,
     time: Long,
     block: StateMachineBuilder.() -> Unit,
-): StateMachineResult {
-    return StateMachineBuilder(state, time).apply(block).build()
-}
+): StateMachineResult = StateMachineBuilder(state, time).apply(block).build()
