@@ -289,12 +289,14 @@ class DefaultGameComponent(
     }
 
     private fun handleTimeGain(effect: GameEffect.TimeGain) {
+        val currentCombo = _state.value.game.comboMultiplier
+        val heatThreshold = _state.value.game.config.heatModeThreshold
         _state.update {
             it.copy(
                 showTimeGain = true,
                 timeGainAmount = effect.amount,
-                isMegaBonus = _state.value.game.comboMultiplier >= GameConstants.MEGA_BONUS_THRESHOLD,
-                isHeatMode = true,
+                isMegaBonus = currentCombo >= GameConstants.MEGA_BONUS_THRESHOLD,
+                isHeatMode = currentCombo >= heatThreshold,
             )
         }
         scope.launch {
@@ -304,7 +306,13 @@ class DefaultGameComponent(
     }
 
     private fun handleTimeLoss(effect: GameEffect.TimeLoss) {
-        _state.update { it.copy(showTimeLoss = true, timeLossAmount = effect.amount.toLong()) }
+        _state.update {
+            it.copy(
+                showTimeLoss = true,
+                timeLossAmount = effect.amount.toLong(),
+                isHeatMode = false, // Combo is broken on mismatch
+            )
+        }
         scope.launch {
             delay(GameConstants.UI_FEEDBACK_DURATION_MS)
             _state.update { it.copy(showTimeLoss = false) }
