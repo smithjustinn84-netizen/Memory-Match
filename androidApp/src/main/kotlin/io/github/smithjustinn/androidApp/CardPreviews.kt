@@ -35,3 +35,17 @@ internal fun PlayingCardFaceDownPreview() {
         backColor = Color.Red,
     )
 }
+
+@Preview(showBackground = true)
+@Composable
+internal fun PokerCardPreview() {
+    PlayingCard(
+        content =
+            CardContent(
+                suit = Suit.Spades,
+                rank = Rank.Ace,
+                visualState = CardVisualState(isFaceUp = true),
+            ),
+        settings = io.github.smithjustinn.domain.models.CardDisplaySettings(symbolTheme = io.github.smithjustinn.domain.models.CardSymbolTheme.POKER),
+    )
+}

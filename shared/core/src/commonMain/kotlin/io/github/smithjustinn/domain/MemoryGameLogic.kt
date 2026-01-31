@@ -295,7 +295,7 @@ object MemoryGameLogic {
 
     private const val TIME_ATTACK_BONUS_MULTIPLIER = 10
     const val MIN_PAIRS_FOR_DOUBLE_DOWN = 3
-    const val TIME_PENALTY_MISMATCH = 2L
+
 
     /**
      * Activates Double Down if requirements are met.
@@ -323,6 +323,7 @@ object TimeAttackLogic {
     private const val DIFF_LEVEL_8 = 8
     private const val DIFF_LEVEL_10 = 10
     private const val DIFF_LEVEL_12 = 12
+    const val TIME_PENALTY_MISMATCH = 2L
     private const val INITIAL_TIME_6 = 25L
     private const val INITIAL_TIME_8 = 35L
     private const val INITIAL_TIME_10 = 45L

@@ -28,14 +28,15 @@ Memory-Match is not just a game; it's a reference implementation for **Clean Arc
 ## 📸 Experience the UI
 
 <p align="center">
-  <img src="screenshots/Screenshot_20260126_221943.png" width="180" alt="Screen 1">
-  <img src="screenshots/Screenshot_20260126_221954.png" width="180" alt="Screen 2">
-  <img src="screenshots/Screenshot_20260126_222019.png" width="180" alt="Screen 3">
+  <img src="screenshots/Screenshot_20260130_210034.png" width="180" alt="Screen 1">
+  <img src="screenshots/Screenshot_20260130_210054.png" width="180" alt="Screen 2">
+  <img src="screenshots/Screenshot_20260130_210112.png" width="180" alt="Screen 3">
+  <img src="screenshots/Screenshot_20260130_210326.png" width="180" alt="Screen 4">
 </p>
 <p align="center">
-  <img src="screenshots/Screenshot_20260126_222045.png" width="180" alt="Screen 4">
-  <img src="screenshots/Screenshot_20260126_222104.png" width="180" alt="Screen 5">
-  <img src="screenshots/Screenshot_20260126_222122.png" width="180" alt="Screen 6">
+  <img src="screenshots/Screenshot_20260130_210358.png" width="180" alt="Screen 5">
+  <img src="screenshots/Screenshot_20260130_210417.png" width="180" alt="Screen 6">
+  <img src="screenshots/Screenshot_20260130_210449.png" width="180" alt="Screen 7">
 </p>
 
 ---

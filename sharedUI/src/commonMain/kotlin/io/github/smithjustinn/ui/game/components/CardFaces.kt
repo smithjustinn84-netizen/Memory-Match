@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -195,103 +196,94 @@ private fun PokerCardFace(
     suitColor: Color,
     getFontSize: (Float) -> androidx.compose.ui.unit.TextUnit,
 ) {
-    // Similar to Classic but using Serif font and slightly different layout
+    val density = LocalDensity.current
+    val strokeWidth = with(density) { 2.dp.toPx() }
+    val borderColor = io.github.smithjustinn.theme.PokerTheme.colors.goldenYellow
+
+    // Gold Border
+    androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize()) {
+        drawRect(
+            color = borderColor,
+            style = androidx.compose.ui.graphics.drawscope.Stroke(width = strokeWidth),
+        )
+        // Inner thin border
+        drawRect(
+            color = borderColor.copy(alpha = 0.5f),
+            topLeft = androidx.compose.ui.geometry.Offset(strokeWidth * 2, strokeWidth * 2),
+            size = size.copy(width = size.width - strokeWidth * 4, height = size.height - strokeWidth * 4),
+            style = androidx.compose.ui.graphics.drawscope.Stroke(width = strokeWidth / 2),
+        )
+    }
+
+    // Serif Typography for Premium Look
     val serifTypography =
-        MaterialTheme.typography.labelLarge.copy(
+        MaterialTheme.typography.displaySmall.copy(
             fontFamily = androidx.compose.ui.text.font.FontFamily.Serif,
+            fontWeight = FontWeight.Bold,
         )
 
-    // Top Left
-    CornerRank(
-        rank = rank,
-        suit = suit,
-        suitColor = suitColor,
-        getFontSize = getFontSize,
-        style = serifTypography,
-        alignment = Alignment.Start,
-    )
-
-    // Center Suit
-    CenterSuitWatermark(
-        suit = suit,
-        suitColor = suitColor,
-        getFontSize = getFontSize,
-        style = serifTypography,
-        rank = rank,
-    )
-
-    // Bottom Right (Rotated)
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
-        CornerRank(
-            rank = rank,
-            suit = suit,
-            suitColor = suitColor,
-            getFontSize = getFontSize,
-            style = serifTypography,
-            alignment = Alignment.End,
-            modifier = Modifier.graphicsLayer { rotationZ = FULL_ROTATION },
+    val labelTypography =
+        MaterialTheme.typography.labelMedium.copy(
+            fontFamily = androidx.compose.ui.text.font.FontFamily.Serif,
+            fontWeight = FontWeight.SemiBold,
         )
-    }
-}
 
-@Composable
-private fun CornerRank(
-    rank: Rank,
-    suit: Suit,
-    suitColor: Color,
-    getFontSize: (Float) -> androidx.compose.ui.unit.TextUnit,
-    style: androidx.compose.ui.text.TextStyle,
-    alignment: Alignment.Horizontal,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        horizontalAlignment = alignment,
-        modifier = modifier,
-    ) {
-        Text(
-            text = rank.symbol,
-            color = suitColor,
-            style =
-                style.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = getFontSize(FONT_SIZE_MEDIUM),
+    Box(modifier = Modifier.fillMaxSize().padding(8.dp)) {
+        // Top Left Jumbo Index
+        Column(modifier = Modifier.align(Alignment.TopStart)) {
+            Text(
+                text = rank.symbol,
+                color = suitColor,
+                style = serifTypography.copy(fontSize = getFontSize(FONT_SIZE_TITLE)),
+                lineHeight = getFontSize(FONT_SIZE_TITLE),
+            )
+            Text(
+                text = suit.symbol,
+                color = suitColor,
+                style = labelTypography.copy(fontSize = getFontSize(FONT_SIZE_MEDIUM)),
+                modifier = Modifier.align(Alignment.CenterHorizontally).offset(y = (-4).dp),
+            )
+        }
+
+        // Center Elegant Element
+        Box(modifier = Modifier.align(Alignment.Center)) {
+            Text(
+                text = suit.symbol,
+                color = suitColor.copy(alpha = 0.15f),
+                style = serifTypography.copy(fontSize = getFontSize(FONT_SIZE_HUGE)),
+            )
+            Text(
+                text = rank.symbol,
+                color = suitColor.copy(alpha = 0.8f),
+                style = serifTypography.copy(
+                    fontSize = getFontSize(FONT_SIZE_DISPLAY),
+                    shadow = androidx.compose.ui.graphics.Shadow(
+                        color = io.github.smithjustinn.theme.PokerTheme.colors.goldenYellow.copy(alpha = 0.5f),
+                        blurRadius = 4f
+                    )
                 ),
-        )
-        Text(
-            text = suit.symbol,
-            color = suitColor,
-            style =
-                style.copy(
-                    fontSize = getFontSize(FONT_SIZE_SMALL),
-                    fontWeight = FontWeight.Normal,
-                ),
-        )
-    }
-}
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
 
-@Composable
-private fun CenterSuitWatermark(
-    suit: Suit,
-    suitColor: Color,
-    getFontSize: (Float) -> androidx.compose.ui.unit.TextUnit,
-    style: androidx.compose.ui.text.TextStyle,
-    rank: Rank,
-) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(
-            text = suit.symbol,
-            color = suitColor.copy(alpha = 0.1f), // Very subtle watermark
-            style = style.copy(fontSize = getFontSize(FONT_SIZE_HUGE)),
-        )
-
-        Text(
-            text = rank.symbol,
-            color = suitColor,
-            style =
-                style.copy(
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = getFontSize(FONT_SIZE_TITLE),
-                ),
-        )
+        // Bottom Right Jumbo Index (Inverted)
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .graphicsLayer { rotationZ = FULL_ROTATION }
+        ) {
+            Text(
+                text = rank.symbol,
+                color = suitColor,
+                style = serifTypography.copy(fontSize = getFontSize(FONT_SIZE_TITLE)),
+                lineHeight = getFontSize(FONT_SIZE_TITLE),
+            )
+            Text(
+                text = suit.symbol,
+                color = suitColor,
+                style = labelTypography.copy(fontSize = getFontSize(FONT_SIZE_MEDIUM)),
+                modifier = Modifier.align(Alignment.CenterHorizontally).offset(y = (-4).dp),
+            )
+        }
     }
 }
