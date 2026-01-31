@@ -96,6 +96,8 @@ class GameStateMachine(
 
             GameDomainEvent.MatchFailure -> {
                 emitEffect(GameEffect.PlayFlipSound)
+                emitEffect(GameEffect.PlayMismatch)
+                emitEffect(GameEffect.VibrateMismatch)
                 scope.launch(dispatchers.default) {
                     delay(MISMATCH_DELAY_MS)
                     dispatch(GameAction.ProcessMismatch)

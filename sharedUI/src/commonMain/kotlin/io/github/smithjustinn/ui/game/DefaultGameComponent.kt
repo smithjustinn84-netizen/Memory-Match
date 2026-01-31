@@ -286,7 +286,6 @@ class DefaultGameComponent(
             delay(GameConstants.UI_FEEDBACK_DURATION_MS)
             _state.update { it.copy(showTimeLoss = false) }
         }
-        _events.tryEmit(GameUiEvent.VibrateMismatch)
     }
 
     private fun handleMatchSound() {
