@@ -34,11 +34,20 @@ class DefaultBuyInComponent(
     ComponentContext by componentContext {
     private val _state =
         MutableStateFlow(
-            BuyInUIState(
-                stage = stage,
-                bankedScore = bankedScore,
-                availableWagers = calculateAvailableWagers(bankedScore),
-            ),
+            run {
+                val availableWagers = calculateAvailableWagers(bankedScore)
+                BuyInUIState(
+                    stage = stage,
+                    bankedScore = bankedScore,
+                    availableWagers = availableWagers,
+                    selectedWager =
+                        if (availableWagers.contains(100)) {
+                            100
+                        } else {
+                            availableWagers.firstOrNull() ?: 0
+                        },
+                )
+            },
         )
     override val state: StateFlow<BuyInUIState> = _state.asStateFlow()
 

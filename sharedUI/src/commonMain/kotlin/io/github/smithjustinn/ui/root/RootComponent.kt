@@ -146,7 +146,8 @@ class DefaultRootComponent(
                                 seed = null,
                                 circuitStage = stage,
                                 bankedScore = bankedScore ?: 0,
-                                currentWager = if (forceNewGame) 0 else 0, // Wager will be loaded from saved game or handled by BuyIn
+                                // Wager will be loaded from saved game or handled by BuyIn
+                                currentWager = if (forceNewGame) 0 else 0,
                             ),
                         )
                     }
