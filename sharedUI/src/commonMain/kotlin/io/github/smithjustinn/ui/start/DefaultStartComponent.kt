@@ -2,6 +2,7 @@ package io.github.smithjustinn.ui.start
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.lifecycle.doOnResume
+import io.github.smithjustinn.data.local.CircuitStatsEntity
 import io.github.smithjustinn.di.AppGraph
 import io.github.smithjustinn.domain.models.CardDisplaySettings
 import io.github.smithjustinn.domain.models.DifficultyLevel
@@ -12,13 +13,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
 
 class DefaultStartComponent(
     componentContext: ComponentContext,
-    appGraph: AppGraph,
+    private val appGraph: AppGraph,
     private val onNavigateToGame: (pairs: Int, mode: GameMode, forceNewGame: Boolean) -> Unit,
     private val onNavigateToSettings: () -> Unit,
     private val onNavigateToStats: () -> Unit,
@@ -65,11 +67,28 @@ class DefaultStartComponent(
         scope.launch {
             try {
                 val savedGame = gameStateRepository.getSavedGameState()
-                _state.update {
-                    it.copy(
+                val activeCircuit: io.github.smithjustinn.data.local.CircuitStatsEntity? =
+                    appGraph.appDatabase
+                        .circuitStatsDao()
+                        .getActiveCircuitRun()
+                        .firstOrNull()
+
+                _state.update { currentState ->
+                    val runId = activeCircuit?.runId
+                    val stage =
+                        activeCircuit?.let { entity ->
+                            io.github.smithjustinn.domain.models.CircuitStage.entries
+                                .find { it.id == entity.currentStageId }
+                        }
+                    val banked = activeCircuit?.bankedScore ?: 0
+
+                    currentState.copy(
                         hasSavedGame = savedGame != null && !savedGame.first.isGameOver,
                         savedGamePairCount = savedGame?.first?.pairCount ?: 0,
-                        savedGameMode = savedGame?.first?.mode ?: GameMode.STANDARD,
+                        savedGameMode = savedGame?.first?.mode ?: GameMode.TIME_ATTACK,
+                        activeCircuitRunId = runId,
+                        activeCircuitStage = stage,
+                        activeCircuitBankedScore = banked,
                     )
                 }
             } catch (e: Exception) {
@@ -108,7 +127,13 @@ class DefaultStartComponent(
     }
 
     override fun onResumeGame() {
-        if (state.value.hasSavedGame) {
+        if (state.value.activeCircuitRunId != null) {
+            onNavigateToGame(
+                state.value.activeCircuitStage?.pairCount ?: 6,
+                GameMode.HIGH_ROLLER,
+                false,
+            )
+        } else if (state.value.hasSavedGame) {
             onNavigateToGame(
                 state.value.savedGamePairCount,
                 state.value.savedGameMode,

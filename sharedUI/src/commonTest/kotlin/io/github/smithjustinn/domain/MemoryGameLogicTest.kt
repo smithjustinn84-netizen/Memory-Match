@@ -31,7 +31,7 @@ class MemoryGameLogicTest {
 
         assertEquals(pairCount * 2, state.cards.size)
         assertEquals(pairCount, state.pairCount)
-        assertEquals(GameMode.STANDARD, state.mode)
+        assertEquals(GameMode.TIME_ATTACK, state.mode)
 
         // Verify we have pairs
         val groups = state.cards.groupBy { it.suit to it.rank }
@@ -44,7 +44,7 @@ class MemoryGameLogicTest {
     @Test
     fun `createInitialState with Time Attack mode`() {
         val pairCount = 4
-        val state = MemoryGameLogic.createInitialState(pairCount, mode = GameMode.TIME_ATTACK)
+        val state = MemoryGameLogic.createInitialState(pairCount)
 
         assertEquals(GameMode.TIME_ATTACK, state.mode)
     }
@@ -159,9 +159,9 @@ class MemoryGameLogicTest {
     }
 
     @Test
-    fun `applyFinalBonuses should calculate score correctly for Standard mode`() {
+    fun `applyFinalBonuses should calculate score correctly for non-Time Attack mode`() {
         val pairCount = 2
-        var state = MemoryGameLogic.createInitialState(pairCount, mode = GameMode.STANDARD)
+        var state = MemoryGameLogic.createInitialState(pairCount, mode = GameMode.DAILY_CHALLENGE)
 
         // Manually set the state to win with some stats
         state =
@@ -207,21 +207,21 @@ class MemoryGameLogicTest {
 
     @Test
     fun `calculateInitialTime should return correct values for difficulties`() {
-        assertEquals(25L, MemoryGameLogic.calculateInitialTime(6))
-        assertEquals(35L, MemoryGameLogic.calculateInitialTime(8))
-        assertEquals(45L, MemoryGameLogic.calculateInitialTime(10))
-        assertEquals(55L, MemoryGameLogic.calculateInitialTime(12))
-        assertEquals(55L, MemoryGameLogic.calculateInitialTime(12))
+        assertEquals(25L, TimeAttackLogic.calculateInitialTime(6))
+        assertEquals(35L, TimeAttackLogic.calculateInitialTime(8))
+        assertEquals(45L, TimeAttackLogic.calculateInitialTime(10))
+        assertEquals(55L, TimeAttackLogic.calculateInitialTime(12))
+        assertEquals(55L, TimeAttackLogic.calculateInitialTime(12))
     }
 
     @Test
     fun `calculateTimeGain should return correct values including combo bonus`() {
         // Base gain (combo 1)
-        assertEquals(3, MemoryGameLogic.calculateTimeGain(1))
+        assertEquals(3, TimeAttackLogic.calculateTimeGain(1))
         // Combo 2
-        assertEquals(5, MemoryGameLogic.calculateTimeGain(2))
+        assertEquals(5, TimeAttackLogic.calculateTimeGain(2))
         // Combo 3
-        assertEquals(7, MemoryGameLogic.calculateTimeGain(3))
+        assertEquals(7, TimeAttackLogic.calculateTimeGain(3))
     }
 
     @Test
@@ -307,12 +307,12 @@ class MemoryGameLogicTest {
     fun `calculateInitialTime should fallback for unknown pair count`() {
         // Fallback is pairCount * 4
         // Pair count 20 -> 80L
-        assertEquals(80L, MemoryGameLogic.calculateInitialTime(20))
+        assertEquals(80L, TimeAttackLogic.calculateInitialTime(20))
     }
 
     @Test
     fun `TIME_PENALTY_MISMATCH should be 2 seconds`() {
-        assertEquals(2L, MemoryGameLogic.TIME_PENALTY_MISMATCH)
+        assertEquals(2L, TimeAttackLogic.TIME_PENALTY_MISMATCH)
     }
 
     @Test

@@ -3,28 +3,11 @@ package io.github.smithjustinn.domain
 import io.github.smithjustinn.domain.models.CardState
 import io.github.smithjustinn.domain.models.GameDomainEvent
 import io.github.smithjustinn.domain.models.GameMode
-import io.github.smithjustinn.domain.models.MatchComment
 import io.github.smithjustinn.domain.models.MemoryGameState
 import io.github.smithjustinn.domain.models.Rank
 import io.github.smithjustinn.domain.models.ScoreBreakdown
 import io.github.smithjustinn.domain.models.ScoringConfig
 import io.github.smithjustinn.domain.models.Suit
-import io.github.smithjustinn.resources.Res
-import io.github.smithjustinn.resources.comment_all_in
-import io.github.smithjustinn.resources.comment_bad_beat
-import io.github.smithjustinn.resources.comment_boom
-import io.github.smithjustinn.resources.comment_eagle_eyes
-import io.github.smithjustinn.resources.comment_full_house
-import io.github.smithjustinn.resources.comment_great_find
-import io.github.smithjustinn.resources.comment_high_roller
-import io.github.smithjustinn.resources.comment_on_a_roll
-import io.github.smithjustinn.resources.comment_one_more
-import io.github.smithjustinn.resources.comment_perfect
-import io.github.smithjustinn.resources.comment_photographic
-import io.github.smithjustinn.resources.comment_pot_odds
-import io.github.smithjustinn.resources.comment_sharp
-import io.github.smithjustinn.resources.comment_the_nuts
-import io.github.smithjustinn.resources.comment_you_got_it
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlin.random.Random
@@ -36,7 +19,7 @@ object MemoryGameLogic {
     fun createInitialState(
         pairCount: Int,
         config: ScoringConfig = ScoringConfig(),
-        mode: GameMode = GameMode.STANDARD,
+        mode: GameMode = GameMode.TIME_ATTACK,
         random: Random = Random,
     ): MemoryGameState {
         val allPossibleCards =
@@ -130,26 +113,29 @@ object MemoryGameLogic {
         first: CardState,
         second: CardState,
     ): Pair<MemoryGameState, GameDomainEvent?> {
-        val newCards =
-            state.cards
-                .map { card ->
-                    if (card.id == first.id || card.id == second.id) {
-                        card.copy(isMatched = true)
-                    } else {
-                        card
-                    }
-                }.toImmutableList()
+        val newCards = updateCardsForMatch(state.cards, first.id, second.id)
+
+        val matchesFound = newCards.count { it.isMatched } / 2
+        val isWon = matchesFound == state.pairCount
+        val moves = state.moves + 1
 
         val config = state.config
         val comboFactor = state.comboMultiplier * state.comboMultiplier
         val matchBasePoints = config.baseMatchPoints
         val matchComboBonus = comboFactor * config.comboBonusPoints
-        val matchPoints = matchBasePoints + matchComboBonus
-        val pointsEarned = matchPoints
 
-        val matchesFound = newCards.count { it.isMatched } / 2
-        val isWon = matchesFound == state.pairCount
-        val moves = state.moves + 1
+        val scoreResult =
+            if (state.mode == GameMode.HIGH_ROLLER) {
+                val hrResult = HighRollerLogic.calculateHighRollerScore(state, isWon, matchBasePoints, matchComboBonus)
+                MatchScoreResult(
+                    finalScore = hrResult.finalScore,
+                    resultingPot = hrResult.resultingPot,
+                    resultingBankedScore = hrResult.resultingBankedScore,
+                    ddBonus = hrResult.ddBonus,
+                )
+            } else {
+                calculateMatchScore(state, isWon, matchBasePoints, matchComboBonus)
+            }
 
         val comment =
             GameCommentGenerator.generateMatchComment(
@@ -160,37 +146,25 @@ object MemoryGameLogic {
                 config,
             )
 
-        val preDoubleScore = state.score + pointsEarned
-        val finalScore =
-            if (isWon && state.isDoubleDownActive) {
-                preDoubleScore * 2
-            } else {
-                preDoubleScore
-            }
-        val ddBonus = finalScore - preDoubleScore
-
         val newState =
             state.copy(
                 cards = newCards,
                 isGameWon = isWon,
                 isGameOver = isWon,
                 moves = moves,
-                score = finalScore,
+                score = scoreResult.finalScore,
+                currentPot = scoreResult.resultingPot,
+                bankedScore = scoreResult.resultingBankedScore,
                 totalBasePoints = state.totalBasePoints + matchBasePoints,
                 totalComboBonus = state.totalComboBonus + matchComboBonus,
-                totalDoubleDownBonus = ddBonus,
+                totalDoubleDownBonus = scoreResult.ddBonus,
                 comboMultiplier = state.comboMultiplier + 1,
                 isDoubleDownActive = state.isDoubleDownActive && !isWon, // Deactivate on win
                 matchComment = comment,
                 lastMatchedIds = persistentListOf(first.id, second.id),
             )
 
-        val event =
-            when {
-                isWon -> GameDomainEvent.GameWon
-                state.comboMultiplier > config.theNutsThreshold -> GameDomainEvent.TheNutsAchieved
-                else -> GameDomainEvent.MatchSuccess
-            }
+        val event = determineSuccessEvent(isWon, state.comboMultiplier, config)
 
         return newState to event
     }
@@ -221,11 +195,24 @@ object MemoryGameLogic {
             ) to GameDomainEvent.GameOver
         }
 
+        val isHighRoller = state.mode == GameMode.HIGH_ROLLER
+        val badBeat =
+            if (isHighRoller) {
+                HighRollerLogic.calculateBadBeat(state)
+            } else {
+                null
+            }
+        val finalPot = badBeat?.finalPot ?: 0
+        val isBusted = badBeat?.isBusted ?: false
+
         val newState =
             state.copy(
                 moves = state.moves + 1,
                 comboMultiplier = 0,
-                score = state.score.coerceAtLeast(0),
+                score = if (isHighRoller) state.bankedScore else state.score.coerceAtLeast(0),
+                currentPot = finalPot,
+                isBusted = isBusted,
+                isGameOver = isBusted,
                 isDoubleDownActive = false,
                 cards =
                     state.cards
@@ -314,101 +301,55 @@ object MemoryGameLogic {
     }
 }
 
-/**
- * Logic specific to Time Attack mode.
- */
-object TimeAttackLogic {
-    private const val DIFF_LEVEL_6 = 6
-    private const val DIFF_LEVEL_8 = 8
-    private const val DIFF_LEVEL_10 = 10
-    private const val DIFF_LEVEL_12 = 12
-    const val TIME_PENALTY_MISMATCH = 2L
-    private const val INITIAL_TIME_6 = 25L
-    private const val INITIAL_TIME_8 = 35L
-    private const val INITIAL_TIME_10 = 45L
-    private const val INITIAL_TIME_12 = 55L
-    private const val TIME_PER_PAIR_FALLBACK = 4
-    private const val BASE_TIME_GAIN = 3
-    private const val COMBO_TIME_BONUS_MULTIPLIER = 2
+private fun updateCardsForMatch(
+    cards: List<CardState>,
+    firstId: Int,
+    secondId: Int,
+): kotlinx.collections.immutable.ImmutableList<CardState> =
+    cards
+        .map { card ->
+            if (card.id == firstId || card.id == secondId) {
+                card.copy(isMatched = true, isFaceUp = true)
+            } else {
+                card
+            }
+        }.toImmutableList()
 
-    /**
-     * Calculates the initial time for Time Attack mode based on the pair count.
-     */
-    fun calculateInitialTime(pairCount: Int): Long =
-        when (pairCount) {
-            DIFF_LEVEL_6 -> INITIAL_TIME_6
-            DIFF_LEVEL_8 -> INITIAL_TIME_8
-            DIFF_LEVEL_10 -> INITIAL_TIME_10
-            DIFF_LEVEL_12 -> INITIAL_TIME_12
-            else -> (pairCount * TIME_PER_PAIR_FALLBACK).toLong()
-        }
+private fun calculateMatchScore(
+    state: MemoryGameState,
+    isWon: Boolean,
+    matchBasePoints: Int,
+    matchComboBonus: Int,
+): MatchScoreResult {
+    val multiplier = if (state.isDoubleDownActive) 2 else 1
+    val matchTotal = (matchBasePoints + matchComboBonus) * multiplier
+    val ddBonus = if (state.isDoubleDownActive) matchTotal / 2 else 0
 
-    /**
-     * Logic for calculating time gain based on combo.
-     */
-    fun calculateTimeGain(comboMultiplier: Int): Int {
-        val baseGain = BASE_TIME_GAIN
-        val comboBonus = (comboMultiplier - 1) * COMBO_TIME_BONUS_MULTIPLIER
-        return baseGain + comboBonus
-    }
+    val newBankedScore = state.bankedScore + matchTotal
+    val finalScore = if (isWon) newBankedScore else state.score
+
+    return MatchScoreResult(
+        finalScore = finalScore,
+        resultingPot = state.currentPot,
+        resultingBankedScore = newBankedScore,
+        ddBonus = ddBonus,
+    )
 }
 
-/**
- * Generates comments based on game events.
- */
-object GameCommentGenerator {
-    private const val POT_ODDS_DIVISOR = 2
-    private const val MOVES_PER_MATCH_THRESHOLD = 2
-    private const val ONE_MORE_REMAINING = 1
+private data class MatchScoreResult(
+    val finalScore: Int,
+    val resultingPot: Int,
+    val resultingBankedScore: Int,
+    val ddBonus: Int,
+)
 
-    fun generateMatchComment(
-        moves: Int,
-        matchesFound: Int,
-        totalPairs: Int,
-        combo: Int,
-        config: ScoringConfig,
-    ): MatchComment {
-        if (matchesFound == totalPairs) return MatchComment(Res.string.comment_perfect)
-
-        return when {
-            combo > config.theNutsThreshold -> {
-                MatchComment(Res.string.comment_the_nuts, persistentListOf(combo))
-            }
-
-            combo > config.highRollerThreshold -> {
-                MatchComment(Res.string.comment_high_roller, persistentListOf(combo))
-            }
-
-            matchesFound == 1 -> {
-                MatchComment(Res.string.comment_all_in)
-            }
-
-            matchesFound == totalPairs / POT_ODDS_DIVISOR -> {
-                MatchComment(Res.string.comment_pot_odds)
-            }
-
-            moves <= matchesFound * MOVES_PER_MATCH_THRESHOLD -> {
-                MatchComment(Res.string.comment_photographic)
-            }
-
-            matchesFound == totalPairs - ONE_MORE_REMAINING -> {
-                MatchComment(Res.string.comment_one_more)
-            }
-
-            else -> {
-                val randomRes =
-                    listOf(
-                        Res.string.comment_great_find,
-                        Res.string.comment_you_got_it,
-                        Res.string.comment_boom,
-                        Res.string.comment_eagle_eyes,
-                        Res.string.comment_sharp,
-                        Res.string.comment_on_a_roll,
-                        Res.string.comment_full_house,
-                        Res.string.comment_bad_beat,
-                    ).random()
-                MatchComment(randomRes)
-            }
-        }
+private fun determineSuccessEvent(
+    isWon: Boolean,
+    comboMultiplier: Int,
+    config: ScoringConfig,
+): GameDomainEvent =
+    when {
+        isWon -> GameDomainEvent.GameWon
+        comboMultiplier > config.theNutsThreshold -> GameDomainEvent.TheNutsAchieved
+        else -> GameDomainEvent.MatchSuccess
     }
-}

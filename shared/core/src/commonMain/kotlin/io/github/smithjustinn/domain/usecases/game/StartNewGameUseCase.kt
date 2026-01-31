@@ -13,7 +13,7 @@ open class StartNewGameUseCase {
     open operator fun invoke(
         pairCount: Int,
         config: ScoringConfig = ScoringConfig(),
-        mode: GameMode = GameMode.STANDARD,
+        mode: GameMode = GameMode.TIME_ATTACK,
         seed: Long? = null,
     ): MemoryGameState {
         val finalSeed = seed ?: Random.nextLong()

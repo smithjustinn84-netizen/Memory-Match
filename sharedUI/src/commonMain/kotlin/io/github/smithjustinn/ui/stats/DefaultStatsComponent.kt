@@ -43,7 +43,7 @@ class DefaultStatsComponent(
     private val _events = Channel<StatsUiEvent>(Channel.BUFFERED)
     override val events: Flow<StatsUiEvent> = _events.receiveAsFlow()
 
-    private val selectedGameMode = MutableStateFlow(GameMode.STANDARD)
+    private val selectedGameMode = MutableStateFlow(GameMode.TIME_ATTACK)
 
     init {
         lifecycle.doOnDestroy { scope.cancel() }

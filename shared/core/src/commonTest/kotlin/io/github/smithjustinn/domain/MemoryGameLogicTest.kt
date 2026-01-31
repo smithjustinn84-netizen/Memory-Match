@@ -1,6 +1,7 @@
 package io.github.smithjustinn.domain
 
 import io.github.smithjustinn.domain.models.GameDomainEvent
+import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.ScoringConfig
 import kotlinx.collections.immutable.toImmutableList
 import kotlin.test.Test
@@ -127,7 +128,7 @@ class MemoryGameLogicTest {
                 moveBonusMultiplier = 100,
             )
         // Simulate a won state
-        var state = MemoryGameLogic.createInitialState(pairCount = 2, config = config)
+        var state = MemoryGameLogic.createInitialState(pairCount = 2, config = config, mode = GameMode.DAILY_CHALLENGE)
         state =
             state.copy(
                 isGameWon = true,
@@ -167,21 +168,21 @@ class MemoryGameLogicTest {
 
     @Test
     fun `calculateInitialTime returns correct values`() {
-        assertEquals(25L, MemoryGameLogic.calculateInitialTime(6))
-        assertEquals(35L, MemoryGameLogic.calculateInitialTime(8))
-        assertEquals(45L, MemoryGameLogic.calculateInitialTime(10))
-        assertEquals(55L, MemoryGameLogic.calculateInitialTime(12))
-        assertEquals(12L, MemoryGameLogic.calculateInitialTime(3)) // Fallback 3 * 4
+        assertEquals(25L, TimeAttackLogic.calculateInitialTime(6))
+        assertEquals(35L, TimeAttackLogic.calculateInitialTime(8))
+        assertEquals(45L, TimeAttackLogic.calculateInitialTime(10))
+        assertEquals(55L, TimeAttackLogic.calculateInitialTime(12))
+        assertEquals(12L, TimeAttackLogic.calculateInitialTime(3)) // Fallback 3 * 4
     }
 
     @Test
     fun `calculateTimeGain scales with combo`() {
         // Base = 3, Multiplier = 2
         // Combo 1: 3 + (0 * 2) = 3
-        assertEquals(3, MemoryGameLogic.calculateTimeGain(1))
+        assertEquals(3, TimeAttackLogic.calculateTimeGain(1))
         // Combo 2: 3 + (1 * 2) = 5
-        assertEquals(5, MemoryGameLogic.calculateTimeGain(2))
+        assertEquals(5, TimeAttackLogic.calculateTimeGain(2))
         // Combo 5: 3 + (4 * 2) = 11
-        assertEquals(11, MemoryGameLogic.calculateTimeGain(5))
+        assertEquals(11, TimeAttackLogic.calculateTimeGain(5))
     }
 }

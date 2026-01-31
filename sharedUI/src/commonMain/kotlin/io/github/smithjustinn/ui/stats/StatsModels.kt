@@ -9,7 +9,7 @@ import kotlinx.collections.immutable.persistentListOf
 data class StatsState(
     val difficultyLeaderboards: ImmutableList<Pair<DifficultyLevel, ImmutableList<LeaderboardEntry>>> =
         persistentListOf(),
-    val selectedGameMode: GameMode = GameMode.STANDARD,
+    val selectedGameMode: GameMode = GameMode.TIME_ATTACK,
 )
 
 sealed class StatsUiEvent {

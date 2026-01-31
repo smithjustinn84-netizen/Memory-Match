@@ -2,6 +2,7 @@ package io.github.smithjustinn.di
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import co.touchlab.kermit.Logger
+import io.github.smithjustinn.data.local.AppDatabase
 import io.github.smithjustinn.domain.repositories.GameStateRepository
 import io.github.smithjustinn.domain.repositories.GameStatsRepository
 import io.github.smithjustinn.domain.repositories.LeaderboardRepository
@@ -28,6 +29,8 @@ interface AppGraph {
     val hapticsService: HapticsService
     val coroutineDispatchers: io.github.smithjustinn.utils.CoroutineDispatchers
     val applicationScope: kotlinx.coroutines.CoroutineScope
+
+    val appDatabase: AppDatabase
 
     val gameStateRepository: GameStateRepository
     val settingsRepository: SettingsRepository

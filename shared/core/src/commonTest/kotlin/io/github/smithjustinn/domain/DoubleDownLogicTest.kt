@@ -95,7 +95,7 @@ class DoubleDownLogicTest {
                 cards = cards,
                 pairCount = 1,
                 config = defaultConfig,
-                mode = GameMode.STANDARD,
+                mode = GameMode.TIME_ATTACK,
                 score = startScore,
                 isDoubleDownActive = true,
                 comboMultiplier = 3,

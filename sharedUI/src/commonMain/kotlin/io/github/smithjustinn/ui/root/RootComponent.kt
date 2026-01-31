@@ -46,6 +46,10 @@ interface RootComponent {
         class Stats(
             val component: StatsComponent,
         ) : Child()
+
+        class BuyIn(
+            val component: io.github.smithjustinn.ui.circuit.BuyInComponent,
+        ) : Child()
     }
 }
 
@@ -79,7 +83,7 @@ class DefaultRootComponent(
         }
     }
 
-    // Url format: memorymatch://game?mode=STANDARD&pairs=8&seed=12345
+    // Url format: memorymatch://game?mode=TIME_ATTACK&pairs=8&seed=12345
     private fun handleDeepLink(url: String) {
         if (!url.startsWith("memorymatch://game")) return
 
@@ -88,7 +92,7 @@ class DefaultRootComponent(
             val pairsStr = url.getQueryParameter("pairs")
             val seedStr = url.getQueryParameter("seed")
 
-            val mode = modeStr?.let { GameMode.valueOf(it) } ?: GameMode.STANDARD
+            val mode = modeStr?.let { GameMode.valueOf(it) } ?: GameMode.TIME_ATTACK
             val pairs = pairsStr?.toIntOrNull() ?: DEFAULT_PAIR_COUNT
             val seed = seedStr?.toLongOrNull()
 
@@ -108,6 +112,7 @@ class DefaultRootComponent(
             is Config.Game -> RootComponent.Child.Game(createGameComponent(config, componentContext))
             is Config.Settings -> RootComponent.Child.Settings(createSettingsComponent(componentContext))
             is Config.Stats -> RootComponent.Child.Stats(createStatsComponent(componentContext))
+            is Config.BuyIn -> RootComponent.Child.BuyIn(createBuyInComponent(config, componentContext))
         }
 
     private fun createStartComponent(componentContext: ComponentContext): StartComponent =
@@ -116,7 +121,11 @@ class DefaultRootComponent(
             appGraph = appGraph,
             onNavigateToGame =
                 @OptIn(com.arkivanov.decompose.DelicateDecomposeApi::class) { pairs, mode, forceNewGame ->
-                    navigation.push(Config.Game(pairs, mode, forceNewGame, null))
+                    if (mode == io.github.smithjustinn.domain.models.GameMode.HIGH_ROLLER) {
+                        navigation.push(Config.BuyIn(io.github.smithjustinn.domain.models.CircuitStage.QUALIFIER, 0))
+                    } else {
+                        navigation.push(Config.Game(pairs, mode, forceNewGame, null))
+                    }
                 },
             onNavigateToSettings =
                 @OptIn(com.arkivanov.decompose.DelicateDecomposeApi::class) {
@@ -141,7 +150,37 @@ class DefaultRootComponent(
                     mode = config.mode,
                     forceNewGame = config.forceNewGame,
                     seed = config.seed,
+                    circuitStage = config.circuitStage,
+                    bankedScore = config.bankedScore,
+                    currentWager = config.currentWager,
                 ),
+            onBackClicked = navigation::pop,
+            onCycleStage = { nextStage, bankedScore ->
+                navigation.push(Config.BuyIn(nextStage, bankedScore))
+            },
+        )
+
+    private fun createBuyInComponent(
+        config: Config.BuyIn,
+        componentContext: ComponentContext,
+    ): io.github.smithjustinn.ui.circuit.BuyInComponent =
+        io.github.smithjustinn.ui.circuit.DefaultBuyInComponent(
+            componentContext = componentContext,
+            stage = config.stage,
+            bankedScore = config.bankedScore,
+            onStartRound = { wager ->
+                navigation.push(
+                    Config.Game(
+                        pairs = config.stage.pairCount,
+                        mode = io.github.smithjustinn.domain.models.GameMode.HIGH_ROLLER,
+                        forceNewGame = true,
+                        seed = null,
+                        circuitStage = config.stage,
+                        bankedScore = config.bankedScore,
+                        currentWager = wager,
+                    ),
+                )
+            },
             onBackClicked = navigation::pop,
         )
 
@@ -169,11 +208,20 @@ class DefaultRootComponent(
             val mode: GameMode,
             val forceNewGame: Boolean,
             val seed: Long?,
+            val circuitStage: io.github.smithjustinn.domain.models.CircuitStage? = null,
+            val bankedScore: Int = 0,
+            val currentWager: Int = 0,
         ) : Config
 
         @Serializable data object Settings : Config
 
         @Serializable data object Stats : Config
+
+        @Serializable
+        data class BuyIn(
+            val stage: io.github.smithjustinn.domain.models.CircuitStage,
+            val bankedScore: Int,
+        ) : Config
     }
 }
 

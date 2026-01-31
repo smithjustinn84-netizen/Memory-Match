@@ -11,10 +11,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.resources.Res
-import io.github.smithjustinn.resources.daily_challenge
 import io.github.smithjustinn.resources.game_mode
-import io.github.smithjustinn.resources.mode_standard
-import io.github.smithjustinn.resources.mode_time_attack
+import io.github.smithjustinn.resources.mode_daily_challenge_caps
+import io.github.smithjustinn.resources.mode_high_roller_caps
+import io.github.smithjustinn.resources.mode_time_attack_caps
 import io.github.smithjustinn.ui.components.PillSegmentedControl
 import org.jetbrains.compose.resources.stringResource
 
@@ -24,7 +24,7 @@ fun ModeSelector(
     onModeSelected: (GameMode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val modes = listOf(GameMode.STANDARD, GameMode.TIME_ATTACK)
+    val modes = listOf(GameMode.TIME_ATTACK)
 
     Column(
         modifier = modifier,
@@ -43,9 +43,9 @@ fun ModeSelector(
             onItemSelected = onModeSelected,
             labelProvider = { mode ->
                 when (mode) {
-                    GameMode.STANDARD -> stringResource(Res.string.mode_standard)
-                    GameMode.TIME_ATTACK -> stringResource(Res.string.mode_time_attack)
-                    GameMode.DAILY_CHALLENGE -> stringResource(Res.string.daily_challenge)
+                    GameMode.TIME_ATTACK -> stringResource(Res.string.mode_time_attack_caps)
+                    GameMode.DAILY_CHALLENGE -> stringResource(Res.string.mode_daily_challenge_caps)
+                    GameMode.HIGH_ROLLER -> stringResource(Res.string.mode_high_roller_caps)
                 }
             },
         )

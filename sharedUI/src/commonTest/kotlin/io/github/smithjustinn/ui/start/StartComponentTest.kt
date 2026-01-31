@@ -33,7 +33,7 @@ class StartComponentTest : BaseComponentTest() {
                 assertEquals(DifficultyLevel.defaultLevels.size, state.difficulties.size)
                 assertEquals(DifficultyLevel.defaultLevels[1].pairs, state.selectedDifficulty.pairs)
                 assertFalse(state.hasSavedGame)
-                assertEquals(GameMode.STANDARD, state.selectedMode)
+                assertEquals(GameMode.TIME_ATTACK, state.selectedMode)
             }
         }
 
@@ -58,7 +58,7 @@ class StartComponentTest : BaseComponentTest() {
             component = createDefaultComponent(lifecycle)
             testDispatcher.scheduler.runCurrent()
 
-            val newMode = GameMode.TIME_ATTACK
+            val newMode = GameMode.DAILY_CHALLENGE
             component.state.test {
                 awaitItem() // Initial state
                 component.onModeSelected(newMode)
@@ -97,11 +97,11 @@ class StartComponentTest : BaseComponentTest() {
             testDispatcher.scheduler.runCurrent()
 
             component.onDifficultySelected(DifficultyLevel.defaultLevels[2]) // 10 pairs
-            component.onModeSelected(GameMode.TIME_ATTACK)
+            component.onModeSelected(GameMode.DAILY_CHALLENGE)
             testDispatcher.scheduler.runCurrent()
 
             component.onStartGame()
-            assertEquals(Triple(10, GameMode.TIME_ATTACK, true), navigatedToGame)
+            assertEquals(Triple(10, GameMode.DAILY_CHALLENGE, true), navigatedToGame)
         }
 
     @Test

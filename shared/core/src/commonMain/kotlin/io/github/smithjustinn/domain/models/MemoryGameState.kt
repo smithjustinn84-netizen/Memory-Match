@@ -33,8 +33,12 @@ data class MemoryGameState(
     @Transient val matchComment: MatchComment? = null,
     val config: ScoringConfig = ScoringConfig(),
     val scoreBreakdown: ScoreBreakdown = ScoreBreakdown(),
-    val mode: GameMode = GameMode.STANDARD,
+    val mode: GameMode = GameMode.TIME_ATTACK,
     @Serializable(with = IntListSerializer::class)
     val lastMatchedIds: ImmutableList<Int> = persistentListOf(),
     val seed: Long? = null,
+    val currentPot: Int = 0,
+    val bankedScore: Int = 0,
+    val currentWager: Int = 0,
+    val circuitStage: CircuitStage = CircuitStage.QUALIFIER,
 )

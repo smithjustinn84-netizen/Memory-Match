@@ -15,19 +15,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import io.github.smithjustinn.domain.models.DifficultyLevel
-import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.resources.Res
-import io.github.smithjustinn.resources.daily_challenge
-import io.github.smithjustinn.resources.game_mode
-import io.github.smithjustinn.resources.mode_standard
-import io.github.smithjustinn.resources.mode_time_attack
 import io.github.smithjustinn.resources.resume_game
 import io.github.smithjustinn.resources.select_difficulty
 import io.github.smithjustinn.resources.start
 import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.components.AppCard
 import io.github.smithjustinn.ui.components.AppIcons
-import io.github.smithjustinn.ui.components.PillSegmentedControl
 import io.github.smithjustinn.ui.components.PokerButton
 import io.github.smithjustinn.ui.components.PokerChip
 import io.github.smithjustinn.ui.start.DifficultyState
@@ -40,7 +34,6 @@ import org.jetbrains.compose.resources.stringResource
 fun DifficultySelectionSection(
     state: DifficultyState,
     onDifficultySelected: (DifficultyLevel) -> Unit,
-    onModeSelected: (GameMode) -> Unit,
     onStartGame: () -> Unit,
     onResumeGame: () -> Unit,
     modifier: Modifier = Modifier,
@@ -54,7 +47,6 @@ fun DifficultySelectionSection(
             verticalArrangement = Arrangement.spacedBy(PokerTheme.spacing.medium),
         ) {
             DifficultySelector(state, onDifficultySelected)
-            ModeSelector(state, onModeSelected)
         }
 
         Spacer(modifier = Modifier.height(PokerTheme.spacing.huge))
@@ -118,27 +110,6 @@ private fun DifficultySelector(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun ModeSelector(
-    state: DifficultyState,
-    onModeSelected: (GameMode) -> Unit,
-) {
-    AppCard(title = stringResource(Res.string.game_mode)) {
-        PillSegmentedControl(
-            items = listOf(GameMode.STANDARD, GameMode.TIME_ATTACK),
-            selectedItem = state.selectedMode,
-            onItemSelected = onModeSelected,
-            labelProvider = { mode ->
-                when (mode) {
-                    GameMode.STANDARD -> stringResource(Res.string.mode_standard)
-                    GameMode.TIME_ATTACK -> stringResource(Res.string.mode_time_attack)
-                    GameMode.DAILY_CHALLENGE -> stringResource(Res.string.daily_challenge)
-                }
-            },
-        )
     }
 }
 

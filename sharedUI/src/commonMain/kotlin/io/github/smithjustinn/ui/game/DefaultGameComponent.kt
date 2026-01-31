@@ -2,9 +2,11 @@ package io.github.smithjustinn.ui.game
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.lifecycle.doOnDestroy
+import io.github.smithjustinn.data.local.CircuitStatsEntity
 import io.github.smithjustinn.di.AppGraph
 import io.github.smithjustinn.domain.MemoryGameLogic
 import io.github.smithjustinn.domain.models.CardDisplaySettings
+import io.github.smithjustinn.domain.models.CircuitStage
 import io.github.smithjustinn.domain.models.GameDomainEvent
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
@@ -28,6 +30,7 @@ class DefaultGameComponent(
     private val appGraph: AppGraph,
     private val args: GameArgs,
     private val onBackClicked: () -> Unit,
+    private val onCycleStage: (nextStage: CircuitStage, bankedScore: Int) -> Unit,
 ) : GameComponent,
     ComponentContext by componentContext {
     private val dispatchers = appGraph.coroutineDispatchers
@@ -163,8 +166,39 @@ class DefaultGameComponent(
                 null
             }
 
-        val initialState = appGraph.startNewGameUseCase(pairCount, mode = mode, seed = finalSeed)
+        val initialState =
+            appGraph
+                .startNewGameUseCase(pairCount, mode = mode, seed = finalSeed)
+                .copy(
+                    bankedScore = args.bankedScore,
+                    currentWager = args.currentWager,
+                    circuitStage = args.circuitStage ?: CircuitStage.QUALIFIER,
+                )
         lifecycleHandler.setupNewGameState(initialState, mode, pairCount)
+
+        // Save active circuit run if starting a new High Roller round
+        if (mode == GameMode.HIGH_ROLLER) {
+            scope.launch {
+                appGraph.appDatabase.circuitStatsDao().saveCircuitStats(
+                    CircuitStatsEntity(
+                        runId =
+                            args.seed?.toString() ?: Clock.System
+                                .now()
+                                .toEpochMilliseconds()
+                                .toString(),
+                        currentStageId =
+                            (
+                                args.circuitStage
+                                    ?: CircuitStage.QUALIFIER
+                            ).id,
+                        bankedScore = args.bankedScore,
+                        currentWager = args.currentWager,
+                        timestamp = Clock.System.now().toEpochMilliseconds(),
+                        isActive = true,
+                    ),
+                )
+            }
+        }
 
         delay(GameConstants.SETTINGS_COLLECTION_DELAY)
 
@@ -239,36 +273,88 @@ class DefaultGameComponent(
     private fun processGameEnd(wonState: MemoryGameState? = null) {
         timerHandler.stopTimer()
         if (wonState != null) {
-            val bonuses = appGraph.calculateFinalScoreUseCase(wonState, _state.value.elapsedTimeSeconds)
-            val isNewHigh = bonuses.score > _state.value.bestScore
-
-            _events.tryEmit(GameUiEvent.VibrateMatch)
-            _events.tryEmit(if (isNewHigh) GameUiEvent.PlayHighScore else GameUiEvent.PlayWin)
-            _state.update { it.copy(game = bonuses, isNewHighScore = isNewHigh) }
-
-            scope.launch {
-                appGraph.saveGameResultUseCase(
-                    pairCount = bonuses.pairCount,
-                    score = bonuses.score,
-                    timeSeconds = _state.value.elapsedTimeSeconds,
-                    moves = bonuses.moves,
-                    gameMode = bonuses.mode,
-                )
-                if (bonuses.mode == GameMode.DAILY_CHALLENGE) {
-                    appGraph.dailyChallengeRepository.saveChallengeResult(
-                        Clock.System.now().toEpochMilliseconds() / GameConstants.MILLIS_IN_DAY,
-                        bonuses.score,
-                        _state.value.elapsedTimeSeconds,
-                        bonuses.moves,
-                    )
-                }
-                appGraph.clearSavedGameUseCase()
-            }
-            feedbackHandler.clearCommentAfterDelay()
+            handleGameWon(wonState)
         } else {
-            _state.update { it.copy(game = it.game.copy(isGameOver = true)) }
-            _events.tryEmit(GameUiEvent.PlayLose)
-            scope.launch { appGraph.clearSavedGameUseCase() }
+            handleGameLost()
+        }
+    }
+
+    private fun handleGameWon(wonState: MemoryGameState) {
+        val bonuses = appGraph.calculateFinalScoreUseCase(wonState, _state.value.elapsedTimeSeconds)
+        val isNewHigh = bonuses.score > _state.value.bestScore
+
+        _events.tryEmit(GameUiEvent.VibrateMatch)
+        _events.tryEmit(if (isNewHigh) GameUiEvent.PlayHighScore else GameUiEvent.PlayWin)
+        _state.update { it.copy(game = bonuses, isNewHighScore = isNewHigh) }
+
+        scope.launch {
+            appGraph.saveGameResultUseCase(
+                pairCount = bonuses.pairCount,
+                score = bonuses.score,
+                timeSeconds = _state.value.elapsedTimeSeconds,
+                moves = bonuses.moves,
+                gameMode = bonuses.mode,
+            )
+
+            handleHighRollerCycling(bonuses)
+            handleDailyChallenge(bonuses)
+            appGraph.clearSavedGameUseCase()
+        }
+        feedbackHandler.clearCommentAfterDelay()
+    }
+
+    private fun handleGameLost() {
+        _state.update { it.copy(game = it.game.copy(isGameOver = true)) }
+        _events.tryEmit(GameUiEvent.PlayLose)
+        scope.launch {
+            val game = _state.value.game
+            if (game.mode == GameMode.HIGH_ROLLER && game.isBusted) {
+                game.seed?.let { seed -> appGraph.appDatabase.circuitStatsDao().deactivateRun(seed.toString()) }
+            }
+            appGraph.clearSavedGameUseCase()
+        }
+    }
+
+    private suspend fun handleHighRollerCycling(bonuses: MemoryGameState) {
+        if (bonuses.mode == GameMode.HIGH_ROLLER) {
+            val nextStage =
+                when (bonuses.circuitStage) {
+                    CircuitStage.QUALIFIER -> CircuitStage.SEMI_FINAL
+                    CircuitStage.SEMI_FINAL -> CircuitStage.GRAND_FINALE
+                    CircuitStage.GRAND_FINALE -> null
+                }
+            if (nextStage != null) {
+                // Progress to next stage: Update existing run or create new if needed
+                appGraph.appDatabase.circuitStatsDao().saveCircuitStats(
+                    CircuitStatsEntity(
+                        runId =
+                            bonuses.seed?.toString() ?: Clock.System
+                                .now()
+                                .toEpochMilliseconds()
+                                .toString(),
+                        currentStageId = nextStage.id,
+                        bankedScore = bonuses.bankedScore,
+                        currentWager = 0, // Reset wager for next buy-in
+                        timestamp = Clock.System.now().toEpochMilliseconds(),
+                        isActive = true,
+                    ),
+                )
+                onCycleStage(nextStage, bonuses.bankedScore)
+            } else {
+                // Completed Grand Finale: Deactivate run
+                bonuses.seed?.let { appGraph.appDatabase.circuitStatsDao().deactivateRun(it.toString()) }
+            }
+        }
+    }
+
+    private suspend fun handleDailyChallenge(bonuses: MemoryGameState) {
+        if (bonuses.mode == GameMode.DAILY_CHALLENGE) {
+            appGraph.dailyChallengeRepository.saveChallengeResult(
+                Clock.System.now().toEpochMilliseconds() / GameConstants.MILLIS_IN_DAY,
+                bonuses.score,
+                _state.value.elapsedTimeSeconds,
+                bonuses.moves,
+            )
         }
     }
 

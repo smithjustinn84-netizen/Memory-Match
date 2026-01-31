@@ -33,7 +33,7 @@ class SaveGameResultUseCaseTest {
             everySuspend { statsRepository.updateStats(any()) } returns Unit
             everySuspend { leaderboardRepository.addEntry(any()) } returns Unit
 
-            useCase(pairCount, score, time, moves, GameMode.STANDARD)
+            useCase(pairCount, score, time, moves, GameMode.TIME_ATTACK)
 
             verifySuspend {
                 statsRepository.updateStats(GameStats(pairCount, score, time))
@@ -54,7 +54,7 @@ class SaveGameResultUseCaseTest {
             everySuspend { statsRepository.updateStats(any()) } returns Unit
             everySuspend { leaderboardRepository.addEntry(any()) } returns Unit
 
-            useCase(pairCount, score, time, moves, GameMode.STANDARD)
+            useCase(pairCount, score, time, moves, GameMode.TIME_ATTACK)
 
             verifySuspend {
                 statsRepository.updateStats(GameStats(pairCount, 100, 50L))
@@ -65,6 +65,6 @@ class SaveGameResultUseCaseTest {
     fun testInvoke_error() =
         runTest {
             everySuspend { statsRepository.getStatsForDifficulty(any()) } throws RuntimeException("Error")
-            useCase(8, 100, 60L, 20, GameMode.STANDARD)
+            useCase(8, 100, 60L, 20, GameMode.TIME_ATTACK)
         }
 }

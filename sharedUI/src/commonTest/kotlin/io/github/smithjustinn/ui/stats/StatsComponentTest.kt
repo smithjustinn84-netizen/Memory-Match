@@ -28,7 +28,7 @@ class StatsComponentTest : BaseComponentTest() {
 
             component.state.test {
                 val state = awaitItem()
-                assertEquals(GameMode.STANDARD, state.selectedGameMode)
+                assertEquals(GameMode.TIME_ATTACK, state.selectedGameMode)
                 assertEquals(
                     io.github.smithjustinn.domain.models.DifficultyLevel.defaultLevels.size,
                     state.difficultyLeaderboards.size,
@@ -44,9 +44,9 @@ class StatsComponentTest : BaseComponentTest() {
 
             component.state.test {
                 awaitItem() // Initial state
-                component.onGameModeSelected(GameMode.TIME_ATTACK)
+                component.onGameModeSelected(GameMode.DAILY_CHALLENGE)
                 val newState = awaitItem()
-                assertEquals(GameMode.TIME_ATTACK, newState.selectedGameMode)
+                assertEquals(GameMode.DAILY_CHALLENGE, newState.selectedGameMode)
             }
         }
 }

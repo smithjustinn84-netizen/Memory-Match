@@ -48,11 +48,24 @@ import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.ScoreBreakdown
 import io.github.smithjustinn.resources.Res
+import io.github.smithjustinn.resources.best_score_label
 import io.github.smithjustinn.resources.busted
+import io.github.smithjustinn.resources.casino_header_title
+import io.github.smithjustinn.resources.circuit_completed
 import io.github.smithjustinn.resources.game_complete
 import io.github.smithjustinn.resources.game_over
+import io.github.smithjustinn.resources.`high_roller_suite`
+import io.github.smithjustinn.resources.moves_label
 import io.github.smithjustinn.resources.play_again
+import io.github.smithjustinn.resources.score_combo_bonus_label
+import io.github.smithjustinn.resources.score_double_down
+import io.github.smithjustinn.resources.score_match_points_label
+import io.github.smithjustinn.resources.score_move_efficiency
+import io.github.smithjustinn.resources.score_time_bonus
+import io.github.smithjustinn.resources.share_receipt
+import io.github.smithjustinn.resources.time_label
 import io.github.smithjustinn.resources.times_up
+import io.github.smithjustinn.resources.total_payout
 import io.github.smithjustinn.ui.components.AppIcons
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
@@ -84,13 +97,14 @@ fun ResultsCard(
     onPlayAgain: () -> Unit,
     onShareReplay: () -> Unit = {},
     modifier: Modifier = Modifier,
-    mode: GameMode = GameMode.STANDARD,
+    mode: GameMode = GameMode.TIME_ATTACK,
     onScoreTick: () -> Unit = {},
 ) {
     val isTimeAttack = mode == GameMode.TIME_ATTACK
     val titleRes =
         when {
             isBusted -> Res.string.busted
+            isWon && mode == GameMode.HIGH_ROLLER -> Res.string.game_complete
             isWon -> Res.string.game_complete
             isTimeAttack -> Res.string.times_up
             else -> Res.string.game_over
@@ -112,6 +126,7 @@ fun ResultsCard(
             highScore = highScore,
             titleRes = titleRes,
             isWon = isWon,
+            mode = mode,
             scoreBreakdown = scoreBreakdown,
             moves = moves,
             elapsedTimeSeconds = elapsedTimeSeconds,
@@ -129,6 +144,7 @@ private fun ResultsCardContent(
     highScore: Int,
     titleRes: org.jetbrains.compose.resources.StringResource,
     isWon: Boolean,
+    mode: GameMode,
     scoreBreakdown: ScoreBreakdown,
     moves: Int,
     elapsedTimeSeconds: Long,
@@ -157,7 +173,7 @@ private fun ResultsCardContent(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                CasinoHeader(titleRes, isWon)
+                CasinoHeader(titleRes, isWon, mode)
                 ReceiptDivider()
                 PayoutSection(scoreBreakdown, moves, elapsedTimeSeconds)
                 ReceiptDivider()
@@ -174,6 +190,7 @@ private fun ResultsCardContent(
 private fun CasinoHeader(
     titleRes: org.jetbrains.compose.resources.StringResource,
     isWon: Boolean,
+    mode: GameMode,
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(
@@ -184,7 +201,7 @@ private fun CasinoHeader(
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "MEMORY MATCH CASINO",
+            text = stringResource(Res.string.casino_header_title),
             style =
                 MaterialTheme.typography.labelMedium.copy(
                     fontFamily = FontFamily.Monospace,
@@ -195,7 +212,14 @@ private fun CasinoHeader(
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = stringResource(titleRes).uppercase(),
+            text =
+                if (isWon &&
+                    mode == GameMode.HIGH_ROLLER
+                ) {
+                    stringResource(Res.string.circuit_completed)
+                } else {
+                    stringResource(titleRes).uppercase()
+                },
             style =
                 MaterialTheme.typography.headlineMedium.copy(
                     fontFamily = FontFamily.Monospace,
@@ -205,7 +229,7 @@ private fun CasinoHeader(
             textAlign = TextAlign.Center,
         )
         Text(
-            text = "HIGH ROLLER SUITE",
+            text = stringResource(Res.string.high_roller_suite),
             style =
                 MaterialTheme.typography.labelSmall.copy(
                     fontFamily = FontFamily.Monospace,
@@ -223,15 +247,15 @@ private fun PayoutSection(
     elapsedTimeSeconds: Long,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        PayoutRow("Base Match Pts", scoreBreakdown.basePoints)
+        PayoutRow(stringResource(Res.string.score_match_points_label), scoreBreakdown.basePoints)
         if (scoreBreakdown.comboBonus > 0) {
-            PayoutRow("Combo Bonus", scoreBreakdown.comboBonus)
+            PayoutRow(stringResource(Res.string.score_combo_bonus_label), scoreBreakdown.comboBonus)
         }
         if (scoreBreakdown.doubleDownBonus > 0) {
-            PayoutRow("Double Or Nothing", scoreBreakdown.doubleDownBonus)
+            PayoutRow(stringResource(Res.string.score_double_down), scoreBreakdown.doubleDownBonus)
         }
-        PayoutRow("Time Bonus", scoreBreakdown.timeBonus)
-        PayoutRow("Move Efficiency", scoreBreakdown.moveBonus)
+        PayoutRow(stringResource(Res.string.score_time_bonus), scoreBreakdown.timeBonus)
+        PayoutRow(stringResource(Res.string.score_move_efficiency), scoreBreakdown.moveBonus)
 
         ReceiptDottedLine()
 
@@ -240,12 +264,12 @@ private fun PayoutSection(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
-                text = "MOVES: $moves",
+                text = stringResource(Res.string.moves_label, moves).uppercase(),
                 style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
                 color = ReceiptInkColor.copy(alpha = 0.7f),
             )
             Text(
-                text = "TIME: ${formatTime(elapsedTimeSeconds)}",
+                text = stringResource(Res.string.time_label, formatTime(elapsedTimeSeconds)).uppercase(),
                 style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
                 color = ReceiptInkColor.copy(alpha = 0.7f),
             )
@@ -263,7 +287,7 @@ private fun TotalPayout(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = "TOTAL PAYOUT",
+            text = stringResource(Res.string.total_payout),
             style =
                 MaterialTheme.typography.titleMedium.copy(
                     fontFamily = FontFamily.Monospace,
@@ -283,7 +307,7 @@ private fun TotalPayout(
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "HIGH SCORE: $highScore",
+            text = stringResource(Res.string.best_score_label, highScore).uppercase(),
             style =
                 MaterialTheme.typography.labelMedium.copy(
                     fontFamily = FontFamily.Monospace,
@@ -377,7 +401,7 @@ private fun ResultsActions(
         shape = RoundedCornerShape(2.dp),
     ) {
         Text(
-            text = "SHARE RECEIPT",
+            text = stringResource(Res.string.share_receipt),
             style =
                 MaterialTheme.typography.labelLarge.copy(
                     fontFamily = FontFamily.Monospace,

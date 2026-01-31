@@ -1,6 +1,7 @@
 package io.github.smithjustinn.di
 
 import co.touchlab.kermit.Logger
+import io.github.smithjustinn.data.local.AppDatabase
 import io.github.smithjustinn.domain.repositories.GameStateRepository
 import io.github.smithjustinn.domain.repositories.GameStatsRepository
 import io.github.smithjustinn.domain.repositories.LeaderboardRepository
@@ -29,6 +30,8 @@ class KoinAppGraph :
     override val hapticsService: HapticsService by inject()
     override val coroutineDispatchers: CoroutineDispatchers by inject()
     override val applicationScope: CoroutineScope by inject()
+
+    override val appDatabase: AppDatabase by inject()
 
     override val gameStateRepository: GameStateRepository by inject()
     override val settingsRepository: SettingsRepository by inject()

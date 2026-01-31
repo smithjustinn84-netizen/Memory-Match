@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 enum class GameMode {
-    STANDARD,
     TIME_ATTACK,
     DAILY_CHALLENGE,
+    HIGH_ROLLER,
 }

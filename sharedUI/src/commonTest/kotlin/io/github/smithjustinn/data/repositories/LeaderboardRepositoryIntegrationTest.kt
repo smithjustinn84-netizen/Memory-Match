@@ -36,7 +36,7 @@ class LeaderboardRepositoryIntegrationTest {
     fun getTopEntries_emitsUpdates() =
         runTest {
             val pairCount = 8
-            val gameMode = GameMode.STANDARD
+            val gameMode = GameMode.TIME_ATTACK
             val entry1 =
                 LeaderboardEntry(
                     pairCount = pairCount,

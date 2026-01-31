@@ -40,7 +40,7 @@ class GameStateRepositoryIntegrationTest {
             val gameState =
                 MemoryGameState(
                     pairCount = 8,
-                    mode = GameMode.STANDARD,
+                    mode = GameMode.TIME_ATTACK,
                 )
             val elapsedTime = 120L
 
@@ -56,7 +56,7 @@ class GameStateRepositoryIntegrationTest {
     @Test
     fun clearGameState() =
         runTest {
-            val gameState = MemoryGameState(pairCount = 8, mode = GameMode.STANDARD)
+            val gameState = MemoryGameState(pairCount = 8, mode = GameMode.TIME_ATTACK)
             repository.saveGameState(gameState, 100L)
 
             repository.clearSavedGameState()

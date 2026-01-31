@@ -29,7 +29,7 @@ class GameComponentTest : BaseComponentTest() {
     private fun createComponent(
         lifecycle: Lifecycle,
         pairCount: Int = 8,
-        mode: GameMode = GameMode.STANDARD,
+        mode: GameMode = GameMode.TIME_ATTACK,
         forceNewGame: Boolean = true,
     ): DefaultGameComponent =
         DefaultGameComponent(
@@ -51,14 +51,14 @@ class GameComponentTest : BaseComponentTest() {
 
             val state = component.state.value
             assertEquals(8, state.game.pairCount)
-            assertEquals(GameMode.STANDARD, state.game.mode)
+            assertEquals(GameMode.TIME_ATTACK, state.game.mode)
             assertFalse(state.isPeeking)
         }
 
     @Test
     fun `resumes saved game if available and valid`() =
         runTest { lifecycle ->
-            val savedGame = MemoryGameState(pairCount = 8, mode = GameMode.STANDARD)
+            val savedGame = MemoryGameState(pairCount = 8, mode = GameMode.TIME_ATTACK)
             everySuspend { context.gameStateRepository.getSavedGameState() } returns
                 (savedGame to 100L)
 
@@ -78,7 +78,7 @@ class GameComponentTest : BaseComponentTest() {
             val savedGame =
                 MemoryGameState(
                     pairCount = 8,
-                    mode = GameMode.STANDARD,
+                    mode = GameMode.TIME_ATTACK,
                     cards = (listOf(card1, card2) + otherCards).toImmutableList(),
                 )
 
@@ -100,9 +100,9 @@ class GameComponentTest : BaseComponentTest() {
         }
 
     @Test
-    fun `timer ticks in Standard mode after initializing`() =
+    fun `timer ticks in Time Attack mode after initializing`() =
         runTest { lifecycle ->
-            component = createComponent(lifecycle, mode = GameMode.STANDARD)
+            component = createComponent(lifecycle)
             testDispatcher.scheduler.runCurrent()
             testDispatcher.scheduler.advanceTimeBy(50L) // Account for initialization delay
             testDispatcher.scheduler.runCurrent()
@@ -139,7 +139,7 @@ class GameComponentTest : BaseComponentTest() {
         runTest { lifecycle ->
             every { context.settingsRepository.isPeekEnabled } returns MutableStateFlow(true)
 
-            component = createComponent(lifecycle, mode = GameMode.STANDARD)
+            component = createComponent(lifecycle)
             testDispatcher.scheduler.runCurrent()
             testDispatcher.scheduler.advanceTimeBy(50L) // Account for initialization delay
             testDispatcher.scheduler.runCurrent()
@@ -184,7 +184,7 @@ class GameComponentTest : BaseComponentTest() {
             val gameWithCombo =
                 MemoryGameState(
                     pairCount = 8,
-                    mode = GameMode.STANDARD,
+                    mode = GameMode.TIME_ATTACK,
                     cards = cards.toImmutableList(),
                     // High multiplier
                     comboMultiplier = 3,

@@ -16,6 +16,7 @@ import androidx.sqlite.execSQL
         GameStateEntity::class,
         SettingsEntity::class,
         DailyChallengeEntity::class,
+        CircuitStatsEntity::class,
     ],
     version = AppDatabase.DATABASE_VERSION,
 )
@@ -32,8 +33,10 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun dailyChallengeDao(): DailyChallengeDao
 
+    abstract fun circuitStatsDao(): CircuitStatsDao
+
     companion object {
-        const val DATABASE_VERSION = 7
+        const val DATABASE_VERSION = 8
         private const val VERSION_1 = 1
         private const val VERSION_2 = 2
         private const val VERSION_3 = 3
@@ -41,6 +44,7 @@ abstract class AppDatabase : RoomDatabase() {
         private const val VERSION_5 = 5
         private const val VERSION_6 = 6
         private const val VERSION_7 = 7
+        private const val VERSION_8 = 8
 
         val MIGRATION_1_2 =
             object : Migration(VERSION_1, VERSION_2) {
@@ -98,6 +102,22 @@ abstract class AppDatabase : RoomDatabase() {
                             "timeSeconds INTEGER NOT NULL, " +
                             "moves INTEGER NOT NULL, " +
                             "PRIMARY KEY(date))",
+                    )
+                }
+            }
+
+        val MIGRATION_7_8 =
+            object : Migration(VERSION_7, VERSION_8) {
+                override fun migrate(connection: SQLiteConnection) {
+                    connection.execSQL(
+                        "CREATE TABLE IF NOT EXISTS circuit_stats " +
+                            "(runId TEXT NOT NULL, " +
+                            "currentStageId INTEGER NOT NULL, " +
+                            "bankedScore INTEGER NOT NULL, " +
+                            "currentWager INTEGER NOT NULL, " +
+                            "timestamp INTEGER NOT NULL, " +
+                            "isActive INTEGER NOT NULL DEFAULT 1, " +
+                            "PRIMARY KEY(runId))",
                     )
                 }
             }

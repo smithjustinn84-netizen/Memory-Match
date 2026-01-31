@@ -12,5 +12,5 @@ data class LeaderboardEntry(
     val timeSeconds: Long,
     val moves: Int,
     val timestamp: Instant,
-    val gameMode: GameMode = GameMode.STANDARD,
+    val gameMode: GameMode = GameMode.TIME_ATTACK,
 )

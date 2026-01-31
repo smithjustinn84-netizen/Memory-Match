@@ -4,7 +4,7 @@ import io.github.smithjustinn.domain.models.GameMode
 
 data class GameTopBarState(
     val time: Long,
-    val mode: GameMode = GameMode.STANDARD,
+    val mode: GameMode = GameMode.TIME_ATTACK,
     val maxTime: Long = 0,
     val showTimeGain: Boolean = false,
     val timeGainAmount: Int = 0,
@@ -16,6 +16,8 @@ data class GameTopBarState(
     val isLowTime: Boolean = false,
     val isCriticalTime: Boolean = false,
     val score: Int = 0,
+    val bankedScore: Int = 0,
+    val currentPot: Int = 0,
     val isHeatMode: Boolean = false,
 ) {
     companion object {

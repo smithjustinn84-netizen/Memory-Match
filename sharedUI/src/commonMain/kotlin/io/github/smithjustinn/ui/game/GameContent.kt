@@ -31,6 +31,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.di.LocalAppGraph
 import io.github.smithjustinn.domain.models.GameMode
+import io.github.smithjustinn.resources.Res
+import io.github.smithjustinn.resources.game_double_or_nothing
 import io.github.smithjustinn.services.AudioService
 import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.components.AdaptiveDensity
@@ -48,6 +50,7 @@ import io.github.smithjustinn.ui.game.components.SteamEffect
 import io.github.smithjustinn.ui.game.components.WalkthroughOverlay
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 
 private const val SHAKE_RESET_OFFSET = 0f
 private const val STEAM_DURATION_MS = 1200
@@ -229,6 +232,8 @@ private fun GameMainScreen(
                             state.game.mode == GameMode.TIME_ATTACK &&
                                 state.elapsedTimeSeconds <= GameTopBarState.CRITICAL_TIME_THRESHOLD_SEC,
                         score = state.game.score,
+                        bankedScore = state.game.bankedScore,
+                        currentPot = state.game.currentPot,
                         isHeatMode = state.isHeatMode,
                     ),
                 onBackClick = {
@@ -354,7 +359,7 @@ private fun BoxScope.DoubleDownButton(onDoubleDown: () -> Unit) {
             ),
     ) {
         Text(
-            text = "DOUBLE OR NOTHING",
+            text = stringResource(Res.string.game_double_or_nothing),
             style = PokerTheme.typography.labelMedium,
             fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
         )

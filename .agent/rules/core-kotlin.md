@@ -7,6 +7,10 @@ globs: ["**/*.kt"]
 
 All Kotlin code must adhere to 2026 standards.
 
+## 🚫 Imports
+
+- **No Wildcard Imports**: Never use wildcard imports (`import package.*`). Always use explicit imports for clarity and to prevent namespace pollution.
+
 ## Context Parameters
 ```kotlin
 // ✅ DO
