@@ -6,6 +6,7 @@ import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
+import com.arkivanov.decompose.router.stack.popWhile
 import com.arkivanov.decompose.value.Value
 import io.github.smithjustinn.di.AppGraph
 import io.github.smithjustinn.domain.models.GameMode
@@ -181,7 +182,9 @@ class DefaultRootComponent(
                     ),
                 )
             },
-            onBackClicked = navigation::pop,
+            onBackClicked = {
+                navigation.popWhile { it != Config.Start }
+            },
         )
 
     private fun createSettingsComponent(componentContext: ComponentContext): SettingsComponent =

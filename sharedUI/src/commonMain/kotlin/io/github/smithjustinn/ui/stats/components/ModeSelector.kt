@@ -24,7 +24,7 @@ fun ModeSelector(
     onModeSelected: (GameMode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val modes = listOf(GameMode.TIME_ATTACK)
+    val modes = listOf(GameMode.TIME_ATTACK, GameMode.HIGH_ROLLER)
 
     Column(
         modifier = modifier,

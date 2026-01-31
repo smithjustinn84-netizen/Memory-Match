@@ -38,7 +38,6 @@ import io.github.smithjustinn.di.LocalAppGraph
 import io.github.smithjustinn.domain.models.DifficultyLevel
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.resources.Res
-import io.github.smithjustinn.resources.high_roller_circuit
 import io.github.smithjustinn.services.AudioService
 import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.components.AppCard
@@ -259,6 +258,7 @@ private fun StartMainContent(
             DifficultySelectionSection(
                 state = state,
                 onDifficultySelected = onDifficultySelected,
+                onModeSelected = onModeSelected,
                 onStartGame = onStartGame,
                 onResumeGame = onResumeGame,
             )
@@ -266,15 +266,6 @@ private fun StartMainContent(
 
         Spacer(modifier = Modifier.height(spacing.medium))
 
-        // High Roller Circuit Entry
-        PokerButton(
-            text = stringResource(Res.string.high_roller_circuit),
-            onClick = { onModeSelected(GameMode.HIGH_ROLLER) },
-            modifier = Modifier.widthIn(max = 300.dp),
-            isPrimary = false,
-            applyGlimmer = true,
-            trailingIcon = AppIcons.Trophy,
-        )
 
         Spacer(modifier = Modifier.weight(1f))
 

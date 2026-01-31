@@ -37,6 +37,7 @@ class GameComponentTest : BaseComponentTest() {
             appGraph = context.appGraph,
             args = GameArgs(pairCount, mode, forceNewGame),
             onBackClicked = {},
+            onCycleStage = { _, _ -> },
         )
 
     @Test

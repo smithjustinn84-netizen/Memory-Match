@@ -409,4 +409,8 @@ class DefaultGameComponent(
             _events.tryEmit(GameUiEvent.VibrateHeat)
         }
     }
+
+    override fun onCycleStage(nextStage: CircuitStage, bankedScore: Int) {
+        onCycleStage.invoke(nextStage, bankedScore)
+    }
 }

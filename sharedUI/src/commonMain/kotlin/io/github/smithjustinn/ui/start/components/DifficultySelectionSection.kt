@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.domain.models.DifficultyLevel
 import io.github.smithjustinn.resources.Res
 import io.github.smithjustinn.resources.resume_game
@@ -27,6 +28,9 @@ import io.github.smithjustinn.ui.components.PokerChip
 import io.github.smithjustinn.ui.start.DifficultyState
 import org.jetbrains.compose.resources.stringResource
 
+import io.github.smithjustinn.ui.stats.components.ModeSelector
+import io.github.smithjustinn.domain.models.GameMode
+
 /**
  * DifficultySelectionSection
  */
@@ -34,6 +38,7 @@ import org.jetbrains.compose.resources.stringResource
 fun DifficultySelectionSection(
     state: DifficultyState,
     onDifficultySelected: (DifficultyLevel) -> Unit,
+    onModeSelected: (GameMode) -> Unit,
     onStartGame: () -> Unit,
     onResumeGame: () -> Unit,
     modifier: Modifier = Modifier,
@@ -46,6 +51,12 @@ fun DifficultySelectionSection(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(PokerTheme.spacing.medium),
         ) {
+            ModeSelector(
+                selectedMode = state.selectedMode,
+                onModeSelected = onModeSelected,
+                modifier = Modifier.fillMaxWidth(),
+            )
+
             DifficultySelector(state, onDifficultySelected)
         }
 
@@ -64,7 +75,16 @@ private fun DifficultySelector(
     state: DifficultyState,
     onDifficultySelected: (DifficultyLevel) -> Unit,
 ) {
-    AppCard(title = stringResource(Res.string.select_difficulty)) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(
+            text = stringResource(Res.string.select_difficulty),
+            style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+        )
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly,
