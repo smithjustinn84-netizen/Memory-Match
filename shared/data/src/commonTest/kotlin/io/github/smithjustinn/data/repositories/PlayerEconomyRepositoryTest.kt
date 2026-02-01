@@ -15,6 +15,8 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import io.github.smithjustinn.domain.models.CardBackTheme
+
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PlayerEconomyRepositoryTest {
@@ -65,28 +67,38 @@ class PlayerEconomyRepositoryTest {
     fun deductCurrency_withSufficientFunds_decreasesBalance() =
         runTest(testDispatcher) {
             val repository = createRepository(backgroundScope)
-            repository.addCurrency(100L)
-
             repository.balance.test {
+
+                assertEquals(0L, awaitItem())
+                
+                repository.addCurrency(100L)
                 assertEquals(100L, awaitItem())
+                
                 val result = repository.deductCurrency(40L)
                 assertTrue(result)
                 assertEquals(60L, awaitItem())
             }
+
+
         }
 
     @Test
     fun deductCurrency_withInsufficientFunds_returnsFalseAndDoesNotChangeBalance() =
         runTest(testDispatcher) {
             val repository = createRepository(backgroundScope)
-            repository.addCurrency(50L)
-
             repository.balance.test {
+
+                assertEquals(0L, awaitItem())
+                
+                repository.addCurrency(50L)
                 assertEquals(50L, awaitItem())
+                
                 val result = repository.deductCurrency(100L)
                 assertFalse(result)
                 expectNoEvents()
             }
+
+
         }
 
     @Test
@@ -108,13 +120,18 @@ class PlayerEconomyRepositoryTest {
     fun unlockItem_alreadyUnlockedItem_doesNotDuplicate() =
         runTest(testDispatcher) {
             val repository = createRepository(backgroundScope)
-            repository.unlockItem("item_1")
-
             repository.unlockedItemIds.test {
-                assertEquals(1, awaitItem().size)
+
+                assertTrue(awaitItem().isEmpty())
+                
+                repository.unlockItem("item_1")
+                assertTrue(awaitItem().contains("item_1"))
+                
                 repository.unlockItem("item_1")
                 expectNoEvents()
             }
+
+
         }
 
     @Test
@@ -126,4 +143,46 @@ class PlayerEconomyRepositoryTest {
             repository.unlockItem("item_1")
             assertTrue(repository.isItemUnlocked("item_1"))
         }
+
+    @Test
+    fun persistenceAcrossInstances_preservesBalanceAndItems() =
+        runTest(testDispatcher) {
+            // First instance
+            val repo1 = createRepository(backgroundScope)
+            repo1.addCurrency(200L)
+            repo1.unlockItem("perm_item_1")
+
+            // Second instance (app "restart")
+            val repo2 = createRepository(backgroundScope)
+            repo2.balance.test {
+                // Skip initial value 0L if it appears first, otherwise expect 200L
+                val first = awaitItem()
+                if (first == 0L) {
+                    assertEquals(200L, awaitItem())
+                } else {
+                    assertEquals(200L, first)
+                }
+            }
+            assertTrue(repo2.isItemUnlocked("perm_item_1"))
+        }
+
+    @Test
+    fun themeSelectionPersistence_preservesSelectedTheme() =
+        runTest(testDispatcher) {
+            val repo1 = createRepository(backgroundScope)
+            repo1.selectTheme(CardBackTheme.CLASSIC.name)
+
+            // Second instance
+            val repo2 = createRepository(backgroundScope)
+            repo2.selectedTheme.test {
+                val first = awaitItem()
+                if (first == CardBackTheme.GEOMETRIC) {
+                    assertEquals(CardBackTheme.CLASSIC, awaitItem())
+                } else {
+                    assertEquals(CardBackTheme.CLASSIC, first)
+                }
+            }
+        }
 }
+
+
