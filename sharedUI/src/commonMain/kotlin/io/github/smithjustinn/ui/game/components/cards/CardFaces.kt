@@ -47,7 +47,7 @@ internal fun CardFace(
 }
 
 @Composable
-private fun ClassicCardFace(
+internal fun ClassicCardFace(
     rank: Rank,
     suit: Suit,
     suitColor: Color,
@@ -115,7 +115,7 @@ private fun ClassicCardFace(
 }
 
 @Composable
-private fun MinimalCardFace(
+internal fun MinimalCardFace(
     rank: Rank,
     suit: Suit,
     suitColor: Color,
@@ -156,7 +156,7 @@ private fun MinimalCardFace(
 }
 
 @Composable
-private fun TextOnlyCardFace(
+internal fun TextOnlyCardFace(
     rank: Rank,
     suit: Suit,
     suitColor: Color,
@@ -190,7 +190,7 @@ private fun TextOnlyCardFace(
 }
 
 @Composable
-private fun PokerCardFace(
+internal fun PokerCardFace(
     rank: Rank,
     suit: Suit,
     suitColor: Color,

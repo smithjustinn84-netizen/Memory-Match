@@ -63,7 +63,6 @@ import io.github.smithjustinn.resources.share_receipt
 import io.github.smithjustinn.resources.time_label
 import io.github.smithjustinn.resources.times_up
 import io.github.smithjustinn.resources.total_payout
-import io.github.smithjustinn.ui.components.AppIcons
 import io.github.smithjustinn.ui.components.ShopIcons
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt

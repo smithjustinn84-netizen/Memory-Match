@@ -33,11 +33,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.domain.models.ShopItem
+import io.github.smithjustinn.domain.models.ShopItemType
 import io.github.smithjustinn.theme.PokerTheme
+import io.github.smithjustinn.ui.assets.AssetProvider
 import io.github.smithjustinn.ui.components.AppCard
 import io.github.smithjustinn.ui.components.AppIcons
-import io.github.smithjustinn.ui.components.ShopIcons
 import io.github.smithjustinn.ui.components.AuroraEffect
+import io.github.smithjustinn.ui.components.ShopIcons
 import io.github.smithjustinn.ui.components.pokerBackground
 
 @Composable
@@ -162,8 +164,8 @@ private fun ShopItemsGrid(
         items(state.items) { item ->
             val isEquipped =
                 when (item.type) {
-                    io.github.smithjustinn.domain.models.ShopItemType.THEME -> item.id == state.activeThemeId
-                    io.github.smithjustinn.domain.models.ShopItemType.CARD_SKIN -> item.id == state.activeSkinId
+                    ShopItemType.THEME -> item.id == state.activeThemeId
+                    ShopItemType.CARD_SKIN -> item.id == state.activeSkinId
                     else -> false
                 }
 
@@ -208,6 +210,16 @@ fun ShopItemCard(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             ShopItemHeader(item.name, isEquipped)
+
+            // Visual preview for themes and skins
+            if (item.type == ShopItemType.THEME ||
+                item.type == ShopItemType.CARD_SKIN
+            ) {
+                AssetProvider.CardPreview(
+                    shopItemId = item.id,
+                    modifier = Modifier.fillMaxWidth().height(120.dp),
+                )
+            }
 
             Text(
                 text = item.description,

@@ -1,0 +1,110 @@
+package io.github.smithjustinn.ui.assets
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
+import io.github.smithjustinn.domain.models.CardBackTheme
+import io.github.smithjustinn.domain.models.CardSymbolTheme
+import io.github.smithjustinn.domain.models.Rank
+import io.github.smithjustinn.domain.models.Suit
+import io.github.smithjustinn.theme.PokerTheme
+import io.github.smithjustinn.ui.game.components.cards.CardBack
+import io.github.smithjustinn.ui.game.components.cards.CardFace
+import io.github.smithjustinn.ui.game.components.grid.CARD_ASPECT_RATIO
+
+/**
+ * AssetProvider provides Composable previews for shop items.
+ * Maps shopItemId strings to their visual representations.
+ */
+object AssetProvider {
+    /**
+     * Resolves a CardBackTheme from a shop item ID.
+     */
+    fun getBackTheme(id: String): CardBackTheme? = CardBackTheme.entries.firstOrNull { it.id == id }
+
+    /**
+     * Resolves a CardSymbolTheme from a shop item ID.
+     */
+    fun getSymbolTheme(id: String): CardSymbolTheme? = CardSymbolTheme.entries.firstOrNull { it.id == id }
+
+    /**
+     * Renders a preview of a card asset based on the shop item ID.
+     * - For card back themes: Shows the back pattern
+     * - For card skins: Shows an Ace of Spades in that style
+     */
+    @Composable
+    fun CardPreview(
+        shopItemId: String,
+        modifier: Modifier = Modifier,
+    ) {
+        val backTheme = getBackTheme(shopItemId)
+        val symbolTheme = getSymbolTheme(shopItemId)
+
+        Box(
+            modifier =
+                modifier
+                    .aspectRatio(CARD_ASPECT_RATIO)
+                    .padding(8.dp),
+        ) {
+            when {
+                backTheme != null -> {
+                    // Render card back preview
+                    CardBackPreview(
+                        theme = backTheme,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
+                symbolTheme != null -> {
+                    // Render card face preview (Ace of Spades)
+                    CardFacePreview(
+                        theme = symbolTheme,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
+                else -> {
+                    // Unknown ID - render empty box
+                    Box(modifier = Modifier.fillMaxSize())
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun CardBackPreview(
+        theme: CardBackTheme,
+        modifier: Modifier = Modifier,
+    ) {
+        val backColor = PokerTheme.colors.primary
+        BoxWithConstraints(modifier = modifier) {
+            CardBack(
+                theme = theme,
+                backColor = backColor,
+                rotation = 0f,
+            )
+        }
+    }
+
+    @Composable
+    private fun CardFacePreview(
+        theme: CardSymbolTheme,
+        modifier: Modifier = Modifier,
+    ) {
+        val suitColor = Color.Black // Spades is black
+
+        BoxWithConstraints(modifier = modifier) {
+            CardFace(
+                rank = Rank.Ace,
+                suit = Suit.Spades,
+                suitColor = suitColor,
+                theme = theme,
+            )
+        }
+    }
+}

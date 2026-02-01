@@ -112,7 +112,7 @@ internal fun ShimmerEffect() {
 }
 
 @Composable
-private fun GeometricCardBack(baseColor: Color) {
+internal fun GeometricCardBack(baseColor: Color) {
     val patternColor = Color.White.copy(alpha = LOW_ALPHA)
     Canvas(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp))) {
         drawRect(baseColor)
@@ -149,7 +149,7 @@ private fun GeometricCardBack(baseColor: Color) {
 }
 
 @Composable
-private fun ClassicCardBack(baseColor: Color) {
+internal fun ClassicCardBack(baseColor: Color) {
     Canvas(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp))) {
         drawRect(baseColor)
 
@@ -184,7 +184,7 @@ private fun ClassicCardBack(baseColor: Color) {
 }
 
 @Composable
-private fun PatternCardBack(baseColor: Color) {
+internal fun PatternCardBack(baseColor: Color) {
     Canvas(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp))) {
         drawRect(baseColor)
 
@@ -227,7 +227,7 @@ private fun PatternCardBack(baseColor: Color) {
 }
 
 @Composable
-private fun PokerCardBack(baseColor: Color) {
+internal fun PokerCardBack(baseColor: Color) {
     Canvas(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp))) {
         // White Border usually
         drawRect(Color.White)

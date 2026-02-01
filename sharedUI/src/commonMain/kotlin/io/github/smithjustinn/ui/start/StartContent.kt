@@ -41,8 +41,8 @@ import io.github.smithjustinn.services.AudioService
 import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.components.AppCard
 import io.github.smithjustinn.ui.components.AppIcons
-import io.github.smithjustinn.ui.components.ShopIcons
 import io.github.smithjustinn.ui.components.AuroraEffect
+import io.github.smithjustinn.ui.components.ShopIcons
 import io.github.smithjustinn.ui.components.pokerBackground
 import io.github.smithjustinn.ui.components.rememberGlimmerBrush
 import io.github.smithjustinn.ui.start.components.DifficultySelectionSection

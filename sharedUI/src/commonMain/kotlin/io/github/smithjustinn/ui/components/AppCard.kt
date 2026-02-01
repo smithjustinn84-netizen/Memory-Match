@@ -30,10 +30,11 @@ fun AppCard(
         modifier = modifier.fillMaxWidth(),
         shape = shapes.medium,
         color = backgroundColor,
-        border = border ?: BorderStroke(
-            width = 1.dp,
-            color = colors.goldenYellow.copy(alpha = 0.2f), // Brass-like inlay border
-        ),
+        border =
+            border ?: BorderStroke(
+                width = 1.dp,
+                color = colors.goldenYellow.copy(alpha = 0.2f), // Brass-like inlay border
+            ),
     ) {
         Column(modifier = Modifier.padding(spacing.medium)) {
             if (title != null) {

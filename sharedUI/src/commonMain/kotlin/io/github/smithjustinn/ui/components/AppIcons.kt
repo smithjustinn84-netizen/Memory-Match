@@ -11,7 +11,6 @@ import androidx.compose.ui.unit.dp
 
 @Suppress("ktlint:standard:backing-property-naming", "MagicNumber", "LongMethod", "LargeClass")
 object AppIcons {
-
     private var _arrowBack: ImageVector? = null
     val ArrowBack: ImageVector
         get() {
@@ -491,7 +490,6 @@ object AppIcons {
                 }.build()
                 .also { _swapHoriz = it }
         }
-
 }
 
 object ShopIcons {
