@@ -468,4 +468,96 @@ object AppIcons {
                 }.build()
                 .also { _share = it }
         }
+
+    private var _visibilityOff: ImageVector? = null
+    val VisibilityOff: ImageVector
+        get() {
+            _visibilityOff?.let { return it }
+            return ImageVector
+                .Builder(
+                    name = "VisibilityOff",
+                    defaultWidth = 24.0.dp,
+                    defaultHeight = 24.0.dp,
+                    viewportWidth = 24.0f,
+                    viewportHeight = 24.0f,
+                ).apply {
+                    path(fill = SolidColor(Color.Black)) {
+                        moveTo(12.0f, 7.0f)
+                        curveToRelative(2.76f, 0.0f, 5.0f, 2.24f, 5.0f, 5.0f)
+                        curveToRelative(0.0f, 0.65f, -0.13f, 1.26f, -0.36f, 1.81f)
+                        lineToRelative(2.42f, 2.42f)
+                        curveTo(20.44f, 14.96f, 21.37f, 13.59f, 22.0f, 12.0f)
+                        curveToRelative(-1.73f, -4.39f, -6.0f, -7.5f, -11.0f, -7.5f)
+                        curveToRelative(-1.27f, 0.0f, -2.48f, 0.2f, -3.61f, 0.57f)
+                        lineToRelative(2.13f, 2.13f)
+                        curveTo(10.3f, 7.07f, 11.12f, 7.0f, 12.0f, 7.0f)
+                        close()
+                        moveTo(2.0f, 4.27f)
+                        lineToRelative(2.28f, 2.28f)
+                        lineToRelative(0.46f, 0.46f)
+                        curveTo(3.26f, 8.44f, 2.13f, 10.09f, 1.11f, 12.0f)
+                        curveToRelative(1.73f, 4.39f, 6.0f, 7.5f, 11.0f, 7.5f)
+                        curveToRelative(1.55f, 0.0f, 3.03f, -0.3f, 4.38f, -0.84f)
+                        lineToRelative(0.42f, 0.42f)
+                        lineTo(19.73f, 22.0f)
+                        lineTo(21.0f, 20.73f)
+                        lineTo(3.27f, 3.0f)
+                        lineTo(2.0f, 4.27f)
+                        close()
+                        moveTo(7.53f, 9.8f)
+                        lineToRelative(1.55f, 1.55f)
+                        curveTo(9.03f, 11.49f, 9.0f, 11.74f, 9.0f, 12.0f)
+                        curveToRelative(0.0f, 1.66f, 1.34f, 3.0f, 3.0f, 3.0f)
+                        curveToRelative(0.26f, 0.0f, 0.51f, -0.03f, 0.65f, -0.08f)
+                        lineToRelative(1.55f, 1.55f)
+                        curveToRelative(-0.67f, 0.33f, -1.41f, 0.53f, -2.2f, 0.53f)
+                        curveToRelative(-2.76f, 0.0f, -5.0f, -2.24f, -5.0f, -5.0f)
+                        curveToRelative(0.0f, -0.79f, 0.2f, -1.53f, 0.53f, -2.2f)
+                        close()
+                        moveTo(11.84f, 9.02f)
+                        lineToRelative(3.15f, 3.15f)
+                        lineToRelative(0.02f, -0.16f)
+                        curveToRelative(0.0f, -1.66f, -1.34f, -3.0f, -3.0f, -3.0f)
+                        lineToRelative(-0.17f, 0.01f)
+                        close()
+                    }
+                }.build()
+                .also { _visibilityOff = it }
+        }
+
+    private var _swapHoriz: ImageVector? = null
+    val SwapHoriz: ImageVector
+        get() {
+            _swapHoriz?.let { return it }
+            return ImageVector
+                .Builder(
+                    name = "SwapHoriz",
+                    defaultWidth = 24.0.dp,
+                    defaultHeight = 24.0.dp,
+                    viewportWidth = 24.0f,
+                    viewportHeight = 24.0f,
+                ).apply {
+                    path(fill = SolidColor(Color.Black)) {
+                        moveTo(6.99f, 11.0f)
+                        lineTo(3.0f, 15.0f)
+                        lineToRelative(3.99f, 4.0f)
+                        verticalLineToRelative(-3.0f)
+                        horizontalLineTo(14.0f)
+                        verticalLineToRelative(-2.0f)
+                        horizontalLineTo(6.99f)
+                        verticalLineToRelative(-3.0f)
+                        close()
+                        moveTo(21.0f, 9.0f)
+                        lineToRelative(-3.99f, -4.0f)
+                        verticalLineToRelative(3.0f)
+                        horizontalLineTo(10.0f)
+                        verticalLineToRelative(2.0f)
+                        horizontalLineToRelative(7.01f)
+                        verticalLineToRelative(3.0f)
+                        lineTo(21.0f, 9.0f)
+                        close()
+                    }
+                }.build()
+                .also { _swapHoriz = it }
+        }
 }

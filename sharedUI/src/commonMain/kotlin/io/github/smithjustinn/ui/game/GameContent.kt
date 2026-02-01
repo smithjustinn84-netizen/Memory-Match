@@ -46,6 +46,7 @@ import io.github.smithjustinn.ui.game.components.hud.ComboBadgeState
 import io.github.smithjustinn.ui.game.components.hud.DealerSpeechBubble
 import io.github.smithjustinn.ui.game.components.hud.GameTopBar
 import io.github.smithjustinn.ui.game.components.hud.GameTopBarState
+import io.github.smithjustinn.ui.game.components.hud.MutatorIndicators
 import io.github.smithjustinn.ui.game.components.overlays.PeekCountdownOverlay
 import io.github.smithjustinn.ui.game.components.overlays.WalkthroughOverlay
 import kotlinx.coroutines.delay
@@ -322,6 +323,15 @@ private fun BoxScope.GameHUD(
             compact = useCompactUI,
         )
     }
+
+    MutatorIndicators(
+        activeMutators = state.game.activeMutators,
+        modifier =
+            Modifier
+                .align(Alignment.TopStart)
+                .padding(top = SPEECH_BUBBLE_TOP_PADDING_DP.dp + 60.dp, start = PokerTheme.spacing.medium),
+        compact = useCompactUI,
+    )
 
     if (state.isDoubleDownAvailable) {
         DoubleDownButton(onDoubleDown)

@@ -1,6 +1,7 @@
 package io.github.smithjustinn.domain
 
 import app.cash.turbine.test
+import io.github.smithjustinn.domain.models.DailyChallengeMutator
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
 import io.github.smithjustinn.test.BaseLogicTest
@@ -167,6 +168,38 @@ class GameStateMachineTest : BaseLogicTest() {
                         .none { it.isFaceUp && !it.isMatched },
                     "All non-matched cards should be face down after scan",
                 )
+            }
+        }
+
+    @Test
+    fun `Blackout mutator reduces mismatch delay`() =
+        runTest {
+            val state =
+                MemoryGameLogic.createInitialState(pairCount = 6, mode = GameMode.TIME_ATTACK).copy(
+                    activeMutators = setOf(DailyChallengeMutator.BLACKOUT),
+                )
+            val firstCard = state.cards[0]
+            val nonMatchCard = state.cards.drop(1).first { it.suit != firstCard.suit || it.rank != firstCard.rank }
+
+            val machine = createStateMachine(initialState = state)
+
+            machine.effects.test {
+                machine.dispatch(GameAction.FlipCard(firstCard.id))
+                assertEquals(GameEffect.PlayFlipSound, awaitItem())
+
+                machine.dispatch(GameAction.FlipCard(nonMatchCard.id))
+                assertEquals(GameEffect.PlayFlipSound, awaitItem())
+                assertEquals(GameEffect.PlayMismatch, awaitItem())
+                assertEquals(GameEffect.VibrateMismatch, awaitItem())
+
+                // With Blackout, delay should be 500ms (MISMATCH_DELAY_MS / 2)
+                advanceTimeBy(501)
+
+                // ProcessMismatch happens
+                val timerUpdate = awaitItem()
+                assertTrue(timerUpdate is GameEffect.TimerUpdate)
+                val timeLoss = awaitItem()
+                assertTrue(timeLoss is GameEffect.TimeLoss)
             }
         }
 

@@ -37,6 +37,7 @@ data class MemoryGameState(
     @Serializable(with = IntListSerializer::class)
     val lastMatchedIds: ImmutableList<Int> = persistentListOf(),
     val seed: Long? = null,
+    val activeMutators: Set<DailyChallengeMutator> = emptySet(),
 ) {
     init {
         require(pairCount > 0) { "Pair count must be positive" }

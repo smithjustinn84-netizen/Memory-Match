@@ -168,4 +168,6 @@
     <string name="buy_in_start_round">START ROUND</string>
     <string name="buy_in_back_to_lobby">BACK TO LOBBY</string>
     <string name="game_double_or_nothing">DOUBLE OR NOTHING</string>
+    <string name="mutator_blackout">BLACKOUT</string>
+    <string name="mutator_mirage">MIRAGE</string>
 </resources>

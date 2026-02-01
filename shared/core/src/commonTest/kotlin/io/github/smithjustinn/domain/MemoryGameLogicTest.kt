@@ -1,5 +1,6 @@
 package io.github.smithjustinn.domain
 
+import io.github.smithjustinn.domain.models.DailyChallengeMutator
 import io.github.smithjustinn.domain.models.GameDomainEvent
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.ScoringConfig
@@ -25,6 +26,7 @@ import io.github.smithjustinn.resources.comment_smooth_call
 import io.github.smithjustinn.resources.comment_you_got_it
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -495,5 +497,55 @@ class MemoryGameLogicTest {
                 Res.string.comment_no_bluff,
             )
         assertTrue(randomComments.contains(s2.matchComment?.res))
+    }
+
+    @Test
+    fun `applyMutators with Mirage swaps cards every 5 moves`() {
+        val state =
+            MemoryGameLogic.createInitialState(pairCount = 4).copy(
+                moves = 5,
+                activeMutators = setOf(DailyChallengeMutator.MIRAGE),
+            )
+        val initialCards = state.cards
+
+        // Use a fixed seed for random to ensure predictability if needed,
+        // but here we just want to see if they changed.
+        val newState = MemoryGameLogic.applyMutators(state, Random(42))
+
+        assertFalse(initialCards == newState.cards, "Cards should have been swapped")
+        assertEquals(initialCards.size, newState.cards.size)
+        // Verify unmatched cards are still the same set, just different order
+        assertEquals(
+            initialCards.filter { !it.isMatched }.toSet(),
+            newState.cards.filter { !it.isMatched }.toSet(),
+        )
+    }
+
+    @Test
+    fun `applyMutators with Mirage does not swap on non-5th move`() {
+        val state =
+            MemoryGameLogic.createInitialState(pairCount = 4).copy(
+                moves = 4,
+                activeMutators = setOf(DailyChallengeMutator.MIRAGE),
+            )
+        val initialCards = state.cards
+
+        val newState = MemoryGameLogic.applyMutators(state)
+
+        assertEquals(initialCards, newState.cards, "Cards should NOT have been swapped")
+    }
+
+    @Test
+    fun `applyMutators does nothing if Mirage is not active`() {
+        val state =
+            MemoryGameLogic.createInitialState(pairCount = 4).copy(
+                moves = 5,
+                activeMutators = emptySet(),
+            )
+        val initialCards = state.cards
+
+        val newState = MemoryGameLogic.applyMutators(state)
+
+        assertEquals(initialCards, newState.cards, "Cards should NOT have been swapped")
     }
 }

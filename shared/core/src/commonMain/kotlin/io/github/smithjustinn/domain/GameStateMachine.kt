@@ -1,5 +1,6 @@
 package io.github.smithjustinn.domain
 
+import io.github.smithjustinn.domain.models.DailyChallengeMutator
 import io.github.smithjustinn.domain.models.GameDomainEvent
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
@@ -91,36 +92,11 @@ class GameStateMachine(
                 when (event) {
                     GameDomainEvent.CardFlipped -> effect(GameEffect.PlayFlipSound)
 
-                    GameDomainEvent.MatchSuccess, GameDomainEvent.TheNutsAchieved -> {
-                        effect(GameEffect.PlayFlipSound)
-                        effect(GameEffect.VibrateMatch)
-                        effect(GameEffect.PlayMatchSound)
-                        if (event == GameDomainEvent.TheNutsAchieved) {
-                            effect(GameEffect.PlayTheNutsSound)
-                        } else if (flippedState.comboMultiplier >= flippedState.config.heatModeThreshold) {
-                            effect(GameEffect.VibrateHeat)
-                        }
-                        if (flippedState.mode == GameMode.TIME_ATTACK) {
-                            val bonus =
-                                TimeAttackLogic.calculateTimeGain(
-                                    flippedState.comboMultiplier,
-                                    flippedState.config,
-                                )
-                            updateTime { it + bonus }
-                            effect(GameEffect.TimerUpdate(internalTimeSeconds + bonus))
-                            effect(GameEffect.TimeGain(bonus))
-                        }
-                    }
+                    GameDomainEvent.MatchSuccess, GameDomainEvent.TheNutsAchieved ->
+                        handleMatchEvent(flippedState, event)
 
-                    GameDomainEvent.MatchFailure -> {
-                        effect(GameEffect.PlayFlipSound)
-                        effect(GameEffect.PlayMismatch)
-                        effect(GameEffect.VibrateMismatch)
-                        scope.launch(dispatchers.default) {
-                            delay(MISMATCH_DELAY_MS)
-                            dispatch(GameAction.ProcessMismatch)
-                        }
-                    }
+                    GameDomainEvent.MatchFailure ->
+                        handleMismatchEvent(flippedState)
 
                     GameDomainEvent.GameWon -> {
                         effect(GameEffect.PlayFlipSound)
@@ -142,6 +118,50 @@ class GameStateMachine(
             }
 
         applyResult(result)
+    }
+
+    private fun StateMachineBuilder.handleMatchEvent(
+        flippedState: MemoryGameState,
+        event: GameDomainEvent,
+    ) {
+        effect(GameEffect.PlayFlipSound)
+        effect(GameEffect.VibrateMatch)
+        effect(GameEffect.PlayMatchSound)
+        if (event == GameDomainEvent.TheNutsAchieved) {
+            effect(GameEffect.PlayTheNutsSound)
+        } else if (flippedState.comboMultiplier >= flippedState.config.heatModeThreshold) {
+            effect(GameEffect.VibrateHeat)
+        }
+        if (flippedState.mode == GameMode.TIME_ATTACK) {
+            val bonus =
+                TimeAttackLogic.calculateTimeGain(
+                    flippedState.comboMultiplier,
+                    flippedState.config,
+                )
+            updateTime { it + bonus }
+            effect(GameEffect.TimerUpdate(internalTimeSeconds + bonus))
+            effect(GameEffect.TimeGain(bonus))
+        }
+        // Apply mutators (e.g. Mirage swap)
+        transition { MemoryGameLogic.applyMutators(it) }
+    }
+
+    private fun StateMachineBuilder.handleMismatchEvent(flippedState: MemoryGameState) {
+        effect(GameEffect.PlayFlipSound)
+        effect(GameEffect.PlayMismatch)
+        effect(GameEffect.VibrateMismatch)
+        scope.launch(dispatchers.default) {
+            val delayMs =
+                if (flippedState.activeMutators.contains(DailyChallengeMutator.BLACKOUT)) {
+                    MISMATCH_DELAY_MS / 2
+                } else {
+                    MISMATCH_DELAY_MS
+                }
+            delay(delayMs)
+            dispatch(GameAction.ProcessMismatch)
+        }
+        // Apply mutators (e.g. Mirage swap)
+        transition { MemoryGameLogic.applyMutators(it) }
     }
 
     private fun handleDoubleDown() {

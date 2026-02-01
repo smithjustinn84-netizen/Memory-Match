@@ -1,6 +1,7 @@
 package io.github.smithjustinn.domain
 
 import io.github.smithjustinn.domain.models.CardState
+import io.github.smithjustinn.domain.models.DailyChallengeMutator
 import io.github.smithjustinn.domain.models.GameDomainEvent
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
@@ -229,6 +230,7 @@ object MemoryGameLogic {
     ): MemoryGameState = ScoringCalculator.applyFinalBonuses(state, elapsedTimeSeconds)
 
     const val MIN_PAIRS_FOR_DOUBLE_DOWN = 3
+    private const val MIRAGE_MOVE_INTERVAL = 5
 
     /**
      * Activates Double Down if requirements are met.
@@ -245,6 +247,49 @@ object MemoryGameLogic {
         } else {
             state
         }
+    }
+
+    /**
+     * Applies active mutators to the game state.
+     * Currently handles:
+     * - MIRAGE: Swaps two random unmatched cards every 5 moves.
+     */
+    fun applyMutators(
+        state: MemoryGameState,
+        random: Random = Random,
+    ): MemoryGameState {
+        var currentState = state
+        if (state.activeMutators.contains(DailyChallengeMutator.MIRAGE) &&
+            state.moves > 0 &&
+            state.moves % MIRAGE_MOVE_INTERVAL == 0
+        ) {
+            currentState = handleMirageSwap(currentState, random)
+        }
+        return currentState
+    }
+
+    private fun handleMirageSwap(
+        state: MemoryGameState,
+        random: Random,
+    ): MemoryGameState {
+        val unmatchedIndices =
+            state.cards
+                .mapIndexedNotNull { index, card ->
+                    if (!card.isMatched) index else null
+                }
+
+        if (unmatchedIndices.size < 2) return state
+
+        val shuffledIndices = unmatchedIndices.shuffled(random)
+        val idx1 = shuffledIndices[0]
+        val idx2 = shuffledIndices[1]
+
+        val newCards = state.cards.toMutableList()
+        val temp = newCards[idx1]
+        newCards[idx1] = newCards[idx2]
+        newCards[idx2] = temp
+
+        return state.copy(cards = newCards.toImmutableList())
     }
 }
 
