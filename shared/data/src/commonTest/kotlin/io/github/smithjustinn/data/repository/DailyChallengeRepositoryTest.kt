@@ -19,12 +19,13 @@ import kotlin.test.assertEquals
 class DailyChallengeRepositoryTest {
     private val dao = mock<DailyChallengeDao>()
     private val testDispatcher = UnconfinedTestDispatcher()
-    private val dispatchers = CoroutineDispatchers(
-        main = testDispatcher,
-        mainImmediate = testDispatcher,
-        io = testDispatcher,
-        default = testDispatcher
-    )
+    private val dispatchers =
+        CoroutineDispatchers(
+            main = testDispatcher,
+            mainImmediate = testDispatcher,
+            io = testDispatcher,
+            default = testDispatcher,
+        )
     private val repository = DailyChallengeRepositoryImpl(dao, dispatchers)
 
     @Test

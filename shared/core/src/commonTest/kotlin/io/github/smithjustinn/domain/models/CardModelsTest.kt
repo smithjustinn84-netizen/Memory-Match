@@ -6,7 +6,6 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class CardModelsTest {
-
     @Test
     fun `Suit isRed returns correct values`() {
         assertTrue(Suit.Hearts.isRed)

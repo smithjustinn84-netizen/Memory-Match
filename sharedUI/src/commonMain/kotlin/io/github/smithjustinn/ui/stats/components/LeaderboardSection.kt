@@ -29,6 +29,7 @@ import io.github.smithjustinn.resources.stats_moves_header
 import io.github.smithjustinn.resources.stats_time_header
 import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.components.AppCard
+import io.github.smithjustinn.ui.start.displayNameRes
 import io.github.smithjustinn.utils.formatTime
 import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.stringResource
@@ -41,7 +42,7 @@ fun LeaderboardSection(
 ) {
     AppCard(
         modifier = modifier,
-        title = stringResource(level.nameRes),
+        title = stringResource(level.type.displayNameRes),
     ) {
         LeaderboardList(level, entries)
     }

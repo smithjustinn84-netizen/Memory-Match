@@ -8,7 +8,6 @@ import kotlin.test.assertNotNull
 import kotlin.time.Instant
 
 class ModelClassesTest {
-
     @Test
     fun `GameMode values exist`() {
         assertNotNull(GameMode.valueOf("TIME_ATTACK"))
@@ -26,13 +25,14 @@ class ModelClassesTest {
 
     @Test
     fun `LeaderboardEntry has correct properties`() {
-        val entry = LeaderboardEntry(
-            pairCount = 8,
-            score = 100,
-            timeSeconds = 60,
-            moves = 20,
-            timestamp = Instant.DISTANT_PAST
-        )
+        val entry =
+            LeaderboardEntry(
+                pairCount = 8,
+                score = 100,
+                timeSeconds = 60,
+                moves = 20,
+                timestamp = Instant.DISTANT_PAST,
+            )
         assertEquals(8, entry.pairCount)
         assertEquals(100, entry.score)
     }
@@ -60,7 +60,7 @@ class ModelClassesTest {
         assertEquals(100, config.baseMatchPoints)
         assertEquals(50, config.comboBonusPoints)
     }
-    
+
     @Test
     fun `GameDomainEvent coverage`() {
         assertNotNull(GameDomainEvent.CardFlipped)

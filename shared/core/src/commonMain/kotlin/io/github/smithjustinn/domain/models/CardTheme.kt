@@ -1,5 +1,8 @@
 package io.github.smithjustinn.domain.models
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 enum class CardBackTheme {
     GEOMETRIC,
     CLASSIC,
@@ -7,6 +10,7 @@ enum class CardBackTheme {
     POKER,
 }
 
+@Serializable
 enum class CardSymbolTheme {
     CLASSIC,
     MINIMAL,
@@ -14,6 +18,7 @@ enum class CardSymbolTheme {
     POKER,
 }
 
+@Serializable
 data class CardDisplaySettings(
     val backTheme: CardBackTheme = CardBackTheme.GEOMETRIC,
     val symbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC,

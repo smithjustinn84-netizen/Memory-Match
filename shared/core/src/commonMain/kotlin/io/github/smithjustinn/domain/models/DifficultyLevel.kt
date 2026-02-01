@@ -1,26 +1,33 @@
 package io.github.smithjustinn.domain.models
 
-import io.github.smithjustinn.resources.Res
-import io.github.smithjustinn.resources.difficulty_casual
-import io.github.smithjustinn.resources.difficulty_master
-import io.github.smithjustinn.resources.difficulty_shark
-import io.github.smithjustinn.resources.difficulty_tourist
-import org.jetbrains.compose.resources.StringResource
+import kotlinx.serialization.Serializable
 
 /**
- * Represents a difficulty level with a name resource and pair count.
+ * Difficulty type identifier for the game.
  */
+@Serializable
+enum class DifficultyType {
+    TOURIST,
+    CASUAL,
+    MASTER,
+    SHARK,
+}
+
+/**
+ * Represents a difficulty level with a type identifier and pair count.
+ */
+@Serializable
 data class DifficultyLevel(
-    val nameRes: StringResource,
+    val type: DifficultyType,
     val pairs: Int,
 ) {
     companion object {
         val defaultLevels =
             listOf(
-                DifficultyLevel(Res.string.difficulty_tourist, 6),
-                DifficultyLevel(Res.string.difficulty_casual, 8),
-                DifficultyLevel(Res.string.difficulty_master, 10),
-                DifficultyLevel(Res.string.difficulty_shark, 12),
+                DifficultyLevel(DifficultyType.TOURIST, 6),
+                DifficultyLevel(DifficultyType.CASUAL, 8),
+                DifficultyLevel(DifficultyType.MASTER, 10),
+                DifficultyLevel(DifficultyType.SHARK, 12),
             )
     }
 }

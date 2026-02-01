@@ -4,7 +4,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class DifficultyLevelTest {
-
     @Test
     fun `defaultLevels contains all levels`() {
         assertEquals(4, DifficultyLevel.defaultLevels.size)

@@ -49,4 +49,17 @@ class MemoryGameStateTest {
         assertEquals(state.cards, copied.cards)
         assertEquals(state.pairCount, copied.pairCount)
     }
+
+    @Test
+    fun testValidation() {
+        kotlin.test.assertFailsWith<IllegalArgumentException> {
+            MemoryGameState(pairCount = 0)
+        }
+        kotlin.test.assertFailsWith<IllegalArgumentException> {
+            MemoryGameState(moves = -1)
+        }
+        kotlin.test.assertFailsWith<IllegalArgumentException> {
+            MemoryGameState(comboMultiplier = -1)
+        }
+    }
 }

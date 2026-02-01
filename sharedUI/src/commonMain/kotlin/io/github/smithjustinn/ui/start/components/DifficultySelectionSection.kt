@@ -26,6 +26,7 @@ import io.github.smithjustinn.ui.components.AppIcons
 import io.github.smithjustinn.ui.components.PokerButton
 import io.github.smithjustinn.ui.components.PokerChip
 import io.github.smithjustinn.ui.start.DifficultyState
+import io.github.smithjustinn.ui.start.displayNameRes
 import io.github.smithjustinn.ui.stats.components.ModeSelector
 import org.jetbrains.compose.resources.stringResource
 
@@ -109,7 +110,7 @@ private fun DifficultySelector(
                     )
 
                     Text(
-                        text = stringResource(level.nameRes),
+                        text = stringResource(level.type.displayNameRes),
                         style = PokerTheme.typography.labelSmall,
                         color =
                             if (state.selectedDifficulty == level) {

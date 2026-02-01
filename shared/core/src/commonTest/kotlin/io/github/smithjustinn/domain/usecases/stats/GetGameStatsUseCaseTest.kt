@@ -16,12 +16,13 @@ class GetGameStatsUseCaseTest {
     private val useCase = GetGameStatsUseCase(repository)
 
     @Test
-    fun `invoke returns stats from repository`() = runTest {
-        val stats = GameStats(pairCount = 8, bestScore = 100, bestTimeSeconds = 60)
-        every { repository.getStatsForDifficulty(8) } returns flowOf(stats)
+    fun `invoke returns stats from repository`() =
+        runTest {
+            val stats = GameStats(pairCount = 8, bestScore = 100, bestTimeSeconds = 60)
+            every { repository.getStatsForDifficulty(8) } returns flowOf(stats)
 
-        val result = useCase(8).first()
+            val result = useCase(8).first()
 
-        assertEquals(stats, result)
-    }
+            assertEquals(stats, result)
+        }
 }

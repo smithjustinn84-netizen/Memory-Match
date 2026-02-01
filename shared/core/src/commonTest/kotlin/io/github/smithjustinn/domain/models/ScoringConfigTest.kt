@@ -34,4 +34,17 @@ class ScoringConfigTest {
         assertEquals(5000, config.moveBonusMultiplier)
         assertEquals(3, config.heatModeThreshold)
     }
+
+    @Test
+    fun testValidation() {
+        kotlin.test.assertFailsWith<IllegalArgumentException> {
+            ScoringConfig(baseMatchPoints = 0)
+        }
+        kotlin.test.assertFailsWith<IllegalArgumentException> {
+            ScoringConfig(heatModeThreshold = 0)
+        }
+        kotlin.test.assertFailsWith<IllegalArgumentException> {
+            ScoringConfig(highRollerThreshold = 10, theNutsThreshold = 5)
+        }
+    }
 }
