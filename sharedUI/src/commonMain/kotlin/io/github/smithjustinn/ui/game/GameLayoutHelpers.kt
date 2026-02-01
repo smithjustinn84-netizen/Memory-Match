@@ -80,14 +80,6 @@ fun GameGameOverOverlay(
                 .fillMaxSize()
                 .background(Color.Black.copy(alpha = BLACK_OVERLAY_ALPHA)),
     ) {
-        if (state.game.isGameWon) {
-            // Background celebration
-            CardFountainOverlay(
-                cards = state.game.cards,
-                settings = state.cardSettings,
-            )
-        }
-
         // Main content
         GameResultsOverlay(
             state = state,
@@ -96,7 +88,12 @@ fun GameGameOverOverlay(
         )
 
         if (state.game.isGameWon) {
-            // Foreground celebration
+            // Celebration effects - now above the results card
+            CardFountainOverlay(
+                cards = state.game.cards,
+                settings = state.cardSettings,
+            )
+
             ConfettiEffect()
 
             if (state.isNewHighScore) {
