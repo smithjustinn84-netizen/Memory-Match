@@ -161,11 +161,6 @@ private fun ShopItemsGrid(
         }
     }
 }
-            hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter),
-        )
-    }
-}
 
 @Composable
 fun ShopItemCard(
