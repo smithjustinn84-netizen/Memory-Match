@@ -139,6 +139,7 @@ object MemoryGameLogic {
                 state.pairCount,
                 state.comboMultiplier,
                 config,
+                isDoubleDownActive = state.isDoubleDownActive,
             )
 
         val newState =

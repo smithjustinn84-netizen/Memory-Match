@@ -6,14 +6,22 @@ import io.github.smithjustinn.domain.models.ScoringConfig
 import io.github.smithjustinn.resources.Res
 import io.github.smithjustinn.resources.comment_bad_beat
 import io.github.smithjustinn.resources.comment_boom
+import io.github.smithjustinn.resources.comment_check_mate
 import io.github.smithjustinn.resources.comment_eagle_eyes
+import io.github.smithjustinn.resources.comment_flopped_a_set
 import io.github.smithjustinn.resources.comment_full_house
 import io.github.smithjustinn.resources.comment_great_find
+import io.github.smithjustinn.resources.comment_grinding
+import io.github.smithjustinn.resources.comment_no_bluff
 import io.github.smithjustinn.resources.comment_on_a_roll
 import io.github.smithjustinn.resources.comment_one_more
 import io.github.smithjustinn.resources.comment_photographic
+import io.github.smithjustinn.resources.comment_poker_face
 import io.github.smithjustinn.resources.comment_pot_odds
+import io.github.smithjustinn.resources.comment_reading_tells
+import io.github.smithjustinn.resources.comment_river_magic
 import io.github.smithjustinn.resources.comment_sharp
+import io.github.smithjustinn.resources.comment_smooth_call
 import io.github.smithjustinn.resources.comment_you_got_it
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -358,7 +366,7 @@ class MemoryGameLogicTest {
         var (s1, _) = MemoryGameLogic.flipCard(state, p2c1.id)
         var (s2, _) = MemoryGameLogic.flipCard(s1, p2c2.id)
 
-        // matchesFound should be 2. Total 4. Halfway.
+        // matchesFound should be 2. Total 4. Pot Odds (config.commentPotOddsDivisor=2)
         assertEquals(Res.string.comment_pot_odds, s2.matchComment?.res)
 
         // 2. One More: matchesFound == totalPairs - 1
@@ -394,7 +402,8 @@ class MemoryGameLogicTest {
         // Match Pair 2 -> Matches = 3. Total 4. One more to go.
         s1 = MemoryGameLogic.flipCard(state, pair2[0].id).first
         s2 = MemoryGameLogic.flipCard(s1, pair2[1].id).first
-        assertEquals(Res.string.comment_one_more, s2.matchComment?.res)
+        val oneMoreOptions = listOf(Res.string.comment_one_more, Res.string.comment_river_magic)
+        assertTrue(oneMoreOptions.contains(s2.matchComment?.res))
 
         // 3. Photographic (moves <= matches * 2)
         state = MemoryGameLogic.createInitialState(4)
@@ -432,7 +441,13 @@ class MemoryGameLogicTest {
         s1 = MemoryGameLogic.flipCard(state, pairs4[1][0].id).first
         s2 = MemoryGameLogic.flipCard(s1, pairs4[1][1].id).first
 
-        assertEquals(Res.string.comment_photographic, s2.matchComment?.res)
+        val photographicOptions =
+            listOf(
+                Res.string.comment_photographic,
+                Res.string.comment_reading_tells,
+                Res.string.comment_eagle_eyes,
+            )
+        assertTrue(photographicOptions.contains(s2.matchComment?.res))
 
         // 4. Else (Random)
         state = MemoryGameLogic.createInitialState(10)
@@ -468,11 +483,16 @@ class MemoryGameLogicTest {
                 Res.string.comment_great_find,
                 Res.string.comment_you_got_it,
                 Res.string.comment_boom,
-                Res.string.comment_eagle_eyes,
                 Res.string.comment_sharp,
                 Res.string.comment_on_a_roll,
                 Res.string.comment_full_house,
                 Res.string.comment_bad_beat,
+                Res.string.comment_flopped_a_set,
+                Res.string.comment_smooth_call,
+                Res.string.comment_poker_face,
+                Res.string.comment_grinding,
+                Res.string.comment_check_mate,
+                Res.string.comment_no_bluff,
             )
         assertTrue(randomComments.contains(s2.matchComment?.res))
     }

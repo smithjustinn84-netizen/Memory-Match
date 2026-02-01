@@ -60,6 +60,19 @@
     <string name="comment_all_in">All In! 💰</string>
     <string name="comment_pot_odds">Good Pot Odds! 📈</string>
     <string name="comment_high_roller">High Roller! 💎</string>
+    <string name="comment_pocket_aces">Pocket Aces! ♠️❤️</string>
+    <string name="comment_royal_flush">Royal Flush! 🔥👑</string>
+    <string name="comment_ship_it">Ship it! 🚢</string>
+    <string name="comment_stacking_chips">Stacking chips! 💰</string>
+    <string name="comment_heater_active">Heater active! 🔥</string>
+    <string name="comment_flopped_a_set">Flopped a set! 🎰</string>
+    <string name="comment_river_magic">River magic! 🌊</string>
+    <string name="comment_smooth_call">Smooth call. 😎</string>
+    <string name="comment_poker_face">Nice poker face. 😐</string>
+    <string name="comment_grinding">Grinding it out. ☕</string>
+    <string name="comment_reading_tells">Reading the tells! 📖</string>
+    <string name="comment_check_mate">Check-mate? No, Check-raise! ♟️</string>
+    <string name="comment_no_bluff">No bluffing here! 🃏</string>
 
     <string name="score_breakdown_title">Score Breakdown</string>
     <string name="score_match_points">Match Points</string>
