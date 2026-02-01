@@ -41,6 +41,7 @@ import io.github.smithjustinn.services.AudioService
 import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.components.AppCard
 import io.github.smithjustinn.ui.components.AppIcons
+import io.github.smithjustinn.ui.components.ShopIcons
 import io.github.smithjustinn.ui.components.AuroraEffect
 import io.github.smithjustinn.ui.components.pokerBackground
 import io.github.smithjustinn.ui.components.rememberGlimmerBrush
@@ -190,7 +191,7 @@ private fun BoxScope.StartTopActions(
                 .padding(spacing.medium),
     ) {
         MedallionIcon(
-            icon = AppIcons.ShoppingCart,
+            icon = ShopIcons.ShoppingCart,
             onClick = onShopClick,
             applyGlimmer = true,
             tint = PokerTheme.colors.goldenYellow,
@@ -346,7 +347,7 @@ private fun WalletBadge(
             modifier = Modifier.padding(horizontal = 16.dp),
         ) {
             Icon(
-                imageVector = AppIcons.CasinoChip,
+                imageVector = ShopIcons.CasinoChip,
                 contentDescription = null,
                 tint = PokerTheme.colors.goldenYellow,
                 modifier = Modifier.size(MEDALLION_ICON_SIZE_DP.dp),

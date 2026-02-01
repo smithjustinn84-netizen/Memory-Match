@@ -64,6 +64,7 @@ import io.github.smithjustinn.resources.time_label
 import io.github.smithjustinn.resources.times_up
 import io.github.smithjustinn.resources.total_payout
 import io.github.smithjustinn.ui.components.AppIcons
+import io.github.smithjustinn.ui.components.ShopIcons
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
 
@@ -188,7 +189,7 @@ private fun CasinoHeader(
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(
-            imageVector = AppIcons.CasinoChip,
+            imageVector = ShopIcons.CasinoChip,
             contentDescription = null,
             tint = ReceiptInkColor,
             modifier = Modifier.size(32.dp),

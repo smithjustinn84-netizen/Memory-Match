@@ -7,6 +7,7 @@ import io.github.smithjustinn.domain.repositories.PlayerEconomyRepository
 import io.github.smithjustinn.domain.usecases.economy.BuyItemUseCase
 import io.github.smithjustinn.domain.usecases.economy.GetPlayerBalanceUseCase
 import io.github.smithjustinn.domain.usecases.economy.GetShopItemsUseCase
+import io.github.smithjustinn.domain.usecases.economy.SetActiveCosmeticUseCase
 import io.github.smithjustinn.utils.componentScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,6 +36,7 @@ class DefaultShopComponent(
     private val buyItemUseCase: BuyItemUseCase by inject()
     private val getPlayerBalanceUseCase: GetPlayerBalanceUseCase by inject()
     private val getShopItemsUseCase: GetShopItemsUseCase by inject()
+    private val setActiveCosmeticUseCase: SetActiveCosmeticUseCase by inject()
 
     // Directly injecting repo for unlocked items for now
     private val playerEconomyRepository: PlayerEconomyRepository by inject()
@@ -48,13 +50,17 @@ class DefaultShopComponent(
         scope.launch {
             val balanceFlow = getPlayerBalanceUseCase()
             val unlockedFlow = playerEconomyRepository.unlockedItemIds
+            val themeFlow = playerEconomyRepository.selectedTheme
+            val skinFlow = playerEconomyRepository.selectedSkin
             val allItems = getShopItemsUseCase()
 
-            combine(balanceFlow, unlockedFlow) { balance, unlockedIds ->
+            combine(balanceFlow, unlockedFlow, themeFlow, skinFlow) { balance, unlockedIds, theme, skin ->
                 ShopState(
                     balance = balance,
                     items = allItems,
                     unlockedItemIds = unlockedIds,
+                    activeThemeId = theme.id,
+                    activeSkinId = skin.id,
                 )
             }.collect { newState ->
                 _state.update {
@@ -62,6 +68,8 @@ class DefaultShopComponent(
                         balance = newState.balance,
                         items = newState.items,
                         unlockedItemIds = newState.unlockedItemIds,
+                        activeThemeId = newState.activeThemeId,
+                        activeSkinId = newState.activeSkinId,
                     )
                 }
             }
@@ -81,6 +89,12 @@ class DefaultShopComponent(
             } else {
                 // Success handled by flow update
             }
+        }
+    }
+
+    override fun onEquipItemClicked(item: ShopItem) {
+        scope.launch {
+            setActiveCosmeticUseCase(item.id, item.type)
         }
     }
 

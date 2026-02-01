@@ -7,6 +7,8 @@ data class ShopState(
     val balance: Long = 0,
     val items: List<ShopItem> = emptyList(),
     val unlockedItemIds: Set<String> = emptySet(),
+    val activeThemeId: String? = null,
+    val activeSkinId: String? = null,
     val error: String? = null,
 )
 
@@ -16,6 +18,8 @@ interface ShopComponent {
     fun onBackClicked()
 
     fun onBuyItemClicked(item: ShopItem)
+
+    fun onEquipItemClicked(item: ShopItem)
 
     fun onClearError()
 }

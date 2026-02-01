@@ -19,6 +19,7 @@ fun AppCard(
     modifier: Modifier = Modifier,
     title: String? = null,
     backgroundColor: Color = Color.Black.copy(alpha = 0.3f), // Recessed felt look
+    border: BorderStroke? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = PokerTheme.colors
@@ -29,11 +30,10 @@ fun AppCard(
         modifier = modifier.fillMaxWidth(),
         shape = shapes.medium,
         color = backgroundColor,
-        border =
-            BorderStroke(
-                width = 1.dp,
-                color = colors.goldenYellow.copy(alpha = 0.2f), // Brass-like inlay border
-            ),
+        border = border ?: BorderStroke(
+            width = 1.dp,
+            color = colors.goldenYellow.copy(alpha = 0.2f), // Brass-like inlay border
+        ),
     ) {
         Column(modifier = Modifier.padding(spacing.medium)) {
             if (title != null) {

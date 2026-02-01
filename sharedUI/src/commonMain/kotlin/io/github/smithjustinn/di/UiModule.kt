@@ -5,6 +5,7 @@ import io.github.smithjustinn.domain.usecases.economy.DefaultEarnCurrencyUseCase
 import io.github.smithjustinn.domain.usecases.economy.EarnCurrencyUseCase
 import io.github.smithjustinn.domain.usecases.economy.GetPlayerBalanceUseCase
 import io.github.smithjustinn.domain.usecases.economy.GetShopItemsUseCase
+import io.github.smithjustinn.domain.usecases.economy.SetActiveCosmeticUseCase
 import io.github.smithjustinn.domain.usecases.game.CalculateFinalScoreUseCase
 import io.github.smithjustinn.domain.usecases.game.ClearSavedGameUseCase
 import io.github.smithjustinn.domain.usecases.game.FlipCardUseCase
@@ -33,4 +34,5 @@ val uiModule =
         singleOf(::BuyItemUseCase)
         singleOf(::GetPlayerBalanceUseCase)
         singleOf(::GetShopItemsUseCase)
+        singleOf(::SetActiveCosmeticUseCase)
     }

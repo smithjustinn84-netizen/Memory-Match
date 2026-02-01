@@ -36,6 +36,7 @@ import io.github.smithjustinn.domain.models.ShopItem
 import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.components.AppCard
 import io.github.smithjustinn.ui.components.AppIcons
+import io.github.smithjustinn.ui.components.ShopIcons
 import io.github.smithjustinn.ui.components.AuroraEffect
 import io.github.smithjustinn.ui.components.pokerBackground
 
@@ -79,6 +80,7 @@ fun ShopContent(
             ShopItemsGrid(
                 state = state,
                 onBuyItem = { component.onBuyItemClicked(it) },
+                onEquipItem = { component.onEquipItemClicked(it) },
                 modifier = Modifier.weight(1f),
             )
         }
@@ -126,7 +128,7 @@ private fun ShopHeader(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                imageVector = AppIcons.CasinoChip,
+                imageVector = ShopIcons.CasinoChip,
                 contentDescription = "Bankroll",
                 tint = PokerTheme.colors.goldenYellow,
                 modifier = Modifier.size(24.dp),
@@ -145,6 +147,7 @@ private fun ShopHeader(
 private fun ShopItemsGrid(
     state: ShopState,
     onBuyItem: (ShopItem) -> Unit,
+    onEquipItem: (ShopItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyVerticalGrid(
@@ -157,11 +160,20 @@ private fun ShopItemsGrid(
         modifier = modifier,
     ) {
         items(state.items) { item ->
+            val isEquipped =
+                when (item.type) {
+                    io.github.smithjustinn.domain.models.ShopItemType.THEME -> item.id == state.activeThemeId
+                    io.github.smithjustinn.domain.models.ShopItemType.CARD_SKIN -> item.id == state.activeSkinId
+                    else -> false
+                }
+
             ShopItemCard(
                 item = item,
                 isUnlocked = state.unlockedItemIds.contains(item.id),
+                isEquipped = isEquipped,
                 canAfford = state.balance >= item.price,
                 onBuy = { onBuyItem(item) },
+                onEquip = { onEquipItem(item) },
             )
         }
     }
@@ -171,23 +183,32 @@ private fun ShopItemsGrid(
 fun ShopItemCard(
     item: ShopItem,
     isUnlocked: Boolean,
+    isEquipped: Boolean,
     canAfford: Boolean,
     onBuy: () -> Unit,
+    onEquip: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val canClick = (!isUnlocked && canAfford) || (isUnlocked && !isEquipped && !item.isConsumable)
+    val onClick = if (isUnlocked) onEquip else onBuy
+
     AppCard(
-        modifier = modifier.clickable(enabled = !isUnlocked && canAfford, onClick = onBuy),
-        backgroundColor = if (isUnlocked) PokerTheme.colors.surface.copy(alpha = 0.5f) else PokerTheme.colors.surface,
+        modifier = modifier.clickable(enabled = canClick, onClick = onClick),
+        backgroundColor =
+            getCardBackgroundColor(isEquipped, isUnlocked),
+        border =
+            if (isEquipped) {
+                androidx.compose.foundation.BorderStroke(2.dp, PokerTheme.colors.goldenYellow)
+            } else {
+                null
+            },
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Text(
-                text = item.name,
-                style = MaterialTheme.typography.titleMedium,
-                color = PokerTheme.colors.onSurface,
-            )
+            ShopItemHeader(item.name, isEquipped)
+
             Text(
                 text = item.description,
                 style = MaterialTheme.typography.bodyMedium,
@@ -195,19 +216,79 @@ fun ShopItemCard(
             )
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (isUnlocked && !item.isConsumable) {
-                Text(
-                    text = "OWNED",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = Color.Green,
-                )
-            } else {
-                Text(
-                    text = "$${item.price}",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = if (canAfford) PokerTheme.colors.goldenYellow else Color.Red,
-                )
-            }
+            ShopItemStatusBadge(item, isUnlocked, isEquipped, canAfford)
+        }
+    }
+}
+
+@Composable
+private fun getCardBackgroundColor(
+    isEquipped: Boolean,
+    isUnlocked: Boolean,
+): Color =
+    when {
+        isEquipped -> PokerTheme.colors.surface.copy(alpha = 0.8f)
+        isUnlocked -> PokerTheme.colors.surface.copy(alpha = 0.5f)
+        else -> PokerTheme.colors.surface
+    }
+
+@Composable
+private fun ShopItemHeader(
+    name: String,
+    isEquipped: Boolean,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = name,
+            style = MaterialTheme.typography.titleMedium,
+            color = PokerTheme.colors.onSurface,
+            modifier = Modifier.weight(1f),
+        )
+        if (isEquipped) {
+            Icon(
+                imageVector = ShopIcons.CheckCircle,
+                contentDescription = "Equipped",
+                tint = PokerTheme.colors.goldenYellow,
+                modifier = Modifier.size(20.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun ShopItemStatusBadge(
+    item: ShopItem,
+    isUnlocked: Boolean,
+    isEquipped: Boolean,
+    canAfford: Boolean,
+) {
+    when {
+        isEquipped -> {
+            Text(
+                text = "EQUIPPED",
+                style = MaterialTheme.typography.labelLarge,
+                color = PokerTheme.colors.goldenYellow,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+        isUnlocked && !item.isConsumable -> {
+            Text(
+                text = "EQUIP",
+                style = MaterialTheme.typography.labelLarge,
+                color = Color.Green,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+        else -> {
+            Text(
+                text = "$${item.price}",
+                style = MaterialTheme.typography.labelLarge,
+                color = if (canAfford) PokerTheme.colors.goldenYellow else Color.Red,
+            )
         }
     }
 }

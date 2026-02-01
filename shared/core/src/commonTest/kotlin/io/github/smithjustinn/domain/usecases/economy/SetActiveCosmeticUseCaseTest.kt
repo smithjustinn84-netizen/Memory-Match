@@ -1,0 +1,35 @@
+package io.github.smithjustinn.domain.usecases.economy
+
+import dev.mokkery.answering.returns
+import dev.mokkery.everySuspend
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
+import io.github.smithjustinn.domain.models.ShopItemType
+import io.github.smithjustinn.domain.repositories.PlayerEconomyRepository
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
+
+class SetActiveCosmeticUseCaseTest {
+    private val repository = mock<PlayerEconomyRepository>()
+    private val useCase = SetActiveCosmeticUseCase(repository)
+
+    @Test
+    fun `invoke should call selectTheme when itemType is THEME`() =
+        runTest {
+            everySuspend { repository.selectTheme("theme1") } returns Unit
+
+            useCase("theme1", ShopItemType.THEME)
+
+            verifySuspend { repository.selectTheme("theme1") }
+        }
+
+    @Test
+    fun `invoke should call selectSkin when itemType is CARD_SKIN`() =
+        runTest {
+            everySuspend { repository.selectSkin("skin1") } returns Unit
+
+            useCase("skin1", ShopItemType.CARD_SKIN)
+
+            verifySuspend { repository.selectSkin("skin1") }
+        }
+}
