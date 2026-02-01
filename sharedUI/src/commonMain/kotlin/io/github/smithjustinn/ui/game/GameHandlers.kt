@@ -237,18 +237,18 @@ internal class GameLifecycleHandler(
     private val timerHandler: GameTimerHandler,
     private val onMatchFailure: (MemoryGameState, Boolean) -> Unit,
 ) {
-    fun resumeExistingGame(savedGame: Pair<MemoryGameState, Long>) {
+    fun resumeExistingGame(savedGame: io.github.smithjustinn.domain.models.SavedGame) {
         val initialTime =
-            if (savedGame.first.mode == GameMode.TIME_ATTACK) {
-                TimeAttackLogic.calculateInitialTime(savedGame.first.pairCount, savedGame.first.config)
+            if (savedGame.gameState.mode == GameMode.TIME_ATTACK) {
+                TimeAttackLogic.calculateInitialTime(savedGame.gameState.pairCount, savedGame.gameState.config)
             } else {
                 0L
             }
 
         state.update {
             it.copy(
-                game = savedGame.first.copy(lastMatchedIds = persistentListOf()),
-                elapsedTimeSeconds = savedGame.second,
+                game = savedGame.gameState.copy(lastMatchedIds = persistentListOf()),
+                elapsedTimeSeconds = savedGame.elapsedTimeSeconds,
                 maxTimeSeconds = initialTime,
                 showComboExplosion = false,
                 isNewHighScore = false,
@@ -256,13 +256,13 @@ internal class GameLifecycleHandler(
                 showTimeGain = false,
                 showTimeLoss = false,
                 hasUsedDoubleDownPeek = false,
-                isHeatMode = savedGame.first.comboMultiplier >= savedGame.first.config.heatModeThreshold,
+                isHeatMode = savedGame.gameState.comboMultiplier >= savedGame.gameState.config.heatModeThreshold,
             )
         }
-        timerHandler.startTimer(savedGame.first.mode)
+        timerHandler.startTimer(savedGame.gameState.mode)
 
-        if (savedGame.first.cards.any { it.isError }) {
-            onMatchFailure(savedGame.first, true)
+        if (savedGame.gameState.cards.any { it.isError }) {
+            onMatchFailure(savedGame.gameState, true)
         }
     }
 
@@ -296,13 +296,13 @@ internal class GameLifecycleHandler(
     }
 
     fun isSavedGameValid(
-        savedGame: Pair<MemoryGameState, Long>,
+        savedGame: io.github.smithjustinn.domain.models.SavedGame,
         pairCount: Int,
         mode: GameMode,
     ): Boolean =
-        savedGame.first.pairCount == pairCount &&
-            !savedGame.first.isGameOver &&
-            savedGame.first.mode == mode
+        savedGame.gameState.pairCount == pairCount &&
+            !savedGame.gameState.isGameOver &&
+            savedGame.gameState.mode == mode
 
     fun saveGame() {
         appGraph.applicationScope.launch(appGraph.coroutineDispatchers.io) {

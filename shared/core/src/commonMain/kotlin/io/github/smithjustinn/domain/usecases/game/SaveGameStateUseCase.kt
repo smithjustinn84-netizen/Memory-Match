@@ -11,15 +11,13 @@ open class SaveGameStateUseCase(
     private val gameStateRepository: GameStateRepository,
     private val logger: Logger,
 ) {
-    @Suppress("TooGenericExceptionCaught")
     open suspend operator fun invoke(
         state: MemoryGameState,
         elapsedTimeSeconds: Long,
-    ) {
-        try {
+    ): Result<Unit> =
+        runCatching {
             gameStateRepository.saveGameState(state, elapsedTimeSeconds)
-        } catch (e: Exception) {
+        }.onFailure { e ->
             logger.e(e) { "Failed to save game state via use case" }
         }
-    }
 }

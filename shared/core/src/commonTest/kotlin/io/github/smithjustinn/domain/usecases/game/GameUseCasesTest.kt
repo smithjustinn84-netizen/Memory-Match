@@ -8,6 +8,7 @@ import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import io.github.smithjustinn.domain.models.MemoryGameState
+import io.github.smithjustinn.domain.models.SavedGame
 import io.github.smithjustinn.domain.repositories.GameStateRepository
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -51,10 +52,10 @@ class GameUseCasesTest {
         runTest {
             val useCase = GetSavedGameUseCase(repository, logger)
             val state = MemoryGameState()
-            everySuspend { repository.getSavedGameState() } returns (state to 100L)
+            everySuspend { repository.getSavedGameState() } returns SavedGame(state, 100L)
             val result = useCase()
-            assertEquals(state, result?.first)
-            assertEquals(100L, result?.second)
+            assertEquals(state, result?.gameState)
+            assertEquals(100L, result?.elapsedTimeSeconds)
         }
 
     @Test

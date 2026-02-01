@@ -71,9 +71,9 @@ class DefaultStartComponent(
                 val savedGame = gameStateRepository.getSavedGameState()
                 _state.update {
                     it.copy(
-                        hasSavedGame = savedGame != null && !savedGame.first.isGameOver,
-                        savedGamePairCount = savedGame?.first?.pairCount ?: 0,
-                        savedGameMode = savedGame?.first?.mode ?: GameMode.TIME_ATTACK,
+                        hasSavedGame = savedGame != null && !savedGame.gameState.isGameOver,
+                        savedGamePairCount = savedGame?.gameState?.pairCount ?: 0,
+                        savedGameMode = savedGame?.gameState?.mode ?: GameMode.TIME_ATTACK,
                     )
                 }
             } catch (e: Exception) {

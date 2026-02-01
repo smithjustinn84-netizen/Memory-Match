@@ -15,12 +15,15 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class SettingsRepositoryImpl(
     private val dao: SettingsDao,
     private val logger: Logger,
 ) : SettingsRepository {
     private val scope = CoroutineScope(Dispatchers.IO)
+    private val writeMutex = Mutex()
 
     private val settingsFlow =
         dao
@@ -132,48 +135,57 @@ class SettingsRepositoryImpl(
                 initialValue = false,
             )
 
-    override suspend fun setPeekEnabled(enabled: Boolean) {
-        val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
-        dao.saveSettings(current.copy(isPeekEnabled = enabled))
-    }
+    override suspend fun setPeekEnabled(enabled: Boolean) =
+        writeMutex.withLock {
+            val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
+            dao.saveSettings(current.copy(isPeekEnabled = enabled))
+        }
 
-    override suspend fun setSoundEnabled(enabled: Boolean) {
-        val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
-        dao.saveSettings(current.copy(isSoundEnabled = enabled))
-    }
+    override suspend fun setSoundEnabled(enabled: Boolean) =
+        writeMutex.withLock {
+            val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
+            dao.saveSettings(current.copy(isSoundEnabled = enabled))
+        }
 
-    override suspend fun setMusicEnabled(enabled: Boolean) {
-        val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
-        dao.saveSettings(current.copy(isMusicEnabled = enabled))
-    }
+    override suspend fun setMusicEnabled(enabled: Boolean) =
+        writeMutex.withLock {
+            val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
+            dao.saveSettings(current.copy(isMusicEnabled = enabled))
+        }
 
-    override suspend fun setWalkthroughCompleted(completed: Boolean) {
-        val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
-        dao.saveSettings(current.copy(isWalkthroughCompleted = completed))
-    }
+    override suspend fun setWalkthroughCompleted(completed: Boolean) =
+        writeMutex.withLock {
+            val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
+            dao.saveSettings(current.copy(isWalkthroughCompleted = completed))
+        }
 
-    override suspend fun setSoundVolume(volume: Float) {
-        val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
-        dao.saveSettings(current.copy(soundVolume = volume))
-    }
+    override suspend fun setSoundVolume(volume: Float) =
+        writeMutex.withLock {
+            val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
+            dao.saveSettings(current.copy(soundVolume = volume))
+        }
 
-    override suspend fun setMusicVolume(volume: Float) {
-        val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
-        dao.saveSettings(current.copy(musicVolume = volume))
-    }
+    override suspend fun setMusicVolume(volume: Float) =
+        writeMutex.withLock {
+            val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
+            dao.saveSettings(current.copy(musicVolume = volume))
+        }
 
-    override suspend fun setCardBackTheme(theme: CardBackTheme) {
-        val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
-        dao.saveSettings(current.copy(cardBackTheme = theme.name))
-    }
+    override suspend fun setCardBackTheme(theme: CardBackTheme) =
+        writeMutex.withLock {
+            val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
+            dao.saveSettings(current.copy(cardBackTheme = theme.name))
+        }
 
-    override suspend fun setCardSymbolTheme(theme: CardSymbolTheme) {
-        val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
-        dao.saveSettings(current.copy(cardSymbolTheme = theme.name))
-    }
+    override suspend fun setCardSymbolTheme(theme: CardSymbolTheme) =
+        writeMutex.withLock {
+            val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
+            dao.saveSettings(current.copy(cardSymbolTheme = theme.name))
+        }
 
-    override suspend fun setSuitsMultiColored(enabled: Boolean) {
-        val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
-        dao.saveSettings(current.copy(areSuitsMultiColored = enabled))
-    }
+    override suspend fun setSuitsMultiColored(enabled: Boolean) =
+        writeMutex.withLock {
+            val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
+            dao.saveSettings(current.copy(areSuitsMultiColored = enabled))
+        }
 }

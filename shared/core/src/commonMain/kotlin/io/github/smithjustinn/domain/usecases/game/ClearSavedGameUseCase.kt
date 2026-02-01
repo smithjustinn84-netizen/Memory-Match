@@ -10,12 +10,10 @@ open class ClearSavedGameUseCase(
     private val gameStateRepository: GameStateRepository,
     private val logger: Logger,
 ) {
-    @Suppress("TooGenericExceptionCaught")
-    open suspend operator fun invoke() {
-        try {
+    open suspend operator fun invoke(): Result<Unit> =
+        runCatching {
             gameStateRepository.clearSavedGameState()
-        } catch (e: Exception) {
+        }.onFailure { e ->
             logger.e(e) { "Failed to clear saved game state via use case" }
         }
-    }
 }

@@ -4,6 +4,7 @@ import co.touchlab.kermit.Logger
 import io.github.smithjustinn.data.local.GameStateDao
 import io.github.smithjustinn.data.local.GameStateEntity
 import io.github.smithjustinn.domain.models.MemoryGameState
+import io.github.smithjustinn.domain.models.SavedGame
 import io.github.smithjustinn.domain.repositories.GameStateRepository
 import kotlinx.serialization.json.Json
 
@@ -26,11 +27,11 @@ class GameStateRepositoryImpl(
     }
 
     @Suppress("TooGenericExceptionCaught")
-    override suspend fun getSavedGameState(): Pair<MemoryGameState, Long>? {
+    override suspend fun getSavedGameState(): SavedGame? {
         val entity = dao.getSavedGameState() ?: return null
         return try {
             val gameState = json.decodeFromString<MemoryGameState>(entity.gameStateJson)
-            gameState to entity.elapsedTimeSeconds
+            SavedGame(gameState, entity.elapsedTimeSeconds)
         } catch (e: kotlinx.serialization.SerializationException) {
             logger.e(e) { "Failed to decode saved game state: JSON corruption" }
             null

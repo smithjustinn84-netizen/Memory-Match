@@ -117,7 +117,7 @@ class DefaultGameComponent(
     private suspend fun initializeGameState(args: GameArgs): GameInitResult {
         val savedGame = if (args.forceNewGame) null else appGraph.getSavedGameUseCase()
         return if (savedGame != null && isSavedGameValid(savedGame, args.pairCount, args.mode)) {
-            GameInitResult(savedGame.first, savedGame.second, isResumed = true)
+            GameInitResult(savedGame.gameState, savedGame.elapsedTimeSeconds, isResumed = true)
         } else {
             val newState = setupNewGame(args.pairCount, args.mode, args.seed)
             val initialTime =
@@ -414,13 +414,13 @@ class DefaultGameComponent(
     }
 
     private fun isSavedGameValid(
-        savedGame: Pair<MemoryGameState, Long>,
+        savedGame: io.github.smithjustinn.domain.models.SavedGame,
         pairCount: Int,
         mode: GameMode,
     ): Boolean =
-        savedGame.first.pairCount == pairCount &&
-            !savedGame.first.isGameOver &&
-            savedGame.first.mode == mode
+        savedGame.gameState.pairCount == pairCount &&
+            !savedGame.gameState.isGameOver &&
+            savedGame.gameState.mode == mode
 
     private fun saveGame(
         game: MemoryGameState,

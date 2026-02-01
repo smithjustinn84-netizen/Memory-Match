@@ -1,6 +1,7 @@
 package io.github.smithjustinn.domain.repositories
 
 import io.github.smithjustinn.domain.models.MemoryGameState
+import io.github.smithjustinn.domain.models.SavedGame
 
 interface GameStateRepository {
     suspend fun saveGameState(
@@ -8,7 +9,7 @@ interface GameStateRepository {
         elapsedTimeSeconds: Long,
     )
 
-    suspend fun getSavedGameState(): Pair<MemoryGameState, Long>?
+    suspend fun getSavedGameState(): SavedGame?
 
     suspend fun clearSavedGameState()
 }

@@ -1,7 +1,7 @@
 package io.github.smithjustinn.domain.usecases.game
 
 import co.touchlab.kermit.Logger
-import io.github.smithjustinn.domain.models.MemoryGameState
+import io.github.smithjustinn.domain.models.SavedGame
 import io.github.smithjustinn.domain.repositories.GameStateRepository
 
 /**
@@ -12,7 +12,7 @@ open class GetSavedGameUseCase(
     private val logger: Logger,
 ) {
     @Suppress("TooGenericExceptionCaught")
-    open suspend operator fun invoke(): Pair<MemoryGameState, Long>? =
+    open suspend operator fun invoke(): SavedGame? =
         try {
             gameStateRepository.getSavedGameState()
         } catch (e: Exception) {
