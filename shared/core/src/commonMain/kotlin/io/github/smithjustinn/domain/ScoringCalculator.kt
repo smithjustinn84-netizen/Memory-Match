@@ -11,6 +11,7 @@ import io.github.smithjustinn.domain.models.ScoringConfig
  */
 object ScoringCalculator {
     private const val TIME_ATTACK_BONUS_MULTIPLIER = 10
+    private const val DAILY_CHALLENGE_CURRENCY_BONUS = 500
 
     data class MatchScoreResult(
         val finalScore: Int,
@@ -74,6 +75,13 @@ object ScoringCalculator {
 
         val totalScore = state.score + timeBonus + moveBonus
 
+        val earnedCurrency =
+            if (state.mode == GameMode.DAILY_CHALLENGE) {
+                totalScore + DAILY_CHALLENGE_CURRENCY_BONUS
+            } else {
+                totalScore
+            }
+
         return state.copy(
             score = totalScore,
             scoreBreakdown =
@@ -84,6 +92,7 @@ object ScoringCalculator {
                     timeBonus = timeBonus,
                     moveBonus = moveBonus,
                     totalScore = totalScore,
+                    earnedCurrency = earnedCurrency,
                 ),
         )
     }

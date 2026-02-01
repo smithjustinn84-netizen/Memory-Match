@@ -4,6 +4,7 @@ import io.github.smithjustinn.domain.models.DailyChallengeMutator
 import io.github.smithjustinn.domain.models.GameDomainEvent
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
+import io.github.smithjustinn.domain.usecases.economy.EarnCurrencyUseCase
 import io.github.smithjustinn.utils.CoroutineDispatchers
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
@@ -29,6 +30,7 @@ class GameStateMachine(
     private val dispatchers: CoroutineDispatchers,
     private val initialState: MemoryGameState,
     private val initialTimeSeconds: Long,
+    private val earnCurrencyUseCase: EarnCurrencyUseCase,
     private val onSaveState: (MemoryGameState, Long) -> Unit,
 ) {
     private val _state = MutableStateFlow(initialState)
@@ -103,6 +105,9 @@ class GameStateMachine(
                         stopTimer()
                         val finalState = MemoryGameLogic.applyFinalBonuses(flippedState, internalTimeSeconds)
                         transition { finalState }
+                        scope.launch {
+                            earnCurrencyUseCase.execute(finalState.scoreBreakdown.earnedCurrency.toLong())
+                        }
                         effect(GameEffect.PlayWinSound)
                         effect(GameEffect.VibrateMatch)
                         effect(GameEffect.GameWon(finalState))

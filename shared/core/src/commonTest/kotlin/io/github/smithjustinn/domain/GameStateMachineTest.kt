@@ -1,12 +1,19 @@
 package io.github.smithjustinn.domain
 
 import app.cash.turbine.test
+import dev.mokkery.answering.returns
+import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.github.smithjustinn.domain.models.DailyChallengeMutator
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
+import io.github.smithjustinn.domain.usecases.economy.EarnCurrencyUseCase
 import io.github.smithjustinn.test.BaseLogicTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -203,15 +210,43 @@ class GameStateMachineTest : BaseLogicTest() {
             }
         }
 
+    @Test
+    fun `game win triggers EarnCurrencyUseCase`() =
+        runTest {
+            val state = MemoryGameLogic.createInitialState(pairCount = 1) // Only one pair to win quickly
+            val firstCard = state.cards[0]
+            val matchingCard = state.cards[1]
+            val mockEarnCurrency = mock<EarnCurrencyUseCase>()
+            // Setup mock
+            everySuspend { mockEarnCurrency.execute(any()) } returns Unit
+
+            val machine = createStateMachine(initialState = state, earnCurrencyUseCase = mockEarnCurrency)
+
+            machine.dispatch(GameAction.FlipCard(firstCard.id))
+            advanceUntilIdle()
+            machine.dispatch(GameAction.FlipCard(matchingCard.id))
+            advanceUntilIdle()
+
+            // Verify use case was called
+            verifySuspend {
+                mockEarnCurrency.execute(any())
+            }
+        }
+
     private fun createStateMachine(
         initialState: MemoryGameState = MemoryGameState(mode = GameMode.TIME_ATTACK),
         initialTimeSeconds: Long = INITIAL_TIME,
+        earnCurrencyUseCase: EarnCurrencyUseCase =
+            mock<EarnCurrencyUseCase>().also {
+                everySuspend { it.execute(any()) } returns Unit
+            },
         onSaveState: (MemoryGameState, Long) -> Unit = { _, _ -> },
     ) = GameStateMachine(
         scope = testScope,
         dispatchers = testDispatchers,
         initialState = initialState,
         initialTimeSeconds = initialTimeSeconds,
+        earnCurrencyUseCase = earnCurrencyUseCase,
         onSaveState = onSaveState,
     )
 }

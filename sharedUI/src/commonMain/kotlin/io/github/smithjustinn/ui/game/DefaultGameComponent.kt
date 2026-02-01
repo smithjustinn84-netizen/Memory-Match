@@ -163,6 +163,7 @@ class DefaultGameComponent(
                 dispatchers = dispatchers,
                 initialState = initialState,
                 initialTimeSeconds = initialTime,
+                earnCurrencyUseCase = appGraph.earnCurrencyUseCase,
                 onSaveState = { state, time -> saveGame(state, time) },
             ).also { machine ->
                 scope.launch {

@@ -6,6 +6,7 @@ import io.github.smithjustinn.domain.repositories.GameStateRepository
 import io.github.smithjustinn.domain.repositories.GameStatsRepository
 import io.github.smithjustinn.domain.repositories.LeaderboardRepository
 import io.github.smithjustinn.domain.repositories.SettingsRepository
+import io.github.smithjustinn.domain.usecases.economy.EarnCurrencyUseCase
 import io.github.smithjustinn.domain.usecases.game.CalculateFinalScoreUseCase
 import io.github.smithjustinn.domain.usecases.game.ClearSavedGameUseCase
 import io.github.smithjustinn.domain.usecases.game.FlipCardUseCase
@@ -49,4 +50,5 @@ class KoinAppGraph :
     override val getSavedGameUseCase: GetSavedGameUseCase by inject()
     override val saveGameStateUseCase: SaveGameStateUseCase by inject()
     override val clearSavedGameUseCase: ClearSavedGameUseCase by inject()
+    override val earnCurrencyUseCase: EarnCurrencyUseCase by inject()
 }

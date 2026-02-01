@@ -7,6 +7,7 @@ import io.github.smithjustinn.domain.repositories.GameStateRepository
 import io.github.smithjustinn.domain.repositories.GameStatsRepository
 import io.github.smithjustinn.domain.repositories.LeaderboardRepository
 import io.github.smithjustinn.domain.repositories.SettingsRepository
+import io.github.smithjustinn.domain.usecases.economy.EarnCurrencyUseCase
 import io.github.smithjustinn.domain.usecases.game.CalculateFinalScoreUseCase
 import io.github.smithjustinn.domain.usecases.game.ClearSavedGameUseCase
 import io.github.smithjustinn.domain.usecases.game.FlipCardUseCase
@@ -48,6 +49,7 @@ interface AppGraph {
     val getSavedGameUseCase: GetSavedGameUseCase
     val saveGameStateUseCase: SaveGameStateUseCase
     val clearSavedGameUseCase: ClearSavedGameUseCase
+    val earnCurrencyUseCase: EarnCurrencyUseCase
 }
 
 val LocalAppGraph =
