@@ -130,7 +130,7 @@ internal class GameFeedbackHandler(
         }
 
         if (newState.mode == GameMode.TIME_ATTACK) {
-            val totalTimeGain = TimeAttackLogic.calculateTimeGain(newState.comboMultiplier - 1)
+            val totalTimeGain = TimeAttackLogic.calculateTimeGain(newState.comboMultiplier, newState.config)
             val isMega = newState.comboMultiplier >= GameConstants.MEGA_BONUS_THRESHOLD
 
             state.update {
@@ -165,7 +165,7 @@ internal class GameFeedbackHandler(
 
         var isGameOver = false
         if (newState.mode == GameMode.TIME_ATTACK && !isResuming) {
-            val penalty = TimeAttackLogic.TIME_PENALTY_MISMATCH
+            val penalty = newState.config.timeAttackMismatchPenalty
             state.update {
                 val newTime = (it.elapsedTimeSeconds - penalty).coerceAtLeast(0)
                 if (newTime == 0L) isGameOver = true
@@ -240,7 +240,7 @@ internal class GameLifecycleHandler(
     fun resumeExistingGame(savedGame: Pair<MemoryGameState, Long>) {
         val initialTime =
             if (savedGame.first.mode == GameMode.TIME_ATTACK) {
-                TimeAttackLogic.calculateInitialTime(savedGame.first.pairCount)
+                TimeAttackLogic.calculateInitialTime(savedGame.first.pairCount, savedGame.first.config)
             } else {
                 0L
             }
@@ -273,7 +273,7 @@ internal class GameLifecycleHandler(
     ) {
         val initialTime =
             if (mode == GameMode.TIME_ATTACK) {
-                TimeAttackLogic.calculateInitialTime(pairCount)
+                TimeAttackLogic.calculateInitialTime(pairCount, initialGameState.config)
             } else {
                 0L
             }

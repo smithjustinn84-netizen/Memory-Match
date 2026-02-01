@@ -122,7 +122,7 @@ class DefaultGameComponent(
             val newState = setupNewGame(args.pairCount, args.mode, args.seed)
             val initialTime =
                 if (args.mode == GameMode.TIME_ATTACK) {
-                    TimeAttackLogic.calculateInitialTime(args.pairCount)
+                    TimeAttackLogic.calculateInitialTime(args.pairCount, newState.config)
                 } else {
                     0L
                 }
@@ -137,7 +137,7 @@ class DefaultGameComponent(
     ) {
         val maxTime =
             if (args.mode == GameMode.TIME_ATTACK) {
-                TimeAttackLogic.calculateInitialTime(args.pairCount)
+                TimeAttackLogic.calculateInitialTime(args.pairCount, initialState.config)
             } else {
                 0L
             }

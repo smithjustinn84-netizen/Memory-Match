@@ -10,7 +10,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class DifficultyUIMapperTest {
-
     @Test
     fun testDisplayNameResMapping() {
         assertEquals(Res.string.difficulty_tourist, DifficultyType.TOURIST.displayNameRes)

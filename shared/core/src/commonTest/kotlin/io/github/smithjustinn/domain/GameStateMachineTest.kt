@@ -128,10 +128,11 @@ class GameStateMachineTest : BaseLogicTest() {
                 advanceTimeBy(MISMATCH_DELAY_MS + 1)
 
                 // Then ProcessMismatch is dispatched, which emits TimeLoss and TimerUpdate
-                assertEquals(GameEffect.TimerUpdate(INITIAL_TIME - TimeAttackLogic.TIME_PENALTY_MISMATCH), awaitItem())
+                val penalty = machine.state.value.config.timeAttackMismatchPenalty
+                assertEquals(GameEffect.TimerUpdate(INITIAL_TIME - penalty), awaitItem())
                 val lossEffect = awaitItem()
                 assertTrue(lossEffect is GameEffect.TimeLoss, "Expected TimeLoss effect")
-                assertEquals(TimeAttackLogic.TIME_PENALTY_MISMATCH.toInt(), (lossEffect as GameEffect.TimeLoss).amount)
+                assertEquals(penalty.toInt(), (lossEffect as GameEffect.TimeLoss).amount)
             }
         }
 

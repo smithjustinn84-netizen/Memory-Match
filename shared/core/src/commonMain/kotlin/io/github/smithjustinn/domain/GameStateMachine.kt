@@ -100,7 +100,11 @@ class GameStateMachine(
                             effect(GameEffect.VibrateHeat)
                         }
                         if (flippedState.mode == GameMode.TIME_ATTACK) {
-                            val bonus = TimeAttackLogic.calculateTimeGain(flippedState.comboMultiplier - 1)
+                            val bonus =
+                                TimeAttackLogic.calculateTimeGain(
+                                    flippedState.comboMultiplier,
+                                    flippedState.config,
+                                )
                             updateTime { it + bonus }
                             effect(GameEffect.TimerUpdate(internalTimeSeconds + bonus))
                             effect(GameEffect.TimeGain(bonus.toInt()))
@@ -158,7 +162,7 @@ class GameStateMachine(
             gameStateMachine(_state.value, internalTimeSeconds) {
                 val currentState = _state.value
                 if (currentState.mode == GameMode.TIME_ATTACK) {
-                    val penalty = TimeAttackLogic.TIME_PENALTY_MISMATCH
+                    val penalty = currentState.config.timeAttackMismatchPenalty
                     updateTime { (it - penalty).coerceAtLeast(0) }
                     effect(GameEffect.TimerUpdate(internalTimeSeconds - penalty))
                     effect(GameEffect.TimeLoss(penalty.toInt()))

@@ -5,7 +5,6 @@ import io.github.smithjustinn.domain.models.GameDomainEvent
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
 import io.github.smithjustinn.domain.models.Rank
-import io.github.smithjustinn.domain.models.ScoreBreakdown
 import io.github.smithjustinn.domain.models.ScoringConfig
 import io.github.smithjustinn.domain.models.Suit
 import kotlinx.collections.immutable.persistentListOf
@@ -124,7 +123,14 @@ object MemoryGameLogic {
         val matchBasePoints = config.baseMatchPoints
         val matchComboBonus = comboFactor * config.comboBonusPoints
 
-        val scoreResult = calculateMatchScore(state, isWon, matchBasePoints, matchComboBonus)
+        val scoreResult =
+            ScoringCalculator.calculateMatchScore(
+                currentScore = state.score,
+                isDoubleDownActive = state.isDoubleDownActive,
+                matchBasePoints = matchBasePoints,
+                matchComboBonus = matchComboBonus,
+                isWon = isWon,
+            )
 
         val comment =
             GameCommentGenerator.generateMatchComment(
@@ -151,7 +157,7 @@ object MemoryGameLogic {
                 lastMatchedIds = persistentListOf(first.id, second.id),
             )
 
-        val event = determineSuccessEvent(isWon, state.comboMultiplier, config)
+        val event = ScoringCalculator.determineSuccessEvent(isWon, state.comboMultiplier, config)
 
         return newState to event
     }
@@ -219,43 +225,8 @@ object MemoryGameLogic {
     fun applyFinalBonuses(
         state: MemoryGameState,
         elapsedTimeSeconds: Long,
-    ): MemoryGameState {
-        if (!state.isGameWon) return state
+    ): MemoryGameState = ScoringCalculator.applyFinalBonuses(state, elapsedTimeSeconds)
 
-        val config = state.config
-
-        // Time Bonus: Small impact
-        val timeBonus =
-            if (state.mode == GameMode.TIME_ATTACK) {
-                // In Time Attack, remaining time is the bonus
-                (elapsedTimeSeconds * TIME_ATTACK_BONUS_MULTIPLIER).toInt() // Example: 10 points per remaining second
-            } else {
-                (state.pairCount * config.timeBonusPerPair - (elapsedTimeSeconds * config.timePenaltyPerSecond))
-                    .coerceAtLeast(0)
-                    .toInt()
-            }
-
-        // Move Efficiency Bonus: Dominant factor
-        val moveEfficiency = state.pairCount.toDouble() / state.moves.toDouble()
-        val moveBonus = (moveEfficiency * config.moveBonusMultiplier).toInt()
-
-        val totalScore = state.score + timeBonus + moveBonus
-
-        return state.copy(
-            score = totalScore,
-            scoreBreakdown =
-                ScoreBreakdown(
-                    basePoints = state.totalBasePoints,
-                    comboBonus = state.totalComboBonus,
-                    doubleDownBonus = state.totalDoubleDownBonus,
-                    timeBonus = timeBonus,
-                    moveBonus = moveBonus,
-                    totalScore = totalScore,
-                ),
-        )
-    }
-
-    private const val TIME_ATTACK_BONUS_MULTIPLIER = 10
     const val MIN_PAIRS_FOR_DOUBLE_DOWN = 3
 
     /**
@@ -289,44 +260,3 @@ private fun updateCardsForMatch(
                 card
             }
         }.toImmutableList()
-
-private fun calculateMatchScore(
-    state: MemoryGameState,
-    isWon: Boolean,
-    matchBasePoints: Int,
-    matchComboBonus: Int,
-): MatchScoreResult {
-    val matchPoints = matchBasePoints + matchComboBonus
-
-    return if (isWon && state.isDoubleDownActive) {
-        val totalWithoutBonus = state.score + matchPoints
-        val finalScore = totalWithoutBonus * 2
-        MatchScoreResult(
-            finalScore = finalScore,
-            ddBonus = finalScore - totalWithoutBonus,
-        )
-    } else {
-        val multiplier = if (state.isDoubleDownActive) 2 else 1
-        val matchTotal = matchPoints * multiplier
-        MatchScoreResult(
-            finalScore = state.score + matchTotal,
-            ddBonus = if (state.isDoubleDownActive) matchTotal / 2 else 0,
-        )
-    }
-}
-
-private data class MatchScoreResult(
-    val finalScore: Int,
-    val ddBonus: Int,
-)
-
-private fun determineSuccessEvent(
-    isWon: Boolean,
-    comboMultiplier: Int,
-    config: ScoringConfig,
-): GameDomainEvent =
-    when {
-        isWon -> GameDomainEvent.GameWon
-        comboMultiplier > config.theNutsThreshold -> GameDomainEvent.TheNutsAchieved
-        else -> GameDomainEvent.MatchSuccess
-    }

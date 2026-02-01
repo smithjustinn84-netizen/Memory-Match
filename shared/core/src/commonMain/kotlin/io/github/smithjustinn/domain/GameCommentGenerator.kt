@@ -24,8 +24,6 @@ import kotlinx.collections.immutable.persistentListOf
  * Generates comments based on game events.
  */
 object GameCommentGenerator {
-    private const val POT_ODDS_DIVISOR = 2
-    private const val MOVES_PER_MATCH_THRESHOLD = 2
     private const val ONE_MORE_REMAINING = 1
 
     fun generateMatchComment(
@@ -50,11 +48,11 @@ object GameCommentGenerator {
                 MatchComment(Res.string.comment_all_in)
             }
 
-            matchesFound == totalPairs / POT_ODDS_DIVISOR -> {
+            matchesFound == totalPairs / config.commentPotOddsDivisor -> {
                 MatchComment(Res.string.comment_pot_odds)
             }
 
-            moves <= matchesFound * MOVES_PER_MATCH_THRESHOLD -> {
+            moves <= matchesFound * config.commentMovesPerMatchThreshold -> {
                 MatchComment(Res.string.comment_photographic)
             }
 

@@ -10,23 +10,41 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ScoringConfig(
     /** Base points awarded for each successful card match. */
-    val baseMatchPoints: Int = 100,
+    val baseMatchPoints: Int = DEFAULT_BASE_MATCH_POINTS,
     /** Additional points per combo level (stacks with each consecutive match). */
-    val comboBonusPoints: Int = 50,
+    val comboBonusPoints: Int = DEFAULT_COMBO_BONUS_POINTS,
     /** Bonus points per pair when completing the game quickly. */
-    val timeBonusPerPair: Int = 50,
+    val timeBonusPerPair: Int = DEFAULT_TIME_BONUS_PER_PAIR,
     /** Points deducted per second over the target completion time. */
-    val timePenaltyPerSecond: Int = 1,
+    val timePenaltyPerSecond: Int = DEFAULT_TIME_PENALTY_PER_SECOND,
     /** Base value for move efficiency calculation (higher rewards fewer moves). */
-    val moveBonusMultiplier: Int = 10000,
+    val moveBonusMultiplier: Int = DEFAULT_MOVE_BONUS_MULTIPLIER,
     /** Combo streak required to activate heat mode visual effects. */
-    val heatModeThreshold: Int = 3,
+    val heatModeThreshold: Int = DEFAULT_HEAT_MODE_THRESHOLD,
     /** Points lost when failing a Double Down bet. */
-    val doubleDownPenalty: Int = 500,
+    val doubleDownPenalty: Int = DEFAULT_DOUBLE_DOWN_PENALTY,
     /** Minimum combo streak for the "High Roller" achievement. */
-    val highRollerThreshold: Int = 1,
+    val highRollerThreshold: Int = DEFAULT_HIGH_ROLLER_THRESHOLD,
     /** Combo streak required for "The Nuts" achievement (very difficult). */
-    val theNutsThreshold: Int = 6,
+    val theNutsThreshold: Int = DEFAULT_THE_NUTS_THRESHOLD,
+    /** Map of pair counts to initial time bank in Time Attack mode. */
+    val timeAttackInitialTimeMap: Map<Int, Long> =
+        mapOf(
+            PAIR_COUNT_6 to INITIAL_TIME_25,
+            PAIR_COUNT_8 to INITIAL_TIME_35,
+            PAIR_COUNT_10 to INITIAL_TIME_45,
+            PAIR_COUNT_12 to INITIAL_TIME_55,
+        ),
+    /** Base time gain on match in Time Attack. */
+    val timeAttackBaseGain: Int = DEFAULT_TIME_ATTACK_BASE_GAIN,
+    /** Bonus time per combo level in Time Attack. */
+    val timeAttackComboBonusMultiplier: Int = DEFAULT_TIME_ATTACK_COMBO_BONUS_MULTIPLIER,
+    /** Penalty in seconds for a mismatch in Time Attack. */
+    val timeAttackMismatchPenalty: Long = DEFAULT_TIME_ATTACK_MISMATCH_PENALTY,
+    /** Divisor used to determine "Pot Odds" comment timing. */
+    val commentPotOddsDivisor: Int = DEFAULT_COMMENT_POT_ODDS_DIVISOR,
+    /** Threshold for "Photographic" memory comment (moves per match). */
+    val commentMovesPerMatchThreshold: Int = DEFAULT_COMMENT_MOVES_PER_MATCH_THRESHOLD,
 ) {
     init {
         require(baseMatchPoints > 0) { "Base match points must be positive" }
@@ -34,5 +52,33 @@ data class ScoringConfig(
         require(theNutsThreshold >= highRollerThreshold) {
             "The Nuts threshold must be >= High Roller threshold"
         }
+    }
+
+    companion object {
+        const val DEFAULT_BASE_MATCH_POINTS = 100
+        const val DEFAULT_COMBO_BONUS_POINTS = 50
+        const val DEFAULT_TIME_BONUS_PER_PAIR = 50
+        const val DEFAULT_TIME_PENALTY_PER_SECOND = 1
+        const val DEFAULT_MOVE_BONUS_MULTIPLIER = 10000
+        const val DEFAULT_HEAT_MODE_THRESHOLD = 3
+        const val DEFAULT_DOUBLE_DOWN_PENALTY = 500
+        const val DEFAULT_HIGH_ROLLER_THRESHOLD = 1
+        const val DEFAULT_THE_NUTS_THRESHOLD = 6
+
+        const val PAIR_COUNT_6 = 6
+        const val PAIR_COUNT_8 = 8
+        const val PAIR_COUNT_10 = 10
+        const val PAIR_COUNT_12 = 12
+
+        const val INITIAL_TIME_25 = 25L
+        const val INITIAL_TIME_35 = 35L
+        const val INITIAL_TIME_45 = 45L
+        const val INITIAL_TIME_55 = 55L
+
+        const val DEFAULT_TIME_ATTACK_BASE_GAIN = 3
+        const val DEFAULT_TIME_ATTACK_COMBO_BONUS_MULTIPLIER = 2
+        const val DEFAULT_TIME_ATTACK_MISMATCH_PENALTY = 2L
+        const val DEFAULT_COMMENT_POT_ODDS_DIVISOR = 2
+        const val DEFAULT_COMMENT_MOVES_PER_MATCH_THRESHOLD = 2
     }
 }

@@ -2,6 +2,7 @@ package io.github.smithjustinn.domain
 
 import io.github.smithjustinn.domain.models.GameDomainEvent
 import io.github.smithjustinn.domain.models.GameMode
+import io.github.smithjustinn.domain.models.ScoringConfig
 import io.github.smithjustinn.resources.Res
 import io.github.smithjustinn.resources.comment_bad_beat
 import io.github.smithjustinn.resources.comment_boom
@@ -207,21 +208,22 @@ class MemoryGameLogicTest {
 
     @Test
     fun `calculateInitialTime should return correct values for difficulties`() {
-        assertEquals(25L, TimeAttackLogic.calculateInitialTime(6))
-        assertEquals(35L, TimeAttackLogic.calculateInitialTime(8))
-        assertEquals(45L, TimeAttackLogic.calculateInitialTime(10))
-        assertEquals(55L, TimeAttackLogic.calculateInitialTime(12))
-        assertEquals(55L, TimeAttackLogic.calculateInitialTime(12))
+        val config = ScoringConfig()
+        assertEquals(25L, TimeAttackLogic.calculateInitialTime(6, config))
+        assertEquals(35L, TimeAttackLogic.calculateInitialTime(8, config))
+        assertEquals(45L, TimeAttackLogic.calculateInitialTime(10, config))
+        assertEquals(55L, TimeAttackLogic.calculateInitialTime(12, config))
     }
 
     @Test
     fun `calculateTimeGain should return correct values including combo bonus`() {
+        val config = ScoringConfig()
         // Base gain (combo 1)
-        assertEquals(3, TimeAttackLogic.calculateTimeGain(1))
+        assertEquals(3, TimeAttackLogic.calculateTimeGain(1, config))
         // Combo 2
-        assertEquals(5, TimeAttackLogic.calculateTimeGain(2))
+        assertEquals(5, TimeAttackLogic.calculateTimeGain(2, config))
         // Combo 3
-        assertEquals(7, TimeAttackLogic.calculateTimeGain(3))
+        assertEquals(7, TimeAttackLogic.calculateTimeGain(3, config))
     }
 
     @Test
@@ -305,14 +307,16 @@ class MemoryGameLogicTest {
 
     @Test
     fun `calculateInitialTime should fallback for unknown pair count`() {
+        val config = ScoringConfig()
         // Fallback is pairCount * 4
         // Pair count 20 -> 80L
-        assertEquals(80L, TimeAttackLogic.calculateInitialTime(20))
+        assertEquals(80L, TimeAttackLogic.calculateInitialTime(20, config))
     }
 
     @Test
     fun `TIME_PENALTY_MISMATCH should be 2 seconds`() {
-        assertEquals(2L, TimeAttackLogic.TIME_PENALTY_MISMATCH)
+        val config = ScoringConfig()
+        assertEquals(2L, config.timeAttackMismatchPenalty)
     }
 
     @Test
