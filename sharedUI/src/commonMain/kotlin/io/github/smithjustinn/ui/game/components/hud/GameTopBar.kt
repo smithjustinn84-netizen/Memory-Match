@@ -39,8 +39,9 @@ import io.github.smithjustinn.resources.Res
 import io.github.smithjustinn.resources.back_content_description
 import io.github.smithjustinn.resources.mute_content_description
 import io.github.smithjustinn.resources.restart_content_description
-import io.github.smithjustinn.resources.score_caps
 import io.github.smithjustinn.resources.unmute_content_description
+import io.github.smithjustinn.resources.hud_pot_label
+import io.github.smithjustinn.resources.buy_in_banked_label
 import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.components.AppIcons
 import io.github.smithjustinn.ui.game.components.timer.TimerDisplay
@@ -134,8 +135,9 @@ private fun TopBarMainRow(
             layout = if (state.compact) TimerLayout.COMPACT else TimerLayout.STANDARD,
         )
 
-        PotScoreDisplay(
-            score = state.score,
+        ScoringDisplay(
+            bankedScore = state.bankedScore,
+            currentPot = state.currentPot,
             compact = state.compact,
             modifier =
                 Modifier.onGloballyPositioned { coords ->
@@ -178,44 +180,79 @@ private fun ControlButtons(
 }
 
 @Composable
-private fun PotScoreDisplay(
-    score: Int,
+private fun ScoringDisplay(
+    bankedScore: Int,
+    currentPot: Int,
     compact: Boolean,
     modifier: Modifier = Modifier,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier,
+    ) {
+        // Current Pot Display (At Risk)
+        ValueBadge(
+            label = stringResource(Res.string.hud_pot_label),
+            value = currentPot,
+            color = PokerTheme.colors.goldenYellow,
+            compact = compact,
+        )
+
+        // Banked Score Display (Safe)
+        ValueBadge(
+            label = stringResource(Res.string.buy_in_banked_label),
+            value = bankedScore,
+            color = PokerTheme.colors.brass,
+            compact = compact,
+        )
+    }
+}
+
+@Composable
+private fun ValueBadge(
+    label: String,
+    value: Int,
+    color: Color,
+    compact: Boolean,
 ) {
     Surface(
         shape =
             androidx.compose.foundation.shape
-                .RoundedCornerShape(if (compact) 12.dp else 16.dp),
-        color = Color.Black.copy(alpha = 0.3f), // Glassmorphism-lite on wood
-        border = androidx.compose.foundation.BorderStroke(1.dp, PokerTheme.colors.brass.copy(alpha = 0.3f)),
-        modifier = modifier.height(if (compact) 36.dp else 44.dp),
+                .RoundedCornerShape(if (compact) 10.dp else 14.dp),
+        color = Color.Black.copy(alpha = 0.4f),
+        border = androidx.compose.foundation.BorderStroke(1.dp, color.copy(alpha = 0.3f)),
+        modifier = Modifier.height(if (compact) 32.dp else 40.dp),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = if (compact) 12.dp else 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(if (compact) 4.dp else 8.dp),
+            modifier = Modifier.padding(horizontal = if (compact) 8.dp else 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(if (compact) 4.dp else 6.dp),
         ) {
             Text(
-                text = stringResource(Res.string.score_caps),
+                text = label,
                 style =
                     androidx.compose.material3.MaterialTheme.typography.labelSmall.copy(
                         fontWeight = androidx.compose.ui.text.font.FontWeight.Black,
-                        letterSpacing = 1.sp,
-                        fontFamily = androidx.compose.ui.text.font.FontFamily.Serif,
+                        fontSize = if (compact) 9.sp else 11.sp,
+                        letterSpacing = 0.5.sp,
+                        fontFamily =
+                            androidx.compose.ui.text.font.FontWeight.Bold.toString().lowercase().let {
+                                androidx.compose.ui.text.font.FontFamily.Serif
+                            },
                     ),
-                color = PokerTheme.colors.brass.copy(alpha = 0.7f),
+                color = color.copy(alpha = 0.8f),
             )
 
             Text(
-                text = score.toString(),
+                text = value.toString(),
                 style =
-                    androidx.compose.material3.MaterialTheme.typography.titleLarge.copy(
-                        fontSize = if (compact) 16.sp else 20.sp,
+                    androidx.compose.material3.MaterialTheme.typography.titleMedium.copy(
+                        fontSize = if (compact) 14.sp else 18.sp,
                         fontWeight = androidx.compose.ui.text.font.FontWeight.Black,
                         fontFamily = androidx.compose.ui.text.font.FontFamily.Serif,
                     ),
-                color = PokerTheme.colors.brass,
+                color = color,
             )
         }
     }

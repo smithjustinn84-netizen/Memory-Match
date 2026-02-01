@@ -149,7 +149,7 @@
     <string name="score_double_down">Double Or Nothing</string>
     <string name="score_move_efficiency">Move Efficiency</string>
     <string name="share_receipt">SHARE RECEIPT</string>
-    <string name="pot_caps">POT</string>
+    <string name="hud_pot_label">POT</string>
     <string name="score_caps">SCORE</string>
     <string name="high_roller_circuit">HIGH ROLLER CIRCUIT</string>
     <string name="mode_high_roller">High Roller</string>

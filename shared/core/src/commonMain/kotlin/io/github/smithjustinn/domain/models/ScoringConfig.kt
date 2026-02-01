@@ -45,6 +45,10 @@ data class ScoringConfig(
     val commentPotOddsDivisor: Int = DEFAULT_COMMENT_POT_ODDS_DIVISOR,
     /** Threshold for "Photographic" memory comment (moves per match). */
     val commentMovesPerMatchThreshold: Int = DEFAULT_COMMENT_MOVES_PER_MATCH_THRESHOLD,
+    /** Number of matches required to bank the current pot. */
+    val matchMilestoneInterval: Int = DEFAULT_MATCH_MILESTONE_INTERVAL,
+    /** Percentage of the current pot lost on a mismatch (0.0 to 1.0). */
+    val potMismatchPenalty: Double = DEFAULT_POT_MISMATCH_PENALTY,
 ) {
     init {
         require(baseMatchPoints > 0) { "Base match points must be positive" }
@@ -80,5 +84,8 @@ data class ScoringConfig(
         const val DEFAULT_TIME_ATTACK_MISMATCH_PENALTY = 2L
         const val DEFAULT_COMMENT_POT_ODDS_DIVISOR = 2
         const val DEFAULT_COMMENT_MOVES_PER_MATCH_THRESHOLD = 2
+
+        const val DEFAULT_MATCH_MILESTONE_INTERVAL = 4
+        const val DEFAULT_POT_MISMATCH_PENALTY = 0.25
     }
 }

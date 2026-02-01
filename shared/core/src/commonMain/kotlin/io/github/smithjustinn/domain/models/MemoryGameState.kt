@@ -24,6 +24,7 @@ data class MemoryGameState(
     val isGameOver: Boolean = false,
     val moves: Int = 0,
     val score: Int = 0,
+    val currentPot: Int = 0,
     val totalBasePoints: Int = 0,
     val totalComboBonus: Int = 0,
     val totalDoubleDownBonus: Int = 0,

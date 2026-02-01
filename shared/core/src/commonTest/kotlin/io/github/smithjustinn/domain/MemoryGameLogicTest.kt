@@ -104,7 +104,9 @@ class MemoryGameLogicTest {
         assertTrue(state2.cards.first { it.id == firstCard.id }.isMatched)
         assertTrue(state2.cards.first { it.id == secondCard.id }.isMatched)
         assertEquals(1, state2.moves)
-        assertEquals(state2.config.baseMatchPoints, state2.score)
+        // First match is not a milestone (4), so score should be 0 and points in pot
+        assertEquals(0, state2.score)
+        assertEquals(state2.config.baseMatchPoints, state2.currentPot)
     }
 
     @Test
@@ -533,6 +535,58 @@ class MemoryGameLogicTest {
         val newState = MemoryGameLogic.applyMutators(state)
 
         assertEquals(initialCards, newState.cards, "Cards should NOT have been swapped")
+    }
+
+    @Test
+    fun `pot should accumulate until milestone match`() {
+        val pairCount = 6
+        val state = MemoryGameLogic.createInitialState(pairCount)
+        val pairs =
+            state.cards
+                .groupBy { it.suit to it.rank }
+                .values
+                .toList()
+
+        // Match 1
+        val (s1, _) = MemoryGameLogic.flipCard(state, pairs[0][0].id)
+        val (s2, _) = MemoryGameLogic.flipCard(s1, pairs[0][1].id)
+        assertEquals(0, s2.score)
+        assertEquals(100, s2.currentPot) // Base match points
+
+        // Match 2
+        val (s3, _) = MemoryGameLogic.flipCard(s2, pairs[1][0].id)
+        val (s4, _) = MemoryGameLogic.flipCard(s3, pairs[1][1].id)
+        assertEquals(0, s4.score)
+        // 100 + (100 base + 50 combo) = 250
+        assertEquals(250, s4.currentPot)
+
+        // Match 3
+        val (s5, _) = MemoryGameLogic.flipCard(s4, pairs[2][0].id)
+        val (s6, _) = MemoryGameLogic.flipCard(s5, pairs[2][1].id)
+        assertEquals(0, s6.score)
+        // 250 + (100 base + 50 * 2^2) = 250 + 300 = 550
+        assertEquals(550, s6.currentPot)
+
+        // Match 4 (Milestone!)
+        val (s7, _) = MemoryGameLogic.flipCard(s6, pairs[3][0].id)
+        val (s8, _) = MemoryGameLogic.flipCard(s7, pairs[3][1].id)
+        // 550 + (100 base + 50 * 3^2) = 550 + 550 = 1100
+        assertEquals(1100, s8.score)
+        assertEquals(0, s8.currentPot)
+    }
+
+    @Test
+    fun `pot should reduce on mismatch`() {
+        val state = MemoryGameLogic.createInitialState(4).copy(currentPot = 1000)
+        val firstCard = state.cards[0]
+        val nonMatchCard = state.cards.first { it.suit != firstCard.suit || it.rank != firstCard.rank }
+
+        val (s1, _) = MemoryGameLogic.flipCard(state, firstCard.id)
+        val (s2, _) = MemoryGameLogic.flipCard(s1, nonMatchCard.id)
+
+        // Penalty is 0.25 of 1000 = 250
+        assertEquals(750, s2.currentPot)
+        assertEquals(0, s2.score)
     }
 
     @Test
