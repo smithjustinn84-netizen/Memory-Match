@@ -2,7 +2,7 @@
   <img src="screenshots/hero.jpg" width="100%" alt="Memory Match Hero Banner">
 </p>
 
-# 🧩 Memory-Match
+# 🧩 Memory-Match: Blackjack Edition
 
 [![Kotlin 2.3.0](https://img.shields.io/badge/Kotlin-2.3.0-purple?logo=kotlin)](https://kotlinlang.org/)
 [![Compose Multiplatform 1.10.0](https://img.shields.io/badge/Compose_Multiplatform-1.10.0-blue?logo=jetpackcompose)](https://www.jetbrains.com/lp/compose-multiplatform/)
@@ -10,7 +10,7 @@
 
 **A high-performance, cross-platform memory game built with Kotlin Multiplatform, showcasing modern 2026 development standards.**
 
-Memory-Match is not just a game; it's a reference implementation for **Clean Architecture**, **Modular Design**, and **AI-Agentic Development** in the Kotlin ecosystem.
+Memory-Match is not just a game; it's a reference implementation for **Clean Architecture**, **Modular Design**, and **AI-Agentic Development** in the Kotlin ecosystem. It features a unique **Casino/Poker theme**, combining classic memory mechanics with high-stakes "Heat" systems and dynamic dealer commentary.
 
 ---
 
@@ -62,11 +62,10 @@ Success breeds intensity. By matching multiple pairs in quick succession, you bu
     *   **Constraint**: Requires 3+ pairs to activate.
 
 ### ✨ Key Features
-*   **Interactive Walkthrough**: A seamless, step-by-step introduction for new players, ensuring they understand the "Heat" mechanics and game objectives from the very first flip.
-*   **Game Results & Analytics**: Receive a comprehensive breakdown of your performance after every match, including accuracy percentages, match speed, and combo efficiency.
-*   **Visual Polish & Dynamics**: Experience high-fidelity animations with the **Bouncing Cards Overlay**, dynamic **Confetti Celebrations**, and particle-based flip effects.
-*   **Customizable Aesthetics**: Choose from diverse **Card Back Themes** (Geometric, Minimal, Tactical) and **Symbol Sets** (Classic, Modern, Abstract).
-*   **Platform-Native Haptics**: Professional haptic feedback (iOS Taptic Engine / Android Vibrator) calibrated for specific game events, from card flips to "Heat" activation.
+*   **Poker-Style Commentary**: A dynamic Dealer personality providing context-aware commentary ("River Magic!", "Pot Odds!", "All In!") based on your gameplay.
+*   **High-Fidelity Audio**: Custom **Polyphonic Sound Engine** supporting simultaneous SFX traversal (iOS/Android) and rich environmental audio.
+*   **Aurora Ambient Effects**: Beautiful, procedural "Northern Lights" background effects that react to game state and "Heat" levels.
+*   **Tactile Haptics**: Professional grade, platform-optimized haptic feedback (CoreHaptics on iOS, VibratorManager on Android) for every interaction.
 *   **State Persistence**: Your progress is automatically saved locally using **Room KMP**, allowing you to resume any game exactly where you left off.
 *   **Deep-Linked Replays**: Share specific game configurations via deep links (`memorymatch://game?seed=...`). Every game generates a unique seed for sharing exact card layouts.
 *   **Comprehensive Stats**: Track your best scores, fastest times, and total moves across all difficulty levels and game modes.
@@ -138,13 +137,14 @@ We use a **Component-Based MVVM** pattern powered by **Decompose**, ensuring str
 | :---------------- | :------------------------ | :---------- | :-------------------------------------------------- |
 | **Language**      | **Kotlin**                | 2.3.0       | K2 Mode, Context Parameters, Multi-dollar strings   |
 | **UI**            | **Compose Multiplatform** | 1.10.0      | Adaptive layouts, Shared Resources, Skiko Rendering |
-| **Collections**   | **Immutable Collections** | 0.5.0       | Optimized Strong Skipping support for Compose       |
-| **DI**            | **Koin**                  | 4.0.2       | Pragmatic, stable, KMP-native                       |
+| **Collections**   | **Immutable Collections** | 0.4.0       | Optimized Strong Skipping support for Compose       |
+| **DI**            | **Koin**                  | 4.1.1       | Pragmatic, stable, KMP-native                       |
 | **Navigation**    | **Decompose**             | 3.4.0       | Lifecycle-aware, platform-agnostic navigation       |
 | **Persistence**   | **Room (KMP)**            | 2.8.4       | Type-safe SQLite, Bundled Drivers                   |
-| **Networking**    | **Ktor**                  | 3.x         | Multi-platform asynchronous client                  |
-| **Image Loading** | **Coil3**                 | 3.x         | Multiplatform-first image pipeline                  |
-| Testing           | **Turbine + Mokkery**     | 1.2.1 / 3.x | Flow-first testing, KSP-based mocking               |
+| **Networking**    | **Ktor**                  | 3.4.0       | Multi-platform asynchronous client                  |
+| **Image Loading** | **Coil3**                 | 3.3.0       | Multiplatform-first image pipeline                  |
+| **Animations**    | **Compottie**             | 2.0.2       | Lottie for KMP                                      |
+| **Testing**       | **Turbine + Mokkery**     | 1.2.1 / 3.x | Flow-first testing, KSP-based mocking               |
 
 ---
 
