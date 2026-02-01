@@ -16,6 +16,8 @@ import io.github.smithjustinn.ui.game.GameArgs
 import io.github.smithjustinn.ui.game.GameComponent
 import io.github.smithjustinn.ui.settings.DefaultSettingsComponent
 import io.github.smithjustinn.ui.settings.SettingsComponent
+import io.github.smithjustinn.ui.shop.DefaultShopComponent
+import io.github.smithjustinn.ui.shop.ShopComponent
 import io.github.smithjustinn.ui.start.DefaultStartComponent
 import io.github.smithjustinn.ui.start.StartComponent
 import io.github.smithjustinn.ui.stats.DefaultStatsComponent
@@ -47,6 +49,10 @@ interface RootComponent {
 
         class Stats(
             val component: StatsComponent,
+        ) : Child()
+
+        class Shop(
+            val component: ShopComponent,
         ) : Child()
     }
 }
@@ -110,6 +116,7 @@ class DefaultRootComponent(
             is Config.Game -> RootComponent.Child.Game(createGameComponent(config, componentContext))
             is Config.Settings -> RootComponent.Child.Settings(createSettingsComponent(componentContext))
             is Config.Stats -> RootComponent.Child.Stats(createStatsComponent(componentContext))
+            is Config.Shop -> RootComponent.Child.Shop(createShopComponent(componentContext))
         }
 
     private fun createStartComponent(componentContext: ComponentContext): StartComponent =
@@ -134,6 +141,10 @@ class DefaultRootComponent(
             onNavigateToStats =
                 @OptIn(DelicateDecomposeApi::class) {
                     navigation.push(Config.Stats)
+                },
+            onNavigateToShop =
+                @OptIn(DelicateDecomposeApi::class) {
+                    navigation.push(Config.Shop)
                 },
         )
 
@@ -161,6 +172,13 @@ class DefaultRootComponent(
             onBackClicked = navigation::pop,
         )
 
+    private fun createShopComponent(componentContext: ComponentContext): ShopComponent =
+        DefaultShopComponent(
+            componentContext = componentContext,
+            appGraph = appGraph,
+            onBackClicked = navigation::pop,
+        )
+
     private fun createStatsComponent(componentContext: ComponentContext): StatsComponent =
         DefaultStatsComponent(
             componentContext = componentContext,
@@ -183,6 +201,8 @@ class DefaultRootComponent(
         @Serializable data object Settings : Config
 
         @Serializable data object Stats : Config
+
+        @Serializable data object Shop : Config
     }
 }
 

@@ -100,6 +100,10 @@ fun StartContent(
                 audioService.playEffect(AudioService.SoundEffect.CLICK)
                 component.onDailyChallengeClick()
             },
+            onShopClick = {
+                audioService.playEffect(AudioService.SoundEffect.CLICK)
+                component.onShopClick()
+            },
             modifier = Modifier.fillMaxSize(),
         )
     }
@@ -130,6 +134,7 @@ private fun StartScreenLayout(
     onSettingsClick: () -> Unit,
     onStatsClick: () -> Unit,
     onDailyChallengeClick: () -> Unit,
+    onShopClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     // Animation States
@@ -152,6 +157,7 @@ private fun StartScreenLayout(
             onDailyChallengeClick = onDailyChallengeClick,
             onStatsClick = onStatsClick,
             onSettingsClick = onSettingsClick,
+            onShopClick = onShopClick,
             modifier = headerModifier,
         )
 
@@ -177,6 +183,7 @@ private fun BoxScope.StartTopActions(
     onDailyChallengeClick: () -> Unit,
     onStatsClick: () -> Unit,
     onSettingsClick: () -> Unit,
+    onShopClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val spacing = PokerTheme.spacing
@@ -209,6 +216,12 @@ private fun BoxScope.StartTopActions(
                 .padding(spacing.medium),
         horizontalArrangement = Arrangement.spacedBy(spacing.small),
     ) {
+        MedallionIcon(
+            icon = AppIcons.ShoppingCart,
+            onClick = onShopClick,
+            applyGlimmer = true,
+            tint = PokerTheme.colors.goldenYellow,
+        )
         MedallionIcon(
             icon = AppIcons.Trophy,
             onClick = onStatsClick,

@@ -13,6 +13,7 @@ import androidx.room.TypeConverters
         GameStateEntity::class,
         SettingsEntity::class,
         DailyChallengeEntity::class,
+        PlayerEconomyEntity::class,
     ],
     version = AppDatabase.DATABASE_VERSION,
     exportSchema = false,
@@ -29,6 +30,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun settingsDao(): SettingsDao
 
     abstract fun dailyChallengeDao(): DailyChallengeDao
+
+    abstract fun playerEconomyDao(): PlayerEconomyDao
 
     companion object {
         const val DATABASE_VERSION = 1

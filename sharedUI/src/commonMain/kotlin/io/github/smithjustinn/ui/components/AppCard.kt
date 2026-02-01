@@ -18,6 +18,7 @@ import io.github.smithjustinn.theme.PokerTheme
 fun AppCard(
     modifier: Modifier = Modifier,
     title: String? = null,
+    backgroundColor: Color = Color.Black.copy(alpha = 0.3f), // Recessed felt look
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = PokerTheme.colors
@@ -27,7 +28,7 @@ fun AppCard(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = shapes.medium,
-        color = Color.Black.copy(alpha = 0.3f), // Recessed felt look
+        color = backgroundColor,
         border =
             BorderStroke(
                 width = 1.dp,

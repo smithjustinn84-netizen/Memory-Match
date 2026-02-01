@@ -560,4 +560,57 @@ object AppIcons {
                 }.build()
                 .also { _swapHoriz = it }
         }
+
+    private var _shoppingCart: ImageVector? = null
+    val ShoppingCart: ImageVector
+        get() {
+            _shoppingCart?.let { return it }
+            return ImageVector
+                .Builder(
+                    name = "ShoppingCart",
+                    defaultWidth = 24.0.dp,
+                    defaultHeight = 24.0.dp,
+                    viewportWidth = 24.0f,
+                    viewportHeight = 24.0f,
+                ).apply {
+                    path(fill = SolidColor(Color.Black)) {
+                        moveTo(7.0f, 18.0f)
+                        curveToRelative(-1.1f, 0.0f, -1.99f, 0.9f, -1.99f, 2.0f)
+                        reflectiveCurveTo(5.9f, 22.0f, 7.0f, 22.0f)
+                        reflectiveCurveToRelative(2.0f, -0.9f, 2.0f, -2.0f)
+                        reflectiveCurveToRelative(-0.9f, -2.0f, -1.0f, -2.0f)
+                        close()
+                        moveTo(1.0f, 2.0f)
+                        verticalLineToRelative(2.0f)
+                        horizontalLineToRelative(2.0f)
+                        lineToRelative(3.6f, 7.59f)
+                        lineToRelative(-1.35f, 2.45f)
+                        curveToRelative(-0.16f, 0.28f, -0.25f, 0.61f, -0.25f, 0.96f)
+                        curveToRelative(0.0f, 1.1f, 0.9f, 2.0f, 2.0f, 2.0f)
+                        horizontalLineToRelative(12.0f)
+                        verticalLineToRelative(-2.0f)
+                        horizontalLineTo(7.42f)
+                        curveToRelative(-0.14f, 0.0f, -0.25f, -0.11f, -0.25f, -0.25f)
+                        lineToRelative(0.03f, -0.12f)
+                        lineToRelative(0.9f, -1.63f)
+                        horizontalLineToRelative(7.45f)
+                        curveToRelative(0.75f, 0.0f, 1.41f, -0.41f, 1.75f, -1.03f)
+                        lineToRelative(3.58f, -6.49f)
+                        curveToRelative(0.08f, -0.14f, 0.12f, -0.31f, 0.12f, -0.48f)
+                        curveToRelative(0.0f, -0.55f, -0.45f, -1.0f, -1.0f, -1.0f)
+                        horizontalLineTo(4.21f)
+                        lineTo(3.52f, 2.0f)
+                        horizontalLineTo(1.0f)
+                        close()
+                        moveTo(17.0f, 18.0f)
+                        curveToRelative(-1.1f, 0.0f, -1.99f, 0.9f, -1.99f, 2.0f)
+                        reflectiveCurveToRelative(0.9f, 2.0f, 1.0f, 2.0f)
+                        reflectiveCurveToRelative(2.0f, -0.9f, 2.0f, -2.0f)
+                        reflectiveCurveToRelative(-0.9f, -2.0f, -1.0f, -2.0f)
+                        close()
+                    }
+                }.build()
+                .also { _shoppingCart = it }
+        }
+
 }

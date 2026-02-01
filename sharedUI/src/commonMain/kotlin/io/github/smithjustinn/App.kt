@@ -27,6 +27,7 @@ import io.github.smithjustinn.ui.settings.SettingsContent
 import io.github.smithjustinn.ui.splash.SplashScreen
 import io.github.smithjustinn.ui.start.StartContent
 import io.github.smithjustinn.ui.stats.StatsContent
+import io.github.smithjustinn.ui.shop.ShopContent
 
 private const val SPLASH_ANIMATION_DURATION = 1000
 
@@ -65,6 +66,7 @@ fun App(
                         is RootComponent.Child.Game -> GameContent(child.component)
                         is RootComponent.Child.Settings -> SettingsContent(child.component)
                         is RootComponent.Child.Stats -> StatsContent(child.component)
+                        is RootComponent.Child.Shop -> ShopContent(child.component)
                     }
                 }
             }

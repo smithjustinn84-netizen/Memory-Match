@@ -1,0 +1,86 @@
+package io.github.smithjustinn.ui.shop
+
+import com.arkivanov.decompose.ComponentContext
+import io.github.smithjustinn.di.AppGraph
+import io.github.smithjustinn.domain.models.ShopItem
+import io.github.smithjustinn.domain.usecases.economy.BuyItemUseCase
+import io.github.smithjustinn.domain.usecases.economy.GetPlayerBalanceUseCase
+import io.github.smithjustinn.domain.usecases.economy.GetShopItemsUseCase
+import io.github.smithjustinn.utils.componentScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+
+class DefaultShopComponent(
+    componentContext: ComponentContext,
+    private val appGraph: AppGraph, // Using AppGraph for injection if possible, or KoinComponent
+    private val onBackClicked: () -> Unit,
+) : ShopComponent, ComponentContext by componentContext, KoinComponent {
+
+    // Inject use cases via Koin (or could be passed via AppGraph if exposed there, 
+    // but typically we can inject if AppGraph doesn't have them all property listed)
+    // Actually AppGraph is preferred if available.
+    // For now I'll use Koin inject for the new use cases if they are not in AppGraph interface yet.
+    // Wait, I didn't update AppGraph to expose these use cases. 
+    // It's cleaner to inject them here or update AppGraph. 
+    // I will use `inject` for expediency as I haven't seen AppGraph definition recently.
+    
+    private val buyItemUseCase: BuyItemUseCase by inject()
+    private val getPlayerBalanceUseCase: GetPlayerBalanceUseCase by inject()
+    private val getShopItemsUseCase: GetShopItemsUseCase by inject()
+    private val playerEconomyRepository: io.github.smithjustinn.domain.repositories.PlayerEconomyRepository by inject() // Directly injecting repo for unlocked items for now
+
+    private val _state = MutableStateFlow(ShopState())
+    override val state: StateFlow<ShopState> = _state.asStateFlow()
+
+    private val scope = lifecycle.componentScope(appGraph.coroutineDispatchers.mainImmediate)
+
+    init {
+        scope.launch {
+            val balanceFlow = getPlayerBalanceUseCase()
+            val unlockedFlow = playerEconomyRepository.unlockedItemIds
+            val allItems = getShopItemsUseCase()
+
+            combine(balanceFlow, unlockedFlow) { balance, unlockedIds ->
+                ShopState(
+                    balance = balance,
+                    items = allItems,
+                    unlockedItemIds = unlockedIds
+                )
+            }.collect { newState ->
+                _state.update { 
+                    it.copy(
+                        balance = newState.balance,
+                        items = newState.items,
+                        unlockedItemIds = newState.unlockedItemIds
+                    ) 
+                }
+            }
+        }
+    }
+
+    override fun onBackClicked() {
+        onBackClicked.invoke()
+    }
+
+    override fun onBuyItemClicked(item: ShopItem) {
+        scope.launch {
+            val result = buyItemUseCase(item.id, item.price)
+            if (result.isFailure) {
+                // Show error
+                _state.update { it.copy(error = result.exceptionOrNull()?.message ?: "Purchase failed") }
+            } else {
+                 // Success handled by flow update
+            }
+        }
+    }
+
+    override fun onClearError() {
+        _state.update { it.copy(error = null) }
+    }
+}

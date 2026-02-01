@@ -12,6 +12,11 @@ import io.github.smithjustinn.domain.usecases.stats.SaveGameResultUseCase
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
+import io.github.smithjustinn.domain.usecases.economy.EarnCurrencyUseCase
+import io.github.smithjustinn.domain.usecases.economy.BuyItemUseCase
+import io.github.smithjustinn.domain.usecases.economy.GetPlayerBalanceUseCase
+import io.github.smithjustinn.domain.usecases.economy.GetShopItemsUseCase
+
 val uiModule =
     module {
         singleOf(::CalculateFinalScoreUseCase)
@@ -23,4 +28,8 @@ val uiModule =
         singleOf(::StartNewGameUseCase)
         singleOf(::GetGameStatsUseCase)
         singleOf(::SaveGameResultUseCase)
+        singleOf(::EarnCurrencyUseCase)
+        singleOf(::BuyItemUseCase)
+        singleOf(::GetPlayerBalanceUseCase)
+        singleOf(::GetShopItemsUseCase)
     }

@@ -21,5 +21,7 @@ interface StartComponent {
 
     fun onStatsClick()
 
+    fun onShopClick()
+
     fun onEntranceAnimationCompleted()
 }

@@ -1,0 +1,105 @@
+package io.github.smithjustinn.data.repositories
+
+import co.touchlab.kermit.Logger
+import io.github.smithjustinn.data.local.PlayerEconomyDao
+import io.github.smithjustinn.data.local.PlayerEconomyEntity
+import io.github.smithjustinn.domain.repositories.PlayerEconomyRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+
+class PlayerEconomyRepositoryImpl(
+    private val dao: PlayerEconomyDao,
+    private val logger: Logger,
+) : PlayerEconomyRepository {
+    private val scope = CoroutineScope(Dispatchers.IO)
+    private val writeMutex = Mutex()
+
+    private val economyFlow =
+        dao
+            .getPlayerEconomy()
+            .shareIn(
+                scope = scope,
+                started = SharingStarted.Eagerly,
+                replay = 1,
+            )
+
+    override val balance: StateFlow<Long> =
+        economyFlow
+            .map { it?.balance ?: 0L }
+            .stateIn(
+                scope = scope,
+                started = SharingStarted.Eagerly,
+                initialValue = 0L,
+            )
+
+    override val unlockedItemIds: StateFlow<Set<String>> =
+        economyFlow
+            .map { entity ->
+                entity?.unlockedItemIds
+                    ?.split(",")
+                    ?.filter { it.isNotBlank() }
+                    ?.toSet() ?: emptySet()
+            }.stateIn(
+                scope = scope,
+                started = SharingStarted.Eagerly,
+                initialValue = emptySet(),
+            )
+
+    override suspend fun addCurrency(amount: Long) =
+        writeMutex.withLock {
+            val current = getOrCreateEntity()
+            val newBalance = current.balance + amount
+            dao.savePlayerEconomy(current.copy(balance = newBalance))
+            logger.d { "Added $amount currency. New balance: $newBalance" }
+        }
+
+    override suspend fun deductCurrency(amount: Long): Boolean =
+        writeMutex.withLock {
+            val current = getOrCreateEntity()
+            if (current.balance >= amount) {
+                val newBalance = current.balance - amount
+                dao.savePlayerEconomy(current.copy(balance = newBalance))
+                logger.d { "Deducted $amount currency. New balance: $newBalance" }
+                true
+            } else {
+                logger.w { "Insufficient funds. Balance: ${current.balance}, Required: $amount" }
+                false
+            }
+        }
+
+    override suspend fun unlockItem(itemId: String) =
+        writeMutex.withLock {
+            val current = getOrCreateEntity()
+            val currentItems =
+                current.unlockedItemIds
+                    .split(",")
+                    .filter { it.isNotBlank() }
+                    .toMutableSet()
+
+            if (!currentItems.contains(itemId)) {
+                currentItems.add(itemId)
+                val newItemsString = currentItems.joinToString(",")
+                dao.savePlayerEconomy(current.copy(unlockedItemIds = newItemsString))
+                logger.d { "Unlocked item: $itemId" }
+            }
+        }
+
+    override suspend fun isItemUnlocked(itemId: String): Boolean {
+        // We can check the StateFlow directly for synchronous checking if needed,
+        // or query DB. StateFlow is better for UI.
+        return unlockedItemIds.value.contains(itemId)
+    }
+
+    private suspend fun getOrCreateEntity(): PlayerEconomyEntity {
+        return dao.getPlayerEconomy().firstOrNull() ?: PlayerEconomyEntity()
+    }
+}

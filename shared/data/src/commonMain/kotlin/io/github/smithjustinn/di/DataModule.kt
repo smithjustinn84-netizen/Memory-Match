@@ -16,6 +16,10 @@ import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
+import io.github.smithjustinn.data.local.PlayerEconomyDao
+import io.github.smithjustinn.data.repositories.PlayerEconomyRepositoryImpl
+import io.github.smithjustinn.domain.repositories.PlayerEconomyRepository
+
 val dataModule =
     module {
         single { get<AppDatabase>().gameStatsDao() }
@@ -23,12 +27,14 @@ val dataModule =
         single { get<AppDatabase>().gameStateDao() }
         single { get<AppDatabase>().settingsDao() }
         single { get<AppDatabase>().dailyChallengeDao() }
+        single { get<AppDatabase>().playerEconomyDao() }
 
         singleOf(::GameStatsRepositoryImpl) { bind<GameStatsRepository>() }
         singleOf(::LeaderboardRepositoryImpl) { bind<LeaderboardRepository>() }
         singleOf(::GameStateRepositoryImpl) { bind<GameStateRepository>() }
         singleOf(::SettingsRepositoryImpl) { bind<SettingsRepository>() }
         singleOf(::DailyChallengeRepositoryImpl) { bind<DailyChallengeRepository>() }
+        singleOf(::PlayerEconomyRepositoryImpl) { bind<PlayerEconomyRepository>() }
 
         single { Json { ignoreUnknownKeys = true } }
     }
