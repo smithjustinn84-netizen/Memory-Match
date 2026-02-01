@@ -6,7 +6,6 @@ import io.github.smithjustinn.data.local.createTestDatabase
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.Json
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -24,7 +23,6 @@ class GameStateRepositoryIntegrationTest {
         repository =
             GameStateRepositoryImpl(
                 dao = database.gameStateDao(),
-                json = Json,
                 logger = Logger.withTag("Test"),
             )
     }

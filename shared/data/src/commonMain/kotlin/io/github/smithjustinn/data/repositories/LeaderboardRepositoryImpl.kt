@@ -6,6 +6,7 @@ import io.github.smithjustinn.data.local.LeaderboardEntity
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.LeaderboardEntry
 import io.github.smithjustinn.domain.repositories.LeaderboardRepository
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -23,7 +24,7 @@ class LeaderboardRepositoryImpl(
             .map { entities ->
                 entities.map { it.toDomain() }
             }.catch { e ->
-                if (e is kotlinx.coroutines.CancellationException) throw e
+                if (e is CancellationException) throw e
                 logger.e(e) { "Error fetching leaderboard for difficulty: $pairCount, mode: $gameMode" }
                 emit(emptyList())
             }
@@ -32,8 +33,9 @@ class LeaderboardRepositoryImpl(
     override suspend fun addEntry(entry: LeaderboardEntry) {
         try {
             dao.insertEntry(entry.toEntity())
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            if (e is kotlinx.coroutines.CancellationException) throw e
             logger.e(e) { "Error adding leaderboard entry: $entry" }
         }
     }

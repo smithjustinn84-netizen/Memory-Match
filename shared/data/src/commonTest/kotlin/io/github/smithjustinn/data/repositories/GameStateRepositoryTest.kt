@@ -10,7 +10,6 @@ import io.github.smithjustinn.data.local.GameStateDao
 import io.github.smithjustinn.data.local.GameStateEntity
 import io.github.smithjustinn.domain.models.MemoryGameState
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -18,9 +17,8 @@ import kotlin.test.assertNull
 
 class GameStateRepositoryTest {
     private val dao = mock<GameStateDao>()
-    private val json = Json { ignoreUnknownKeys = true }
     private val logger = Logger.withTag("Test")
-    private val repository = GameStateRepositoryImpl(dao, json, logger)
+    private val repository = GameStateRepositoryImpl(dao, logger)
 
     @Test
     fun testSaveGameState() =

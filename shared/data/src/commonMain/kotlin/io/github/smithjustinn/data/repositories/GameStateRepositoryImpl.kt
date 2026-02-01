@@ -6,11 +6,10 @@ import io.github.smithjustinn.data.local.GameStateEntity
 import io.github.smithjustinn.domain.models.MemoryGameState
 import io.github.smithjustinn.domain.models.SavedGame
 import io.github.smithjustinn.domain.repositories.GameStateRepository
-import kotlinx.serialization.json.Json
+import kotlin.coroutines.cancellation.CancellationException
 
 class GameStateRepositoryImpl(
     private val dao: GameStateDao,
-    private val json: Json,
     private val logger: Logger,
 ) : GameStateRepository {
     @Suppress("TooGenericExceptionCaught")
@@ -20,8 +19,9 @@ class GameStateRepositoryImpl(
     ) {
         try {
             dao.saveGameState(GameStateEntity(gameState = gameState, elapsedTimeSeconds = elapsedTimeSeconds))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            if (e is kotlinx.coroutines.CancellationException) throw e
             logger.e(e) { "Failed to save game state" }
         }
     }
@@ -31,8 +31,9 @@ class GameStateRepositoryImpl(
         val entity = dao.getSavedGameState() ?: return null
         return try {
             SavedGame(entity.gameState, entity.elapsedTimeSeconds)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            if (e is kotlinx.coroutines.CancellationException) throw e
             logger.e(e) { "Failed to retrieve saved game state: Database error" }
             null
         }
@@ -42,8 +43,9 @@ class GameStateRepositoryImpl(
     override suspend fun clearSavedGameState() {
         try {
             dao.clearSavedGameState()
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            if (e is kotlinx.coroutines.CancellationException) throw e
             logger.e(e) { "Failed to clear saved game state" }
         }
     }
