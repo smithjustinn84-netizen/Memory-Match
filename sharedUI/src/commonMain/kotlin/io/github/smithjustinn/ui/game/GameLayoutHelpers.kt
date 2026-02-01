@@ -29,10 +29,10 @@ import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.di.LocalAppGraph
 import io.github.smithjustinn.services.AudioService
 import io.github.smithjustinn.theme.PokerTheme
-import io.github.smithjustinn.ui.game.components.CardFountainOverlay
-import io.github.smithjustinn.ui.game.components.ConfettiEffect
-import io.github.smithjustinn.ui.game.components.NewHighScoreSnackbar
-import io.github.smithjustinn.ui.game.components.ResultsCard
+import io.github.smithjustinn.ui.game.components.effects.CardFountainOverlay
+import io.github.smithjustinn.ui.game.components.effects.ConfettiEffect
+import io.github.smithjustinn.ui.game.components.hud.NewHighScoreSnackbar
+import io.github.smithjustinn.ui.game.components.hud.ResultsCard
 import kotlinx.coroutines.launch
 
 private const val HEAT_TRANSITION_DURATION_MS = 800

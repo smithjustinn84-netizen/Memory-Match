@@ -32,9 +32,9 @@ import io.github.smithjustinn.domain.models.CardDisplaySettings
 import io.github.smithjustinn.domain.models.Rank
 import io.github.smithjustinn.domain.models.Suit
 import io.github.smithjustinn.theme.PokerTheme
-import io.github.smithjustinn.ui.game.components.CardContent
-import io.github.smithjustinn.ui.game.components.CardVisualState
-import io.github.smithjustinn.ui.game.components.PlayingCard
+import io.github.smithjustinn.ui.game.components.cards.CardContent
+import io.github.smithjustinn.ui.game.components.cards.CardVisualState
+import io.github.smithjustinn.ui.game.components.cards.PlayingCard
 
 // Card Preview Layout & Animation Durations
 private const val CARD_ROTATION_DURATION = 3000
