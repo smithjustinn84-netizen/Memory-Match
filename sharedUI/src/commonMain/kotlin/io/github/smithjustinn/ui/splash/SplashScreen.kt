@@ -28,6 +28,7 @@ import io.github.smithjustinn.domain.models.CardDisplaySettings
 import io.github.smithjustinn.resources.Res
 import io.github.smithjustinn.resources.splash_dealing_cards
 import io.github.smithjustinn.resources.splash_title
+import io.github.smithjustinn.ui.components.AuroraEffect
 import io.github.smithjustinn.ui.components.GlimmerText
 import io.github.smithjustinn.ui.components.pokerBackground
 import io.github.smithjustinn.ui.components.rememberGlimmerBrush
@@ -58,6 +59,10 @@ fun SplashScreen(onDataLoaded: () -> Unit) {
                 .pokerBackground(),
         contentAlignment = Alignment.Center,
     ) {
+        AuroraEffect(
+            modifier = Modifier.align(Alignment.BottomCenter),
+        )
+
         AnimatedVisibility(
             visible = isVisible,
             enter = fadeIn(animationSpec = tween(SPLASH_FADE_DURATION_MS)),

@@ -5,10 +5,10 @@ import io.github.smithjustinn.data.local.GameStatsDao
 import io.github.smithjustinn.data.local.GameStatsEntity
 import io.github.smithjustinn.domain.models.GameStats
 import io.github.smithjustinn.domain.repositories.GameStatsRepository
-import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlin.coroutines.cancellation.CancellationException
 
 class GameStatsRepositoryImpl(
     private val dao: GameStatsDao,

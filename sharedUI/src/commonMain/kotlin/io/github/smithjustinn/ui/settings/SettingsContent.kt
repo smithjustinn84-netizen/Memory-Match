@@ -65,6 +65,7 @@ import io.github.smithjustinn.theme.ModernGold
 import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.components.AppCard
 import io.github.smithjustinn.ui.components.AppIcons
+import io.github.smithjustinn.ui.components.AuroraEffect
 import io.github.smithjustinn.ui.components.PillSegmentedControl
 import io.github.smithjustinn.ui.components.pokerBackground
 import org.jetbrains.compose.resources.stringResource
@@ -93,6 +94,10 @@ fun SettingsContent(
                 .fillMaxSize()
                 .pokerBackground(),
     ) {
+        AuroraEffect(
+            modifier = Modifier.align(Alignment.BottomCenter),
+        )
+
         Scaffold(
             containerColor = Color.Transparent,
             topBar = { SettingsTopBar(audioService, component) },
