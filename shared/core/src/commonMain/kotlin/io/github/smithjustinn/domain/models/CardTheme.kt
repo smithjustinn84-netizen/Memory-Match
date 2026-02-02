@@ -13,7 +13,8 @@ enum class CardBackTheme(
     ;
 
     companion object {
-        fun fromIdOrName(value: String): CardBackTheme = entries.find { it.id == value || it.name == value } ?: GEOMETRIC
+        fun fromIdOrName(value: String): CardBackTheme =
+            entries.find { it.id == value || it.name == value } ?: GEOMETRIC
     }
 }
 
@@ -28,6 +29,7 @@ enum class CardSymbolTheme(
     ;
 
     companion object {
-        fun fromIdOrName(value: String): CardSymbolTheme = entries.find { it.id == value || it.name == value } ?: CLASSIC
+        fun fromIdOrName(value: String): CardSymbolTheme =
+            entries.find { it.id == value || it.name == value } ?: CLASSIC
     }
 }

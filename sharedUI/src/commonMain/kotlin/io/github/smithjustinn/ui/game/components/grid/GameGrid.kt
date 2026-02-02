@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.toSize
 import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.domain.models.CardState
 import io.github.smithjustinn.domain.models.CardSymbolTheme
+import io.github.smithjustinn.ui.assets.getPreferredColor
 import io.github.smithjustinn.ui.game.components.cards.CardContent
 import io.github.smithjustinn.ui.game.components.cards.CardVisualState
 import io.github.smithjustinn.ui.game.components.cards.PlayingCard
@@ -281,6 +282,7 @@ private fun GridItem(
                     ),
             ),
         backTheme = cardBackTheme,
+        backColor = cardBackTheme.getPreferredColor(),
         symbolTheme = cardSymbolTheme,
         areSuitsMultiColored = areSuitsMultiColored,
         muckTargetOffset = muckTargetOffset,

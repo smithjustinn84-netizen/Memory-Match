@@ -13,7 +13,6 @@ import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.domain.models.CardSymbolTheme
 import io.github.smithjustinn.domain.models.Rank
 import io.github.smithjustinn.domain.models.Suit
-import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.game.components.cards.CardBack
 import io.github.smithjustinn.ui.game.components.cards.CardFace
 import io.github.smithjustinn.ui.game.components.cards.ShimmerEffect
@@ -81,7 +80,7 @@ object AssetProvider {
         theme: CardBackTheme,
         modifier: Modifier = Modifier,
     ) {
-        val backColor = PokerTheme.colors.primary
+        val backColor = theme.getPreferredColor()
         BoxWithConstraints(modifier = modifier) {
             Box {
                 CardBack(
