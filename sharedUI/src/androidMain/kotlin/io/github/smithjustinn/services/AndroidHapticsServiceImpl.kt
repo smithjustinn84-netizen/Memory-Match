@@ -22,6 +22,23 @@ class AndroidHapticsServiceImpl(
     }
 
     @RequiresPermission(Manifest.permission.VIBRATE)
+    override fun performHapticFeedback(type: HapticFeedbackType) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val effect =
+                when (type) {
+                    HapticFeedbackType.LIGHT -> VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK)
+                    HapticFeedbackType.HEAVY -> VibrationEffect.createPredefined(VibrationEffect.EFFECT_HEAVY_CLICK)
+                }
+            vibrator?.vibrate(effect)
+        } else {
+            when (type) {
+                HapticFeedbackType.LIGHT -> vibrate(longArrayOf(0, 10), intArrayOf(0, 150))
+                HapticFeedbackType.HEAVY -> vibrate(longArrayOf(0, 50), intArrayOf(0, 255))
+            }
+        }
+    }
+
+    @RequiresPermission(Manifest.permission.VIBRATE)
     override fun vibrateMatch() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             vibrator?.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_HEAVY_CLICK))

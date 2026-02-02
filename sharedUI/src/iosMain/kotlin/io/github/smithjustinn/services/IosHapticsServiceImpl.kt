@@ -18,6 +18,19 @@ class IosHapticsServiceImpl : HapticsService {
         notificationGenerator.prepare()
     }
 
+    override fun performHapticFeedback(type: HapticFeedbackType) {
+        when (type) {
+            HapticFeedbackType.LIGHT -> {
+                lightImpactGenerator.impactOccurred()
+                lightImpactGenerator.prepare()
+            }
+            HapticFeedbackType.HEAVY -> {
+                heavyImpactGenerator.impactOccurred()
+                heavyImpactGenerator.prepare()
+            }
+        }
+    }
+
     override fun vibrateMatch() {
         heavyImpactGenerator.impactOccurred()
         heavyImpactGenerator.prepare()

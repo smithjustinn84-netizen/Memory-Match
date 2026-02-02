@@ -43,6 +43,8 @@ import io.github.smithjustinn.ui.components.AppIcons
 import io.github.smithjustinn.ui.components.AuroraEffect
 import io.github.smithjustinn.ui.components.ShopIcons
 import io.github.smithjustinn.ui.components.pokerBackground
+import io.github.smithjustinn.di.LocalAppGraph
+import io.github.smithjustinn.services.HapticFeedbackType
 
 sealed class ShopItemState {
     data class Locked(
@@ -62,6 +64,7 @@ fun ShopContent(
 ) {
     val state by component.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val hapticsService = LocalAppGraph.current.hapticsService
 
     LaunchedEffect(state.error) {
         state.error?.let {
@@ -94,8 +97,14 @@ fun ShopContent(
 
             ShopItemsGrid(
                 state = state,
-                onBuyItem = { component.onBuyItemClicked(it) },
-                onEquipItem = { component.onEquipItemClicked(it) },
+                onBuyItem = {
+                    hapticsService.performHapticFeedback(HapticFeedbackType.HEAVY)
+                    component.onBuyItemClicked(it)
+                },
+                onEquipItem = {
+                    hapticsService.performHapticFeedback(HapticFeedbackType.LIGHT)
+                    component.onEquipItemClicked(it)
+                },
                 modifier = Modifier.weight(1f),
             )
         }
