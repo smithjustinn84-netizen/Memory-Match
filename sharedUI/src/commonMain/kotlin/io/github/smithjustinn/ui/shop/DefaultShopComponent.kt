@@ -53,9 +53,10 @@ class DefaultShopComponent(
             val unlockedFlow = playerEconomyRepository.unlockedItemIds
             val themeFlow = playerEconomyRepository.selectedTheme
             val skinFlow = playerEconomyRepository.selectedSkin
-            val allItems = withContext(appGraph.coroutineDispatchers.io) {
-                getShopItemsUseCase()
-            }
+            val allItems =
+                withContext(appGraph.coroutineDispatchers.io) {
+                    getShopItemsUseCase()
+                }
 
             combine(balanceFlow, unlockedFlow, themeFlow, skinFlow) { balance, unlockedIds, theme, skin ->
                 ShopState(
