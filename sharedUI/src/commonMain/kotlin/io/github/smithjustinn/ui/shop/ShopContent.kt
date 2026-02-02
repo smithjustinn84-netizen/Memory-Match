@@ -219,41 +219,43 @@ fun ShopItemCard(
         modifier =
             modifier
                 .fillMaxWidth()
-                .heightIn(min = 320.dp) // Maintain height for preview visibility
                 .clickable(enabled = canClick) {
                     if (isOwned) onEquip() else onBuy()
                 },
         backgroundColor = getCardBackgroundColor(shopItemState),
         border =
             if (isEquipped) {
-                BorderStroke(2.dp, PokerTheme.colors.goldenYellow) // Standard green/active color
+                BorderStroke(2.dp, PokerTheme.colors.goldenYellow)
             } else {
                 null
             },
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(16.dp).heightIn(min = 280.dp),
         ) {
             ShopItemPreview(
                 itemId = item.id,
                 itemType = item.type,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.fillMaxWidth(),
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             ShopItemInfo(
                 name = item.name,
                 description = item.description,
+                modifier = Modifier.fillMaxWidth(),
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(16.dp))
 
             ShopActionButton(
                 shopItemState = shopItemState,
                 onBuy = onBuy,
                 onEquip = onEquip,
+                modifier = Modifier.fillMaxWidth(),
             )
         }
     }
@@ -266,13 +268,13 @@ private fun ShopItemPreview(
     modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
         CosmeticPreviewRegistry.Preview(
             itemId = itemId,
             itemType = itemType,
-            modifier = Modifier.fillMaxHeight(0.9f),
+            modifier = Modifier.fillMaxWidth(0.85f),
         )
     }
 }
@@ -281,24 +283,30 @@ private fun ShopItemPreview(
 private fun ShopItemInfo(
     name: String,
     description: String,
+    modifier: Modifier = Modifier,
 ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier,
+    ) {
         Text(
             text = name,
-            style = MaterialTheme.typography.titleMedium,
-            color = PokerTheme.colors.onSurface,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.titleLarge,
+            color = PokerTheme.colors.goldenYellow,
+            fontWeight = FontWeight.ExtraBold,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
 
         if (description.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = description,
-                style = MaterialTheme.typography.bodySmall,
-                color = PokerTheme.colors.onSurface.copy(alpha = 0.7f),
-                maxLines = 1,
+                style = MaterialTheme.typography.labelMedium,
+                color = PokerTheme.colors.onSurface.copy(alpha = 0.6f),
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             )
         }
     }
@@ -309,23 +317,24 @@ private fun ShopActionButton(
     shopItemState: ShopItemState,
     onBuy: () -> Unit,
     onEquip: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     when (shopItemState) {
         is ShopItemState.Equipped -> {
             PokerButton(
-                text = "Active",
+                text = "ACTIVE",
                 onClick = {},
                 enabled = false,
-                containerColor = PokerTheme.colors.bonusGreen,
+                containerColor = PokerTheme.colors.bonusGreen.copy(alpha = 0.4f),
                 contentColor = Color.White,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = modifier,
             )
         }
         is ShopItemState.Owned -> {
             PokerButton(
-                text = "Equip",
+                text = "EQUIP",
                 onClick = onEquip,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = modifier,
             )
         }
         is ShopItemState.Locked -> {
@@ -333,7 +342,7 @@ private fun ShopActionButton(
                 text = "$${shopItemState.price}",
                 leadingIcon = ShopIcons.CasinoChip,
                 onClick = onBuy,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = modifier,
                 contentColor = if (shopItemState.canAfford) PokerTheme.colors.goldenYellow else Color(0xFFE57373),
             )
         }
