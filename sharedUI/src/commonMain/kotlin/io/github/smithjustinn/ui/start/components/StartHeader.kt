@@ -9,7 +9,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.smithjustinn.domain.models.CardDisplaySettings
+import io.github.smithjustinn.domain.models.CardBackTheme
+import io.github.smithjustinn.domain.models.CardSymbolTheme
 import io.github.smithjustinn.resources.Res
 import io.github.smithjustinn.resources.app_name
 import io.github.smithjustinn.theme.PokerTheme
@@ -22,7 +23,9 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun StartHeader(
     modifier: Modifier = Modifier,
-    settings: CardDisplaySettings = CardDisplaySettings(),
+    backTheme: CardBackTheme = CardBackTheme.GEOMETRIC,
+    symbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC,
+    areSuitsMultiColored: Boolean = false,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -37,7 +40,9 @@ fun StartHeader(
 
         CardPreview(
             modifier = Modifier.height(180.dp),
-            settings = settings,
+            backTheme = backTheme,
+            symbolTheme = symbolTheme,
+            areSuitsMultiColored = areSuitsMultiColored,
         )
     }
 }

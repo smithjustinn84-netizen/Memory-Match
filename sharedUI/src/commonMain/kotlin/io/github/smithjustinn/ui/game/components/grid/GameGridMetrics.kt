@@ -3,8 +3,9 @@ package io.github.smithjustinn.ui.game.components.grid
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import io.github.smithjustinn.domain.models.CardDisplaySettings
+import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.domain.models.CardState
+import io.github.smithjustinn.domain.models.CardSymbolTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlin.math.ceil
@@ -72,7 +73,9 @@ internal data class GridCardState(
 )
 
 internal data class GridSettings(
-    val displaySettings: CardDisplaySettings = CardDisplaySettings(),
+    val cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC,
+    val cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC,
+    val areSuitsMultiColored: Boolean = false,
     val showComboExplosion: Boolean = false,
 )
 

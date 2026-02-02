@@ -112,7 +112,9 @@ fun GameGameOverOverlay(
             // Celebration effects - now above the results card
             CardFountainOverlay(
                 cards = state.game.cards,
-                settings = state.cardSettings,
+                cardBackTheme = state.cardBackTheme,
+                cardSymbolTheme = state.cardSymbolTheme,
+                areSuitsMultiColored = state.areSuitsMultiColored,
             )
 
             ConfettiEffect()

@@ -281,7 +281,9 @@ private fun GameMainContent(
                 ),
             settings =
                 GridSettings(
-                    displaySettings = state.cardSettings,
+                    cardBackTheme = state.cardBackTheme,
+                    cardSymbolTheme = state.cardSymbolTheme,
+                    areSuitsMultiColored = state.areSuitsMultiColored,
                     showComboExplosion = state.showComboExplosion,
                 ),
             onCardClick = { cardId -> component.onFlipCard(cardId) },

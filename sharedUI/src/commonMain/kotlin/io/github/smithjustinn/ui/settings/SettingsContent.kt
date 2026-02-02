@@ -4,10 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -40,17 +38,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.di.LocalAppGraph
-import io.github.smithjustinn.domain.models.CardBackTheme
-import io.github.smithjustinn.domain.models.CardSymbolTheme
 import io.github.smithjustinn.resources.Res
 import io.github.smithjustinn.resources.back_content_description
 import io.github.smithjustinn.resources.settings
-import io.github.smithjustinn.resources.settings_appearance
-import io.github.smithjustinn.resources.settings_card_back_style
 import io.github.smithjustinn.resources.settings_enable_peek
 import io.github.smithjustinn.resources.settings_enable_peek_desc
-import io.github.smithjustinn.resources.settings_four_color_deck
-import io.github.smithjustinn.resources.settings_four_color_deck_desc
 import io.github.smithjustinn.resources.settings_game_music
 import io.github.smithjustinn.resources.settings_game_music_desc
 import io.github.smithjustinn.resources.settings_gameplay_audio
@@ -59,14 +51,12 @@ import io.github.smithjustinn.resources.settings_reset_walkthrough
 import io.github.smithjustinn.resources.settings_reset_walkthrough_desc
 import io.github.smithjustinn.resources.settings_sound_effects
 import io.github.smithjustinn.resources.settings_sound_effects_desc
-import io.github.smithjustinn.resources.settings_symbol_style
 import io.github.smithjustinn.services.AudioService
 import io.github.smithjustinn.theme.ModernGold
 import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.components.AppCard
 import io.github.smithjustinn.ui.components.AppIcons
 import io.github.smithjustinn.ui.components.AuroraEffect
-import io.github.smithjustinn.ui.components.PillSegmentedControl
 import io.github.smithjustinn.ui.components.pokerBackground
 import org.jetbrains.compose.resources.stringResource
 
@@ -81,7 +71,7 @@ fun SettingsContent(
     val audioService = graph.audioService
 
     LaunchedEffect(Unit) {
-        component.events.collect { event ->
+        component.events.collect { event: SettingsUiEvent ->
             when (event) {
                 SettingsUiEvent.PlayClick -> audioService.playEffect(AudioService.SoundEffect.CLICK)
             }
@@ -113,7 +103,6 @@ fun SettingsContent(
                             .align(Alignment.TopCenter),
                     verticalArrangement = Arrangement.spacedBy(20.dp),
                 ) {
-                    SettingsAppearanceSection(state, audioService, component)
                     SettingsAudioSection(state, audioService, component)
                     SettingsResetSection(state, audioService, component)
                 }
@@ -154,58 +143,6 @@ private fun SettingsTopBar(
             }
         },
     )
-}
-
-@Composable
-private fun SettingsAppearanceSection(
-    state: SettingsState,
-    audioService: AudioService,
-    component: SettingsComponent,
-) {
-    AppCard(title = stringResource(Res.string.settings_appearance)) {
-        ThemeSelector(
-            title = stringResource(Res.string.settings_card_back_style),
-            options = CardBackTheme.entries,
-            selected = state.cardBackTheme,
-            onSelect = {
-                audioService.playEffect(AudioService.SoundEffect.CLICK)
-                component.setCardBackTheme(it)
-            },
-            labelProvider = { it.name.lowercase().replaceFirstChar { char -> char.uppercase() } },
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        ThemeSelector(
-            title = stringResource(Res.string.settings_symbol_style),
-            options = CardSymbolTheme.entries,
-            selected = state.cardSymbolTheme,
-            onSelect = {
-                audioService.playEffect(AudioService.SoundEffect.CLICK)
-                component.setCardSymbolTheme(it)
-            },
-            labelProvider = {
-                it.name.lowercase().replace("text_only", "text only").replaceFirstChar { char ->
-                    char.uppercase()
-                }
-            },
-        )
-
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = 12.dp),
-            color = Color.White.copy(alpha = 0.1f),
-        )
-
-        SettingsToggle(
-            title = stringResource(Res.string.settings_four_color_deck),
-            description = stringResource(Res.string.settings_four_color_deck_desc),
-            checked = state.areSuitsMultiColored,
-            onCheckedChange = {
-                audioService.playEffect(AudioService.SoundEffect.CLICK)
-                component.toggleSuitsMultiColored(it)
-            },
-        )
-    }
 }
 
 @Composable
@@ -316,31 +253,6 @@ private fun SettingsResetSection(
                 Text(stringResource(Res.string.settings_reset))
             }
         }
-    }
-}
-
-@Composable
-private fun <T> ThemeSelector(
-    title: String,
-    options: List<T>,
-    selected: T,
-    onSelect: (T) -> Unit,
-    labelProvider: @Composable (T) -> String,
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-        )
-
-        PillSegmentedControl(
-            items = options,
-            selectedItem = selected,
-            onItemSelected = onSelect,
-            labelProvider = { labelProvider(it) },
-        )
     }
 }
 

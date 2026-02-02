@@ -8,7 +8,6 @@ import io.github.smithjustinn.domain.GameStateMachine
 import io.github.smithjustinn.domain.MemoryGameLogic
 import io.github.smithjustinn.domain.TimeAttackLogic
 import io.github.smithjustinn.domain.models.CardBackTheme
-import io.github.smithjustinn.domain.models.CardDisplaySettings
 import io.github.smithjustinn.domain.models.CardSymbolTheme
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
@@ -71,18 +70,14 @@ class DefaultGameComponent(
             startGame(args)
 
             combine(
-                settings.areSuitsMultiColored,
                 appGraph.playerEconomyRepository.selectedTheme,
                 appGraph.playerEconomyRepository.selectedSkin,
-            ) { multiColor: Boolean, theme: CardBackTheme, skin: CardSymbolTheme ->
+            ) { theme: CardBackTheme, skin: CardSymbolTheme ->
                 _state.update {
                     it.copy(
-                        cardSettings =
-                            CardDisplaySettings(
-                                backTheme = theme,
-                                symbolTheme = skin,
-                                areSuitsMultiColored = multiColor,
-                            ),
+                        cardBackTheme = theme,
+                        cardSymbolTheme = skin,
+                        areSuitsMultiColored = false, // Default value, no longer in Settings
                         selectedTheme = theme,
                     )
                 }

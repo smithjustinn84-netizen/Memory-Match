@@ -3,7 +3,6 @@ package io.github.smithjustinn.ui.start
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.lifecycle.doOnResume
 import io.github.smithjustinn.di.AppGraph
-import io.github.smithjustinn.domain.models.CardDisplaySettings
 import io.github.smithjustinn.domain.models.DifficultyLevel
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.utils.componentScope
@@ -11,7 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
@@ -50,22 +48,15 @@ class DefaultStartComponent(
         }
 
         scope.launch {
-            combine(
-                settingsRepository.cardBackTheme,
-                settingsRepository.cardSymbolTheme,
-                settingsRepository.areSuitsMultiColored,
-            ) { cardBack, cardSymbol, multiColor ->
-                _state.update {
-                    it.copy(
-                        cardSettings =
-                            CardDisplaySettings(
-                                backTheme = cardBack,
-                                symbolTheme = cardSymbol,
-                                areSuitsMultiColored = multiColor,
-                            ),
-                    )
-                }
-            }.collect()
+            playerEconomyRepository.selectedTheme.collect { theme ->
+                _state.update { it.copy(cardBackTheme = theme) }
+            }
+        }
+
+        scope.launch {
+            playerEconomyRepository.selectedSkin.collect { skin ->
+                _state.update { it.copy(cardSymbolTheme = skin) }
+            }
         }
 
         lifecycle.doOnResume { checkSavedGame() }

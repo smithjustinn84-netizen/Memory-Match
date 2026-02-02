@@ -1,7 +1,5 @@
 package io.github.smithjustinn.domain.repositories
 
-import io.github.smithjustinn.domain.models.CardBackTheme
-import io.github.smithjustinn.domain.models.CardSymbolTheme
 import kotlinx.coroutines.flow.StateFlow
 
 interface SettingsRepository {
@@ -11,9 +9,6 @@ interface SettingsRepository {
     val isWalkthroughCompleted: StateFlow<Boolean>
     val soundVolume: StateFlow<Float>
     val musicVolume: StateFlow<Float>
-    val cardBackTheme: StateFlow<CardBackTheme>
-    val cardSymbolTheme: StateFlow<CardSymbolTheme>
-    val areSuitsMultiColored: StateFlow<Boolean>
 
     suspend fun setPeekEnabled(enabled: Boolean)
 
@@ -26,10 +21,4 @@ interface SettingsRepository {
     suspend fun setSoundVolume(volume: Float)
 
     suspend fun setMusicVolume(volume: Float)
-
-    suspend fun setCardBackTheme(theme: CardBackTheme)
-
-    suspend fun setCardSymbolTheme(theme: CardSymbolTheme)
-
-    suspend fun setSuitsMultiColored(enabled: Boolean)
 }

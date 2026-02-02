@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -228,7 +229,7 @@ private fun ValueBadge(
             ),
         color = color.copy(alpha = 0.15f),
         border = BorderStroke(1.dp, color.copy(alpha = 0.3f)),
-        modifier = Modifier.padding(top = if (compact) 0.dp else (-4).dp),
+        modifier = Modifier.offset(y = if (compact) 0.dp else (-4).dp),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

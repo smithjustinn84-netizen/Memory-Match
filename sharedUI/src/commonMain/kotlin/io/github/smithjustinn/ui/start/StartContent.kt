@@ -249,7 +249,9 @@ private fun StartMainContent(
         Spacer(modifier = Modifier.weight(1f))
 
         StartHeader(
-            settings = state.cardSettings,
+            backTheme = state.cardBackTheme,
+            symbolTheme = state.cardSymbolTheme,
+            areSuitsMultiColored = state.areSuitsMultiColored,
             modifier = Modifier.padding(bottom = spacing.large),
         )
 

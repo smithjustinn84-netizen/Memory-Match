@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.smithjustinn.domain.models.CardDisplaySettings
 import io.github.smithjustinn.resources.Res
 import io.github.smithjustinn.resources.splash_dealing_cards
 import io.github.smithjustinn.resources.splash_title
@@ -78,7 +77,6 @@ fun SplashScreen(onDataLoaded: () -> Unit) {
 
                 // Animated Card Preview
                 CardPreview(
-                    settings = CardDisplaySettings(),
                     modifier = Modifier.width(280.dp), // Slightly smaller to look focused
                 )
 

@@ -1,10 +1,7 @@
 package io.github.smithjustinn.data.repositories
 
-import co.touchlab.kermit.Logger
 import io.github.smithjustinn.data.local.SettingsDao
 import io.github.smithjustinn.data.local.SettingsEntity
-import io.github.smithjustinn.domain.models.CardBackTheme
-import io.github.smithjustinn.domain.models.CardSymbolTheme
 import io.github.smithjustinn.domain.repositories.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +17,6 @@ import kotlinx.coroutines.sync.withLock
 
 class SettingsRepositoryImpl(
     private val dao: SettingsDao,
-    private val logger: Logger,
 ) : SettingsRepository {
     private val scope = CoroutineScope(Dispatchers.IO)
     private val writeMutex = Mutex()
@@ -88,53 +84,6 @@ class SettingsRepositoryImpl(
                 initialValue = 1.0f,
             )
 
-    @Suppress("TooGenericExceptionCaught")
-    override val cardBackTheme: StateFlow<CardBackTheme> =
-        settingsFlow
-            .map { entity ->
-                try {
-                    CardBackTheme.valueOf(entity?.cardBackTheme ?: CardBackTheme.GEOMETRIC.name)
-                } catch (e: IllegalArgumentException) {
-                    logger.e(e) { "Invalid CardBackTheme values stored: ${entity?.cardBackTheme}" }
-                    CardBackTheme.GEOMETRIC
-                } catch (e: Exception) {
-                    logger.e(e) { "Failed to parse CardBackTheme: ${entity?.cardBackTheme}" }
-                    CardBackTheme.GEOMETRIC
-                }
-            }.stateIn(
-                scope = scope,
-                started = SharingStarted.Eagerly,
-                initialValue = CardBackTheme.GEOMETRIC,
-            )
-
-    @Suppress("TooGenericExceptionCaught")
-    override val cardSymbolTheme: StateFlow<CardSymbolTheme> =
-        settingsFlow
-            .map { entity ->
-                try {
-                    CardSymbolTheme.valueOf(entity?.cardSymbolTheme ?: CardSymbolTheme.CLASSIC.name)
-                } catch (e: IllegalArgumentException) {
-                    logger.e(e) { "Invalid CardSymbolTheme values stored: ${entity?.cardSymbolTheme}" }
-                    CardSymbolTheme.CLASSIC
-                } catch (e: Exception) {
-                    logger.e(e) { "Failed to parse CardSymbolTheme: ${entity?.cardSymbolTheme}" }
-                    CardSymbolTheme.CLASSIC
-                }
-            }.stateIn(
-                scope = scope,
-                started = SharingStarted.Eagerly,
-                initialValue = CardSymbolTheme.CLASSIC,
-            )
-
-    override val areSuitsMultiColored: StateFlow<Boolean> =
-        settingsFlow
-            .map { it?.areSuitsMultiColored ?: false }
-            .stateIn(
-                scope = scope,
-                started = SharingStarted.Eagerly,
-                initialValue = false,
-            )
-
     override suspend fun setPeekEnabled(enabled: Boolean) =
         writeMutex.withLock {
             val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
@@ -169,23 +118,5 @@ class SettingsRepositoryImpl(
         writeMutex.withLock {
             val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
             dao.saveSettings(current.copy(musicVolume = volume))
-        }
-
-    override suspend fun setCardBackTheme(theme: CardBackTheme) =
-        writeMutex.withLock {
-            val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
-            dao.saveSettings(current.copy(cardBackTheme = theme.name))
-        }
-
-    override suspend fun setCardSymbolTheme(theme: CardSymbolTheme) =
-        writeMutex.withLock {
-            val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
-            dao.saveSettings(current.copy(cardSymbolTheme = theme.name))
-        }
-
-    override suspend fun setSuitsMultiColored(enabled: Boolean) =
-        writeMutex.withLock {
-            val current = dao.getSettings().firstOrNull() ?: SettingsEntity()
-            dao.saveSettings(current.copy(areSuitsMultiColored = enabled))
         }
 }

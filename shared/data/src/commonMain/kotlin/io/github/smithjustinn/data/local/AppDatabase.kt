@@ -37,13 +37,31 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun playerEconomyDao(): PlayerEconomyDao
 
     companion object {
-        const val DATABASE_VERSION = 2
+        const val DATABASE_VERSION = 3
 
         val MIGRATION_1_2 =
             object : Migration(1, 2) {
                 override fun migrate(connection: SQLiteConnection) {
                     connection.execSQL(
                         "ALTER TABLE player_economy ADD COLUMN selectedThemeId TEXT NOT NULL DEFAULT 'GEOMETRIC'",
+                    )
+                }
+            }
+
+        val MIGRATION_2_3 =
+            object : Migration(2, 3) {
+                override fun migrate(connection: SQLiteConnection) {
+                    connection.execSQL("DROP TABLE IF EXISTS `settings`")
+                    connection.execSQL(
+                        "CREATE TABLE IF NOT EXISTS `settings` (" +
+                            "`id` INTEGER NOT NULL, " +
+                            "`isPeekEnabled` INTEGER NOT NULL, " +
+                            "`isSoundEnabled` INTEGER NOT NULL, " +
+                            "`isMusicEnabled` INTEGER NOT NULL, " +
+                            "`isWalkthroughCompleted` INTEGER NOT NULL, " +
+                            "`soundVolume` REAL NOT NULL, " +
+                            "`musicVolume` REAL NOT NULL, " +
+                            "PRIMARY KEY(`id`))",
                     )
                 }
             }

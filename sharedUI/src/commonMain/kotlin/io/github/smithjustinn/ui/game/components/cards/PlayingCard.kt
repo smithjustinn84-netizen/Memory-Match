@@ -30,7 +30,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import io.github.smithjustinn.domain.models.CardDisplaySettings
+import io.github.smithjustinn.domain.models.CardBackTheme
+import io.github.smithjustinn.domain.models.CardSymbolTheme
 import io.github.smithjustinn.domain.models.Rank
 import io.github.smithjustinn.domain.models.Suit
 import io.github.smithjustinn.theme.PokerTheme
@@ -122,7 +123,9 @@ fun PlayingCard(
     content: CardContent,
     modifier: Modifier = Modifier,
     backColor: Color = PokerTheme.colors.feltGreen,
-    settings: CardDisplaySettings = CardDisplaySettings(),
+    backTheme: CardBackTheme = CardBackTheme.GEOMETRIC,
+    symbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC,
+    areSuitsMultiColored: Boolean = false,
     muckTargetOffset: IntOffset = IntOffset(0, MUCK_TARGET_Y_FALLBACK), // Default to flying off bottom
     muckTargetRotation: Float = 15f,
     isMuckingEnabled: Boolean = true,
@@ -138,7 +141,7 @@ fun PlayingCard(
             muckTargetRotation = muckTargetRotation,
             isMuckingEnabled = isMuckingEnabled,
         )
-    val suitColor = calculateSuitColor(content.suit, settings.areSuitsMultiColored, settings.symbolTheme)
+    val suitColor = calculateSuitColor(content.suit, areSuitsMultiColored, symbolTheme)
 
     CardContainer(
         modifier = modifier.offset { IntOffset(animations.shakeOffset.roundToInt(), 0) },
@@ -161,7 +164,8 @@ fun PlayingCard(
             content = content,
             rotation = animations.rotation,
             suitColor = suitColor,
-            settings = settings,
+            backTheme = backTheme,
+            symbolTheme = symbolTheme,
             backColor = backColor,
         )
     }
@@ -172,15 +176,16 @@ private fun CardContentSelectors(
     content: CardContent,
     rotation: Float,
     suitColor: Color,
-    settings: CardDisplaySettings,
+    backTheme: CardBackTheme,
+    symbolTheme: CardSymbolTheme,
     backColor: Color,
 ) {
     if (rotation <= HALF_ROTATION) {
-        CardFace(rank = content.rank, suit = content.suit, suitColor = suitColor, theme = settings.symbolTheme)
+        CardFace(rank = content.rank, suit = content.suit, suitColor = suitColor, theme = symbolTheme)
         if (content.visualState.isRecentlyMatched) ShimmerEffect()
     } else {
         CardBack(
-            theme = settings.backTheme,
+            theme = backTheme,
             backColor = backColor,
             rotation = rotation,
         )

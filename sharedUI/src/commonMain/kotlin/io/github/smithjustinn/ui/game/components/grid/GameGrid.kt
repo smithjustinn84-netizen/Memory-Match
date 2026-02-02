@@ -29,8 +29,9 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import io.github.smithjustinn.domain.models.CardDisplaySettings
+import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.domain.models.CardState
+import io.github.smithjustinn.domain.models.CardSymbolTheme
 import io.github.smithjustinn.ui.game.components.cards.CardContent
 import io.github.smithjustinn.ui.game.components.cards.CardVisualState
 import io.github.smithjustinn.ui.game.components.cards.PlayingCard
@@ -60,7 +61,7 @@ internal fun GameGrid(
         contentAlignment = Alignment.Center,
     ) {
         GridBackground(
-            theme = settings.displaySettings.backTheme,
+            theme = settings.cardBackTheme,
             modifier =
                 Modifier
                     .fillMaxSize()
@@ -214,7 +215,9 @@ private fun GridContent(
                 card = card,
                 isPeeking = gridCardState.isPeeking,
                 lastMatchedIds = gridCardState.lastMatchedIds,
-                displaySettings = settings.displaySettings,
+                cardBackTheme = settings.cardBackTheme,
+                cardSymbolTheme = settings.cardSymbolTheme,
+                areSuitsMultiColored = settings.areSuitsMultiColored,
                 maxWidth = layoutConfig.metrics.maxWidth,
                 screenHeight = screenHeight,
                 gridPosition = gridPosition,
@@ -232,7 +235,9 @@ private fun GridItem(
     card: CardState,
     isPeeking: Boolean,
     lastMatchedIds: kotlinx.collections.immutable.ImmutableList<Int>,
-    displaySettings: CardDisplaySettings,
+    cardBackTheme: CardBackTheme,
+    cardSymbolTheme: CardSymbolTheme,
+    areSuitsMultiColored: Boolean,
     maxWidth: androidx.compose.ui.unit.Dp,
     screenHeight: androidx.compose.ui.unit.Dp,
     gridPosition: Offset,
@@ -275,7 +280,9 @@ private fun GridItem(
                         isError = card.isError,
                     ),
             ),
-        settings = displaySettings,
+        backTheme = cardBackTheme,
+        symbolTheme = cardSymbolTheme,
+        areSuitsMultiColored = areSuitsMultiColored,
         muckTargetOffset = muckTargetOffset,
         muckTargetRotation = fanRotation,
         onClick = { onCardClick(card.id) },

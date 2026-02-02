@@ -21,10 +21,3 @@ enum class CardSymbolTheme(
     TEXT_ONLY("skin_text"),
     POKER("skin_poker"),
 }
-
-@Serializable
-data class CardDisplaySettings(
-    val backTheme: CardBackTheme = CardBackTheme.GEOMETRIC,
-    val symbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC,
-    val areSuitsMultiColored: Boolean = false,
-)

@@ -1,10 +1,8 @@
 package io.github.smithjustinn.data.repositories
 
 import app.cash.turbine.test
-import co.touchlab.kermit.Logger
 import io.github.smithjustinn.data.local.AppDatabase
 import io.github.smithjustinn.data.local.createTestDatabase
-import io.github.smithjustinn.domain.models.CardBackTheme
 import kotlinx.coroutines.test.runTest
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -23,7 +21,6 @@ class SettingsRepositoryIntegrationTest {
         repository =
             SettingsRepositoryImpl(
                 dao = database.settingsDao(),
-                logger = Logger.withTag("Test"),
             )
     }
 
@@ -54,13 +51,6 @@ class SettingsRepositoryIntegrationTest {
                 assertEquals(1.0f, awaitItem()) // Default
                 repository.setSoundVolume(0.5f)
                 assertEquals(0.5f, awaitItem())
-            }
-
-            // Test Card Back Theme
-            repository.cardBackTheme.test {
-                assertEquals(CardBackTheme.GEOMETRIC, awaitItem()) // Default
-                repository.setCardBackTheme(CardBackTheme.PATTERN)
-                assertEquals(CardBackTheme.PATTERN, awaitItem())
             }
 
             // Test walkthrough

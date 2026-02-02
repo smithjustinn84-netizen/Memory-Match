@@ -8,13 +8,11 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.verifySuspend
-import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.test.BaseComponentTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -27,7 +25,6 @@ class SettingsComponentTest : BaseComponentTest() {
 
         // Custom behaviors for this test if needed (defaults are usually enough)
         everySuspend { context.settingsRepository.setPeekEnabled(any()) } returns Unit
-        everySuspend { context.settingsRepository.setCardBackTheme(any()) } returns Unit
         everySuspend { context.settingsRepository.setMusicEnabled(any()) } returns Unit
         everySuspend { context.settingsRepository.setSoundEnabled(any()) } returns Unit
         everySuspend { context.settingsRepository.setSoundVolume(any()) } returns Unit
@@ -51,7 +48,6 @@ class SettingsComponentTest : BaseComponentTest() {
                     val state = awaitItem()
                     if (state.soundVolume == 0.8f) {
                         assertTrue(state.isPeekEnabled || !state.isPeekEnabled) // Just consume it
-                        assertEquals(CardBackTheme.GEOMETRIC, state.cardBackTheme)
                         foundDesiredState = true
                     }
                 }
@@ -68,18 +64,6 @@ class SettingsComponentTest : BaseComponentTest() {
             testDispatcher.scheduler.runCurrent()
 
             verifySuspend { context.settingsRepository.setPeekEnabled(false) }
-        }
-
-    @Test
-    fun `setCardBackTheme updates repository`() =
-        runTest { lifecycle ->
-            component = createComponent(lifecycle)
-            testDispatcher.scheduler.runCurrent()
-
-            component.setCardBackTheme(CardBackTheme.GEOMETRIC)
-            testDispatcher.scheduler.runCurrent()
-
-            verifySuspend { context.settingsRepository.setCardBackTheme(CardBackTheme.GEOMETRIC) }
         }
 
     private fun createComponent(lifecycle: Lifecycle): DefaultSettingsComponent =

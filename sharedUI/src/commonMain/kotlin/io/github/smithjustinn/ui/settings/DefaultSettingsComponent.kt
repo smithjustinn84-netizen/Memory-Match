@@ -3,8 +3,6 @@ package io.github.smithjustinn.ui.settings
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.lifecycle.doOnDestroy
 import io.github.smithjustinn.di.AppGraph
-import io.github.smithjustinn.domain.models.CardBackTheme
-import io.github.smithjustinn.domain.models.CardSymbolTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -43,22 +41,12 @@ class DefaultSettingsComponent(
             AudioSettings(sound, music, soundVol, musicVol)
         }
 
-    private val themeSettingsFlow =
-        combine(
-            settingsRepository.cardBackTheme,
-            settingsRepository.cardSymbolTheme,
-            settingsRepository.areSuitsMultiColored,
-        ) { back, symbol, multiColor ->
-            ThemeSettings(back, symbol, multiColor)
-        }
-
     override val state: StateFlow<SettingsState> =
         combine(
             settingsRepository.isPeekEnabled,
             settingsRepository.isWalkthroughCompleted,
             audioSettingsFlow,
-            themeSettingsFlow,
-        ) { peek, walkthrough, audio, theme ->
+        ) { peek, walkthrough, audio ->
             SettingsState(
                 isPeekEnabled = peek,
                 isWalkthroughCompleted = walkthrough,
@@ -66,9 +54,6 @@ class DefaultSettingsComponent(
                 isMusicEnabled = audio.isMusicEnabled,
                 soundVolume = audio.soundVolume,
                 musicVolume = audio.musicVolume,
-                cardBackTheme = theme.cardBackTheme,
-                cardSymbolTheme = theme.cardSymbolTheme,
-                areSuitsMultiColored = theme.areSuitsMultiColored,
             )
         }.stateIn(
             scope = scope,
@@ -81,12 +66,6 @@ class DefaultSettingsComponent(
         val isMusicEnabled: Boolean,
         val soundVolume: Float,
         val musicVolume: Float,
-    )
-
-    private data class ThemeSettings(
-        val cardBackTheme: CardBackTheme,
-        val cardSymbolTheme: CardSymbolTheme,
-        val areSuitsMultiColored: Boolean,
     )
 
     init {
@@ -120,24 +99,6 @@ class DefaultSettingsComponent(
     override fun setMusicVolume(volume: Float) {
         scope.launch {
             settingsRepository.setMusicVolume(volume)
-        }
-    }
-
-    override fun setCardBackTheme(theme: CardBackTheme) {
-        scope.launch {
-            settingsRepository.setCardBackTheme(theme)
-        }
-    }
-
-    override fun setCardSymbolTheme(theme: CardSymbolTheme) {
-        scope.launch {
-            settingsRepository.setCardSymbolTheme(theme)
-        }
-    }
-
-    override fun toggleSuitsMultiColored(enabled: Boolean) {
-        scope.launch {
-            settingsRepository.setSuitsMultiColored(enabled)
         }
     }
 

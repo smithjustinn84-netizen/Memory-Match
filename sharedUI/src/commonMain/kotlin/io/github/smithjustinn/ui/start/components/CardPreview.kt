@@ -28,7 +28,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import io.github.smithjustinn.domain.models.CardDisplaySettings
+import io.github.smithjustinn.domain.models.CardBackTheme
+import io.github.smithjustinn.domain.models.CardSymbolTheme
 import io.github.smithjustinn.domain.models.Rank
 import io.github.smithjustinn.domain.models.Suit
 import io.github.smithjustinn.theme.PokerTheme
@@ -100,7 +101,9 @@ private const val STAR_7_DELAY = 1200
 @Composable
 fun CardPreview(
     modifier: Modifier = Modifier,
-    settings: CardDisplaySettings = CardDisplaySettings(),
+    backTheme: CardBackTheme = CardBackTheme.GEOMETRIC,
+    symbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC,
+    areSuitsMultiColored: Boolean = false,
 ) {
     var isFanned by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
@@ -142,7 +145,7 @@ fun CardPreview(
         contentAlignment = Alignment.Center,
     ) {
         BackgroundGlow()
-        CardStack(floatOffset, rotation, fanMultiplier, settings)
+        CardStack(floatOffset, rotation, fanMultiplier, backTheme, symbolTheme, areSuitsMultiColored)
         StarsLayer()
     }
 }
@@ -175,19 +178,30 @@ private fun CardStack(
     floatOffset: Float,
     rotation: Float,
     fanMultiplier: Float,
-    settings: CardDisplaySettings,
+    backTheme: CardBackTheme,
+    symbolTheme: CardSymbolTheme,
+    areSuitsMultiColored: Boolean,
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(CARD_SPACING.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.offset(y = floatOffset.dp),
     ) {
-        PreviewCard(Suit.Hearts, (-BASE_ROTATION * fanMultiplier) + rotation, CARD_FRONT_Z_INDEX, settings)
+        PreviewCard(
+            Suit.Hearts,
+            (-BASE_ROTATION * fanMultiplier) + rotation,
+            CARD_FRONT_Z_INDEX,
+            backTheme,
+            symbolTheme,
+            areSuitsMultiColored,
+        )
         PreviewCard(
             Suit.Spades,
             (BASE_ROTATION * fanMultiplier) - rotation,
             CARD_BACK_Z_INDEX,
-            settings,
+            backTheme,
+            symbolTheme,
+            areSuitsMultiColored,
             CARD_TRANSLATION_Y,
         )
     }
@@ -198,7 +212,9 @@ private fun PreviewCard(
     suit: Suit,
     rotationZ: Float,
     zIndex: Float,
-    settings: CardDisplaySettings,
+    backTheme: CardBackTheme,
+    symbolTheme: CardSymbolTheme,
+    areSuitsMultiColored: Boolean,
     translationY: Float = 0f,
 ) {
     PlayingCard(
@@ -212,7 +228,9 @@ private fun PreviewCard(
                         isMatched = false,
                     ),
             ),
-        settings = settings,
+        backTheme = backTheme,
+        symbolTheme = symbolTheme,
+        areSuitsMultiColored = areSuitsMultiColored,
         modifier =
             Modifier
                 .width(CARD_WIDTH.dp)

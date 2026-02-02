@@ -7,19 +7,6 @@ import kotlin.time.Instant
 
 class SerializationTest {
     @Test
-    fun testCardDisplaySettingsSerialization() {
-        val settings =
-            CardDisplaySettings(
-                backTheme = CardBackTheme.POKER,
-                symbolTheme = CardSymbolTheme.POKER,
-                areSuitsMultiColored = true,
-            )
-        val json = Json.encodeToString(CardDisplaySettings.serializer(), settings)
-        val decoded = Json.decodeFromString(CardDisplaySettings.serializer(), json)
-        assertEquals(settings, decoded)
-    }
-
-    @Test
     fun testGameStatsSerialization() {
         val stats = GameStats(pairCount = 8, bestScore = 1500, bestTimeSeconds = 45)
         val json = Json.encodeToString(GameStats.serializer(), stats)

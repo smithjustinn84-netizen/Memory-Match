@@ -20,8 +20,9 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import io.github.smithjustinn.domain.models.CardDisplaySettings
+import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.domain.models.CardState
+import io.github.smithjustinn.domain.models.CardSymbolTheme
 import io.github.smithjustinn.ui.game.components.cards.CardContent
 import io.github.smithjustinn.ui.game.components.cards.CardVisualState
 import io.github.smithjustinn.ui.game.components.cards.PlayingCard
@@ -123,7 +124,9 @@ private class CelebrationCard(
 fun CardFountainOverlay(
     cards: List<CardState>,
     modifier: Modifier = Modifier,
-    settings: CardDisplaySettings = CardDisplaySettings(),
+    cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC,
+    cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC,
+    areSuitsMultiColored: Boolean = false,
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val density = LocalDensity.current
@@ -166,7 +169,7 @@ fun CardFountainOverlay(
 
         PhysicsEngine(celebrationCards, heightPx)
 
-        CelebrationCardsLayer(celebrationCards, settings)
+        CelebrationCardsLayer(celebrationCards, cardBackTheme, cardSymbolTheme, areSuitsMultiColored)
     }
 }
 
@@ -192,7 +195,9 @@ private fun PhysicsEngine(
 @Composable
 private fun CelebrationCardsLayer(
     celebrationCards: List<CelebrationCard>,
-    settings: CardDisplaySettings,
+    cardBackTheme: CardBackTheme,
+    cardSymbolTheme: CardSymbolTheme,
+    areSuitsMultiColored: Boolean,
 ) {
     celebrationCards.forEach { cCard ->
         if (cCard.alpha > 0f && cCard.scale > 0f) {
@@ -208,7 +213,9 @@ private fun CelebrationCardsLayer(
                                     isMatched = true,
                                 ),
                         ),
-                    settings = settings,
+                    backTheme = cardBackTheme,
+                    symbolTheme = cardSymbolTheme,
+                    areSuitsMultiColored = areSuitsMultiColored,
                     isMuckingEnabled = false,
                     modifier =
                         Modifier
