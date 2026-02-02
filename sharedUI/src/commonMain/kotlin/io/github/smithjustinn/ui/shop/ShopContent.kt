@@ -42,6 +42,12 @@ import io.github.smithjustinn.ui.components.AuroraEffect
 import io.github.smithjustinn.ui.components.ShopIcons
 import io.github.smithjustinn.ui.components.pokerBackground
 
+sealed class ShopItemState {
+    data class Locked(val price: Long, val canAfford: Boolean) : ShopItemState()
+    data object Owned : ShopItemState()
+    data object Equipped : ShopItemState()
+}
+
 @Composable
 fun ShopContent(
     component: ShopComponent,
@@ -169,11 +175,17 @@ private fun ShopItemsGrid(
                     else -> false
                 }
 
+            val isUnlocked = state.unlockedItemIds.contains(item.id)
+            val shopItemState =
+                when {
+                    isEquipped -> ShopItemState.Equipped
+                    isUnlocked -> ShopItemState.Owned
+                    else -> ShopItemState.Locked(item.price, state.balance >= item.price)
+                }
+
             ShopItemCard(
                 item = item,
-                isUnlocked = state.unlockedItemIds.contains(item.id),
-                isEquipped = isEquipped,
-                canAfford = state.balance >= item.price,
+                shopItemState = shopItemState,
                 onBuy = { onBuyItem(item) },
                 onEquip = { onEquipItem(item) },
             )
@@ -184,20 +196,30 @@ private fun ShopItemsGrid(
 @Composable
 fun ShopItemCard(
     item: ShopItem,
-    isUnlocked: Boolean,
-    isEquipped: Boolean,
-    canAfford: Boolean,
+    shopItemState: ShopItemState,
     onBuy: () -> Unit,
     onEquip: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val canClick = (!isUnlocked && canAfford) || (isUnlocked && !isEquipped && !item.isConsumable)
-    val onClick = if (isUnlocked) onEquip else onBuy
+    val isEquipped = shopItemState is ShopItemState.Equipped
+    val canClick =
+        when (shopItemState) {
+            is ShopItemState.Locked -> shopItemState.canAfford
+            is ShopItemState.Owned -> !item.isConsumable
+            is ShopItemState.Equipped -> false
+        }
+    val onClick =
+        when (shopItemState) {
+            is ShopItemState.Locked -> onBuy
+            is ShopItemState.Owned -> onEquip
+            is ShopItemState.Equipped -> {
+                {}
+            }
+        }
 
     AppCard(
         modifier = modifier.clickable(enabled = canClick, onClick = onClick),
-        backgroundColor =
-            getCardBackgroundColor(isEquipped, isUnlocked),
+        backgroundColor = getCardBackgroundColor(shopItemState),
         border =
             if (isEquipped) {
                 androidx.compose.foundation.BorderStroke(2.dp, PokerTheme.colors.goldenYellow)
@@ -228,20 +250,17 @@ fun ShopItemCard(
             )
             Spacer(modifier = Modifier.height(8.dp))
 
-            ShopItemStatusBadge(item, isUnlocked, isEquipped, canAfford)
+            ShopItemStatusBadge(shopItemState)
         }
     }
 }
 
 @Composable
-private fun getCardBackgroundColor(
-    isEquipped: Boolean,
-    isUnlocked: Boolean,
-): Color =
-    when {
-        isEquipped -> PokerTheme.colors.surface.copy(alpha = 0.8f)
-        isUnlocked -> PokerTheme.colors.surface.copy(alpha = 0.5f)
-        else -> PokerTheme.colors.surface
+private fun getCardBackgroundColor(shopItemState: ShopItemState): Color =
+    when (shopItemState) {
+        is ShopItemState.Equipped -> PokerTheme.colors.surface.copy(alpha = 0.8f)
+        is ShopItemState.Owned -> PokerTheme.colors.surface.copy(alpha = 0.5f)
+        is ShopItemState.Locked -> PokerTheme.colors.surface
     }
 
 @Composable
@@ -272,34 +291,46 @@ private fun ShopItemHeader(
 }
 
 @Composable
-private fun ShopItemStatusBadge(
-    item: ShopItem,
-    isUnlocked: Boolean,
-    isEquipped: Boolean,
-    canAfford: Boolean,
-) {
-    when {
-        isEquipped -> {
-            Text(
-                text = "EQUIPPED",
-                style = MaterialTheme.typography.labelLarge,
-                color = PokerTheme.colors.goldenYellow,
-                fontWeight = FontWeight.Bold,
-            )
+private fun ShopItemStatusBadge(shopItemState: ShopItemState) {
+    when (shopItemState) {
+        is ShopItemState.Equipped -> {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Text(
+                    text = "ACTIVE",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = PokerTheme.colors.goldenYellow,
+                    fontWeight = FontWeight.Bold,
+                )
+                Icon(
+                    imageVector = ShopIcons.CheckCircle,
+                    contentDescription = "Active",
+                    tint = PokerTheme.colors.goldenYellow,
+                    modifier = Modifier.size(16.dp),
+                )
+            }
         }
-        isUnlocked && !item.isConsumable -> {
+        is ShopItemState.Owned -> {
             Text(
                 text = "EQUIP",
                 style = MaterialTheme.typography.labelLarge,
-                color = Color.Green,
+                color = Color(0xFF4CAF50),
                 fontWeight = FontWeight.Bold,
             )
         }
-        else -> {
+        is ShopItemState.Locked -> {
             Text(
-                text = "$${item.price}",
+                text = "BUY - $${shopItemState.price}",
                 style = MaterialTheme.typography.labelLarge,
-                color = if (canAfford) PokerTheme.colors.goldenYellow else Color.Red,
+                color =
+                    if (shopItemState.canAfford) {
+                        PokerTheme.colors.goldenYellow
+                    } else {
+                        Color(0xFFE57373)
+                    },
+                fontWeight = FontWeight.Bold,
             )
         }
     }
