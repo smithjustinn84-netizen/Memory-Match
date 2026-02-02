@@ -20,6 +20,76 @@ import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.domain.models.CardSymbolTheme
 import io.github.smithjustinn.domain.models.Rank
 import io.github.smithjustinn.domain.models.Suit
+import io.github.smithjustinn.theme.PokerTheme
+
+object CardFaces {
+    @Composable
+    fun Classic(modifier: Modifier = Modifier) =
+        PreviewContainer(modifier) {
+            ClassicCardFace(
+                rank = Rank.Ace,
+                suit = Suit.Spades,
+                suitColor = Color.Black,
+                getFontSize = { getPreviewFontSize(it) },
+            )
+        }
+
+    @Composable
+    fun Minimal(modifier: Modifier = Modifier) =
+        PreviewContainer(modifier) {
+            MinimalCardFace(
+                rank = Rank.Ace,
+                suit = Suit.Spades,
+                suitColor = Color.Black,
+                getFontSize = { getPreviewFontSize(it) },
+            )
+        }
+
+    @Composable
+    fun TextOnly(modifier: Modifier = Modifier) =
+        PreviewContainer(modifier) {
+            TextOnlyCardFace(
+                rank = Rank.Ace,
+                suit = Suit.Spades,
+                suitColor = Color.Black,
+                getFontSize = { getPreviewFontSize(it) },
+            )
+        }
+
+    @Composable
+    fun Poker(modifier: Modifier = Modifier) =
+        PreviewContainer(modifier) {
+            PokerCardFace(
+                rank = Rank.Ace,
+                suit = Suit.Spades,
+                suitColor = Color.Black,
+                getFontSize = { getPreviewFontSize(it) },
+            )
+        }
+
+    @Composable
+    private fun PreviewContainer(
+        modifier: Modifier = Modifier,
+        content: @Composable () -> Unit,
+    ) {
+        androidx.compose.material3.Card(
+            modifier = modifier.fillMaxSize(),
+            shape =
+                androidx.compose.foundation.shape
+                    .RoundedCornerShape(12.dp),
+            colors =
+                androidx.compose.material3.CardDefaults.cardColors(
+                    containerColor = Color.White,
+                ),
+        ) {
+            Box(modifier = Modifier.fillMaxSize().padding(4.dp)) {
+                content()
+            }
+        }
+    }
+
+    private fun getPreviewFontSize(baseSize: Float) = (baseSize * (80f / BASE_CARD_WIDTH)).sp
+}
 
 @Composable
 internal fun CardFace(

@@ -1,12 +1,14 @@
 package io.github.smithjustinn.ui.shop
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,29 +35,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import io.github.smithjustinn.di.LocalAppGraph
 import io.github.smithjustinn.domain.models.ShopItem
 import io.github.smithjustinn.domain.models.ShopItemType
+import io.github.smithjustinn.services.HapticFeedbackType
 import io.github.smithjustinn.theme.PokerTheme
-import io.github.smithjustinn.ui.assets.AssetProvider
 import io.github.smithjustinn.ui.components.AppCard
 import io.github.smithjustinn.ui.components.AppIcons
 import io.github.smithjustinn.ui.components.AuroraEffect
+import io.github.smithjustinn.ui.components.PokerButton
 import io.github.smithjustinn.ui.components.ShopIcons
 import io.github.smithjustinn.ui.components.pokerBackground
-import io.github.smithjustinn.di.LocalAppGraph
-import io.github.smithjustinn.services.HapticFeedbackType
-
-sealed class ShopItemState {
-    data class Locked(
-        val price: Long,
-        val canAfford: Boolean,
-    ) : ShopItemState()
-
-    data object Owned : ShopItemState()
-
-    data object Equipped : ShopItemState()
-}
+import io.github.smithjustinn.ui.shop.components.CosmeticPreviewRegistry
 
 @Composable
 fun ShopContent(
@@ -204,6 +197,7 @@ private fun ShopItemsGrid(
                 shopItemState = shopItemState,
                 onBuy = { onBuyItem(item) },
                 onEquip = { onEquipItem(item) },
+                modifier = Modifier.fillMaxWidth(),
             )
         }
     }
@@ -218,74 +212,130 @@ fun ShopItemCard(
     modifier: Modifier = Modifier,
 ) {
     val isEquipped = shopItemState is ShopItemState.Equipped
-    val canClick =
-        when (shopItemState) {
-            is ShopItemState.Locked -> shopItemState.canAfford
-            is ShopItemState.Owned -> !item.isConsumable
-            is ShopItemState.Equipped -> false
-        }
-    val onClick =
-        when (shopItemState) {
-            is ShopItemState.Locked -> onBuy
-            is ShopItemState.Owned -> onEquip
-            is ShopItemState.Equipped -> {
-                {}
-            }
-        }
+    val isOwned = shopItemState is ShopItemState.Owned || isEquipped
+    val canClick = !isEquipped
 
     AppCard(
         modifier =
             modifier
                 .fillMaxWidth()
-                .heightIn(min = 240.dp)
-                .clickable(enabled = canClick, onClick = onClick),
+                .heightIn(min = 320.dp) // Maintain height for preview visibility
+                .clickable(enabled = canClick) {
+                    if (isOwned) onEquip() else onBuy()
+                },
         backgroundColor = getCardBackgroundColor(shopItemState),
         border =
             if (isEquipped) {
-                androidx.compose.foundation.BorderStroke(2.dp, PokerTheme.colors.goldenYellow)
+                BorderStroke(2.dp, PokerTheme.colors.goldenYellow) // Standard green/active color
             } else {
                 null
             },
     ) {
         Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            ShopItemHeader(item.name, isEquipped)
-
-            // Visual preview for themes and skins
-            if (item.type == ShopItemType.THEME ||
-                item.type == ShopItemType.CARD_SKIN
-            ) {
-                val aspectRatio =
-                    if (item.type == ShopItemType.CARD_SKIN) {
-                        2.5f / 3.5f // Poker card aspect ratio
-                    } else {
-                        4f / 3f // Theme preview aspect ratio
-                    }
-
-                Box(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(aspectRatio),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    AssetProvider.CardPreview(
-                        shopItemId = item.id,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                }
-            }
-
-            Text(
-                text = item.description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = PokerTheme.colors.onSurface.copy(alpha = 0.7f),
+            ShopItemPreview(
+                itemId = item.id,
+                itemType = item.type,
+                modifier = Modifier.weight(1f),
             )
-            Spacer(modifier = Modifier.height(8.dp))
 
-            ShopItemStatusBadge(shopItemState)
+            Spacer(modifier = Modifier.height(12.dp))
+
+            ShopItemInfo(
+                name = item.name,
+                description = item.description,
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            ShopActionButton(
+                shopItemState = shopItemState,
+                onBuy = onBuy,
+                onEquip = onEquip,
+            )
+        }
+    }
+}
+
+@Composable
+private fun ShopItemPreview(
+    itemId: String,
+    itemType: ShopItemType,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center,
+    ) {
+        CosmeticPreviewRegistry.Preview(
+            itemId = itemId,
+            itemType = itemType,
+            modifier = Modifier.fillMaxHeight(0.9f),
+        )
+    }
+}
+
+@Composable
+private fun ShopItemInfo(
+    name: String,
+    description: String,
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = name,
+            style = MaterialTheme.typography.titleMedium,
+            color = PokerTheme.colors.onSurface,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+
+        if (description.isNotEmpty()) {
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = PokerTheme.colors.onSurface.copy(alpha = 0.7f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}
+
+@Composable
+private fun ShopActionButton(
+    shopItemState: ShopItemState,
+    onBuy: () -> Unit,
+    onEquip: () -> Unit,
+) {
+    when (shopItemState) {
+        is ShopItemState.Equipped -> {
+            PokerButton(
+                text = "Active",
+                onClick = {},
+                enabled = false,
+                containerColor = PokerTheme.colors.bonusGreen,
+                contentColor = Color.White,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        is ShopItemState.Owned -> {
+            PokerButton(
+                text = "Equip",
+                onClick = onEquip,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        is ShopItemState.Locked -> {
+            PokerButton(
+                text = "$${shopItemState.price}",
+                leadingIcon = ShopIcons.CasinoChip,
+                onClick = onBuy,
+                modifier = Modifier.fillMaxWidth(),
+                contentColor = if (shopItemState.canAfford) PokerTheme.colors.goldenYellow else Color(0xFFE57373),
+            )
         }
     }
 }
@@ -297,76 +347,3 @@ private fun getCardBackgroundColor(shopItemState: ShopItemState): Color =
         is ShopItemState.Owned -> PokerTheme.colors.surface.copy(alpha = 0.5f)
         is ShopItemState.Locked -> PokerTheme.colors.surface
     }
-
-@Composable
-private fun ShopItemHeader(
-    name: String,
-    isEquipped: Boolean,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = name,
-            style = MaterialTheme.typography.titleMedium,
-            color = PokerTheme.colors.onSurface,
-            modifier = Modifier.weight(1f),
-        )
-        if (isEquipped) {
-            Icon(
-                imageVector = ShopIcons.CheckCircle,
-                contentDescription = "Equipped",
-                tint = PokerTheme.colors.goldenYellow,
-                modifier = Modifier.size(20.dp),
-            )
-        }
-    }
-}
-
-@Composable
-private fun ShopItemStatusBadge(shopItemState: ShopItemState) {
-    when (shopItemState) {
-        is ShopItemState.Equipped -> {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                Text(
-                    text = "ACTIVE",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = PokerTheme.colors.goldenYellow,
-                    fontWeight = FontWeight.Bold,
-                )
-                Icon(
-                    imageVector = ShopIcons.CheckCircle,
-                    contentDescription = "Active",
-                    tint = PokerTheme.colors.goldenYellow,
-                    modifier = Modifier.size(16.dp),
-                )
-            }
-        }
-        is ShopItemState.Owned -> {
-            Text(
-                text = "EQUIP",
-                style = MaterialTheme.typography.labelLarge,
-                color = Color(0xFF4CAF50),
-                fontWeight = FontWeight.Bold,
-            )
-        }
-        is ShopItemState.Locked -> {
-            Text(
-                text = "BUY - $${shopItemState.price}",
-                style = MaterialTheme.typography.labelLarge,
-                color =
-                    if (shopItemState.canAfford) {
-                        PokerTheme.colors.goldenYellow
-                    } else {
-                        Color(0xFFE57373)
-                    },
-                fontWeight = FontWeight.Bold,
-            )
-        }
-    }
-}

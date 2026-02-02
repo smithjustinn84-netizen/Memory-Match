@@ -10,6 +10,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,6 +35,52 @@ private const val SHIMMER_OFFSET = 500f
 
 // Rotation angles (degrees)
 private const val DIAGONAL_ROTATION = 45f
+
+object CardBacks {
+    @Composable
+    fun Standard(modifier: Modifier = Modifier) =
+        PreviewContainer(modifier) { GeometricCardBack(Color(0xFF1A237E)) } // Deep Blue
+
+    @Composable
+    fun Dark(modifier: Modifier = Modifier) =
+        PreviewContainer(modifier) { GeometricCardBack(Color(0xFF263238)) } // Charcoal
+
+    @Composable
+    fun Nature(modifier: Modifier = Modifier) =
+        PreviewContainer(modifier) { GeometricCardBack(Color(0xFF1B5E20)) } // Forest Green
+
+    @Composable
+    fun Classic(modifier: Modifier = Modifier) =
+        PreviewContainer(modifier) { ClassicCardBack(Color(0xFFB71C1C)) } // Deep Red
+
+    @Composable
+    fun Pattern(modifier: Modifier = Modifier) =
+        PreviewContainer(modifier) { PatternCardBack(Color(0xFF4527A0)) } // Deep Purple
+
+    @Composable
+    fun Poker(modifier: Modifier = Modifier) =
+        PreviewContainer(modifier) { PokerCardBack(Color(0xFF004D40)) } // Deep Teal
+
+    @Composable
+    private fun PreviewContainer(
+        modifier: Modifier = Modifier,
+        content: @Composable () -> Unit,
+    ) {
+        Box(
+            modifier =
+                modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color.White), // White border look
+        ) {
+            Box(
+                modifier = Modifier.padding(2.dp).fillMaxSize(),
+            ) {
+                content()
+            }
+        }
+    }
+}
 
 @Composable
 internal fun CardBack(

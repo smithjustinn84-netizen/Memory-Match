@@ -46,6 +46,7 @@ fun PokerButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     leadingIcon: ImageVector? = null,
     trailingIcon: ImageVector? = null,
     containerColor: Color = PokerTheme.colors.oakWood,
@@ -57,7 +58,7 @@ fun PokerButton(
     val infiniteTransition = rememberInfiniteTransition(label = "poker_button_pulse")
     val scale by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = if (isPulsing) PULSE_SCALE_TARGET else 1f,
+        targetValue = if (isPulsing && enabled) PULSE_SCALE_TARGET else 1f,
         animationSpec =
             infiniteRepeatable(
                 animation = tween(PULSE_ANIMATION_DURATION_MS, easing = LinearEasing),
@@ -81,11 +82,11 @@ fun PokerButton(
             modifier
                 .height(BUTTON_HEIGHT_DP.dp)
                 .scale(scale)
-                .shadow(shadowElevation, PokerTheme.shapes.medium)
+                .shadow(if (enabled) shadowElevation else 0.dp, PokerTheme.shapes.medium)
                 .clip(PokerTheme.shapes.medium)
-                .then(if (border != null) Modifier.border(border, PokerTheme.shapes.medium) else Modifier)
-                .background(finalContainerColor)
-                .clickable(onClick = onClick)
+                .then(if (border != null && enabled) Modifier.border(border, PokerTheme.shapes.medium) else Modifier)
+                .background(if (enabled) finalContainerColor else finalContainerColor.copy(alpha = 0.5f))
+                .clickable(enabled = enabled, onClick = onClick)
                 .padding(horizontal = PokerTheme.spacing.medium),
         contentAlignment = Alignment.Center,
     ) {
@@ -93,8 +94,8 @@ fun PokerButton(
             text = text,
             leadingIcon = leadingIcon,
             trailingIcon = trailingIcon,
-            contentColor = finalContentColor,
-            applyGlimmer = applyGlimmer,
+            contentColor = if (enabled) finalContentColor else finalContentColor.copy(alpha = 0.5f),
+            applyGlimmer = applyGlimmer && enabled,
         )
     }
 }

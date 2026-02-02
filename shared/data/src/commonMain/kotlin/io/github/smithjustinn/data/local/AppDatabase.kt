@@ -36,6 +36,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun playerEconomyDao(): PlayerEconomyDao
 
+    @Suppress("MagicNumber")
     companion object {
         const val DATABASE_VERSION = 3
 
