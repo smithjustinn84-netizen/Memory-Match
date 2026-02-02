@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -43,8 +45,13 @@ import io.github.smithjustinn.ui.components.ShopIcons
 import io.github.smithjustinn.ui.components.pokerBackground
 
 sealed class ShopItemState {
-    data class Locked(val price: Long, val canAfford: Boolean) : ShopItemState()
+    data class Locked(
+        val price: Long,
+        val canAfford: Boolean,
+    ) : ShopItemState()
+
     data object Owned : ShopItemState()
+
     data object Equipped : ShopItemState()
 }
 
@@ -218,7 +225,11 @@ fun ShopItemCard(
         }
 
     AppCard(
-        modifier = modifier.clickable(enabled = canClick, onClick = onClick),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .heightIn(min = 240.dp)
+                .clickable(enabled = canClick, onClick = onClick),
         backgroundColor = getCardBackgroundColor(shopItemState),
         border =
             if (isEquipped) {
@@ -237,10 +248,25 @@ fun ShopItemCard(
             if (item.type == ShopItemType.THEME ||
                 item.type == ShopItemType.CARD_SKIN
             ) {
-                AssetProvider.CardPreview(
-                    shopItemId = item.id,
-                    modifier = Modifier.fillMaxWidth().height(120.dp),
-                )
+                val aspectRatio =
+                    if (item.type == ShopItemType.CARD_SKIN) {
+                        2.5f / 3.5f // Poker card aspect ratio
+                    } else {
+                        4f / 3f // Theme preview aspect ratio
+                    }
+
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(aspectRatio),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    AssetProvider.CardPreview(
+                        shopItemId = item.id,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
             }
 
             Text(

@@ -110,18 +110,19 @@ private fun TopBarMainRow(
         BackButton(
             onClick = onBackClick,
             compact = state.compact,
-            modifier = Modifier.align(Alignment.CenterStart)
+            modifier = Modifier.align(Alignment.CenterStart),
         )
 
         // Center: Pot Score
         ScoringDisplay(
             currentPot = state.currentPot,
             compact = state.compact,
-            modifier = Modifier
-                .align(Alignment.Center)
-                .onGloballyPositioned { coords ->
-                    onScorePositioned(coords.positionInRoot())
-                },
+            modifier =
+                Modifier
+                    .align(Alignment.Center)
+                    .onGloballyPositioned { coords ->
+                        onScorePositioned(coords.positionInRoot())
+                    },
         )
 
         // Right: Controls
@@ -131,7 +132,7 @@ private fun TopBarMainRow(
             onRestartClick = onRestartClick,
             compact = state.compact,
             showRestart = true,
-            modifier = Modifier.align(Alignment.CenterEnd)
+            modifier = Modifier.align(Alignment.CenterEnd),
         )
     }
 }
@@ -147,7 +148,7 @@ private fun ControlButtons(
 ) {
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         MuteButton(
             isAudioEnabled = isAudioEnabled,
