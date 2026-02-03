@@ -34,4 +34,19 @@ class JsonShopItemRepositoryTest {
                 throw e
             }
         }
+
+    @Test
+    fun `getShopItems returns cached items on subsequent calls`() =
+        runTest {
+            try {
+                val items1 = repository.getShopItems()
+                val items2 = repository.getShopItems()
+
+                // Check that the list instances are the same (identity equality)
+                // This proves the cache was used.
+                assertTrue(items1 === items2, "Subsequent calls should return the same cached list instance")
+            } catch (e: Exception) {
+                throw e
+            }
+        }
 }
