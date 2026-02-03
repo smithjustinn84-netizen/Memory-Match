@@ -2,10 +2,13 @@ package io.github.smithjustinn.di
 
 import co.touchlab.kermit.Logger
 import io.github.smithjustinn.data.local.AppDatabase
+import io.github.smithjustinn.domain.repositories.DailyChallengeRepository
 import io.github.smithjustinn.domain.repositories.GameStateRepository
 import io.github.smithjustinn.domain.repositories.GameStatsRepository
 import io.github.smithjustinn.domain.repositories.LeaderboardRepository
+import io.github.smithjustinn.domain.repositories.PlayerEconomyRepository
 import io.github.smithjustinn.domain.repositories.SettingsRepository
+import io.github.smithjustinn.domain.repositories.ShopItemRepository
 import io.github.smithjustinn.domain.usecases.economy.EarnCurrencyUseCase
 import io.github.smithjustinn.domain.usecases.game.CalculateFinalScoreUseCase
 import io.github.smithjustinn.domain.usecases.game.ClearSavedGameUseCase
@@ -38,11 +41,9 @@ class KoinAppGraph :
     override val settingsRepository: SettingsRepository by inject()
     override val leaderboardRepository: LeaderboardRepository by inject()
     override val gameStatsRepository: GameStatsRepository by inject()
-    override val dailyChallengeRepository:
-        io.github.smithjustinn.domain.repositories.DailyChallengeRepository by inject()
-    override val playerEconomyRepository:
-        io.github.smithjustinn.domain.repositories.PlayerEconomyRepository by inject()
-
+    override val dailyChallengeRepository: DailyChallengeRepository by inject()
+    override val playerEconomyRepository: PlayerEconomyRepository by inject()
+    override val shopItemRepository: ShopItemRepository by inject()
     override val startNewGameUseCase: StartNewGameUseCase by inject()
     override val flipCardUseCase: FlipCardUseCase by inject()
     override val resetErrorCardsUseCase: ResetErrorCardsUseCase by inject()

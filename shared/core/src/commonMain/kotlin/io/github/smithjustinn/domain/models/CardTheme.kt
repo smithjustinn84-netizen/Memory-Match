@@ -14,7 +14,7 @@ enum class CardBackTheme(
 
     companion object {
         fun fromIdOrName(value: String): CardBackTheme =
-            entries.find { it.id == value || it.name == value } ?: GEOMETRIC
+            entries.find { value.startsWith(it.id) || it.name == value } ?: GEOMETRIC
     }
 }
 
@@ -38,4 +38,5 @@ enum class CardSymbolTheme(
 data class CardTheme(
     val back: CardBackTheme = CardBackTheme.GEOMETRIC,
     val skin: CardSymbolTheme = CardSymbolTheme.CLASSIC,
+    val backColorHex: String? = null,
 )

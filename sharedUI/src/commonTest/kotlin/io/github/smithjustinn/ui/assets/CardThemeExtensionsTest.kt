@@ -13,4 +13,23 @@ class CardThemeExtensionsTest {
         assertEquals(Color(0xFF4527A0), CardBackTheme.PATTERN.getPreferredColor())
         assertEquals(Color(0xFF004D40), CardBackTheme.POKER.getPreferredColor())
     }
+
+    @Test
+    fun testToColor() {
+        // Valid 6-digit hex
+        assertEquals(Color(0xFFFF0000), "FF0000".toColor())
+        assertEquals(Color(0xFF00FF00), "#00FF00".toColor())
+
+        // Valid 8-digit hex (ARGB)
+        assertEquals(Color(0x80FF0000), "80FF0000".toColor())
+        assertEquals(Color(0x80FF0000), "#80FF0000".toColor())
+
+        // Invalid hex
+        assertEquals(Color.Gray, "invalid".toColor())
+        assertEquals(Color.Gray, "GGGGGG".toColor())
+
+        // Incorrect length
+        assertEquals(Color.Gray, "F00".toColor())
+        assertEquals(Color.Gray, "FF00000".toColor())
+    }
 }

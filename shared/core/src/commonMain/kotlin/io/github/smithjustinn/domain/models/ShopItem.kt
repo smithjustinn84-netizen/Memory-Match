@@ -18,4 +18,5 @@ data class ShopItem(
     val price: Long,
     val type: ShopItemType,
     val isConsumable: Boolean = false,
+    val hexColor: String? = null,
 )

@@ -70,13 +70,17 @@ class DefaultGameComponent(
 
             startGame(args)
 
+            val shopItems = appGraph.shopItemRepository.getShopItems()
+
             combine(
-                appGraph.playerEconomyRepository.selectedTheme,
+                appGraph.playerEconomyRepository.selectedThemeId,
                 appGraph.playerEconomyRepository.selectedSkin,
-            ) { theme: CardBackTheme, skin: CardSymbolTheme ->
+            ) { themeId: String, skin: CardSymbolTheme ->
+                val theme = CardBackTheme.fromIdOrName(themeId)
+                val hexColor = shopItems.find { item -> item.id == themeId }?.hexColor
                 _state.update {
                     it.copy(
-                        cardTheme = CardTheme(back = theme, skin = skin),
+                        cardTheme = CardTheme(back = theme, skin = skin, backColorHex = hexColor),
                         areSuitsMultiColored = false, // Default value, no longer in Settings
                     )
                 }

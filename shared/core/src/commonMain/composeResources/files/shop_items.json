@@ -5,15 +5,44 @@
     "description": "The default geometric pattern.",
     "price": 0,
     "type": "THEME",
-    "isConsumable": false
+    "isConsumable": false,
+    "hexColor": "#1A237E"
   },
   {
-    "id": "skin_classic",
-    "name": "Standard Face",
-    "description": "Classic card face design.",
-    "price": 0,
-    "type": "CARD_SKIN",
-    "isConsumable": false
+    "id": "theme_standard_green",
+    "name": "Geometric Forest",
+    "description": "Deep forest green geometric pattern.",
+    "price": 100,
+    "type": "THEME",
+    "isConsumable": false,
+    "hexColor": "#1B5E20"
+  },
+  {
+    "id": "theme_standard_charcoal",
+    "name": "Geometric Onyx",
+    "description": "Sleek charcoal geometric pattern.",
+    "price": 100,
+    "type": "THEME",
+    "isConsumable": false,
+    "hexColor": "#263238"
+  },
+  {
+    "id": "theme_standard_orange",
+    "name": "Geometric Amber",
+    "description": "Vibrant orange geometric pattern.",
+    "price": 150,
+    "type": "THEME",
+    "isConsumable": false,
+    "hexColor": "#E65100"
+  },
+  {
+    "id": "theme_standard_pink",
+    "name": "Geometric Rose",
+    "description": "Elegant pink geometric pattern.",
+    "price": 150,
+    "type": "THEME",
+    "isConsumable": false,
+    "hexColor": "#880E4F"
   },
   {
     "id": "theme_classic",
@@ -21,7 +50,44 @@
     "description": "Traditional card design.",
     "price": 0,
     "type": "THEME",
-    "isConsumable": false
+    "isConsumable": false,
+    "hexColor": "#B71C1C"
+  },
+  {
+    "id": "theme_classic_blue",
+    "name": "Classic Azure",
+    "description": "Traditional design in deep blue.",
+    "price": 100,
+    "type": "THEME",
+    "isConsumable": false,
+    "hexColor": "#1A237E"
+  },
+  {
+    "id": "theme_classic_green",
+    "name": "Classic Emerald",
+    "description": "Traditional design in vibrant green.",
+    "price": 100,
+    "type": "THEME",
+    "isConsumable": false,
+    "hexColor": "#1B5E20"
+  },
+  {
+    "id": "theme_classic_purple",
+    "name": "Classic Royal",
+    "description": "Traditional design in royal purple.",
+    "price": 150,
+    "type": "THEME",
+    "isConsumable": false,
+    "hexColor": "#4527A0"
+  },
+  {
+    "id": "theme_classic_teal",
+    "name": "Classic Oceanic",
+    "description": "Traditional design in deep teal.",
+    "price": 150,
+    "type": "THEME",
+    "isConsumable": false,
+    "hexColor": "#004D40"
   },
   {
     "id": "theme_pattern",
@@ -29,7 +95,44 @@
     "description": "Intricate pattern design.",
     "price": 300,
     "type": "THEME",
-    "isConsumable": false
+    "isConsumable": false,
+    "hexColor": "#4527A0"
+  },
+  {
+    "id": "theme_pattern_red",
+    "name": "Pattern Crimson",
+    "description": "Intricate pattern in deep red.",
+    "price": 350,
+    "type": "THEME",
+    "isConsumable": false,
+    "hexColor": "#B71C1C"
+  },
+  {
+    "id": "theme_pattern_blue",
+    "name": "Pattern Cobalt",
+    "description": "Intricate pattern in cobalt blue.",
+    "price": 350,
+    "type": "THEME",
+    "isConsumable": false,
+    "hexColor": "#1A237E"
+  },
+  {
+    "id": "theme_pattern_green",
+    "name": "Pattern Jade",
+    "description": "Intricate pattern in jade green.",
+    "price": 350,
+    "type": "THEME",
+    "isConsumable": false,
+    "hexColor": "#1B5E20"
+  },
+  {
+    "id": "theme_pattern_gold",
+    "name": "Pattern Gilded",
+    "description": "Intricate pattern in regal gold.",
+    "price": 500,
+    "type": "THEME",
+    "isConsumable": false,
+    "hexColor": "#FFD700"
   },
   {
     "id": "theme_poker",
@@ -37,6 +140,51 @@
     "description": "Classic poker table aesthetic.",
     "price": 400,
     "type": "THEME",
+    "isConsumable": false,
+    "hexColor": "#004D40"
+  },
+  {
+    "id": "theme_poker_red",
+    "name": "Poker Cardinal",
+    "description": "Poker aesthetic in cardinal red.",
+    "price": 450,
+    "type": "THEME",
+    "isConsumable": false,
+    "hexColor": "#B71C1C"
+  },
+  {
+    "id": "theme_poker_blue",
+    "name": "Poker Navy",
+    "description": "Poker aesthetic in navy blue.",
+    "price": 450,
+    "type": "THEME",
+    "isConsumable": false,
+    "hexColor": "#1A237E"
+  },
+  {
+    "id": "theme_poker_black",
+    "name": "Poker Midnight",
+    "description": "Poker aesthetic in midnight black.",
+    "price": 500,
+    "type": "THEME",
+    "isConsumable": false,
+    "hexColor": "#121212"
+  },
+  {
+    "id": "theme_poker_gold",
+    "name": "Poker Executive",
+    "description": "Poker aesthetic in executive gold.",
+    "price": 600,
+    "type": "THEME",
+    "isConsumable": false,
+    "hexColor": "#FFD700"
+  },
+  {
+    "id": "skin_classic",
+    "name": "Standard Face",
+    "description": "Classic card face design.",
+    "price": 0,
+    "type": "CARD_SKIN",
     "isConsumable": false
   },
   {

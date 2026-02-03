@@ -236,6 +236,7 @@ fun ShopItemCard(
             ShopItemPreview(
                 itemId = item.id,
                 itemType = item.type,
+                hexColor = item.hexColor,
                 modifier = Modifier.fillMaxWidth(),
             )
 
@@ -264,6 +265,7 @@ fun ShopItemCard(
 private fun ShopItemPreview(
     itemId: String,
     itemType: ShopItemType,
+    hexColor: String?,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -273,6 +275,7 @@ private fun ShopItemPreview(
         CosmeticPreviewRegistry.Preview(
             itemId = itemId,
             itemType = itemType,
+            hexColor = hexColor,
             modifier = Modifier.fillMaxWidth(0.85f),
         )
     }

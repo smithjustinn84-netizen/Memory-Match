@@ -28,6 +28,7 @@ import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.domain.models.CardTheme
 import io.github.smithjustinn.theme.ModernGold
 import io.github.smithjustinn.ui.assets.getPreferredColor
+import io.github.smithjustinn.ui.assets.toColor
 import kotlin.math.abs
 
 // Animation durations (milliseconds)
@@ -67,7 +68,7 @@ object CardBacks {
     fun Render(
         theme: CardTheme,
         modifier: Modifier = Modifier,
-        backgroundColor: Color = theme.back.getPreferredColor(),
+        backgroundColor: Color = theme.backColorHex?.toColor() ?: theme.back.getPreferredColor(),
         rotation: Float = 0f,
     ) {
         Box(modifier = modifier) {

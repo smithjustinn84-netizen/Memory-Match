@@ -89,6 +89,16 @@ class PlayerEconomyRepositoryImpl(
                 initialValue = CardBackTheme.GEOMETRIC,
             )
 
+    override val selectedThemeId: StateFlow<String> =
+        economyFlow
+            .map { entity ->
+                entity?.selectedThemeId ?: PlayerEconomyEntity().selectedThemeId
+            }.stateIn(
+                scope = scope,
+                started = SharingStarted.Eagerly,
+                initialValue = PlayerEconomyEntity().selectedThemeId,
+            )
+
     override val selectedSkin: StateFlow<CardSymbolTheme> =
         economyFlow
             .map { entity ->

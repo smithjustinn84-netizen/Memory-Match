@@ -57,6 +57,7 @@ object AssetProvider {
                     // Render card back preview
                     CardBackPreview(
                         theme = backTheme,
+                        hexColor = null, // Default for now, can be expanded if needed
                         modifier = Modifier.fillMaxSize(),
                     )
                 }
@@ -78,9 +79,10 @@ object AssetProvider {
     @Composable
     private fun CardBackPreview(
         theme: CardBackTheme,
+        hexColor: String?,
         modifier: Modifier = Modifier,
     ) {
-        val backColor = theme.getPreferredColor()
+        val backColor = hexColor?.toColor() ?: theme.getPreferredColor()
         BoxWithConstraints(modifier = modifier) {
             Box {
                 CardBack(

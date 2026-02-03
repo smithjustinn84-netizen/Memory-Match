@@ -8,6 +8,7 @@ interface PlayerEconomyRepository {
     val balance: StateFlow<Long>
     val unlockedItemIds: StateFlow<Set<String>>
     val selectedTheme: StateFlow<CardBackTheme>
+    val selectedThemeId: StateFlow<String>
     val selectedSkin: StateFlow<CardSymbolTheme>
 
     suspend fun addCurrency(amount: Long)

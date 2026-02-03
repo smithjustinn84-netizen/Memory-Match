@@ -14,3 +14,20 @@ fun CardBackTheme.getPreferredColor(): Color =
         CardBackTheme.PATTERN -> Color(0xFF4527A0) // Deep Purple
         CardBackTheme.POKER -> Color(0xFF004D40) // Deep Teal
     }
+
+/**
+ * Converts a hex string to a Compose [Color].
+ * Supports formats: "#RRGGBB", "RRGGBB", "#AARRGGBB", "AARRGGBB".
+ */
+fun String.toColor(): Color {
+    val hex = this.removePrefix("#")
+    return try {
+        when (hex.length) {
+            6 -> Color(hex.toLong(16) or 0xFF000000L)
+            8 -> Color(hex.toLong(16))
+            else -> Color.Gray
+        }
+    } catch (e: NumberFormatException) {
+        Color.Gray
+    }
+}

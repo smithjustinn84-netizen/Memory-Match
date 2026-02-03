@@ -6,8 +6,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.domain.models.ShopItemType
-import io.github.smithjustinn.ui.game.components.cards.CardBacks
+import io.github.smithjustinn.ui.assets.getPreferredColor
+import io.github.smithjustinn.ui.assets.toColor
+import io.github.smithjustinn.ui.game.components.cards.CardBack
 import io.github.smithjustinn.ui.game.components.cards.CardFaces
 
 object CosmeticPreviewRegistry {
@@ -15,6 +18,7 @@ object CosmeticPreviewRegistry {
     fun Preview(
         itemId: String,
         itemType: ShopItemType,
+        hexColor: String? = null,
         modifier: Modifier = Modifier,
     ) {
         // Standard playing card aspect ratio
@@ -27,7 +31,7 @@ object CosmeticPreviewRegistry {
                     .padding(4.dp), // Subtle padding for the card look
         ) {
             when (itemType) {
-                ShopItemType.THEME -> ThemePreview(itemId)
+                ShopItemType.THEME -> ThemePreview(itemId, hexColor)
                 ShopItemType.CARD_SKIN -> SkinPreview(itemId)
                 else -> { /* Render generic icon for PowerUps/Currency */ }
             }
@@ -35,17 +39,18 @@ object CosmeticPreviewRegistry {
     }
 
     @Composable
-    private fun ThemePreview(themeId: String) {
-        // Map economy IDs to CardBack composables
-        when (themeId) {
-            "theme_standard" -> CardBacks.Standard()
-            "theme_classic" -> CardBacks.Classic()
-            "theme_pattern" -> CardBacks.Pattern()
-            "theme_poker" -> CardBacks.Poker()
-            "theme_dark" -> CardBacks.Dark()
-            "theme_nature" -> CardBacks.Nature()
-            else -> CardBacks.Standard() // Fallback
-        }
+    private fun ThemePreview(
+        themeId: String,
+        hexColor: String?,
+    ) {
+        val theme = CardBackTheme.fromIdOrName(themeId)
+        val color = hexColor?.toColor() ?: theme.getPreferredColor()
+
+        CardBack(
+            theme = theme,
+            backColor = color,
+            rotation = 0f,
+        )
     }
 
     @Composable
