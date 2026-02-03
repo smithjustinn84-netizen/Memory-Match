@@ -8,6 +8,7 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.domain.models.CardSymbolTheme
+import io.github.smithjustinn.domain.models.DifficultyType
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
 import io.github.smithjustinn.domain.models.SavedGame
@@ -29,7 +30,9 @@ class DefaultGameComponentTest : BaseComponentTest() {
         every { context.settingsRepository.isMusicEnabled } returns MutableStateFlow(true)
         every { context.settingsRepository.isSoundEnabled } returns MutableStateFlow(true)
         every { context.playerEconomyRepository.selectedTheme } returns MutableStateFlow(CardBackTheme.GEOMETRIC)
+        every { context.playerEconomyRepository.selectedThemeId } returns MutableStateFlow("GEOMETRIC")
         every { context.playerEconomyRepository.selectedSkin } returns MutableStateFlow(CardSymbolTheme.CLASSIC)
+        everySuspend { context.shopItemRepository.getShopItems() } returns emptyList()
     }
 
     @Test
@@ -99,6 +102,7 @@ class DefaultGameComponentTest : BaseComponentTest() {
                 GameArgs(
                     pairCount = 8,
                     mode = GameMode.TIME_ATTACK,
+                    difficulty = DifficultyType.CASUAL,
                     seed = null,
                     forceNewGame = forceNewGame,
                 ),

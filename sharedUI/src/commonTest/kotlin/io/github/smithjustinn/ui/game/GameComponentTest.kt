@@ -9,6 +9,8 @@ import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.verifySuspend
 import io.github.smithjustinn.domain.models.CardState
+import io.github.smithjustinn.domain.models.CardSymbolTheme
+import io.github.smithjustinn.domain.models.DifficultyType
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
 import io.github.smithjustinn.domain.models.Rank
@@ -18,6 +20,7 @@ import io.github.smithjustinn.test.BaseComponentTest
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -26,6 +29,14 @@ import kotlin.test.assertTrue
 @OptIn(ExperimentalCoroutinesApi::class)
 class GameComponentTest : BaseComponentTest() {
     private lateinit var component: DefaultGameComponent
+
+    @BeforeTest
+    override fun setUp() {
+        super.setUp()
+        everySuspend { context.shopItemRepository.getShopItems() } returns emptyList()
+        every { context.playerEconomyRepository.selectedThemeId } returns MutableStateFlow("GEOMETRIC")
+        every { context.playerEconomyRepository.selectedSkin } returns MutableStateFlow(CardSymbolTheme.CLASSIC)
+    }
 
     private fun createComponent(
         lifecycle: Lifecycle,
@@ -36,7 +47,7 @@ class GameComponentTest : BaseComponentTest() {
         DefaultGameComponent(
             componentContext = DefaultComponentContext(lifecycle = lifecycle),
             appGraph = context.appGraph,
-            args = GameArgs(pairCount, mode, forceNewGame),
+            args = GameArgs(pairCount, mode, DifficultyType.CASUAL, forceNewGame),
             onBackClicked = {},
         )
 

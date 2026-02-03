@@ -17,6 +17,7 @@ import io.github.smithjustinn.domain.repositories.GameStatsRepository
 import io.github.smithjustinn.domain.repositories.LeaderboardRepository
 import io.github.smithjustinn.domain.repositories.PlayerEconomyRepository
 import io.github.smithjustinn.domain.repositories.SettingsRepository
+import io.github.smithjustinn.domain.repositories.ShopItemRepository
 import io.github.smithjustinn.domain.usecases.economy.DefaultEarnCurrencyUseCase
 import io.github.smithjustinn.domain.usecases.game.CalculateFinalScoreUseCase
 import io.github.smithjustinn.domain.usecases.game.ClearSavedGameUseCase
@@ -47,6 +48,7 @@ class MokkeryTestContext(
     val leaderboardRepository: LeaderboardRepository = mock()
     val dailyChallengeRepository: DailyChallengeRepository = mock()
     val playerEconomyRepository: PlayerEconomyRepository = mock()
+    val shopItemRepository: ShopItemRepository = mock()
     val audioService: AudioService = mock()
     val hapticsService: HapticsService = mock()
     val logger: Logger = Logger(StaticConfig())
@@ -73,9 +75,9 @@ class MokkeryTestContext(
         every { appGraph.leaderboardRepository } returns leaderboardRepository
         every { appGraph.dailyChallengeRepository } returns dailyChallengeRepository
         every { appGraph.playerEconomyRepository } returns playerEconomyRepository
+        every { appGraph.shopItemRepository } returns shopItemRepository
         every { appGraph.audioService } returns audioService
         every { appGraph.hapticsService } returns hapticsService
-        every { appGraph.logger } returns logger
         every { appGraph.logger } returns logger
         every { appGraph.coroutineDispatchers } returns coroutineDispatchers
         every { appGraph.applicationScope } returns TestScope(coroutineDispatchers.main)
@@ -109,8 +111,10 @@ class MokkeryTestContext(
         every { settingsRepository.musicVolume } returns MutableStateFlow(0.5f)
 
         every { playerEconomyRepository.selectedTheme } returns MutableStateFlow(CardBackTheme.GEOMETRIC)
+        every { playerEconomyRepository.selectedThemeId } returns MutableStateFlow("GEOMETRIC")
         every { playerEconomyRepository.selectedSkin } returns MutableStateFlow(CardSymbolTheme.CLASSIC)
         every { playerEconomyRepository.balance } returns MutableStateFlow(1000L)
+        everySuspend { shopItemRepository.getShopItems() } returns emptyList()
 
         // Repository defaults
         everySuspend { gameStateRepository.getSavedGameState() } returns null

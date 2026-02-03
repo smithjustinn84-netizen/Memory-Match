@@ -7,6 +7,7 @@ import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import io.github.smithjustinn.domain.models.DifficultyLevel
+import io.github.smithjustinn.domain.models.DifficultyType
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
 import io.github.smithjustinn.domain.models.SavedGame
@@ -21,7 +22,7 @@ import kotlin.test.assertTrue
 @OptIn(ExperimentalCoroutinesApi::class)
 class StartComponentTest : BaseComponentTest() {
     private lateinit var component: DefaultStartComponent
-    private var navigatedToGame: Triple<Int, GameMode, Boolean>? = null
+    private var navigatedToGame: GameNavArgs? = null
     private var navigatedToSettings = false
     private var navigatedToStats = false
 
@@ -154,7 +155,7 @@ class StartComponentTest : BaseComponentTest() {
             testDispatcher.scheduler.runCurrent()
 
             component.onStartGame()
-            assertEquals(Triple(10, GameMode.DAILY_CHALLENGE, true), navigatedToGame)
+            assertEquals(GameNavArgs(10, GameMode.DAILY_CHALLENGE, DifficultyType.MASTER, true), navigatedToGame)
         }
 
     @Test
@@ -169,18 +170,25 @@ class StartComponentTest : BaseComponentTest() {
             testDispatcher.scheduler.runCurrent()
 
             component.onResumeGame()
-            assertEquals(Triple(12, GameMode.TIME_ATTACK, false), navigatedToGame)
+            assertEquals(GameNavArgs(12, GameMode.TIME_ATTACK, DifficultyType.CASUAL, false), navigatedToGame)
         }
 
     private fun createDefaultComponent(lifecycle: Lifecycle): DefaultStartComponent =
         DefaultStartComponent(
             componentContext = DefaultComponentContext(lifecycle = lifecycle),
             appGraph = context.appGraph,
-            onNavigateToGame = { pairs, mode, isNewGame ->
-                navigatedToGame = Triple(pairs, mode, isNewGame)
+            onNavigateToGame = { pairs, mode, difficulty, isNewGame ->
+                navigatedToGame = GameNavArgs(pairs, mode, difficulty, isNewGame)
             },
             onNavigateToSettings = { navigatedToSettings = true },
             onNavigateToStats = { navigatedToStats = true },
             onNavigateToShop = {},
         )
 }
+
+data class GameNavArgs(
+    val pairs: Int,
+    val mode: GameMode,
+    val difficulty: DifficultyType,
+    val isNewGame: Boolean,
+)

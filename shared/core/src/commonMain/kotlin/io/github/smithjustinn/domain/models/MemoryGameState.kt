@@ -5,8 +5,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
-// Type-specific serializers moved to MemoryGameSerializers.kt
-
 /**
  * Represents the core state of the memory game.
  */
