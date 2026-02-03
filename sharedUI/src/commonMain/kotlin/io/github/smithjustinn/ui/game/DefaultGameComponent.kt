@@ -10,6 +10,7 @@ import io.github.smithjustinn.domain.TimeAttackLogic
 import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.domain.models.CardSymbolTheme
 import io.github.smithjustinn.domain.models.CardTheme
+import io.github.smithjustinn.domain.models.DifficultyType
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
 import io.github.smithjustinn.utils.componentScope
@@ -122,7 +123,7 @@ class DefaultGameComponent(
         return if (savedGame != null && isSavedGameValid(savedGame, args.pairCount, args.mode)) {
             GameInitResult(savedGame.gameState, savedGame.elapsedTimeSeconds, isResumed = true)
         } else {
-            val newState = setupNewGame(args.pairCount, args.mode, args.seed)
+            val newState = setupNewGame(args.pairCount, args.mode, args.difficulty, args.seed)
             val initialTime =
                 if (args.mode == GameMode.TIME_ATTACK) {
                     TimeAttackLogic.calculateInitialTime(args.pairCount, newState.config)
@@ -221,6 +222,7 @@ class DefaultGameComponent(
     private suspend fun setupNewGame(
         pairCount: Int,
         mode: GameMode,
+        difficulty: DifficultyType,
         seed: Long?,
     ): MemoryGameState {
         val finalSeed =
@@ -232,7 +234,7 @@ class DefaultGameComponent(
 
         val initialState =
             appGraph
-                .startNewGameUseCase(pairCount, mode = mode, seed = finalSeed)
+                .startNewGameUseCase(pairCount, mode = mode, difficulty = difficulty, seed = finalSeed)
 
         _events.tryEmit(GameUiEvent.PlayDeal)
         return initialState

@@ -2,6 +2,7 @@ package io.github.smithjustinn.domain.usecases.game
 
 import io.github.smithjustinn.domain.MemoryGameLogic
 import io.github.smithjustinn.domain.models.DailyChallengeMutator
+import io.github.smithjustinn.domain.models.DifficultyType
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
 import io.github.smithjustinn.domain.models.ScoringConfig
@@ -15,11 +16,12 @@ open class StartNewGameUseCase {
         pairCount: Int,
         config: ScoringConfig = ScoringConfig(),
         mode: GameMode = GameMode.TIME_ATTACK,
+        difficulty: DifficultyType = DifficultyType.CASUAL,
         seed: Long? = null,
     ): MemoryGameState {
         val finalSeed = seed ?: Random.nextLong()
         val random = Random(finalSeed)
-        val baseState = MemoryGameLogic.createInitialState(pairCount, config, mode, random)
+        val baseState = MemoryGameLogic.createInitialState(pairCount, config, mode, difficulty, random)
 
         val activeMutators =
             if (mode == GameMode.DAILY_CHALLENGE) {

@@ -114,8 +114,11 @@ detekt {
     source.setFrom(
         files(
             "shared/core/src/commonMain/kotlin",
+            "shared/core/src/commonTest/kotlin",
             "shared/data/src/commonMain/kotlin",
+            "shared/data/src/commonTest/kotlin",
             "sharedUI/src/commonMain/kotlin",
+            "sharedUI/src/commonTest/kotlin",
             "androidApp/src/main/kotlin",
             "desktopApp/src/main/kotlin",
         ),

@@ -1,5 +1,6 @@
 package io.github.smithjustinn.domain
 
+import io.github.smithjustinn.domain.models.DifficultyType
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
 import io.github.smithjustinn.domain.models.ScoringConfig
@@ -12,10 +13,11 @@ class ScoringCalculatorTest {
         val initialState =
             MemoryGameState(
                 isGameWon = true,
-                score = 100,
+                score = 10000, // Normalized for scaling
                 pairCount = 8,
                 moves = 20,
                 mode = GameMode.DAILY_CHALLENGE,
+                difficulty = DifficultyType.CASUAL,
                 config =
                     ScoringConfig(
                         timeBonusPerPair = 10,
@@ -27,45 +29,68 @@ class ScoringCalculatorTest {
         val resultState = ScoringCalculator.applyFinalBonuses(initialState, elapsedTimeSeconds = 30)
 
         // Expected Score:
-        // Base: 100
+        // Base: 10000
         // Time Bonus: (8 * 10 - 30 * 1) = 50
         // Move Bonus: (8 / 20 * 1000) = 400
-        // Total Score: 100 + 50 + 400 = 550
-        // Earned Currency: 550 + 500 = 1050
+        // Total Score: 10000 + 50 + 400 = 10450
+        // Earned Currency: (10450 / 100) + 500 = 104 + 500 = 604
 
-        assertEquals(550, resultState.score)
-        assertEquals(1050, resultState.scoreBreakdown.earnedCurrency)
+        assertEquals(10450, resultState.score)
+        assertEquals(604, resultState.scoreBreakdown.earnedCurrency)
         assertEquals(500, resultState.scoreBreakdown.dailyChallengeBonus)
     }
 
     @Test
-    fun `applyFinalBonuses does not add daily challenge bonus in other modes`() {
-        val initialState =
-            MemoryGameState(
-                isGameWon = true,
-                score = 100,
-                pairCount = 8,
-                moves = 20,
-                mode = GameMode.TIME_ATTACK,
-                config =
-                    ScoringConfig(
-                        timeBonusPerPair = 10,
-                        timePenaltyPerSecond = 1,
-                        moveBonusMultiplier = 1000,
-                    ),
-            )
+    fun `applyFinalBonuses applies difficultly multipliers correctly`() {
+        val score = 10000
+        
+        val touristState = MemoryGameState(
+            isGameWon = true,
+            score = score,
+            difficulty = DifficultyType.TOURIST,
+            mode = GameMode.TIME_ATTACK,
+            moves = 8,
+        )
+        val casualState = MemoryGameState(
+            isGameWon = true,
+            score = score,
+            difficulty = DifficultyType.CASUAL,
+            mode = GameMode.TIME_ATTACK,
+            moves = 8,
+        )
+        val masterState = MemoryGameState(
+            isGameWon = true,
+            score = score,
+            difficulty = DifficultyType.MASTER,
+            mode = GameMode.TIME_ATTACK,
+            moves = 8,
+        )
+        val sharkState = MemoryGameState(
+            isGameWon = true,
+            score = score,
+            difficulty = DifficultyType.SHARK,
+            mode = GameMode.TIME_ATTACK,
+            moves = 8,
+        )
 
-        val resultState = ScoringCalculator.applyFinalBonuses(initialState, elapsedTimeSeconds = 30)
+        val touristResult = ScoringCalculator.applyFinalBonuses(touristState, 0)
+        val casualResult = ScoringCalculator.applyFinalBonuses(casualState, 0)
+        val masterResult = ScoringCalculator.applyFinalBonuses(masterState, 0)
+        val sharkResult = ScoringCalculator.applyFinalBonuses(sharkState, 0)
 
-        // Time Attack uses different time bonus logic: elapsedTimeSeconds * TIME_ATTACK_BONUS_MULTIPLIER (10)
-        // Time Bonus: 30 * 10 = 300
-        // Move Bonus: 400
-        // Total Score: 100 + 300 + 400 = 800
-        // Earned Currency: 800
+        // Time Attack uses simplified time bonus: 0 * 10 = 0
+        // Move Bonus: 8 / 8 * 10000 = 10000
+        // Total Score: 10000 + 10000 = 20000
+        
+        // Tourist: (20000 / 100) * 0.25 = 200 * 0.25 = 50
+        // Casual: (20000 / 100) * 1.0 = 200 * 1.0 = 200
+        // Master: (20000 / 100) * 2.5 = 200 * 2.5 = 500
+        // Shark: (20000 / 100) * 5.0 = 200 * 5.0 = 1000
 
-        assertEquals(800, resultState.score)
-        assertEquals(800, resultState.scoreBreakdown.earnedCurrency)
-        assertEquals(0, resultState.scoreBreakdown.dailyChallengeBonus)
+        assertEquals(50, touristResult.scoreBreakdown.earnedCurrency)
+        assertEquals(200, casualResult.scoreBreakdown.earnedCurrency)
+        assertEquals(500, masterResult.scoreBreakdown.earnedCurrency)
+        assertEquals(1000, sharkResult.scoreBreakdown.earnedCurrency)
     }
 
     @Test

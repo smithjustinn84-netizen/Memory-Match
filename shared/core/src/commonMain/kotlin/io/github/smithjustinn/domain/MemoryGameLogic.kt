@@ -2,6 +2,7 @@ package io.github.smithjustinn.domain
 
 import io.github.smithjustinn.domain.models.CardState
 import io.github.smithjustinn.domain.models.DailyChallengeMutator
+import io.github.smithjustinn.domain.models.DifficultyType
 import io.github.smithjustinn.domain.models.GameDomainEvent
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
@@ -20,6 +21,7 @@ object MemoryGameLogic {
         pairCount: Int,
         config: ScoringConfig = ScoringConfig(),
         mode: GameMode = GameMode.TIME_ATTACK,
+        difficulty: DifficultyType = DifficultyType.CASUAL,
         random: Random = Random,
     ): MemoryGameState {
         val allPossibleCards =
@@ -47,6 +49,7 @@ object MemoryGameLogic {
             pairCount = pairCount,
             config = config,
             mode = mode,
+            difficulty = difficulty,
         )
     }
 

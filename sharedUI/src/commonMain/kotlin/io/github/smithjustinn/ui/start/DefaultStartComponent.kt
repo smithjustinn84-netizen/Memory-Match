@@ -4,6 +4,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.lifecycle.doOnResume
 import io.github.smithjustinn.di.AppGraph
 import io.github.smithjustinn.domain.models.DifficultyLevel
+import io.github.smithjustinn.domain.models.DifficultyType
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.utils.componentScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +22,7 @@ class DefaultStartComponent(
     private val onNavigateToGame: (
         pairs: Int,
         mode: GameMode,
+        difficulty: DifficultyType,
         forceNewGame: Boolean,
     ) -> Unit,
     private val onNavigateToSettings: () -> Unit,
@@ -71,6 +73,7 @@ class DefaultStartComponent(
                         hasSavedGame = savedGame != null && !savedGame.gameState.isGameOver,
                         savedGamePairCount = savedGame?.gameState?.pairCount ?: 0,
                         savedGameMode = savedGame?.gameState?.mode ?: GameMode.TIME_ATTACK,
+                        savedGameDifficulty = savedGame?.gameState?.difficulty ?: DifficultyType.CASUAL,
                     )
                 }
             } catch (e: Exception) {
@@ -105,7 +108,8 @@ class DefaultStartComponent(
     override fun onStartGame() {
         val pairs = state.value.selectedDifficulty.pairs
         val mode = state.value.selectedMode
-        onNavigateToGame(pairs, mode, true)
+        val difficulty = state.value.selectedDifficulty.type
+        onNavigateToGame(pairs, mode, difficulty, true)
     }
 
     override fun onResumeGame() {
@@ -113,6 +117,7 @@ class DefaultStartComponent(
             onNavigateToGame(
                 state.value.savedGamePairCount,
                 state.value.savedGameMode,
+                state.value.savedGameDifficulty,
                 false,
             )
         }
@@ -121,7 +126,12 @@ class DefaultStartComponent(
     override fun onDailyChallengeClick() {
         if (!state.value.isDailyChallengeCompleted) {
             // Use 8 pairs for Daily Challenge (standard difficulty)
-            onNavigateToGame(DAILY_CHALLENGE_PAIRS, GameMode.DAILY_CHALLENGE, true)
+            onNavigateToGame(
+                DAILY_CHALLENGE_PAIRS,
+                GameMode.DAILY_CHALLENGE,
+                DifficultyType.CASUAL,
+                true
+            )
         }
     }
 

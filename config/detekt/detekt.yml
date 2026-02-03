@@ -3,7 +3,7 @@ complexity:
   # Compose functions naturally have many parameters; we relax this for @Composable
   TooManyFunctions:
     active: true
-    excludes: ['**/ui/**', '**/screens/**', '**/components/**']
+    excludes: ['**/ui/**', '**/screens/**', '**/components/**', '**/test/**', '**/commonTest/**']
   LongParameterList:
     active: true
     # 2026 Meta: Compose slots often require 10+ params (modifier, colors, state, etc.)
@@ -34,7 +34,7 @@ style:
   # Allow "MagicNumbers" in Compose for things like Dp, Sp, and Color hex codes
   MagicNumber:
     active: true
-    excludes: ['**/test/**', '**/androidTest/**', '**/ui/**', '**/*Screen.kt', '**/theme/**']
+    excludes: ['**/test/**', '**/commonTest/**', '**/androidTest/**', '**/ui/**', '**/*Screen.kt', '**/theme/**']
     ignoreEnums: true
     ignoreNumbers: ['-1', '0', '1', '2', '0.5', '100']
     ignoreAnnotated: ['androidx.compose.runtime.Composable']

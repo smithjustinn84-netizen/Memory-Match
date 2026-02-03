@@ -11,6 +11,23 @@ enum class DifficultyType {
     CASUAL,
     MASTER,
     SHARK,
+    ;
+
+    val payoutMultiplier: Double
+        get() =
+            when (this) {
+                TOURIST -> MULTIPLIER_TOURIST
+                CASUAL -> MULTIPLIER_CASUAL
+                MASTER -> MULTIPLIER_MASTER
+                SHARK -> MULTIPLIER_SHARK
+            }
+
+    private companion object {
+        const val MULTIPLIER_TOURIST = 0.25
+        const val MULTIPLIER_CASUAL = 1.0
+        const val MULTIPLIER_MASTER = 2.5
+        const val MULTIPLIER_SHARK = 5.0
+    }
 }
 
 /**

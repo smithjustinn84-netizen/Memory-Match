@@ -39,6 +39,7 @@ data class MemoryGameState(
     val lastMatchedIds: ImmutableList<Int> = persistentListOf(),
     val seed: Long? = null,
     val activeMutators: Set<DailyChallengeMutator> = emptySet(),
+    val difficulty: DifficultyType = DifficultyType.CASUAL,
 ) {
     init {
         require(pairCount > 0) { "Pair count must be positive" }

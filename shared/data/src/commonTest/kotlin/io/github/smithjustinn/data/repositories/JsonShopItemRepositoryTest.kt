@@ -19,7 +19,6 @@ class JsonShopItemRepositoryTest {
             // additional configuration to expose composeResources to commonTest.
 
             // However, we can attempt it.
-            try {
                 val items = repository.getShopItems()
                 assertTrue(items.isNotEmpty(), "Shop items should not be empty")
 
@@ -27,26 +26,16 @@ class JsonShopItemRepositoryTest {
                 assertEquals("theme_standard", firstItem.id)
                 assertEquals("Standard Theme", firstItem.name)
                 assertEquals(ShopItemType.THEME, firstItem.type)
-            } catch (e: Exception) {
-                // Fallback: If resource loading fails in unit test environment is a known issue
-                // without specific gradle setup, we might skip or fail.
-                // For now, let's fail to see if it works.
-                throw e
-            }
         }
 
     @Test
     fun `getShopItems returns cached items on subsequent calls`() =
         runTest {
-            try {
                 val items1 = repository.getShopItems()
                 val items2 = repository.getShopItems()
 
                 // Check that the list instances are the same (identity equality)
                 // This proves the cache was used.
                 assertTrue(items1 === items2, "Subsequent calls should return the same cached list instance")
-            } catch (e: Exception) {
-                throw e
-            }
         }
 }

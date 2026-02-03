@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "toon": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "git+https://github.com/kweinmeister/toon-mcp.git"
+      ]
+    }
+  }
+}

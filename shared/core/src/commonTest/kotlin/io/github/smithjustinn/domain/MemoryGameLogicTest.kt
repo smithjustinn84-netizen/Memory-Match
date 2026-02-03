@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber", "TooManyFunctions")
+
 package io.github.smithjustinn.domain
 
 import io.github.smithjustinn.domain.models.DailyChallengeMutator
@@ -332,50 +334,40 @@ class MemoryGameLogicTest {
     }
 
     @Test
-    fun `match comments coverage`() {
-        // We need to hit specific branches in generateMatchComment
-        // It is private, so we trigger it via flipCard -> handleMatchSuccess
-
-        // 1. Halfway: matchesFound == totalPairs / 2
-        // Total 4 pairs. Match 2 pairs.
+    fun `match comment should be pot odds when matches found equals half of total pairs`() {
+        // Total 4 pairs. Match 2 pairs (halfway).
+        // Matches are calculated AFTER the current one.
         val pairCount = 4
         var state = MemoryGameLogic.createInitialState(pairCount)
-        // Set up state to be 1 match away from halfway (1 match done)
-        // Halfway is 2. So we need 1 match already.
-        // But logic calculates matches AFTER the current one.
-        // So we want existing matches = 1. New match -> 2.
 
-        // Let's just mock the state to be almost there
-        // Pair 1 is matched. Pair 2 is about to be matched.
+        // Mock state to be: 1 existing match. Pair 2 is about to be matched.
         val p1c1 = state.cards[0]
         val p1c2 = state.cards.first { it.id != p1c1.id && it.suit == p1c1.suit && it.rank == p1c1.rank }
 
-        state =
-            state.copy(
-                cards =
-                    state.cards
-                        .map {
-                            if (it.id == p1c1.id || it.id == p1c2.id) it.copy(isMatched = true) else it
-                        }.toImmutableList(),
-                moves = 10, // Ensure moves > matches * 2 to avoid photographic
-            )
+        state = state.copy(
+            cards = state.cards.map {
+                if (it.id == p1c1.id || it.id == p1c2.id) it.copy(isMatched = true) else it
+            }.toImmutableList(),
+            moves = 10, // Ensure moves > matches * 2 to avoid photographic
+        )
 
         // Now find Pair 2
         val p2c1 = state.cards.first { !it.isMatched }
-        val p2c2 =
-            state.cards.first {
-                !it.isMatched && it.suit == p2c1.suit && it.rank == p2c1.rank && it.id != p2c1.id
-            }
+        val p2c2 = state.cards.first {
+            !it.isMatched && it.suit == p2c1.suit && it.rank == p2c1.rank && it.id != p2c1.id
+        }
 
         var (s1, _) = MemoryGameLogic.flipCard(state, p2c1.id)
         var (s2, _) = MemoryGameLogic.flipCard(s1, p2c2.id)
 
         // matchesFound should be 2. Total 4. Pot Odds (config.commentPotOddsDivisor=2)
         assertEquals(Res.string.comment_pot_odds, s2.matchComment?.res)
+    }
 
-        // 2. One More: matchesFound == totalPairs - 1
+    @Test
+    fun `match comment should be one more when matches found equals total pairs minus one`() {
         // Total 4. Need 3 matches.
-        state = MemoryGameLogic.createInitialState(4)
+        var state = MemoryGameLogic.createInitialState(4)
         // Mark 2 pairs matched.
         val cards = state.cards.toMutableList()
         val pairs = cards.groupBy { it.suit to it.rank }.values.toList()
@@ -385,119 +377,89 @@ class MemoryGameLogicTest {
         val pair1 = pairs[1]
         val pair2 = pairs[2] // Target
 
-        state =
-            state.copy(
-                cards =
-                    state.cards
-                        .map { c ->
-                            if (pair0.any { it.id == c.id } ||
-                                pair1.any { it.id == c.id }
-                            ) {
-                                c.copy(isMatched = true)
-                            } else {
-                                c
-                            }
-                        }.toImmutableList(),
-                lastMatchedIds = persistentListOf(),
-                moves = 20,
-                comboMultiplier = 1,
-            )
+        state = state.copy(
+            cards = state.cards.map { c ->
+                if (pair0.any { it.id == c.id } || pair1.any { it.id == c.id }) {
+                    c.copy(isMatched = true)
+                } else {
+                    c
+                }
+            }.toImmutableList(),
+            lastMatchedIds = persistentListOf(),
+            moves = 20,
+            comboMultiplier = 1,
+        )
 
         // Match Pair 2 -> Matches = 3. Total 4. One more to go.
-        s1 = MemoryGameLogic.flipCard(state, pair2[0].id).first
-        s2 = MemoryGameLogic.flipCard(s1, pair2[1].id).first
+        var s1 = MemoryGameLogic.flipCard(state, pair2[0].id).first
+        var s2 = MemoryGameLogic.flipCard(s1, pair2[1].id).first
         val oneMoreOptions = listOf(Res.string.comment_one_more, Res.string.comment_river_magic)
         assertTrue(oneMoreOptions.contains(s2.matchComment?.res))
+    }
 
-        // 3. Photographic (moves <= matches * 2)
-        state = MemoryGameLogic.createInitialState(4)
-        // No matches. Match first pair with 2 moves.
-        val pairs3 =
-            state.cards
-                .groupBy { it.suit to it.rank }
-                .values
-                .toList()
-        s1 = MemoryGameLogic.flipCard(state, pairs3[0][0].id).first
-        MemoryGameLogic.flipCard(s1, pairs3[0][1].id).first
-        // moves=1. matches=1. 1 <= 2.
+    @Test
+    fun `match comment should be photographic when efficient match`() {
+        // Photographic (moves <= matches * 2)
+        var state = MemoryGameLogic.createInitialState(10)
+        val pairs4 = state.cards.groupBy { it.suit to it.rank }.values.toList()
 
-        // So to hit Photographic we need matches > 1, not halfway, not one more.
-        // Total 10 pairs. Match 2. (Matches=2. Total=10. Not 1. Not 5. Not 9.)
-        state = MemoryGameLogic.createInitialState(10)
-        val pairs4 =
-            state.cards
-                .groupBy { it.suit to it.rank }
-                .values
-                .toList()
-
-        state =
-            state.copy(
-                cards =
-                    state.cards
-                        .map { c ->
-                            if (pairs4[0].any { it.id == c.id }) c.copy(isMatched = true) else c
-                        }.toImmutableList(),
-                lastMatchedIds = persistentListOf(),
-                moves = 2,
-                comboMultiplier = 1,
-            )
+        state = state.copy(
+            cards = state.cards.map { c ->
+                if (pairs4[0].any { it.id == c.id }) c.copy(isMatched = true) else c
+            }.toImmutableList(),
+            lastMatchedIds = persistentListOf(),
+            moves = 2,
+            comboMultiplier = 1,
+        )
         // Match pair 1
-        s1 = MemoryGameLogic.flipCard(state, pairs4[1][0].id).first
-        s2 = MemoryGameLogic.flipCard(s1, pairs4[1][1].id).first
+        var s1 = MemoryGameLogic.flipCard(state, pairs4[1][0].id).first
+        var s2 = MemoryGameLogic.flipCard(s1, pairs4[1][1].id).first
 
-        val photographicOptions =
-            listOf(
-                Res.string.comment_photographic,
-                Res.string.comment_reading_tells,
-                Res.string.comment_eagle_eyes,
-            )
+        val photographicOptions = listOf(
+            Res.string.comment_photographic,
+            Res.string.comment_reading_tells,
+            Res.string.comment_eagle_eyes,
+        )
         assertTrue(photographicOptions.contains(s2.matchComment?.res))
+    }
 
-        // 4. Else (Random)
-        state = MemoryGameLogic.createInitialState(10)
-        val pairs5 =
-            state.cards
-                .groupBy { it.suit to it.rank }
-                .values
-                .toList()
-        state =
-            state.copy(
-                cards =
-                    state.cards
-                        .map { c ->
-                            if (pairs5[0].any { it.id == c.id } ||
-                                pairs5[1].any { it.id == c.id }
-                            ) {
-                                c.copy(isMatched = true)
-                            } else {
-                                c
-                            }
-                        }.toImmutableList(),
-                lastMatchedIds = persistentListOf(),
-                moves = 50, // Lots of moves
-                comboMultiplier = 1,
-            )
+    @Test
+    fun `match comment should be random otherwise`() {
+        // Random comments
+        var state = MemoryGameLogic.createInitialState(10)
+        val pairs5 = state.cards.groupBy { it.suit to it.rank }.values.toList()
+        state = state.copy(
+            cards = state.cards.map { c ->
+                if (pairs5[0].any { it.id == c.id } || pairs5[1].any { it.id == c.id }) {
+                    c.copy(isMatched = true)
+                } else {
+                    c
+                }
+            }.toImmutableList(),
+            lastMatchedIds = persistentListOf(),
+            moves = 50, // Lots of moves
+            comboMultiplier = 1,
+        )
         // Match pair 2
-        s1 = MemoryGameLogic.flipCard(state, pairs5[2][0].id).first
-        s2 = MemoryGameLogic.flipCard(s1, pairs5[2][1].id).first
+        var s1 = MemoryGameLogic.flipCard(state, pairs5[2][0].id).first
+        var s2 = MemoryGameLogic.flipCard(s1, pairs5[2][1].id).first
 
         // Should be one of the random ones
-        val randomComments =
-            listOf(
-                Res.string.comment_great_find,
-                Res.string.comment_you_got_it,
-                Res.string.comment_boom,
-                Res.string.comment_sharp,
-                Res.string.comment_on_a_roll,
-                Res.string.comment_full_house,
-                Res.string.comment_bad_beat,
-                Res.string.comment_flopped_a_set,
-                Res.string.comment_smooth_call,
-                Res.string.comment_poker_face,
-                Res.string.comment_grinding,
-                Res.string.comment_check_mate,
-                Res.string.comment_no_bluff,
-            )
+        val randomComments = listOf(
+            Res.string.comment_great_find,
+            Res.string.comment_you_got_it,
+            Res.string.comment_boom,
+            Res.string.comment_sharp,
+            Res.string.comment_on_a_roll,
+            Res.string.comment_full_house,
+            Res.string.comment_bad_beat,
+            Res.string.comment_flopped_a_set,
+            Res.string.comment_smooth_call,
+            Res.string.comment_poker_face,
+            Res.string.comment_grinding,
+            Res.string.comment_check_mate,
+            Res.string.comment_no_bluff,
+        )
         assertTrue(randomComments.contains(s2.matchComment?.res))
     }
 
