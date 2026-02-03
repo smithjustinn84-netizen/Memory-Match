@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.domain.models.CardSymbolTheme
+import io.github.smithjustinn.domain.models.CardTheme
 import io.github.smithjustinn.domain.models.Rank
 import io.github.smithjustinn.domain.models.Suit
 import io.github.smithjustinn.theme.PokerTheme
@@ -66,6 +67,24 @@ object CardFaces {
                 getFontSize = { getPreviewFontSize(it) },
             )
         }
+
+    @Composable
+    fun Render(
+        theme: CardTheme,
+        rank: Rank,
+        suit: Suit,
+        suitColor: Color,
+        modifier: Modifier = Modifier,
+    ) {
+        Box(modifier = modifier) {
+            CardFace(
+                rank = rank,
+                suit = suit,
+                suitColor = suitColor,
+                theme = theme.skin,
+            )
+        }
+    }
 
     @Composable
     private fun PreviewContainer(

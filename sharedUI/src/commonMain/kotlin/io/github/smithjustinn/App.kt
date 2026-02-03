@@ -11,6 +11,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
+import io.github.smithjustinn.domain.models.CardTheme
+import kotlinx.coroutines.flow.combine
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
@@ -21,6 +24,7 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import io.github.smithjustinn.di.AppGraph
 import io.github.smithjustinn.di.LocalAppGraph
 import io.github.smithjustinn.theme.AppTheme
+import io.github.smithjustinn.theme.LocalCardTheme
 import io.github.smithjustinn.ui.game.GameContent
 import io.github.smithjustinn.ui.root.RootComponent
 import io.github.smithjustinn.ui.settings.SettingsContent
@@ -51,7 +55,17 @@ fun App(
         if (show) {
             SplashScreen(onDataLoaded = { showSplash = false })
         } else {
-            CompositionLocalProvider(LocalAppGraph provides appGraph) {
+            val cardTheme by remember(appGraph) {
+                combine(
+                    appGraph.playerEconomyRepository.selectedTheme,
+                    appGraph.playerEconomyRepository.selectedSkin,
+                ) { theme, skin -> CardTheme(back = theme, skin = skin) }
+            }.collectAsState(CardTheme())
+
+            CompositionLocalProvider(
+                LocalAppGraph provides appGraph,
+                LocalCardTheme provides cardTheme,
+            ) {
                 Children(
                     stack = root.childStack,
                     animation =

@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.theme.PokerTheme
+import io.github.smithjustinn.ui.assets.getPreferredColor
 
 @Composable
 fun AppCard(
@@ -25,6 +26,7 @@ fun AppCard(
     val colors = PokerTheme.colors
     val spacing = PokerTheme.spacing
     val shapes = PokerTheme.shapes
+    val cardTheme = PokerTheme.cardTheme
 
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -33,7 +35,7 @@ fun AppCard(
         border =
             border ?: BorderStroke(
                 width = 1.dp,
-                color = colors.goldenYellow.copy(alpha = 0.2f), // Brass-like inlay border
+                color = cardTheme.back.getPreferredColor().copy(alpha = 0.4f), // Brass-like inlay border
             ),
     ) {
         Column(modifier = Modifier.padding(spacing.medium)) {

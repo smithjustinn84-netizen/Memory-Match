@@ -33,3 +33,9 @@ enum class CardSymbolTheme(
             entries.find { it.id == value || it.name == value } ?: CLASSIC
     }
 }
+
+@Serializable
+data class CardTheme(
+    val back: CardBackTheme = CardBackTheme.GEOMETRIC,
+    val skin: CardSymbolTheme = CardSymbolTheme.CLASSIC,
+)

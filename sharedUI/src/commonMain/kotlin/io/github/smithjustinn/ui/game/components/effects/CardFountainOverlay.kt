@@ -20,9 +20,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.domain.models.CardState
-import io.github.smithjustinn.domain.models.CardSymbolTheme
+import io.github.smithjustinn.domain.models.CardTheme
 import io.github.smithjustinn.ui.game.components.cards.CardContent
 import io.github.smithjustinn.ui.game.components.cards.CardVisualState
 import io.github.smithjustinn.ui.game.components.cards.PlayingCard
@@ -124,8 +123,7 @@ private class CelebrationCard(
 fun CardFountainOverlay(
     cards: List<CardState>,
     modifier: Modifier = Modifier,
-    cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC,
-    cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC,
+    theme: CardTheme = CardTheme(),
     areSuitsMultiColored: Boolean = false,
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
@@ -169,7 +167,7 @@ fun CardFountainOverlay(
 
         PhysicsEngine(celebrationCards, heightPx)
 
-        CelebrationCardsLayer(celebrationCards, cardBackTheme, cardSymbolTheme, areSuitsMultiColored)
+        CelebrationCardsLayer(celebrationCards, theme, areSuitsMultiColored)
     }
 }
 
@@ -195,8 +193,7 @@ private fun PhysicsEngine(
 @Composable
 private fun CelebrationCardsLayer(
     celebrationCards: List<CelebrationCard>,
-    cardBackTheme: CardBackTheme,
-    cardSymbolTheme: CardSymbolTheme,
+    theme: CardTheme,
     areSuitsMultiColored: Boolean,
 ) {
     celebrationCards.forEach { cCard ->
@@ -213,8 +210,7 @@ private fun CelebrationCardsLayer(
                                     isMatched = true,
                                 ),
                         ),
-                    backTheme = cardBackTheme,
-                    symbolTheme = cardSymbolTheme,
+                    theme = theme,
                     areSuitsMultiColored = areSuitsMultiColored,
                     isMuckingEnabled = false,
                     modifier =

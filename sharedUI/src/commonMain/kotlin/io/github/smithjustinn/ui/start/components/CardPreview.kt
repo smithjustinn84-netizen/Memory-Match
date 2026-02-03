@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.domain.models.CardSymbolTheme
+import io.github.smithjustinn.domain.models.CardTheme
 import io.github.smithjustinn.domain.models.Rank
 import io.github.smithjustinn.domain.models.Suit
 import io.github.smithjustinn.theme.PokerTheme
@@ -228,8 +229,7 @@ private fun PreviewCard(
                         isMatched = false,
                     ),
             ),
-        backTheme = backTheme,
-        symbolTheme = symbolTheme,
+        theme = CardTheme(back = backTheme, skin = symbolTheme),
         areSuitsMultiColored = areSuitsMultiColored,
         modifier =
             Modifier

@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.toSize
 import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.domain.models.CardState
 import io.github.smithjustinn.domain.models.CardSymbolTheme
+import io.github.smithjustinn.domain.models.CardTheme
 import io.github.smithjustinn.ui.assets.getPreferredColor
 import io.github.smithjustinn.ui.game.components.cards.CardContent
 import io.github.smithjustinn.ui.game.components.cards.CardVisualState
@@ -62,7 +63,7 @@ internal fun GameGrid(
         contentAlignment = Alignment.Center,
     ) {
         GridBackground(
-            theme = settings.cardBackTheme,
+            theme = settings.cardTheme.back,
             modifier =
                 Modifier
                     .fillMaxSize()
@@ -216,8 +217,7 @@ private fun GridContent(
                 card = card,
                 isPeeking = gridCardState.isPeeking,
                 lastMatchedIds = gridCardState.lastMatchedIds,
-                cardBackTheme = settings.cardBackTheme,
-                cardSymbolTheme = settings.cardSymbolTheme,
+                cardTheme = settings.cardTheme,
                 areSuitsMultiColored = settings.areSuitsMultiColored,
                 maxWidth = layoutConfig.metrics.maxWidth,
                 screenHeight = screenHeight,
@@ -236,8 +236,7 @@ private fun GridItem(
     card: CardState,
     isPeeking: Boolean,
     lastMatchedIds: kotlinx.collections.immutable.ImmutableList<Int>,
-    cardBackTheme: CardBackTheme,
-    cardSymbolTheme: CardSymbolTheme,
+    cardTheme: CardTheme,
     areSuitsMultiColored: Boolean,
     maxWidth: androidx.compose.ui.unit.Dp,
     screenHeight: androidx.compose.ui.unit.Dp,
@@ -281,9 +280,7 @@ private fun GridItem(
                         isError = card.isError,
                     ),
             ),
-        backTheme = cardBackTheme,
-        backColor = cardBackTheme.getPreferredColor(),
-        symbolTheme = cardSymbolTheme,
+        theme = cardTheme,
         areSuitsMultiColored = areSuitsMultiColored,
         muckTargetOffset = muckTargetOffset,
         muckTargetRotation = fanRotation,

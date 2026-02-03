@@ -9,6 +9,7 @@ import io.github.smithjustinn.domain.MemoryGameLogic
 import io.github.smithjustinn.domain.TimeAttackLogic
 import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.domain.models.CardSymbolTheme
+import io.github.smithjustinn.domain.models.CardTheme
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MemoryGameState
 import io.github.smithjustinn.utils.componentScope
@@ -75,10 +76,8 @@ class DefaultGameComponent(
             ) { theme: CardBackTheme, skin: CardSymbolTheme ->
                 _state.update {
                     it.copy(
-                        cardBackTheme = theme,
-                        cardSymbolTheme = skin,
+                        cardTheme = CardTheme(back = theme, skin = skin),
                         areSuitsMultiColored = false, // Default value, no longer in Settings
-                        selectedTheme = theme,
                     )
                 }
             }.collect()

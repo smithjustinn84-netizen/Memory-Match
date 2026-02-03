@@ -28,6 +28,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.di.LocalAppGraph
 import io.github.smithjustinn.domain.models.CardBackTheme
+import io.github.smithjustinn.domain.models.CardTheme
 import io.github.smithjustinn.services.AudioService
 import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.game.components.effects.CardFountainOverlay
@@ -46,12 +47,12 @@ private const val RESULTS_MAX_WIDTH = 550
 @Composable
 fun GameBackground(
     isHeatMode: Boolean,
-    theme: CardBackTheme,
+    theme: CardTheme,
 ) {
     val colors = PokerTheme.colors
 
     val themeTopColor =
-        when (theme) {
+        when (theme.back) {
             CardBackTheme.GEOMETRIC -> Color(0xFF121212)
             CardBackTheme.CLASSIC -> colors.feltGreen
             CardBackTheme.PATTERN -> Color(0xFF16212E)
@@ -59,7 +60,7 @@ fun GameBackground(
         }
 
     val themeBottomColor =
-        when (theme) {
+        when (theme.back) {
             CardBackTheme.GEOMETRIC -> Color(0xFF1E1E1E)
             CardBackTheme.CLASSIC -> colors.feltGreenDark
             CardBackTheme.PATTERN -> Color(0xFF243447)
@@ -112,8 +113,7 @@ fun GameGameOverOverlay(
             // Celebration effects - now above the results card
             CardFountainOverlay(
                 cards = state.game.cards,
-                cardBackTheme = state.cardBackTheme,
-                cardSymbolTheme = state.cardSymbolTheme,
+                theme = state.cardTheme,
                 areSuitsMultiColored = state.areSuitsMultiColored,
             )
 

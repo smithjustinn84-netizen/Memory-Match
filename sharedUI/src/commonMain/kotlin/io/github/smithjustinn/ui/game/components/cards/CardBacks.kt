@@ -19,6 +19,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import io.github.smithjustinn.domain.models.CardTheme
+import io.github.smithjustinn.ui.assets.getPreferredColor
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
@@ -60,6 +62,22 @@ object CardBacks {
     @Composable
     fun Poker(modifier: Modifier = Modifier) =
         PreviewContainer(modifier) { PokerCardBack(Color(0xFF004D40)) } // Deep Teal
+
+    @Composable
+    fun Render(
+        theme: CardTheme,
+        modifier: Modifier = Modifier,
+        backgroundColor: Color = theme.back.getPreferredColor(),
+        rotation: Float = 0f,
+    ) {
+        Box(modifier = modifier) {
+            CardBack(
+                theme = theme.back,
+                backColor = backgroundColor,
+                rotation = rotation,
+            )
+        }
+    }
 
     @Composable
     private fun PreviewContainer(

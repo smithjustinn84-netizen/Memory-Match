@@ -14,6 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import io.github.smithjustinn.domain.models.CardTheme
 
 private val LightColorScheme =
     lightColorScheme(
@@ -37,6 +38,7 @@ private val DarkColorScheme =
 
 internal val LocalThemeIsDark = compositionLocalOf { mutableStateOf(true) }
 internal val LocalAppColors = staticCompositionLocalOf { LightAppColors }
+internal val LocalCardTheme = staticCompositionLocalOf { CardTheme() }
 
 object PokerTheme {
     val colors: AppColors
@@ -58,6 +60,11 @@ object PokerTheme {
         @Composable
         @ReadOnlyComposable
         get() = LocalAppTypography.current
+
+    val cardTheme: CardTheme
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalCardTheme.current
 }
 
 @Composable

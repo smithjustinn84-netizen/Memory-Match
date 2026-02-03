@@ -126,7 +126,7 @@ private fun GameMainScreenWrapper(
         val useCompactUI = isLandscape && isCompactHeight
 
         Box(modifier = Modifier.fillMaxSize()) {
-            GameBackground(isHeatMode = state.isHeatMode, theme = state.selectedTheme)
+            GameBackground(isHeatMode = state.isHeatMode, theme = state.cardTheme)
             GameMainScreen(
                 state = state,
                 component = component,
@@ -281,8 +281,7 @@ private fun GameMainContent(
                 ),
             settings =
                 GridSettings(
-                    cardBackTheme = state.cardBackTheme,
-                    cardSymbolTheme = state.cardSymbolTheme,
+                    cardTheme = state.cardTheme,
                     areSuitsMultiColored = state.areSuitsMultiColored,
                     showComboExplosion = state.showComboExplosion,
                 ),

@@ -1,7 +1,6 @@
 package io.github.smithjustinn.ui.game
 
-import io.github.smithjustinn.domain.models.CardBackTheme
-import io.github.smithjustinn.domain.models.CardSymbolTheme
+import io.github.smithjustinn.domain.models.CardTheme
 import io.github.smithjustinn.domain.models.MemoryGameState
 
 data class GameUIState(
@@ -16,8 +15,7 @@ data class GameUIState(
     val isPeekFeatureEnabled: Boolean = false,
     val isSoundEnabled: Boolean = true,
     val isMusicEnabled: Boolean = true,
-    val cardBackTheme: CardBackTheme = CardBackTheme.GEOMETRIC,
-    val cardSymbolTheme: CardSymbolTheme = CardSymbolTheme.CLASSIC,
+    val cardTheme: CardTheme = CardTheme(),
     val areSuitsMultiColored: Boolean = false,
     val showComboExplosion: Boolean = false,
     val showTimeGain: Boolean = false,
@@ -29,7 +27,6 @@ data class GameUIState(
     val showWalkthrough: Boolean = false,
     val walkthroughStep: Int = 0,
     val hasUsedDoubleDownPeek: Boolean = false,
-    val selectedTheme: CardBackTheme = CardBackTheme.GEOMETRIC,
     val totalBalance: Long = 0,
 ) {
     val isDoubleDownAvailable: Boolean
