@@ -2,7 +2,12 @@ package io.github.smithjustinn.services
 
 class JvmHapticsServiceImpl : HapticsService {
     override fun performHapticFeedback(type: HapticFeedbackType) {
-        // No-op for Desktop
+        // No-op for Desktop, but handling explicitly for consistency
+        when (type) {
+            HapticFeedbackType.LIGHT -> {}
+            HapticFeedbackType.HEAVY -> {}
+            HapticFeedbackType.LONG_PRESS -> {}
+        }
     }
 
     override fun vibrateMatch() {

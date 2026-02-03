@@ -28,6 +28,10 @@ class IosHapticsServiceImpl : HapticsService {
                 heavyImpactGenerator.impactOccurred()
                 heavyImpactGenerator.prepare()
             }
+            HapticFeedbackType.LONG_PRESS -> {
+                notificationGenerator.notificationOccurred(UINotificationFeedbackType.UINotificationFeedbackTypeSuccess)
+                notificationGenerator.prepare()
+            }
         }
     }
 

@@ -3,6 +3,7 @@ package io.github.smithjustinn.services
 enum class HapticFeedbackType {
     LIGHT,
     HEAVY,
+    LONG_PRESS,
 }
 
 interface HapticsService {

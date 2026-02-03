@@ -8,6 +8,8 @@ import io.github.smithjustinn.domain.usecases.economy.BuyItemUseCase
 import io.github.smithjustinn.domain.usecases.economy.GetPlayerBalanceUseCase
 import io.github.smithjustinn.domain.usecases.economy.GetShopItemsUseCase
 import io.github.smithjustinn.domain.usecases.economy.SetActiveCosmeticUseCase
+import io.github.smithjustinn.services.HapticFeedbackType
+import io.github.smithjustinn.services.HapticsService
 import io.github.smithjustinn.utils.componentScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -41,6 +43,7 @@ class DefaultShopComponent(
 
     // Directly injecting repo for unlocked items for now
     private val playerEconomyRepository: PlayerEconomyRepository by inject()
+    private val hapticsService: HapticsService by inject()
 
     private val _state = MutableStateFlow(ShopState())
     override val state: StateFlow<ShopState> = _state.asStateFlow()
@@ -92,6 +95,7 @@ class DefaultShopComponent(
                 _state.update { it.copy(error = result.exceptionOrNull()?.message ?: "Purchase failed") }
             } else {
                 // Success handled by flow update
+                hapticsService.performHapticFeedback(HapticFeedbackType.LONG_PRESS)
             }
         }
     }
