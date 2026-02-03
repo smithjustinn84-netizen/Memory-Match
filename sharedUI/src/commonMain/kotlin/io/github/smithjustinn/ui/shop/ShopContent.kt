@@ -41,13 +41,14 @@ import io.github.smithjustinn.domain.models.ShopItem
 import io.github.smithjustinn.domain.models.ShopItemType
 import io.github.smithjustinn.services.HapticFeedbackType
 import io.github.smithjustinn.theme.PokerTheme
+import io.github.smithjustinn.ui.assets.AssetProvider
 import io.github.smithjustinn.ui.components.AppCard
 import io.github.smithjustinn.ui.components.AppIcons
 import io.github.smithjustinn.ui.components.AuroraEffect
 import io.github.smithjustinn.ui.components.PokerButton
 import io.github.smithjustinn.ui.components.ShopIcons
 import io.github.smithjustinn.ui.components.pokerBackground
-import io.github.smithjustinn.ui.shop.components.CosmeticPreviewRegistry
+import io.github.smithjustinn.ui.components.pokerBackground
 
 @Composable
 fun ShopContent(
@@ -166,6 +167,8 @@ private fun ShopItemsGrid(
     onEquipItem: (ShopItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val visibleItems = remember(state.items) { state.items.filter { it.isVisible } }
+
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 160.dp),
         contentPadding =
@@ -175,7 +178,7 @@ private fun ShopItemsGrid(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier,
     ) {
-        items(state.items) { item ->
+        items(visibleItems) { item ->
             val isEquipped =
                 when (item.type) {
                     ShopItemType.THEME -> item.id == state.activeThemeId
@@ -235,8 +238,6 @@ fun ShopItemCard(
         ) {
             ShopItemPreview(
                 itemId = item.id,
-                itemType = item.type,
-                hexColor = item.hexColor,
                 modifier = Modifier.fillMaxWidth(),
             )
 
@@ -264,18 +265,14 @@ fun ShopItemCard(
 @Composable
 private fun ShopItemPreview(
     itemId: String,
-    itemType: ShopItemType,
-    hexColor: String?,
     modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
-        CosmeticPreviewRegistry.Preview(
-            itemId = itemId,
-            itemType = itemType,
-            hexColor = hexColor,
+        AssetProvider.CardPreview(
+            shopItemId = itemId,
             modifier = Modifier.fillMaxWidth(0.85f),
         )
     }

@@ -19,4 +19,5 @@ data class ShopItem(
     val type: ShopItemType,
     val isConsumable: Boolean = false,
     val hexColor: String? = null,
+    val isVisible: Boolean = true,
 )

@@ -15,7 +15,8 @@
     "price": 400,
     "type": "THEME",
     "isConsumable": false,
-    "hexColor": "#1B5E20"
+    "hexColor": "#1B5E20",
+    "isVisible": false
   },
   {
     "id": "theme_standard_charcoal",
@@ -24,7 +25,8 @@
     "price": 400,
     "type": "THEME",
     "isConsumable": false,
-    "hexColor": "#263238"
+    "hexColor": "#263238",
+    "isVisible": false
   },
   {
     "id": "theme_standard_orange",
@@ -33,7 +35,8 @@
     "price": 400,
     "type": "THEME",
     "isConsumable": false,
-    "hexColor": "#E65100"
+    "hexColor": "#E65100",
+    "isVisible": false
   },
   {
     "id": "theme_standard_pink",
@@ -42,7 +45,8 @@
     "price": 400,
     "type": "THEME",
     "isConsumable": false,
-    "hexColor": "#880E4F"
+    "hexColor": "#880E4F",
+    "isVisible": false
   },
   {
     "id": "theme_classic",
@@ -60,7 +64,8 @@
     "price": 400,
     "type": "THEME",
     "isConsumable": false,
-    "hexColor": "#1A237E"
+    "hexColor": "#1A237E",
+    "isVisible": false
   },
   {
     "id": "theme_classic_green",
@@ -69,7 +74,8 @@
     "price": 400,
     "type": "THEME",
     "isConsumable": false,
-    "hexColor": "#1B5E20"
+    "hexColor": "#1B5E20",
+    "isVisible": false
   },
   {
     "id": "theme_classic_purple",
@@ -78,7 +84,8 @@
     "price": 400,
     "type": "THEME",
     "isConsumable": false,
-    "hexColor": "#4527A0"
+    "hexColor": "#4527A0",
+    "isVisible": false
   },
   {
     "id": "theme_classic_teal",
@@ -87,7 +94,8 @@
     "price": 400,
     "type": "THEME",
     "isConsumable": false,
-    "hexColor": "#004D40"
+    "hexColor": "#004D40",
+    "isVisible": false
   },
   {
     "id": "theme_pattern",
@@ -96,7 +104,8 @@
     "price": 800,
     "type": "THEME",
     "isConsumable": false,
-    "hexColor": "#4527A0"
+    "hexColor": "#4527A0",
+    "isVisible": false
   },
   {
     "id": "theme_pattern_red",
@@ -105,7 +114,8 @@
     "price": 800,
     "type": "THEME",
     "isConsumable": false,
-    "hexColor": "#B71C1C"
+    "hexColor": "#B71C1C",
+    "isVisible": false
   },
   {
     "id": "theme_pattern_blue",
@@ -114,7 +124,8 @@
     "price": 800,
     "type": "THEME",
     "isConsumable": false,
-    "hexColor": "#1A237E"
+    "hexColor": "#1A237E",
+    "isVisible": false
   },
   {
     "id": "theme_pattern_green",
@@ -123,7 +134,8 @@
     "price": 800,
     "type": "THEME",
     "isConsumable": false,
-    "hexColor": "#1B5E20"
+    "hexColor": "#1B5E20",
+    "isVisible": false
   },
   {
     "id": "theme_pattern_gold",
@@ -132,7 +144,8 @@
     "price": 2000,
     "type": "THEME",
     "isConsumable": false,
-    "hexColor": "#FFD700"
+    "hexColor": "#FFD700",
+    "isVisible": false
   },
   {
     "id": "theme_poker",
@@ -141,7 +154,8 @@
     "price": 800,
     "type": "THEME",
     "isConsumable": false,
-    "hexColor": "#004D40"
+    "hexColor": "#004D40",
+    "isVisible": false
   },
   {
     "id": "theme_poker_red",
@@ -150,7 +164,8 @@
     "price": 800,
     "type": "THEME",
     "isConsumable": false,
-    "hexColor": "#B71C1C"
+    "hexColor": "#B71C1C",
+    "isVisible": false
   },
   {
     "id": "theme_poker_blue",
@@ -159,7 +174,8 @@
     "price": 800,
     "type": "THEME",
     "isConsumable": false,
-    "hexColor": "#1A237E"
+    "hexColor": "#1A237E",
+    "isVisible": false
   },
   {
     "id": "theme_poker_black",
@@ -168,7 +184,8 @@
     "price": 2000,
     "type": "THEME",
     "isConsumable": false,
-    "hexColor": "#121212"
+    "hexColor": "#121212",
+    "isVisible": false
   },
   {
     "id": "theme_poker_gold",
@@ -177,7 +194,8 @@
     "price": 2000,
     "type": "THEME",
     "isConsumable": false,
-    "hexColor": "#FFD700"
+    "hexColor": "#FFD700",
+    "isVisible": false
   },
   {
     "id": "skin_classic",
@@ -217,7 +235,8 @@
     "description": "Add 10 seconds to the clock.",
     "price": 400,
     "type": "POWER_UP",
-    "isConsumable": true
+    "isConsumable": true,
+    "isVisible": false
   },
   {
     "id": "powerup_peek",
