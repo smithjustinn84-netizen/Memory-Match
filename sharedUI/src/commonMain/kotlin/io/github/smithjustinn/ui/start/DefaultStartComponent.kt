@@ -130,7 +130,7 @@ class DefaultStartComponent(
                 DAILY_CHALLENGE_PAIRS,
                 GameMode.DAILY_CHALLENGE,
                 DifficultyType.CASUAL,
-                true
+                true,
             )
         }
     }

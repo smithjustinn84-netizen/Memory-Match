@@ -22,7 +22,7 @@ enum class DifficultyType {
                 SHARK -> MULTIPLIER_SHARK
             }
 
-    private companion object {
+    companion object {
         const val MULTIPLIER_TOURIST = 0.25
         const val MULTIPLIER_CASUAL = 1.0
         const val MULTIPLIER_MASTER = 2.5

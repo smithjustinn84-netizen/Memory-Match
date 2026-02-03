@@ -1,16 +1,11 @@
 package io.github.smithjustinn.domain.models
 
-import io.github.smithjustinn.utils.ImmutableListSerializer
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import kotlinx.serialization.builtins.serializer
 
-// Type-specific serializers for ImmutableList
-internal object CardStateListSerializer : ImmutableListSerializer<CardState>(CardState.serializer())
-
-internal object IntListSerializer : ImmutableListSerializer<Int>(Int.serializer())
+// Type-specific serializers moved to MemoryGameSerializers.kt
 
 /**
  * Represents the core state of the memory game.

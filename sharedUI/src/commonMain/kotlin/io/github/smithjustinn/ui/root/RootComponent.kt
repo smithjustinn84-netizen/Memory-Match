@@ -10,6 +10,7 @@ import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.backhandler.BackHandler
 import io.github.smithjustinn.di.AppGraph
+import io.github.smithjustinn.domain.models.DifficultyType
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.ui.game.DefaultGameComponent
 import io.github.smithjustinn.ui.game.GameArgs
@@ -101,7 +102,15 @@ class DefaultRootComponent(
             val seed = seedStr?.toLongOrNull()
 
             @OptIn(DelicateDecomposeApi::class)
-            navigation.push(Config.Game(pairs, mode, forceNewGame = true, seed = seed))
+            navigation.push(
+                Config.Game(
+                    pairs,
+                    mode,
+                    DifficultyType.CASUAL,
+                    forceNewGame = true,
+                    seed = seed,
+                ),
+            )
         } catch (e: IllegalArgumentException) {
             logger.e(e) { "Error handling deep link: $url" }
         }
@@ -124,11 +133,12 @@ class DefaultRootComponent(
             componentContext = componentContext,
             appGraph = appGraph,
             onNavigateToGame =
-                @OptIn(DelicateDecomposeApi::class) { pairs, mode, forceNewGame ->
+                @OptIn(DelicateDecomposeApi::class) { pairs, mode, difficulty, forceNewGame ->
                     navigation.push(
                         Config.Game(
                             pairs = pairs,
                             mode = mode,
+                            difficulty = difficulty,
                             forceNewGame = forceNewGame,
                             seed = null,
                         ),
@@ -159,6 +169,7 @@ class DefaultRootComponent(
                 GameArgs(
                     pairCount = config.pairs,
                     mode = config.mode,
+                    difficulty = config.difficulty,
                     forceNewGame = config.forceNewGame,
                     seed = config.seed,
                 ),
@@ -194,6 +205,7 @@ class DefaultRootComponent(
         data class Game(
             val pairs: Int,
             val mode: GameMode,
+            val difficulty: DifficultyType,
             val forceNewGame: Boolean,
             val seed: Long?,
         ) : Config
