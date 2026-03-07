@@ -1,9 +1,16 @@
 package io.github.smithjustinn.domain.services
 
+import kotlinx.coroutines.flow.StateFlow
+
 /**
  * Platform-specific service for loading and showing rewarded ads.
  */
 interface AdService {
+    /**
+     * Observable state of whether an ad is currently loaded and ready to be shown.
+     */
+    val isAdLoaded: StateFlow<Boolean>
+
     /**
      * Loads a rewarded ad with the given ad unit ID.
      * @param adUnitId The platform-specific ad unit identifier

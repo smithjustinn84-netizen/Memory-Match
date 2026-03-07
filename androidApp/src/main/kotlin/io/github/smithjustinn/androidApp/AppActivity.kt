@@ -13,6 +13,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowInsetsControllerCompat
 import com.arkivanov.decompose.defaultComponentContext
 import io.github.smithjustinn.App
+import io.github.smithjustinn.di.AndroidAppGraph
 import io.github.smithjustinn.ui.root.DeepLinkHandler
 import io.github.smithjustinn.ui.root.DefaultRootComponent
 
@@ -22,6 +23,10 @@ class AppActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val appGraph = (application as MemoryMatchApp).appGraph
+        
+        // Update ActivityProvider with current activity
+        (appGraph as? AndroidAppGraph)?.activityProvider?.updateActivity(this)
+
         val root =
             DefaultRootComponent(
                 componentContext = defaultComponentContext(),
@@ -37,6 +42,12 @@ class AppActivity : ComponentActivity() {
                 onThemeChanged = { ApplySystemBarTheme(it) },
             )
         }
+    }
+
+    override fun onDestroy() {
+        val appGraph = (application as MemoryMatchApp).appGraph
+        (appGraph as? AndroidAppGraph)?.activityProvider?.updateActivity(null)
+        super.onDestroy()
     }
 
     override fun onNewIntent(intent: Intent) {
