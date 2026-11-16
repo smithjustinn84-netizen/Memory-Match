@@ -293,7 +293,7 @@ git clone https://github.com/smithjustinn/Memory-Match.git
 ```
 
 ### Fonts
-The app bundles [Fraunces](https://fonts.google.com/specimen/Fraunces), [Inter](https://fonts.google.com/specimen/Inter) and [JetBrains Mono](https://fonts.google.com/specimen/JetBrains+Mono), each under the SIL Open Font License 1.1.
+The app bundles [Fraunces](https://fonts.google.com/specimen/Fraunces), [Inter](https://fonts.google.com/specimen/Inter) and [JetBrains Mono](https://fonts.google.com/specimen/JetBrains+Mono), each under the SIL Open Font License 1.1. The licence texts ship with the app in [`sharedUI/src/commonMain/composeResources/files/licenses/`](sharedUI/src/commonMain/composeResources/files/licenses).
 
 ---
 
