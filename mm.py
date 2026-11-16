@@ -180,7 +180,9 @@ def handle_build(args):
         run_command([
             "xcodebuild", "-project", "iosApp/iosApp.xcodeproj", 
             "-scheme", "iosApp", "-sdk", "iphonesimulator", 
-            "-configuration", config, "build"
+            "-configuration", config,
+            # The Kotlin targets are arm64-only (no iosX64), so don't let Xcode ask for x86_64.
+            "ARCHS=arm64", "build"
         ], show_spinner=True, spinner_msg=f"Building iOS ({config})...")
         
     elif target == "desktop":
