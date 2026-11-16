@@ -23,6 +23,10 @@ interface SettingsComponent {
 
     fun toggleHeatShieldEnabled(enabled: Boolean)
 
+    fun selectCardBack(id: String)
+
+    fun selectSymbolStyle(id: String)
+
     fun resetWalkthrough()
 
     fun onBack()

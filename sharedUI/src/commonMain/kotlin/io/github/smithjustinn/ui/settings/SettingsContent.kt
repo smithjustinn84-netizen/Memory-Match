@@ -57,6 +57,7 @@ import io.github.smithjustinn.resources.Res
 import io.github.smithjustinn.resources.back_content_description
 import io.github.smithjustinn.resources.settings
 import io.github.smithjustinn.resources.settings_appearance
+import io.github.smithjustinn.resources.settings_card_back_style
 import io.github.smithjustinn.resources.settings_enable_heat_shield
 import io.github.smithjustinn.resources.settings_enable_heat_shield_desc
 import io.github.smithjustinn.resources.settings_enable_peek
@@ -74,6 +75,7 @@ import io.github.smithjustinn.resources.settings_reset_walkthrough
 import io.github.smithjustinn.resources.settings_reset_walkthrough_desc
 import io.github.smithjustinn.resources.settings_sound_effects
 import io.github.smithjustinn.resources.settings_sound_effects_desc
+import io.github.smithjustinn.resources.settings_symbol_style
 import io.github.smithjustinn.services.AudioService
 import io.github.smithjustinn.services.HapticFeedbackType
 import io.github.smithjustinn.theme.PokerTheme
@@ -202,51 +204,64 @@ private fun SettingsAppearanceSection(
         hapticsService.performHapticFeedback(HapticFeedbackType.LIGHT)
         audioService.playEffect(AudioService.SoundEffect.CLICK)
     }
-    if (state.isFourColorUnlocked || state.isThirdEyeUnlocked || state.isHeatShieldUnlocked) {
-        SettingsSection(title = stringResource(Res.string.settings_appearance)) {
-            if (state.isFourColorUnlocked) {
-                SettingsToggle(
-                    title = stringResource(Res.string.settings_four_color_deck),
-                    description = stringResource(Res.string.settings_four_color_deck_desc),
-                    checked = state.areSuitsMultiColored,
-                    onCheckedChange = {
-                        playFeedback()
-                        component.toggleSuitsMultiColored(it)
-                    },
-                )
-            }
+    SettingsSection(title = stringResource(Res.string.settings_appearance)) {
+        CosmeticPicker(
+            title = stringResource(Res.string.settings_card_back_style),
+            options = state.cardBacks,
+            onSelect = {
+                playFeedback()
+                component.selectCardBack(it)
+            },
+        )
 
-            if (state.isFourColorUnlocked && state.isThirdEyeUnlocked) {
-                SettingsHairline()
-            }
+        SettingsHairline()
 
-            if (state.isThirdEyeUnlocked) {
-                SettingsToggle(
-                    title = stringResource(Res.string.settings_enable_third_eye),
-                    description = stringResource(Res.string.settings_enable_third_eye_desc),
-                    checked = state.isThirdEyeEnabled,
-                    onCheckedChange = {
-                        playFeedback()
-                        component.toggleThirdEyeEnabled(it)
-                    },
-                )
-            }
+        CosmeticPicker(
+            title = stringResource(Res.string.settings_symbol_style),
+            options = state.symbolStyles,
+            onSelect = {
+                playFeedback()
+                component.selectSymbolStyle(it)
+            },
+        )
 
-            if (state.isHeatShieldUnlocked) {
-                if (state.isFourColorUnlocked || state.isThirdEyeUnlocked) {
-                    SettingsHairline()
-                }
+        if (state.isFourColorUnlocked) {
+            SettingsHairline()
+            SettingsToggle(
+                title = stringResource(Res.string.settings_four_color_deck),
+                description = stringResource(Res.string.settings_four_color_deck_desc),
+                checked = state.areSuitsMultiColored,
+                onCheckedChange = {
+                    playFeedback()
+                    component.toggleSuitsMultiColored(it)
+                },
+            )
+        }
 
-                SettingsToggle(
-                    title = stringResource(Res.string.settings_enable_heat_shield),
-                    description = stringResource(Res.string.settings_enable_heat_shield_desc),
-                    checked = state.isHeatShieldEnabled,
-                    onCheckedChange = {
-                        playFeedback()
-                        component.toggleHeatShieldEnabled(it)
-                    },
-                )
-            }
+        if (state.isThirdEyeUnlocked) {
+            SettingsHairline()
+            SettingsToggle(
+                title = stringResource(Res.string.settings_enable_third_eye),
+                description = stringResource(Res.string.settings_enable_third_eye_desc),
+                checked = state.isThirdEyeEnabled,
+                onCheckedChange = {
+                    playFeedback()
+                    component.toggleThirdEyeEnabled(it)
+                },
+            )
+        }
+
+        if (state.isHeatShieldUnlocked) {
+            SettingsHairline()
+            SettingsToggle(
+                title = stringResource(Res.string.settings_enable_heat_shield),
+                description = stringResource(Res.string.settings_enable_heat_shield_desc),
+                checked = state.isHeatShieldEnabled,
+                onCheckedChange = {
+                    playFeedback()
+                    component.toggleHeatShieldEnabled(it)
+                },
+            )
         }
     }
 }

@@ -13,6 +13,16 @@ data class SettingsUIState(
     val isThirdEyeUnlocked: Boolean = false,
     val isHeatShieldEnabled: Boolean = false,
     val isHeatShieldUnlocked: Boolean = false,
+    val cardBacks: List<CosmeticOption> = emptyList(),
+    val symbolStyles: List<CosmeticOption> = emptyList(),
+)
+
+/** A card back or symbol style the player owns and can switch to from settings. */
+data class CosmeticOption(
+    val id: String,
+    val name: String,
+    val hexColor: String?,
+    val isSelected: Boolean,
 )
 
 sealed class SettingsUiEvent {

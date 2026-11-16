@@ -20,6 +20,7 @@ import io.github.smithjustinn.domain.repositories.SettingsRepository
 import io.github.smithjustinn.domain.repositories.ShopItemRepository
 import io.github.smithjustinn.domain.services.AdService
 import io.github.smithjustinn.domain.usecases.economy.DefaultEarnCurrencyUseCase
+import io.github.smithjustinn.domain.usecases.economy.SetActiveCosmeticUseCase
 import io.github.smithjustinn.domain.usecases.game.CalculateFinalScoreUseCase
 import io.github.smithjustinn.domain.usecases.game.ClearSavedGameUseCase
 import io.github.smithjustinn.domain.usecases.game.FlipCardUseCase
@@ -89,6 +90,7 @@ class MokkeryTestContext(
 
         // UseCases - initialized with mocked repositories where needed
         every { appGraph.startNewGameUseCase } returns StartNewGameUseCase()
+        every { appGraph.setActiveCosmeticUseCase } returns SetActiveCosmeticUseCase(playerEconomyRepository)
         every { appGraph.flipCardUseCase } returns FlipCardUseCase()
         every { appGraph.resetErrorCardsUseCase } returns ResetErrorCardsUseCase()
         every { appGraph.calculateFinalScoreUseCase } returns CalculateFinalScoreUseCase()
@@ -119,6 +121,7 @@ class MokkeryTestContext(
         every { playerEconomyRepository.selectedTheme } returns MutableStateFlow(CardBackTheme.GEOMETRIC)
         every { playerEconomyRepository.selectedThemeId } returns MutableStateFlow("GEOMETRIC")
         every { playerEconomyRepository.selectedSkin } returns MutableStateFlow(CardSymbolTheme.CLASSIC)
+        every { playerEconomyRepository.selectedSkinId } returns MutableStateFlow("skin_classic")
         every { playerEconomyRepository.balance } returns MutableStateFlow(1000L)
         every { playerEconomyRepository.unlockedItemIds } returns MutableStateFlow(emptySet())
         everySuspend { shopItemRepository.getShopItems() } returns emptyList()
