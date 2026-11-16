@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -55,7 +54,7 @@ fun ScoreBreakdownSection(
                 text = stringResource(Res.string.score_breakdown_title).uppercase(),
                 style =
                     MaterialTheme.typography.labelMedium.copy(
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = PokerTheme.fonts.display,
                     ),
                 fontWeight = FontWeight.Black,
                 color = PokerTheme.colors.goldenYellow,

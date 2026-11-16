@@ -20,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -81,7 +80,7 @@ private fun LeaderboardList(
                     text = stringResource(Res.string.no_stats_yet),
                     style =
                         MaterialTheme.typography.bodyMedium.copy(
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = PokerTheme.fonts.display,
                         ),
                     color = PokerTheme.colors.onBackground.copy(alpha = 0.4f),
                 )
@@ -235,7 +234,7 @@ private fun StatMiniItem(
             text = label.uppercase(),
             style =
                 MaterialTheme.typography.labelSmall.copy(
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = PokerTheme.fonts.display,
                 ),
             color = PokerTheme.colors.goldenYellow.copy(alpha = 0.7f),
             fontWeight = FontWeight.ExtraBold,

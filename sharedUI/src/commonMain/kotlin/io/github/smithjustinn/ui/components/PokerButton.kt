@@ -124,7 +124,8 @@ fun PokerButton(
             leadingIcon = leadingIcon,
             trailingIcon = trailingIcon,
             contentColor = buttonColors.content,
-            applyGlimmer = applyGlimmer && enabled,
+            // Bronze shimmer has no contrast on the gold primary fill, so primary text stays solid.
+            applyGlimmer = applyGlimmer && enabled && !isPrimary,
         )
     }
 }

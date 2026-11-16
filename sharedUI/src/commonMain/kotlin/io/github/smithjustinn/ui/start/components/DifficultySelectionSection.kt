@@ -140,7 +140,7 @@ private fun DifficultyItem(
                 if (isSelected) {
                     PokerTheme.colors.goldenYellow
                 } else {
-                    PokerTheme.colors.goldenYellow.copy(alpha = 0.6f)
+                    PokerTheme.colors.onBackground.copy(alpha = UNSELECTED_LABEL_ALPHA)
                 },
             fontWeight =
                 if (isSelected) {
@@ -195,6 +195,7 @@ private fun PrimaryActionButtons(
     }
 }
 
+private const val UNSELECTED_LABEL_ALPHA = 0.8f
 private const val PAIRS_EASY = 6
 private const val PAIRS_MEDIUM = 8
 private const val PAIRS_HARD = 10

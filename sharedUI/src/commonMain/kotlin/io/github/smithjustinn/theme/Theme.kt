@@ -23,7 +23,7 @@ private val LightColorScheme =
         onPrimary = Color.Black,
         background = EmeraldGreenTop,
         onBackground = Color.White,
-        surface = Color(0xFF4E2C1C), // Oak Woodish
+        surface = RaisedSurface,
         onSurface = ModernGold,
     )
 
@@ -33,7 +33,7 @@ private val DarkColorScheme =
         onPrimary = Color.Black,
         background = EmeraldGreenDark,
         onBackground = Color.White,
-        surface = Color(0xFF2D1409), // Darker Oak
+        surface = RaisedSurfaceDark,
         onSurface = ModernGold,
     )
 
@@ -62,6 +62,11 @@ object PokerTheme {
         @ReadOnlyComposable
         get() = LocalAppTypography.current
 
+    val fonts: AppFonts
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalAppFonts.current
+
     val cardTheme: CardTheme
         @Composable
         @ReadOnlyComposable
@@ -78,13 +83,15 @@ fun AppTheme(
     val colors = if (isDarkState.value) DarkAppColors else LightAppColors
     val spacing = AppSpacing()
     val shapes = AppShapes()
-    val typography = Typography()
+    val fonts = rememberAppFonts()
+    val typography = remember(fonts) { appTypography(fonts) }
 
     CompositionLocalProvider(
         LocalThemeIsDark provides isDarkState,
         LocalAppColors provides colors,
         LocalAppSpacing provides spacing,
         LocalAppShapes provides shapes,
+        LocalAppFonts provides fonts,
         LocalAppTypography provides typography,
     ) {
         val isDark by isDarkState

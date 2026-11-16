@@ -30,7 +30,6 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -83,7 +82,7 @@ private fun SpeechBubbleContent(matchComment: MatchComment) {
                 text = commentText,
                 style =
                     MaterialTheme.typography.bodyMedium.copy(
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = PokerTheme.fonts.display,
                         color = Color.Black,
                     ),
                 fontWeight = FontWeight.SemiBold,

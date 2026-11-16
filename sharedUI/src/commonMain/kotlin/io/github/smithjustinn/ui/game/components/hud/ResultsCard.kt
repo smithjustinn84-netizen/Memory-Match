@@ -39,7 +39,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -71,6 +70,7 @@ import io.github.smithjustinn.resources.time_label
 import io.github.smithjustinn.resources.times_up
 import io.github.smithjustinn.resources.total_payout
 import io.github.smithjustinn.services.HapticFeedbackType
+import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.components.ShopIcons
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -213,7 +213,7 @@ private fun CasinoHeader(
             text = stringResource(Res.string.casino_header_title),
             style =
                 MaterialTheme.typography.labelMedium.copy(
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = PokerTheme.fonts.mono,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 2.sp,
                 ),
@@ -229,7 +229,7 @@ private fun CasinoHeader(
                 },
             style =
                 MaterialTheme.typography.headlineMedium.copy(
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = PokerTheme.fonts.mono,
                     fontWeight = FontWeight.Black,
                 ),
             color = if (isWon) ReceiptAccentColor else ReceiptInkColor,
@@ -239,7 +239,7 @@ private fun CasinoHeader(
             text = stringResource(Res.string.high_roller_suite),
             style =
                 MaterialTheme.typography.labelSmall.copy(
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = PokerTheme.fonts.mono,
                     fontStyle = FontStyle.Italic,
                 ),
             color = ReceiptInkColor.copy(alpha = 0.5f),
@@ -275,12 +275,12 @@ private fun PayoutSection(
         ) {
             Text(
                 text = stringResource(Res.string.moves_label, moves).uppercase(),
-                style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+                style = MaterialTheme.typography.bodySmall.copy(fontFamily = PokerTheme.fonts.mono),
                 color = ReceiptInkColor.copy(alpha = 0.7f),
             )
             Text(
                 text = stringResource(Res.string.time_label, formatTime(elapsedTimeSeconds)).uppercase(),
-                style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+                style = MaterialTheme.typography.bodySmall.copy(fontFamily = PokerTheme.fonts.mono),
                 color = ReceiptInkColor.copy(alpha = 0.7f),
             )
         }
@@ -303,7 +303,7 @@ private fun TotalPayout(
             text = stringResource(Res.string.total_payout),
             style =
                 MaterialTheme.typography.titleMedium.copy(
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = PokerTheme.fonts.mono,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp,
                 ),
@@ -313,7 +313,7 @@ private fun TotalPayout(
             text = stringResource(Res.string.clean_number_format, animatedScore),
             style =
                 MaterialTheme.typography.displayMedium.copy(
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = PokerTheme.fonts.mono,
                     fontWeight = FontWeight.Black,
                 ),
             color = ReceiptAccentColor,
@@ -323,7 +323,7 @@ private fun TotalPayout(
             text = stringResource(Res.string.best_score_label, highScore).uppercase(),
             style =
                 MaterialTheme.typography.labelMedium.copy(
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = PokerTheme.fonts.mono,
                     fontWeight = FontWeight.Bold,
                 ),
             color = ReceiptInkColor.copy(alpha = 0.6f),
@@ -408,7 +408,7 @@ private fun ResultsActions(
                     text = stringResource(Res.string.double_rewards).uppercase(),
                     style =
                         MaterialTheme.typography.labelLarge.copy(
-                            fontFamily = FontFamily.Monospace,
+                            fontFamily = PokerTheme.fonts.mono,
                             fontWeight = FontWeight.Black,
                         ),
                 )
@@ -416,7 +416,7 @@ private fun ResultsActions(
                     text = stringResource(Res.string.double_rewards_ad_note),
                     style =
                         MaterialTheme.typography.labelSmall.copy(
-                            fontFamily = FontFamily.Monospace,
+                            fontFamily = PokerTheme.fonts.mono,
                             fontSize = 10.sp,
                         ),
                 )
@@ -441,7 +441,7 @@ private fun ResultsActions(
             text = stringResource(Res.string.play_again).uppercase(),
             style =
                 MaterialTheme.typography.labelLarge.copy(
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = PokerTheme.fonts.mono,
                     fontWeight = FontWeight.Bold,
                 ),
         )
@@ -464,7 +464,7 @@ private fun ResultsActions(
             text = stringResource(Res.string.share_receipt),
             style =
                 MaterialTheme.typography.labelLarge.copy(
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = PokerTheme.fonts.mono,
                     fontWeight = FontWeight.Bold,
                 ),
         )

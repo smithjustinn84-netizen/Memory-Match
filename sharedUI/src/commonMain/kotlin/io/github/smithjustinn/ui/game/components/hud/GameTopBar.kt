@@ -51,7 +51,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -251,7 +250,7 @@ private fun ValueBadge(
                         letterSpacing = 0.5.sp,
                         fontFamily =
                             FontWeight.Bold.toString().lowercase().let {
-                                FontFamily.Serif
+                                PokerTheme.fonts.display
                             },
                     ),
                 color = color.copy(alpha = 0.8f),
@@ -263,7 +262,7 @@ private fun ValueBadge(
                     typography.titleMedium.copy(
                         fontSize = if (compact) 14.sp else 18.sp,
                         fontWeight = FontWeight.Black,
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = PokerTheme.fonts.display,
                     ),
                 color = color,
             )

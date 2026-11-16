@@ -233,7 +233,7 @@ internal fun PixelCardFace(
                 MaterialTheme.typography.displayLarge.copy(
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = getFontSize(FONT_SIZE_HUGE * rank.fontScale),
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = PokerTheme.fonts.mono,
                 ),
             modifier = Modifier.align(Alignment.Center),
         )
@@ -246,7 +246,7 @@ internal fun PixelCardFace(
                 style =
                     MaterialTheme.typography.labelSmall.copy(
                         fontSize = getFontSize(FONT_SIZE_MEDIUM * rank.fontScale),
-                        fontFamily = FontFamily.Monospace,
+                        fontFamily = PokerTheme.fonts.mono,
                         fontWeight = FontWeight.Bold,
                     ),
             )
@@ -256,7 +256,7 @@ internal fun PixelCardFace(
                 style =
                     MaterialTheme.typography.labelSmall.copy(
                         fontSize = getFontSize(FONT_SIZE_SMALL),
-                        fontFamily = FontFamily.Monospace,
+                        fontFamily = PokerTheme.fonts.mono,
                     ),
             )
         }
@@ -274,7 +274,7 @@ internal fun PixelCardFace(
                 style =
                     MaterialTheme.typography.labelSmall.copy(
                         fontSize = getFontSize(FONT_SIZE_MEDIUM * rank.fontScale),
-                        fontFamily = FontFamily.Monospace,
+                        fontFamily = PokerTheme.fonts.mono,
                         fontWeight = FontWeight.Bold,
                     ),
             )
@@ -284,7 +284,7 @@ internal fun PixelCardFace(
                 style =
                     MaterialTheme.typography.labelSmall.copy(
                         fontSize = getFontSize(FONT_SIZE_SMALL),
-                        fontFamily = FontFamily.Monospace,
+                        fontFamily = PokerTheme.fonts.mono,
                     ),
             )
         }
@@ -336,7 +336,7 @@ internal fun FuturisticCardFace(
                 style =
                     MaterialTheme.typography.labelSmall.copy(
                         fontSize = getFontSize(8f * rank.fontScale),
-                        fontFamily = FontFamily.Monospace,
+                        fontFamily = PokerTheme.fonts.mono,
                     ),
             )
             Text(
@@ -362,7 +362,7 @@ internal fun FuturisticCardFace(
                 style =
                     MaterialTheme.typography.labelSmall.copy(
                         fontSize = getFontSize(8f),
-                        fontFamily = FontFamily.Monospace,
+                        fontFamily = PokerTheme.fonts.mono,
                     ),
             )
             Text(
@@ -467,7 +467,7 @@ internal fun RetroCardFace(
 ) {
     val monoStyle =
         MaterialTheme.typography.bodyMedium.copy(
-            fontFamily = FontFamily.Monospace,
+            fontFamily = PokerTheme.fonts.mono,
             fontWeight = FontWeight.Bold,
         )
 
@@ -512,7 +512,7 @@ internal fun ElegantCardFace(
 ) {
     val elegantStyle =
         MaterialTheme.typography.bodyMedium.copy(
-            fontFamily = FontFamily.Serif,
+            fontFamily = PokerTheme.fonts.display,
             fontStyle = FontStyle.Italic,
         )
 
@@ -578,7 +578,7 @@ internal fun CyberpunkCardFace(
                 MaterialTheme.typography.displayLarge.copy(
                     fontWeight = FontWeight.Black,
                     fontSize = getFontSize(FONT_SIZE_DISPLAY * rank.fontScale),
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = PokerTheme.fonts.mono,
                 ),
             modifier = Modifier.align(Alignment.Center).offset(x = 2.dp, y = 2.dp),
         )
@@ -589,7 +589,7 @@ internal fun CyberpunkCardFace(
                 MaterialTheme.typography.displayLarge.copy(
                     fontWeight = FontWeight.Black,
                     fontSize = getFontSize(FONT_SIZE_DISPLAY * rank.fontScale),
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = PokerTheme.fonts.mono,
                 ),
             modifier = Modifier.align(Alignment.Center).offset(x = (-2).dp, y = (-2).dp),
         )
@@ -601,7 +601,7 @@ internal fun CyberpunkCardFace(
                 style =
                     MaterialTheme.typography.labelLarge.copy(
                         fontSize = getFontSize(FONT_SIZE_MEDIUM * rank.fontScale),
-                        fontFamily = FontFamily.Monospace,
+                        fontFamily = PokerTheme.fonts.mono,
                     ),
             )
         }
@@ -613,7 +613,7 @@ internal fun CyberpunkCardFace(
                 style =
                     MaterialTheme.typography.labelLarge.copy(
                         fontSize = getFontSize(FONT_SIZE_MEDIUM),
-                        fontFamily = FontFamily.Monospace,
+                        fontFamily = PokerTheme.fonts.mono,
                     ),
             )
         }
@@ -775,13 +775,13 @@ internal fun PokerCardFace(
     // Serif Typography for Premium Look
     val serifTypography =
         MaterialTheme.typography.displaySmall.copy(
-            fontFamily = FontFamily.Serif,
+            fontFamily = PokerTheme.fonts.display,
             fontWeight = FontWeight.Bold,
         )
 
     val labelTypography =
         MaterialTheme.typography.labelMedium.copy(
-            fontFamily = FontFamily.Serif,
+            fontFamily = PokerTheme.fonts.display,
             fontWeight = FontWeight.SemiBold,
         )
 

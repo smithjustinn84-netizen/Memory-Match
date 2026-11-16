@@ -73,23 +73,23 @@ internal val DarkAppColors =
         background = DeepFeltGreen,
         feltGreen = DeepFeltGreen,
         feltGreenDark = DeepFeltGreenDark,
-        feltGreenCenter = EmeraldGreen, // Still somewhat vibrant in center
+        feltGreenCenter = EmeraldGreenTop, // Still lit in the centre
         feltGreenTop = DeepFeltGreen,
-        surface = Color(0xFF0A0503), // Almost black but warm
+        surface = DeepFeltGreenDark,
     )
 
 internal val HeatAppColors =
     DarkAppColors.copy(
-        primary = NeonCyan,
+        primary = HeatAmber,
         onPrimary = Color.Black,
         background = HeatBackgroundTop,
-        goldenYellow = NeonYellow,
-        softBlue = NeonCyan,
-        bonusGreen = NeonMagenta,
+        goldenYellow = HeatGold,
+        softBlue = HeatAmber,
+        bonusGreen = HeatCoral,
         feltGreen = HeatFeltRed,
         feltGreenDark = HeatFeltRedDark,
         feltGreenCenter = HeatFeltRedCenter,
         feltGreenTop = HeatFeltRedTop,
-        pillSelected = NeonCyan,
-        onSurface = NeonCyan,
+        pillSelected = HeatAmber,
+        onSurface = HeatAmber,
     )

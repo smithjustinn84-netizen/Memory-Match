@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.smithjustinn.theme.PokerTheme
 
 private const val TEXT_SHADOW_OFFSET_PX = 2f
 private const val TEXT_SHADOW_BLUR_RADIUS = 4f
@@ -34,6 +35,7 @@ fun GlimmerText(
             text = text,
             style =
                 TextStyle(
+                    fontFamily = PokerTheme.fonts.display,
                     fontSize = fontSize,
                     fontWeight = FontWeight.Black,
                     letterSpacing = letterSpacing,
@@ -46,6 +48,7 @@ fun GlimmerText(
             text = text,
             style =
                 TextStyle(
+                    fontFamily = PokerTheme.fonts.display,
                     fontSize = fontSize,
                     fontWeight = FontWeight.Black,
                     letterSpacing = letterSpacing,

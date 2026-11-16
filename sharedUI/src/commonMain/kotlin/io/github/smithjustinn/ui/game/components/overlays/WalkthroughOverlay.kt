@@ -24,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -116,7 +115,7 @@ private fun WalkthroughTexts(step: Int) {
         text = stringResource(getTitleRes(step)).uppercase(),
         style =
             MaterialTheme.typography.headlineSmall.copy(
-                fontFamily = FontFamily.Serif,
+                fontFamily = PokerTheme.fonts.display,
             ),
         fontWeight = FontWeight.Black,
         color = ModernGold,
@@ -130,7 +129,7 @@ private fun WalkthroughTexts(step: Int) {
         text = stringResource(getDescriptionRes(step)),
         style =
             MaterialTheme.typography.bodyLarge.copy(
-                fontFamily = FontFamily.Serif,
+                fontFamily = PokerTheme.fonts.display,
             ),
         textAlign = TextAlign.Center,
         color = Color.White.copy(alpha = 0.9f),
@@ -160,7 +159,7 @@ private fun WalkthroughActions(
                 stringResource(Res.string.walkthrough_skip),
                 color = Color.White.copy(alpha = 0.6f),
                 fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.Serif,
+                fontFamily = PokerTheme.fonts.display,
             )
         }
 
@@ -182,7 +181,7 @@ private fun WalkthroughActions(
                 },
                 fontWeight = FontWeight.Black,
                 color = Color.Black, // Dark text on Gold button
-                fontFamily = FontFamily.Serif,
+                fontFamily = PokerTheme.fonts.display,
             )
         }
     }

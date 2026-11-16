@@ -31,9 +31,9 @@ import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.domain.models.CardTheme
 import io.github.smithjustinn.services.AudioService
 import io.github.smithjustinn.services.HapticFeedbackType
-import io.github.smithjustinn.theme.NeonCyan
-import io.github.smithjustinn.theme.NeonMagenta
-import io.github.smithjustinn.theme.NeonYellow
+import io.github.smithjustinn.theme.HeatAmber
+import io.github.smithjustinn.theme.HeatCoral
+import io.github.smithjustinn.theme.HeatGold
 import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.components.AuroraEffect
 import io.github.smithjustinn.ui.game.components.effects.CardFountainOverlay
@@ -97,9 +97,9 @@ fun GameBackground(
     ) {
         if (isHeatMode) {
             AuroraEffect(
-                baseColor = NeonCyan,
-                accentColor = NeonMagenta,
-                highlightColor = NeonYellow,
+                baseColor = HeatAmber,
+                accentColor = HeatCoral,
+                highlightColor = HeatGold,
                 height = (250 + comboMultiplier * 10).coerceAtMost(500).dp,
                 modifier = Modifier.align(Alignment.BottomCenter),
             )

@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.resources.Res
@@ -89,7 +88,7 @@ private fun NewHighScoreContent() {
             text = stringResource(Res.string.new_high_score).uppercase(),
             style =
                 MaterialTheme.typography.titleLarge.copy(
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = PokerTheme.fonts.display,
                 ),
             fontWeight = FontWeight.Black,
             color = Color.White,

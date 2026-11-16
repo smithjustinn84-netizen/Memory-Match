@@ -30,7 +30,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.di.LocalAppGraph
@@ -156,7 +155,7 @@ private fun StatsTopBar(
                 text = stringResource(Res.string.high_scores),
                 style =
                     MaterialTheme.typography.titleLarge.copy(
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = PokerTheme.fonts.display,
                     ),
                 fontWeight = FontWeight.Bold,
                 color = Color.White,

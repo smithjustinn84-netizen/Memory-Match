@@ -29,11 +29,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.resources.Res
 import io.github.smithjustinn.resources.receipt_plus_amount_format
+import io.github.smithjustinn.theme.PokerTheme
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
 
@@ -165,7 +165,7 @@ fun PayoutRow(
             text = label.uppercase(),
             style =
                 MaterialTheme.typography.bodyMedium.copy(
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = PokerTheme.fonts.mono,
                     fontWeight = FontWeight.Medium,
                 ),
             color = color,
@@ -174,7 +174,7 @@ fun PayoutRow(
             text = stringResource(Res.string.receipt_plus_amount_format, amount),
             style =
                 MaterialTheme.typography.bodyMedium.copy(
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = PokerTheme.fonts.mono,
                     fontWeight = FontWeight.Bold,
                 ),
             color = color,
