@@ -54,6 +54,9 @@ interface JvmUiModule {
             ).setDriver(BundledSQLiteDriver())
             .setQueryCoroutineContext(Dispatchers.IO)
             .addMigrations(AppDatabase.MIGRATION_3_4)
+            // Version numbers were reset in Feb 2026, so databases from before that (v5-v7)
+            // are "newer" than the current schema and cannot be migrated: start them fresh.
+            .fallbackToDestructiveMigrationOnDowngrade(dropAllTables = true)
             .build()
     }
 }
