@@ -67,7 +67,7 @@ We follow a **Local-First, Modular-Core** strategy. The project is structured to
     *   **Key Tech**: `Room KMP` (Database), `Ktor` (Network).
 *   **`:sharedUI`**:
     *   **Purpose**: The massive shared UI module. Contains all screens, components, and view models.
-    *   **Key Tech**: `Compose Multiplatform`, `Decompose`, `Koin`.
+    *   **Key Tech**: `Compose Multiplatform`, `Decompose`, `Metro`.
 
 ### Component-Based MVVM & Unidirectional Data Flow (UDF)
 We use **Decompose** combined with a **State Machine** pattern to implement robust, testable UI logic. See **[GAME_ENGINE.md](docs/GAME_ENGINE.md)** for a deep dive into the state machine.
@@ -97,7 +97,7 @@ We stay on the bleeding edge of the Kotlin ecosystem.
 | **Language**   | Kotlin                | 2.3.0+  | K2 Mode enabled.              |
 | **UI**         | Compose Multiplatform | 1.10.0+ | Use Strong Skipping mode.     |
 | **Collections**| Immutable Collections | 0.4.0+  | Essential for Strong Skipping.|
-| **DI**         | Koin                  | 4.1.1+  | Context Parameters favored.   |
+| **DI**         | Metro                 | 1.5+    | Compile-time graph, `AppGraph`.|
 | **Navigation** | Decompose             | 3.4.0+  | Platform-agnostic navigation. |
 | **DB**         | Room KMP              | 2.8.4+  | Type-safe SQLite.             |
 | **Images**     | Coil                  | 3.3.0+  | Shared image loading.         |

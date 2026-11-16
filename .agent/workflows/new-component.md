@@ -17,7 +17,7 @@ Follow these steps to create a new UI component using the project's standard arc
 4. Create `ui/x/XContent.kt` (@Composable).
 
 ## 3. Integration
-1. Register in `Koin` module.
+1. Make new dependencies injectable with Metro (`@Inject` / `@Provides`) and expose them on `AppGraph`.
 2. Add to `RootComponent.Child` and `RootComponent.kt` navigation.
 
 ## 4. Testing

@@ -23,7 +23,7 @@ When an agent is asked to create a new feature or component, it MUST follow this
 - [ ] **Models**: Create `XModels.kt` for UI State, Actions, and Events.
 
 ## 4. Integration
-- [ ] **Dependency Injection**: Add the new component, use cases, and repositories to Koin modules.
+- [ ] **Dependency Injection**: Mark new use cases and repositories `@Inject` (with `@ContributesBinding` for interfaces), expose what the UI needs on `AppGraph`, and stub it in `MokkeryTestContext`.
 - [ ] **Navigation**: Integrate the new component into the `RootComponent` or relevant parent.
 
 ## 5. Verification

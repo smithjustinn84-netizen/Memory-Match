@@ -9,7 +9,7 @@ To maintain the high quality of the Memory-Match project, follow these specializ
 *   **[Core KMP](core-kmp.md)**: Shared code standards, `expect/actual` usage, and commonMain restrictions.
 *   **[Core Kotlin](core-kotlin.md)**: Idiomatic Kotlin patterns (2026), DSL markers, and error handling.
 *   **[Core Logging](core-logging.md)**: Standardizing Kermit 3.x for unified cross-platform logs.
-*   **[DI Koin](di-koin.md)**: Dependency injection patterns and `context(Service)` usage.
+*   **[DI Metro](di-metro.md)**: Compile-time dependency injection with Metro and the `AppGraph` interface.
 *   **[DI Room Integration](di-room-integration.md)**: Specific patterns for injecting Room databases into shared logic.
 
 ---

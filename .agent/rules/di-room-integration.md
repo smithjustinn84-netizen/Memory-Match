@@ -1,13 +1,13 @@
 ---
 trigger: glob
 globs: ["**/*Database.kt", "**/*Dao.kt", "**/*Entity.kt", "**/*Schema*"]
-description: Koin DI & Room Integration
+description: Metro DI & Room Integration
 ---
 
-# Koin DI & Room Integration
-- **Platform Modules:** Define an `expect fun platformModule(): Module` in `commonMain`.
-  - In `androidMain`, the actual module provides `RoomDatabase.Builder<AppDatabase>` using the Android Context.
-  - In `iosMain`, provide the builder directly.
-- **Dependency Injection:** The `AppDatabase` instance should be a `single` in the `commonMain` Koin module.
-  - DAOs should be provided as `single` by calling `get<AppDatabase>().daoName()`.
-- **Agent Instruction:** Use Koin for all dependency injection. Ensure new DAOs are registered in `DataModule.kt` or equivalent.
+# Metro DI & Room Integration
+- **Database instance:** Each platform builds `AppDatabase` in its UI module (`AndroidUiModule`, `IosUiModule`, `JvmUiModule`) with an `@SingleIn(AppScope::class) @Provides fun provideAppDatabase()`, because the builder needs platform inputs (Android `Context`, file paths).
+  - Keep the three builders in step: the same migrations and the same fallback (`fallbackToDestructiveMigrationOnDowngrade`) on every platform.
+- **DAOs:** Provide each DAO from `DataProviders` (`shared/data/.../di/DataProviders.kt`) as `@SingleIn(AppScope::class) @Provides fun provideXDao(database: AppDatabase): XDao = database.xDao()`.
+- **Repositories:** Inject DAOs through the constructor of an `@Inject` class bound with `@ContributesBinding(AppScope::class)`.
+- **Versions:** Bump `AppDatabase.DATABASE_VERSION` for every schema change and add a `Migration`; never lower or reuse a version number.
+- **Agent Instruction:** Use Metro for all dependency injection. Register new DAOs in `DataProviders`.

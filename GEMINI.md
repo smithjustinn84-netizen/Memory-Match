@@ -13,7 +13,7 @@ Memory-Match follows a **Modular-Core** strategy:
 - **UI Layer (`sharedUI`)**: Compose Multiplatform + Decompose (lifecycle-aware).
 - **Core Layer (`shared:core`)**: The "Brain". Custom DSL for `GameStateMachine`.
 - **Data Layer (`shared:data`)**: The "Memory". Room KMP (local persistence).
-- **DI**: Koin 4.1.1+ (favoring **Context Parameters**).
+- **DI**: Metro 1.5+ (compile-time graph; `@Inject`, `@Provides`, `AppGraph`).
 
 ---
 
