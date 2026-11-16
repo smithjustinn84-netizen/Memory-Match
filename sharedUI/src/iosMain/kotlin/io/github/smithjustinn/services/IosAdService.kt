@@ -2,6 +2,9 @@ package io.github.smithjustinn.services
 
 import co.touchlab.kermit.Logger
 import io.github.smithjustinn.domain.services.AdService
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * iOS implementation of AdService.
@@ -10,6 +13,8 @@ import io.github.smithjustinn.domain.services.AdService
  */
 class IosAdService : AdService {
     private val logger = Logger.withTag("IosAdService")
+
+    override val isAdLoaded: StateFlow<Boolean> = MutableStateFlow(false).asStateFlow()
 
     override fun loadRewardedAd(adUnitId: String) {
         logger.i { "Rewarded ad load requested for $adUnitId (Stub)" }

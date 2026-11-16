@@ -4,6 +4,7 @@ import android.content.Context
 import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.createGraphFactory
+import io.github.smithjustinn.services.ActivityProvider
 
 /**
  * Android-specific concrete dependency graph.
@@ -16,6 +17,9 @@ interface AndroidAppGraph :
     CoreProviders,
     DataProviders,
     AndroidUiModule {
+    
+    val activityProvider: ActivityProvider
+
     /**
      * Factory for creating the Android dependency graph with runtime inputs.
      * Context is provided as a dependency that Android providers can use.

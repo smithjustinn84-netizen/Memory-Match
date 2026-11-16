@@ -11,6 +11,7 @@ import dev.zacsweers.metro.SingleIn
 import io.github.smithjustinn.data.local.AppDatabase
 import io.github.smithjustinn.domain.repositories.SettingsRepository
 import io.github.smithjustinn.domain.services.AdService
+import io.github.smithjustinn.services.ActivityProvider
 import io.github.smithjustinn.services.AndroidAdService
 import io.github.smithjustinn.services.AndroidAudioServiceImpl
 import io.github.smithjustinn.services.AndroidHapticsServiceImpl
@@ -32,6 +33,10 @@ interface AndroidUiModule {
 
     @SingleIn(AppScope::class)
     @Provides
+    fun provideActivityProvider(): ActivityProvider = ActivityProvider()
+
+    @SingleIn(AppScope::class)
+    @Provides
     fun provideHapticsService(context: Context): HapticsService = AndroidHapticsServiceImpl(context)
 
     @SingleIn(AppScope::class)
@@ -44,7 +49,7 @@ interface AndroidUiModule {
 
     @SingleIn(AppScope::class)
     @Provides
-    fun provideAdService(activity: Activity?): AdService = AndroidAdService(activityProvider = { activity })
+    fun provideAdService(activityProvider: ActivityProvider): AdService = AndroidAdService(activityProvider = activityProvider)
 
     @SingleIn(AppScope::class)
     @Provides

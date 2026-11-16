@@ -164,8 +164,15 @@ class DefaultGameComponent(
                 appGraph.logger.w(e) { "Failed to load ad unit ID" }
                 return
             }
+
+        // Observe ad loaded state and update UI
+        scope.launch {
+            appGraph.adService.isAdLoaded.collect {
+                updateAdAvailability()
+            }
+        }
+
         appGraph.adService.loadRewardedAd(adUnitId)
-        updateAdAvailability()
     }
 
     private suspend fun observeTheme(shopItems: List<ShopItem>) {
@@ -511,15 +518,18 @@ class DefaultGameComponent(
     private fun updateAdAvailability() {
         val now = Clock.System.now().toEpochMilliseconds()
         val timeSinceLastAd = now - lastAdShownTimestamp
-        val isAvailable = timeSinceLastAd >= AD_COOLDOWN_MILLIS
+        val isCooldownOver = timeSinceLastAd >= AD_COOLDOWN_MILLIS
+        val isAdReady = appGraph.adService.isAdLoaded.value
+
+        val isAvailable = isCooldownOver && isAdReady
         _state.update { it.copy(isRewardedAdAvailable = isAvailable) }
 
-        if (!isAvailable) {
+        if (!isCooldownOver) {
             // Schedule re-check when cooldown expires
             scope.launch {
                 val remainingTime = AD_COOLDOWN_MILLIS - timeSinceLastAd
                 delay(remainingTime)
-                _state.update { it.copy(isRewardedAdAvailable = true) }
+                updateAdAvailability()
             }
         }
     }
