@@ -21,6 +21,7 @@ Memory-Match follows **Progressive Disclosure** to keep context lean.
 -   **`./mm.py context`**: Generate high-signal summary of changes.
 -   **`./mm.py done`**: Verify, format, and prepare commit message.
 -   **`./mm.py build [android|desktop|metadata]`**: Efficiently check compilation.
+-   **`./mm.py build desktop --hot`**: Run desktop with Compose Hot Reload (UI edits apply live).
 -   **`./mm.py test [all|shared|android|desktop]`**: Run specialized test suites.
 
 ---

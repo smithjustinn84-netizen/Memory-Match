@@ -184,8 +184,11 @@ def handle_build(args):
         ], show_spinner=True, spinner_msg=f"Building iOS ({config})...")
         
     elif target == "desktop":
-        task = ":desktopApp:run" if args.run else ":desktopApp:assemble"
-        tasks.append(task)
+        if args.hot:
+            # Compose Hot Reload: recompiles and reloads the running app when sources change.
+            tasks.extend([":desktopApp:hotRun", "--auto"])
+        else:
+            tasks.append(":desktopApp:run" if args.run else ":desktopApp:assemble")
         run_gradle(tasks, params=gradle_args, msg=f"Building Desktop...")
         
     elif target == "metadata":
@@ -523,6 +526,7 @@ def main():
     build_p = subparsers.add_parser("build", help="Build the project for various platforms")
     build_p.add_argument("target", choices=["android", "ios", "desktop", "metadata"], help="Target platform")
     build_p.add_argument("--run", action="store_true", help="Launch the app after build")
+    build_p.add_argument("--hot", action="store_true", help="Launch with Compose Hot Reload (desktop only)")
     build_p.add_argument("--release", action="store_true", help="Build in release mode")
     build_p.add_argument("--clean", action="store_true", help="Run clean before build")
     build_p.add_argument("--log", action="store_true", help="Stream logs (Android only)")
