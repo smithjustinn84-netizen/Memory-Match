@@ -35,6 +35,15 @@ data class AppColors(
     val bronze: Color,
     val tableShadow: Color,
     val glassWhite: Color,
+    // Card Room tokens
+    val ivory: Color,
+    val sage: Color,
+    val sageLight: Color,
+    val ink: Color,
+    val onGold: Color,
+    val goldDeep: Color,
+    val cardStock: Color,
+    val raisedSurface: Color,
 )
 
 internal val LightAppColors =
@@ -58,7 +67,7 @@ internal val LightAppColors =
         feltGreenCenter = EmeraldGreenCenter,
         feltGreenTop = EmeraldGreenTop,
         oakWood = CasinoBlack,
-        pillSelected = ModernGold,
+        pillSelected = Ivory,
         pillUnselected = GlassBlack,
         hudBackground = GlassBlack,
         brass = Brass,
@@ -66,6 +75,14 @@ internal val LightAppColors =
         bronze = Bronze,
         tableShadow = TableShadow,
         glassWhite = GlassWhite,
+        ivory = Ivory,
+        sage = Sage,
+        sageLight = SageLight,
+        ink = Ink,
+        onGold = OnGold,
+        goldDeep = Brass,
+        cardStock = CardStock,
+        raisedSurface = RaisedSurface,
     )
 
 internal val DarkAppColors =
@@ -91,5 +108,11 @@ internal val HeatAppColors =
         feltGreenCenter = HeatFeltRedCenter,
         feltGreenTop = HeatFeltRedTop,
         pillSelected = HeatAmber,
+        hudBackground = HeatGlass,
+        pillUnselected = HeatGlass,
+        sage = HeatSage,
+        onGold = HeatOnAmber,
+        goldDeep = HeatAmberDeep,
+        raisedSurface = HeatRaisedSurface,
         onSurface = HeatAmber,
     )

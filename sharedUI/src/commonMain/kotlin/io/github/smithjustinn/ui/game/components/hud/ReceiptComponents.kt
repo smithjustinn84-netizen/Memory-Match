@@ -8,9 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,89 +20,125 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.resources.Res
 import io.github.smithjustinn.resources.receipt_plus_amount_format
 import io.github.smithjustinn.theme.PokerTheme
 import org.jetbrains.compose.resources.stringResource
+import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-private val ReceiptInkColor = Color(0xFF2B2B2B)
-private const val DOTTED_LINE_ALPHA = 0.5f
-private const val DIVIDER_PADDING_DP = 4
-private const val DOTTED_LINE_HEIGHT_DP = 2
-private const val DOTTED_LINE_PADDING_DP = 8
-private const val DASH_LONG = 10f
-private const val DASH_GAP = 10f
-private const val RECEIPT_EDGE_HEIGHT_DP = 12
-private const val RECEIPT_TRIANGLE_COUNT = 20
-private const val ROTATION_180_DEGREES = 180f
+/** Muted ink for secondary receipt text. There is no theme token for it. */
+private val ReceiptMutedInkColor = Color(0xFF5E5A4E)
+
+/** Tracking for the small header lines at the top of the receipt. */
+val ReceiptHeaderTracking = 0.14.em
+
+/** Tracking for the small detail rows in the receipt body. */
+val ReceiptDetailTracking = 0.06.em
+
+private val ReceiptCaptionFontSize = 12.sp
+private val ReceiptLineItemFontSize = 14.sp
+
+private const val RULE_THICKNESS_DP = 1.5f
+private const val RULE_DASH_DP = 5f
+private const val RULE_GAP_DP = 4f
+private const val RECEIPT_TOOTH_WIDTH_DP = 14
+private const val RECEIPT_TOOTH_HEIGHT_DP = 7
+private const val LINE_ITEM_GAP_DP = 12
 private const val SECONDS_PER_MINUTE = 60
 private const val SCORE_TICK_DURATION_MS = 1500
 private const val HIGH_SCORE_THRESHOLD = 100
 private const val HIGH_SCORE_STEP = 10
 private const val LOW_SCORE_STEP = 1
 
+/** Dashed ink rule that separates the sections of the receipt. */
 @Composable
-fun ReceiptDivider(color: Color = ReceiptInkColor) {
-    HorizontalDivider(
-        modifier = Modifier.padding(vertical = DIVIDER_PADDING_DP.dp),
-        thickness = 1.dp,
-        color = color,
-    )
-}
-
-@Composable
-fun ReceiptDottedLine(color: Color = ReceiptInkColor) {
+fun ReceiptDivider(
+    modifier: Modifier = Modifier,
+    color: Color = PokerTheme.colors.ink,
+) {
     Canvas(
         modifier =
-            Modifier
+            modifier
                 .fillMaxWidth()
-                .height(DOTTED_LINE_HEIGHT_DP.dp)
-                .padding(vertical = DOTTED_LINE_PADDING_DP.dp),
+                .height(RULE_THICKNESS_DP.dp),
     ) {
+        val y = size.height / 2
         drawLine(
-            color = color.copy(alpha = DOTTED_LINE_ALPHA),
-            start = Offset(0f, 0f),
-            end = Offset(size.width, 0f),
-            pathEffect = PathEffect.dashPathEffect(floatArrayOf(DASH_LONG, DASH_GAP), 0f),
-            strokeWidth = 2.dp.toPx(),
+            color = color,
+            start = Offset(0f, y),
+            end = Offset(size.width, y),
+            pathEffect =
+                PathEffect.dashPathEffect(
+                    floatArrayOf(RULE_DASH_DP.dp.toPx(), RULE_GAP_DP.dp.toPx()),
+                    0f,
+                ),
+            strokeWidth = RULE_THICKNESS_DP.dp.toPx(),
         )
     }
 }
 
+/** Zig-zag torn edge that hangs below the bottom of the receipt paper. */
 @Composable
 fun ReceiptEdge(
     color: Color,
-    isTop: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     Canvas(
         modifier =
-            Modifier
+            modifier
                 .fillMaxWidth()
-                .height(RECEIPT_EDGE_HEIGHT_DP.dp)
-                .let { if (isTop) it.rotate(ROTATION_180_DEGREES) else it },
+                .height(RECEIPT_TOOTH_HEIGHT_DP.dp),
     ) {
-        val width = size.width
-        val triangleWidth = width / RECEIPT_TRIANGLE_COUNT
+        val toothCount = ceil(size.width / RECEIPT_TOOTH_WIDTH_DP.dp.toPx()).toInt().coerceAtLeast(1)
+        val toothWidth = size.width / toothCount
+        // Start one pixel above the canvas so no seam shows between the paper and its teeth.
+        val top = -1f
         val path =
             Path().apply {
-                moveTo(0f, 0f)
-                for (i in 0 until RECEIPT_TRIANGLE_COUNT) {
-                    lineTo(i * triangleWidth + triangleWidth / 2, size.height)
-                    lineTo((i + 1) * triangleWidth, 0f)
+                moveTo(0f, top)
+                lineTo(0f, 0f)
+                for (i in 0 until toothCount) {
+                    lineTo(i * toothWidth + toothWidth / 2, size.height)
+                    lineTo((i + 1) * toothWidth, 0f)
                 }
+                lineTo(size.width, top)
                 close()
             }
         drawPath(path, color = color)
     }
+}
+
+/** Small uppercase mono line in muted ink: header lines, moves, time and best score. */
+@Composable
+fun ReceiptCaption(
+    text: String,
+    modifier: Modifier = Modifier,
+    tracking: TextUnit = ReceiptDetailTracking,
+) {
+    Text(
+        text = text.uppercase(),
+        style =
+            TextStyle(
+                fontFamily = PokerTheme.fonts.mono,
+                fontWeight = FontWeight.Medium,
+                fontSize = ReceiptCaptionFontSize,
+                letterSpacing = tracking,
+            ),
+        color = ReceiptMutedInkColor,
+        modifier = modifier,
+    )
 }
 
 fun formatTime(seconds: Long): String {
@@ -147,37 +180,55 @@ fun handleScoreTick(
     }
 }
 
+/** Receipt line item: label on the left, "+amount" on the right. */
 @Composable
 fun PayoutRow(
     label: String,
     amount: Int,
-    color: Color = ReceiptInkColor,
+    modifier: Modifier = Modifier,
+    color: Color = PokerTheme.colors.ink,
 ) {
+    ReceiptLineItem(
+        label = label,
+        value = stringResource(Res.string.receipt_plus_amount_format, amount),
+        modifier = modifier,
+        color = color,
+    )
+}
+
+/** Receipt line item with a preformatted value. */
+@Composable
+fun ReceiptLineItem(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+    color: Color = PokerTheme.colors.ink,
+) {
+    val style =
+        TextStyle(
+            fontFamily = PokerTheme.fonts.mono,
+            fontWeight = FontWeight.Medium,
+            fontSize = ReceiptLineItemFontSize,
+        )
     Row(
         modifier =
-            Modifier
+            modifier
                 .fillMaxWidth()
                 .semantics(mergeDescendants = true) {},
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.spacedBy(LINE_ITEM_GAP_DP.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = label.uppercase(),
-            style =
-                MaterialTheme.typography.bodyMedium.copy(
-                    fontFamily = PokerTheme.fonts.mono,
-                    fontWeight = FontWeight.Medium,
-                ),
+            text = label,
+            style = style,
             color = color,
+            modifier = Modifier.weight(1f),
         )
         Text(
-            text = stringResource(Res.string.receipt_plus_amount_format, amount),
-            style =
-                MaterialTheme.typography.bodyMedium.copy(
-                    fontFamily = PokerTheme.fonts.mono,
-                    fontWeight = FontWeight.Bold,
-                ),
+            text = value,
+            style = style,
             color = color,
+            maxLines = 1,
         )
     }
 }

@@ -8,10 +8,10 @@ import kotlin.test.assertEquals
 class CardThemeExtensionsTest {
     @Test
     fun testGetPreferredColor() {
-        assertEquals(Color(0xFF1A237E), CardBackTheme.GEOMETRIC.getPreferredColor())
-        assertEquals(Color(0xFFB71C1C), CardBackTheme.CLASSIC.getPreferredColor())
-        assertEquals(Color(0xFF4527A0), CardBackTheme.PATTERN.getPreferredColor())
-        assertEquals(Color(0xFF004D40), CardBackTheme.POKER.getPreferredColor())
+        assertEquals(Color(0xFF1C3F6E), CardBackTheme.GEOMETRIC.getPreferredColor())
+        assertEquals(Color(0xFF7A1F2B), CardBackTheme.CLASSIC.getPreferredColor())
+        assertEquals(Color(0xFF1A1A17), CardBackTheme.PATTERN.getPreferredColor())
+        assertEquals(Color(0xFF7A1F2B), CardBackTheme.POKER.getPreferredColor())
     }
 
     @Test

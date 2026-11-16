@@ -3,15 +3,29 @@ package io.github.smithjustinn.ui.game
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -25,13 +39,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.di.LocalAppGraph
 import io.github.smithjustinn.domain.models.DailyChallengeMutator
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.MatchComment
 import io.github.smithjustinn.resources.Res
-import io.github.smithjustinn.resources.game_double_or_nothing
+import io.github.smithjustinn.resources.hud_pairs_found_format
+import io.github.smithjustinn.resources.score_double_down
 import io.github.smithjustinn.services.AudioService
 import io.github.smithjustinn.theme.HeatAppColors
 import io.github.smithjustinn.theme.LocalAppColors
@@ -48,6 +69,7 @@ import io.github.smithjustinn.ui.game.components.hud.ComboBadgeState
 import io.github.smithjustinn.ui.game.components.hud.DealerSpeechBubble
 import io.github.smithjustinn.ui.game.components.hud.GameTopBar
 import io.github.smithjustinn.ui.game.components.hud.GameTopBarState
+import io.github.smithjustinn.ui.game.components.hud.GlassDashboard
 import io.github.smithjustinn.ui.game.components.hud.MutatorIndicators
 import io.github.smithjustinn.ui.game.components.overlays.PeekCountdownOverlay
 import io.github.smithjustinn.ui.game.components.overlays.WalkthroughOverlay
@@ -59,10 +81,14 @@ private object LayoutConstants {
     const val SHAKE_RESET_OFFSET = 0f
     const val STEAM_DURATION_MS = 1200
     const val COMPACT_HEIGHT_THRESHOLD_DP = 500
-    const val DOUBLE_DOWN_BOTTOM_PADDING_DP = 100
     const val SPEECH_BUBBLE_TOP_PADDING_DP = 80
     const val MUTATOR_INDICATORS_TOP_OFFSET_DP = 60
-    const val DOUBLE_DOWN_END_PADDING_DP = 16
+    const val DOUBLE_DOWN_HEIGHT_DP = 52
+    const val BOTTOM_PANEL_MAX_WIDTH_DP = 600
+    const val PIP_WIDTH_DP = 18
+    const val PIP_HEIGHT_DP = 6
+    const val PIP_GAP_DP = 6
+    const val PIP_EMPTY_ALPHA = 0.2f
 }
 
 private data class GameHUDState(
@@ -72,6 +98,8 @@ private data class GameHUDState(
     val activeMutators: Set<DailyChallengeMutator>,
     val isDoubleDownAvailable: Boolean,
     val matchComment: MatchComment?,
+    val matchedPairs: Int,
+    val totalPairs: Int,
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -149,7 +177,6 @@ private fun GameMainScreenWrapper(
             Box(modifier = Modifier.fillMaxSize()) {
                 GameBackground(
                     isHeatMode = state.isHeatMode,
-                    theme = state.cardTheme,
                     comboMultiplier = state.game.comboMultiplier,
                 )
                 GameMainScreen(
@@ -248,6 +275,7 @@ private fun GameTopBarContent(
             state.game.score,
             state.game.currentPot,
             state.isHeatMode,
+            state.game.comboMultiplier,
         ) {
             GameTopBarState(
                 time = state.elapsedTimeSeconds,
@@ -269,6 +297,7 @@ private fun GameTopBarContent(
                 bankedScore = state.game.score,
                 currentPot = state.game.currentPot,
                 isHeatMode = state.isHeatMode,
+                comboMultiplier = state.game.comboMultiplier,
             )
         }
 
@@ -293,12 +322,19 @@ private fun rememberGridCardState(state: GameUIState) =
 
 @Composable
 private fun rememberGridSettings(state: GameUIState) =
-    remember(state.cardTheme, state.areSuitsMultiColored, state.isThirdEyeEnabled, state.showComboExplosion) {
+    remember(
+        state.cardTheme,
+        state.areSuitsMultiColored,
+        state.isThirdEyeEnabled,
+        state.showComboExplosion,
+        state.isHeatMode,
+    ) {
         GridSettings(
             cardTheme = state.cardTheme,
             areSuitsMultiColored = state.areSuitsMultiColored,
             isThirdEyeEnabled = state.isThirdEyeEnabled,
             showComboExplosion = state.showComboExplosion,
+            isHeatMode = state.isHeatMode,
         )
     }
 
@@ -311,6 +347,7 @@ private fun rememberGameHUDState(state: GameUIState) =
         state.game.activeMutators,
         state.isDoubleDownAvailable,
         state.game.matchComment,
+        state.game.cards,
     ) {
         GameHUDState(
             comboMultiplier = state.game.comboMultiplier,
@@ -319,6 +356,8 @@ private fun rememberGameHUDState(state: GameUIState) =
             activeMutators = state.game.activeMutators,
             isDoubleDownAvailable = state.isDoubleDownAvailable,
             matchComment = state.game.matchComment,
+            matchedPairs = state.game.cards.count { it.isMatched } / 2,
+            totalPairs = state.game.cards.size / 2,
         )
     }
 
@@ -340,6 +379,12 @@ private fun GameMainContent(
 
     val gridCardState = rememberGridCardState(state)
     val gridSettings = rememberGridSettings(state)
+    val hudState = rememberGameHUDState(state)
+
+    // The bottom panel floats over the table; the grid keeps clear of it by its measured height.
+    val density = LocalDensity.current
+    var bottomPanelHeight by remember { mutableStateOf(0.dp) }
+    val showBottomPanel = !useCompactUI
 
     Box(modifier = modifier.fillMaxSize()) {
         GameGrid(
@@ -347,13 +392,25 @@ private fun GameMainContent(
             settings = gridSettings,
             onCardClick = onCardClick,
             scorePositionInRoot = scorePosition,
+            bottomInset = if (showBottomPanel) bottomPanelHeight else 0.dp,
         )
 
         GameHUD(
-            state = rememberGameHUDState(state),
+            state = hudState,
             useCompactUI = useCompactUI,
             onDoubleDown = onDoubleDown,
         )
+
+        if (showBottomPanel) {
+            GameBottomPanel(
+                state = hudState,
+                onDoubleDown = onDoubleDown,
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .onSizeChanged { bottomPanelHeight = with(density) { it.height.toDp() } },
+            )
+        }
 
         GameOverlays(
             state = state,
@@ -369,7 +426,8 @@ private fun BoxScope.GameHUD(
     useCompactUI: Boolean,
     onDoubleDown: () -> Unit,
 ) {
-    if (state.comboMultiplier > 1) {
+    // Compact landscape has no height to spare for the bottom panel, so its contents float instead.
+    if (useCompactUI && state.comboMultiplier > 1) {
         ComboBadge(
             state =
                 ComboBadgeState(
@@ -382,7 +440,17 @@ private fun BoxScope.GameHUD(
                 Modifier
                     .align(Alignment.TopEnd)
                     .padding(top = PokerTheme.spacing.medium, end = PokerTheme.spacing.large),
-            compact = useCompactUI,
+            compact = true,
+        )
+    }
+
+    if (useCompactUI && state.isDoubleDownAvailable) {
+        DoubleDownButton(
+            onDoubleDown = onDoubleDown,
+            modifier =
+                Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(PokerTheme.spacing.medium),
         )
     }
 
@@ -404,10 +472,6 @@ private fun BoxScope.GameHUD(
         compact = useCompactUI,
     )
 
-    if (state.isDoubleDownAvailable) {
-        DoubleDownButton(onDoubleDown)
-    }
-
     DealerSpeechBubble(
         matchComment = state.matchComment,
         modifier =
@@ -418,25 +482,120 @@ private fun BoxScope.GameHUD(
     )
 }
 
+/**
+ * Bottom HUD panel: pairs progress on the left; on the right the combo pill, or the
+ * "Double or nothing" call to action while it is on offer in heat mode.
+ */
 @Composable
-private fun BoxScope.DoubleDownButton(onDoubleDown: () -> Unit) {
+private fun GameBottomPanel(
+    state: GameHUDState,
+    onDoubleDown: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val spacing = PokerTheme.spacing
+
+    GlassDashboard(
+        modifier =
+            modifier
+                .windowInsetsPadding(
+                    WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),
+                ).padding(start = spacing.medium, end = spacing.medium, bottom = spacing.small)
+                .widthIn(max = LayoutConstants.BOTTOM_PANEL_MAX_WIDTH_DP.dp),
+        isHeatMode = state.isHeatMode,
+    ) {
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    // Tall enough for the button, so the table does not resize when it appears
+                    .heightIn(min = LayoutConstants.DOUBLE_DOWN_HEIGHT_DP.dp)
+                    .padding(start = spacing.small),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(spacing.medium),
+        ) {
+            PairsProgress(
+                matchedPairs = state.matchedPairs,
+                totalPairs = state.totalPairs,
+                modifier = Modifier.weight(1f),
+            )
+
+            if (state.isDoubleDownAvailable) {
+                DoubleDownButton(onDoubleDown = onDoubleDown)
+            } else if (state.comboMultiplier > 1) {
+                ComboBadge(
+                    state =
+                        ComboBadgeState(
+                            combo = state.comboMultiplier,
+                            isMegaBonus = state.isMegaBonus,
+                            isHeatMode = state.isHeatMode,
+                        ),
+                    infiniteTransition = rememberInfiniteTransition(label = "comboBadge"),
+                    modifier = Modifier.padding(end = spacing.small),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PairsProgress(
+    matchedPairs: Int,
+    totalPairs: Int,
+    modifier: Modifier = Modifier,
+) {
+    val colors = PokerTheme.colors
+    val label = stringResource(Res.string.hud_pairs_found_format, matchedPairs, totalPairs)
+
+    Column(
+        // Announced once as "3 of 8 pairs found"; the pips repeat it visually.
+        modifier = modifier.clearAndSetSemantics { contentDescription = label },
+        verticalArrangement = Arrangement.spacedBy(PokerTheme.spacing.small),
+    ) {
+        Text(
+            text = label,
+            style = PokerTheme.typography.labelLarge.copy(fontSize = 13.sp, fontWeight = FontWeight.SemiBold),
+            color = colors.ivory,
+            maxLines = 1,
+        )
+
+        Row(horizontalArrangement = Arrangement.spacedBy(LayoutConstants.PIP_GAP_DP.dp)) {
+            repeat(totalPairs) { index ->
+                Box(
+                    modifier =
+                        Modifier
+                            .weight(1f, fill = false)
+                            .width(LayoutConstants.PIP_WIDTH_DP.dp)
+                            .height(LayoutConstants.PIP_HEIGHT_DP.dp)
+                            .background(
+                                color =
+                                    if (index < matchedPairs) {
+                                        colors.goldenYellow
+                                    } else {
+                                        colors.ivory.copy(alpha = LayoutConstants.PIP_EMPTY_ALPHA)
+                                    },
+                                shape = CircleShape,
+                            ),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DoubleDownButton(
+    onDoubleDown: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val audioService = LocalAppGraph.current.audioService
 
     PokerButton(
-        text = stringResource(Res.string.game_double_or_nothing),
+        text = stringResource(Res.string.score_double_down),
         onClick = {
             audioService.playEffect(AudioService.SoundEffect.CLICK)
             onDoubleDown()
         },
-        containerColor = PokerTheme.colors.tacticalRed,
-        contentColor = PokerTheme.colors.goldenYellow,
-        modifier =
-            Modifier
-                .align(Alignment.BottomEnd)
-                .padding(
-                    bottom = LayoutConstants.DOUBLE_DOWN_BOTTOM_PADDING_DP.dp,
-                    end = LayoutConstants.DOUBLE_DOWN_END_PADDING_DP.dp,
-                ),
+        isPrimary = true,
+        modifier = modifier.height(LayoutConstants.DOUBLE_DOWN_HEIGHT_DP.dp),
     )
 }
 

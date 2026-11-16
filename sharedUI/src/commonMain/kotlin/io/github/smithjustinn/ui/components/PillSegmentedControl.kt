@@ -2,6 +2,7 @@ package io.github.smithjustinn.ui.components
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
@@ -38,7 +39,8 @@ fun <T> PillSegmentedControl(
     modifier: Modifier = Modifier,
 ) {
     val selectedIndex = items.indexOf(selectedItem)
-    val shape = RoundedCornerShape(CORNER_PERCENT)
+    val shape = RoundedCornerShape(TRACK_RADIUS_DP.dp)
+    val indicatorShape = RoundedCornerShape(INDICATOR_RADIUS_DP.dp)
     val colors = PokerTheme.colors
     val spacing = PokerTheme.spacing
 
@@ -48,6 +50,7 @@ fun <T> PillSegmentedControl(
                 .height(48.dp)
                 .clip(shape)
                 .background(colors.pillUnselected)
+                .border(1.dp, colors.ivory.copy(alpha = TRACK_BORDER_ALPHA), shape)
                 .padding(spacing.extraSmall),
     ) {
         val itemWidth = maxWidth / items.size
@@ -60,7 +63,7 @@ fun <T> PillSegmentedControl(
         SegmentIndicator(
             itemWidth = itemWidth,
             offset = indicatorOffset,
-            shape = shape,
+            shape = indicatorShape,
             color = colors.pillSelected,
         )
 
@@ -126,8 +129,8 @@ private fun <T> SegmentLabels(
                 Text(
                     text = labelProvider(item),
                     style = PokerTheme.typography.labelLarge,
-                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                    color = if (isSelected) colors.feltGreenDark else Color.White.copy(alpha = 0.7f),
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (isSelected) colors.ink else colors.sageLight,
                     textAlign = TextAlign.Center,
                 )
             }
@@ -135,4 +138,6 @@ private fun <T> SegmentLabels(
     }
 }
 
-private const val CORNER_PERCENT = 50
+private const val TRACK_RADIUS_DP = 14
+private const val INDICATOR_RADIUS_DP = 10
+private const val TRACK_BORDER_ALPHA = 0.12f

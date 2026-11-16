@@ -10,19 +10,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.domain.models.DifficultyLevel
 import io.github.smithjustinn.domain.models.LeaderboardEntry
@@ -46,55 +50,25 @@ fun LeaderboardSection(
     entries: ImmutableList<LeaderboardEntry>,
     modifier: Modifier = Modifier,
 ) {
-    AppCard(
+    Column(
         modifier = modifier,
-        title = stringResource(level.type.displayNameRes),
+        verticalArrangement = Arrangement.spacedBy(HEADING_GAP_DP.dp),
     ) {
-        LeaderboardList(level, entries)
-    }
-}
+        LeaderboardHeading(level)
 
-@Composable
-private fun LeaderboardList(
-    level: DifficultyLevel,
-    entries: ImmutableList<LeaderboardEntry>,
-) {
-    Column {
-        LeaderboardInfoRow(level)
-
-        if (entries.isEmpty()) {
-            Column(
-                modifier = Modifier.padding(vertical = PokerTheme.spacing.extraLarge).fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Icon(
-                    imageVector = AppIcons.Trophy,
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp),
-                    tint = PokerTheme.colors.onBackground.copy(alpha = 0.2f),
-                )
-
-                Spacer(modifier = Modifier.height(PokerTheme.spacing.small))
-
-                Text(
-                    text = stringResource(Res.string.no_stats_yet),
-                    style =
-                        MaterialTheme.typography.bodyMedium.copy(
-                            fontFamily = PokerTheme.fonts.display,
-                        ),
-                    color = PokerTheme.colors.onBackground.copy(alpha = 0.4f),
-                )
-            }
-        } else {
-            Column(modifier = Modifier.padding(top = PokerTheme.spacing.medium)) {
+        AppCard {
+            if (entries.isEmpty()) {
+                LeaderboardEmptyState()
+            } else {
                 entries.forEachIndexed { index, entry ->
-                    LeaderboardRow(index + 1, entry)
-                    if (index < entries.size - 1) {
+                    if (index > 0) {
                         HorizontalDivider(
-                            modifier = Modifier.padding(vertical = PokerTheme.spacing.small),
-                            color = Color.White.copy(alpha = 0.1f),
+                            modifier = Modifier.padding(vertical = ROW_VERTICAL_PADDING_DP.dp),
+                            thickness = 1.dp,
+                            color = PokerTheme.colors.ivory.copy(alpha = HAIRLINE_ALPHA),
                         )
                     }
+                    LeaderboardRow(index + 1, entry)
                 }
             }
         }
@@ -102,17 +76,56 @@ private fun LeaderboardList(
 }
 
 @Composable
-private fun LeaderboardInfoRow(level: DifficultyLevel) {
+private fun LeaderboardHeading(level: DifficultyLevel) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.End,
-        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(PokerTheme.spacing.small),
     ) {
         Text(
+            text = stringResource(level.type.displayNameRes),
+            style =
+                PokerTheme.typography.titleLarge.copy(
+                    fontSize = HEADING_SP.sp,
+                    lineHeight = HEADING_LINE_HEIGHT_SP.sp,
+                ),
+            color = PokerTheme.colors.ivory,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .alignByBaseline()
+                    .semantics { heading() },
+        )
+        Text(
             text = stringResource(Res.string.pairs_format, level.pairs),
-            style = PokerTheme.typography.labelMedium,
-            fontWeight = FontWeight.Bold,
-            color = PokerTheme.colors.goldenYellow.copy(alpha = 0.6f),
+            style = PokerTheme.typography.labelLarge.copy(fontSize = PAIRS_SP.sp),
+            color = PokerTheme.colors.sage,
+            maxLines = 1,
+            modifier = Modifier.alignByBaseline(),
+        )
+    }
+}
+
+@Composable
+private fun LeaderboardEmptyState() {
+    Column(
+        modifier = Modifier.padding(vertical = PokerTheme.spacing.medium).fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Icon(
+            imageVector = AppIcons.Trophy,
+            contentDescription = null,
+            modifier = Modifier.size(EMPTY_ICON_SIZE_DP.dp),
+            tint = PokerTheme.colors.sage.copy(alpha = EMPTY_ICON_ALPHA),
+        )
+
+        Spacer(modifier = Modifier.height(PokerTheme.spacing.small))
+
+        Text(
+            text = stringResource(Res.string.no_stats_yet),
+            style = PokerTheme.typography.bodyMedium,
+            color = PokerTheme.colors.sage,
         )
     }
 }
@@ -122,99 +135,77 @@ private fun LeaderboardRow(
     rank: Int,
     entry: LeaderboardEntry,
 ) {
+    val scoreDescription = stringResource(Res.string.score_label, entry.score)
+
     Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = PokerTheme.spacing.medium, vertical = PokerTheme.spacing.small),
-        horizontalArrangement = Arrangement.spacedBy(PokerTheme.spacing.small),
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(ROW_GAP_DP.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        RankBadge(rank)
+        RankMedal(rank)
 
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = stringResource(Res.string.score_label, entry.score),
-                style = PokerTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
+        Text(
+            text = formatScore(entry.score),
+            style =
+                PokerTheme.typography.titleLarge.copy(
+                    fontFamily = PokerTheme.fonts.mono,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = SCORE_SP.sp,
+                    lineHeight = SCORE_LINE_HEIGHT_SP.sp,
+                ),
+            color = PokerTheme.colors.ivory,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .semantics { contentDescription = scoreDescription },
+        )
 
-        Row(
-            modifier = Modifier.weight(WEIGHT_0_6),
-            horizontalArrangement = Arrangement.spacedBy(PokerTheme.spacing.medium),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            StatMiniItem(
-                label = stringResource(Res.string.stats_time_header),
-                value = formatTime(entry.timeSeconds),
-                modifier = Modifier.weight(1f),
-            )
-            StatMiniItem(
-                label = stringResource(Res.string.stats_moves_header),
-                value = entry.moves.toString(),
-                modifier = Modifier.weight(1f),
-            )
-        }
+        StatMiniItem(
+            label = stringResource(Res.string.stats_time_header),
+            value = formatTime(entry.timeSeconds),
+        )
+        StatMiniItem(
+            label = stringResource(Res.string.stats_moves_header),
+            value = entry.moves.toString(),
+            modifier = Modifier.widthIn(min = MOVES_MIN_WIDTH_DP.dp),
+        )
     }
 }
 
-private const val WEIGHT_0_6 = 0.6f
-
-private const val RANK_1 = 1
-private const val RANK_2 = 2
-private const val RANK_3 = 3
-private const val BG_ALPHA_1 = 0.2f
-private const val BG_ALPHA_2 = 0.2f
-private const val BG_ALPHA_3 = 0.2f
-private const val BG_ALPHA_DEFAULT = 0.3f
-private const val BORDER_ALPHA_1 = 0.8f
-private const val BORDER_ALPHA_2 = 0.8f
-private const val BORDER_ALPHA_3 = 0.8f
-private const val BORDER_ALPHA_DEFAULT = 0.1f
-private const val TEXT_ALPHA_DEFAULT = 0.6f
-private val ColorSilver = Color(0xFFC0C0C0)
-private val ColorBronze = Color(0xFFCD7F32)
-
 @Composable
-private fun RankBadge(rank: Int) {
+private fun RankMedal(rank: Int) {
+    val colors = PokerTheme.colors
+    val medalColor =
+        when (rank) {
+            RANK_1 -> colors.goldenYellow
+            RANK_2 -> colors.silver
+            RANK_3 -> colors.bronze
+            else -> null
+        }
+
     Surface(
-        modifier = Modifier.size(32.dp),
+        modifier = Modifier.size(MEDAL_SIZE_DP.dp),
         shape = CircleShape,
-        color =
-            when (rank) {
-                RANK_1 -> PokerTheme.colors.goldenYellow.copy(alpha = BG_ALPHA_1)
-                RANK_2 -> ColorSilver.copy(alpha = BG_ALPHA_2) // Silver
-                RANK_3 -> ColorBronze.copy(alpha = BG_ALPHA_3) // Bronze
-                else -> Color.Black.copy(alpha = BG_ALPHA_DEFAULT)
-            },
+        color = medalColor ?: Color.Transparent,
         border =
-            BorderStroke(
-                width = 1.dp,
-                color =
-                    when (rank) {
-                        RANK_1 -> PokerTheme.colors.goldenYellow.copy(alpha = BORDER_ALPHA_1)
-                        RANK_2 -> ColorSilver.copy(alpha = BORDER_ALPHA_2)
-                        RANK_3 -> ColorBronze.copy(alpha = BORDER_ALPHA_3)
-                        else -> Color.White.copy(alpha = BORDER_ALPHA_DEFAULT)
-                    },
-            ),
+            if (medalColor == null) {
+                BorderStroke(1.dp, colors.ivory.copy(alpha = UNRANKED_BORDER_ALPHA))
+            } else {
+                null
+            },
     ) {
         Box(contentAlignment = Alignment.Center) {
             Text(
                 text = rank.toString(),
-                style = PokerTheme.typography.labelMedium,
-                fontWeight = FontWeight.ExtraBold,
-                color =
-                    when (rank) {
-                        RANK_1 -> PokerTheme.colors.goldenYellow
-                        RANK_2 -> ColorSilver
-                        RANK_3 -> ColorBronze
-                        else -> Color.White.copy(alpha = TEXT_ALPHA_DEFAULT)
-                    },
+                style =
+                    PokerTheme.typography.labelLarge.copy(
+                        fontFamily = PokerTheme.fonts.mono,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = MEDAL_RANK_SP.sp,
+                    ),
+                color = if (medalColor == null) colors.sageLight else colors.onGold,
             )
         }
     }
@@ -229,26 +220,63 @@ private fun StatMiniItem(
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.End,
+        verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
         Text(
             text = label.uppercase(),
             style =
-                MaterialTheme.typography.labelSmall.copy(
-                    fontFamily = PokerTheme.fonts.display,
+                PokerTheme.typography.labelSmall.copy(
+                    fontSize = STAT_LABEL_SP.sp,
+                    letterSpacing = LABEL_LETTER_SPACING_EM.em,
                 ),
-            color = PokerTheme.colors.goldenYellow.copy(alpha = 0.7f),
-            fontWeight = FontWeight.ExtraBold,
-            letterSpacing = 0.5.sp,
+            color = PokerTheme.colors.sage,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
         )
         Text(
             text = value,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
+            style =
+                PokerTheme.typography.bodyMedium.copy(
+                    fontFamily = PokerTheme.fonts.mono,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = STAT_VALUE_SP.sp,
+                ),
+            color = PokerTheme.colors.ivory,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
         )
     }
 }
+
+/** Groups the digits of a (non-negative) score in threes: 7389 becomes "7,389". */
+private fun formatScore(score: Int): String =
+    score
+        .toString()
+        .reversed()
+        .chunked(DIGIT_GROUP_SIZE)
+        .joinToString(",")
+        .reversed()
+
+private const val HEADING_GAP_DP = 12
+private const val HEADING_SP = 20
+private const val HEADING_LINE_HEIGHT_SP = 26
+private const val PAIRS_SP = 13
+
+private const val ROW_VERTICAL_PADDING_DP = 14
+private const val ROW_GAP_DP = 14
+private const val HAIRLINE_ALPHA = 0.1f
+private const val SCORE_SP = 22
+private const val SCORE_LINE_HEIGHT_SP = 26
+private const val MOVES_MIN_WIDTH_DP = 48
+private const val STAT_LABEL_SP = 11
+private const val STAT_VALUE_SP = 15
+private const val LABEL_LETTER_SPACING_EM = 0.08f
+private const val DIGIT_GROUP_SIZE = 3
+
+private const val RANK_1 = 1
+private const val RANK_2 = 2
+private const val RANK_3 = 3
+private const val MEDAL_SIZE_DP = 36
+private const val MEDAL_RANK_SP = 15
+private const val UNRANKED_BORDER_ALPHA = 0.2f
+
+private const val EMPTY_ICON_SIZE_DP = 48
+private const val EMPTY_ICON_ALPHA = 0.5f

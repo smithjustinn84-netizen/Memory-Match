@@ -21,14 +21,16 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.di.LocalAppGraph
-import io.github.smithjustinn.domain.models.CardBackTheme
-import io.github.smithjustinn.domain.models.CardTheme
 import io.github.smithjustinn.services.AudioService
 import io.github.smithjustinn.services.HapticFeedbackType
 import io.github.smithjustinn.theme.HeatAmber
@@ -44,56 +46,38 @@ import io.github.smithjustinn.utils.Constants
 import kotlinx.coroutines.launch
 
 private const val HEAT_TRANSITION_DURATION_MS = 800
-private const val BLACK_OVERLAY_ALPHA = 0.4f
+private const val FELT_RADIUS_WIDTH_FRACTION = 1.2f
+private const val FELT_RADIUS_HEIGHT_FRACTION = 0.7f
+private const val FELT_FOCUS_X = 0.5f
+private const val FELT_FOCUS_Y = 0.45f
+private const val FELT_MID_STOP = 0.5f
+private const val RESULTS_SCRIM_ALPHA = 0.86f
 private const val SNACKBAR_TOP_PADDING = 16
 private const val SNACKBAR_HORIZONTAL_PADDING = 16
 private const val SNACKBAR_MAX_WIDTH = 500
 private const val RESULTS_MAX_WIDTH = 550
 
+/**
+ * The table: one felt gradient, lit slightly above centre and falling off to the rail colour.
+ * In heat mode the felt tokens are the ember palette, so the same gradient cross-fades to red.
+ */
 @Composable
 fun GameBackground(
     isHeatMode: Boolean,
-    theme: CardTheme,
     comboMultiplier: Int,
 ) {
     val colors = PokerTheme.colors
+    val transition = tween<Color>(durationMillis = HEAT_TRANSITION_DURATION_MS)
 
-    val themeTopColor =
-        when (theme.back) {
-            CardBackTheme.GEOMETRIC -> Color(0xFF121212)
-            CardBackTheme.CLASSIC -> colors.feltGreen
-            CardBackTheme.PATTERN -> Color(0xFF16212E)
-            CardBackTheme.POKER -> Color(0xFF231515)
-        }
-
-    val themeBottomColor =
-        when (theme.back) {
-            CardBackTheme.GEOMETRIC -> Color(0xFF1E1E1E)
-            CardBackTheme.CLASSIC -> colors.feltGreenDark
-            CardBackTheme.PATTERN -> Color(0xFF243447)
-            CardBackTheme.POKER -> Color(0xFF352020)
-        }
-
-    val backgroundTopColor by animateColorAsState(
-        targetValue = if (isHeatMode) colors.heatBackgroundTop else themeTopColor,
-        animationSpec = tween(durationMillis = HEAT_TRANSITION_DURATION_MS),
-        label = "backgroundTop",
-    )
-    val backgroundBottomColor by animateColorAsState(
-        targetValue = if (isHeatMode) colors.heatBackgroundBottom else themeBottomColor,
-        animationSpec = tween(durationMillis = HEAT_TRANSITION_DURATION_MS),
-        label = "backgroundBottom",
-    )
+    val centerColor by animateColorAsState(colors.feltGreenCenter, transition, label = "feltCenter")
+    val feltColor by animateColorAsState(colors.feltGreen, transition, label = "felt")
+    val edgeColor by animateColorAsState(colors.feltGreenDark, transition, label = "feltEdge")
 
     Box(
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(backgroundTopColor, backgroundBottomColor),
-                    ),
-                ),
+                .drawBehind { drawFelt(centerColor, feltColor, edgeColor) },
     ) {
         if (isHeatMode) {
             AuroraEffect(
@@ -102,6 +86,35 @@ fun GameBackground(
                 highlightColor = HeatGold,
                 height = (250 + comboMultiplier * 10).coerceAtMost(500).dp,
                 modifier = Modifier.align(Alignment.BottomCenter),
+            )
+        }
+    }
+}
+
+/** An elliptical radial gradient: a circular one, stretched horizontally around its focus. */
+private fun DrawScope.drawFelt(
+    centerColor: Color,
+    feltColor: Color,
+    edgeColor: Color,
+) {
+    drawRect(edgeColor)
+
+    val radius = size.height * FELT_RADIUS_HEIGHT_FRACTION
+    if (radius > 0f) {
+        val focus = Offset(size.width * FELT_FOCUS_X, size.height * FELT_FOCUS_Y)
+        val stretch = size.width * FELT_RADIUS_WIDTH_FRACTION / radius
+        scale(scaleX = stretch, scaleY = 1f, pivot = focus) {
+            drawCircle(
+                brush =
+                    Brush.radialGradient(
+                        0f to centerColor,
+                        FELT_MID_STOP to feltColor,
+                        1f to edgeColor,
+                        center = focus,
+                        radius = radius,
+                    ),
+                radius = radius,
+                center = focus,
             )
         }
     }
@@ -117,7 +130,7 @@ fun GameGameOverOverlay(
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = BLACK_OVERLAY_ALPHA)),
+                .background(PokerTheme.colors.oakWood.copy(alpha = RESULTS_SCRIM_ALPHA)),
     ) {
         // Main content
         GameResultsOverlay(
@@ -191,6 +204,10 @@ private fun BoxScope.GameResultsOverlay(
             hapticsService.vibrateMatch()
         },
         onScoreTick = { hapticsService.vibrateTick() },
+        onBackToLobby = {
+            audioService.playEffect(AudioService.SoundEffect.CLICK)
+            component.onBack()
+        },
         onDoubleRewards = { component.onDoubleRewardsAd() },
         canDoubleRewards = state.canDoubleRewards,
         modifier =

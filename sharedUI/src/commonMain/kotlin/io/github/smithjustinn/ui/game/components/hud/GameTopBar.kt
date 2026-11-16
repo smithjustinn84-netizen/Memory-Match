@@ -1,5 +1,6 @@
 package io.github.smithjustinn.ui.game.components.hud
 
+import androidx.compose.animation.core.InfiniteTransition
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
@@ -9,63 +10,60 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.resources.Res
 import io.github.smithjustinn.resources.back_content_description
+import io.github.smithjustinn.resources.combo_badge_format
+import io.github.smithjustinn.resources.hud_heat_label
+import io.github.smithjustinn.resources.hud_pot_label
+import io.github.smithjustinn.resources.hud_score_label
 import io.github.smithjustinn.resources.mute_content_description
 import io.github.smithjustinn.resources.restart_content_description
-import io.github.smithjustinn.resources.score_caps
 import io.github.smithjustinn.resources.unmute_content_description
 import io.github.smithjustinn.services.AudioService
 import io.github.smithjustinn.services.HapticFeedbackType
 import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.components.AppIcons
 import io.github.smithjustinn.ui.extensions.pokerClickable
+import io.github.smithjustinn.ui.game.components.timer.TimerDisplay
+import io.github.smithjustinn.ui.game.components.timer.TimerFeedback
+import io.github.smithjustinn.ui.game.components.timer.TimerLayout
+import io.github.smithjustinn.ui.game.components.timer.TimerState
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
 
@@ -78,294 +76,249 @@ fun GameTopBar(
     onScorePositioned: (Offset) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
+    val spacing = PokerTheme.spacing
+
     GlassDashboard(
-        modifier = modifier.statusBarsPadding(),
+        modifier =
+            modifier
+                .statusBarsPadding()
+                .padding(horizontal = spacing.medium, vertical = spacing.small),
         isHeatMode = state.isHeatMode,
     ) {
         val isTimeAttack = state.mode == GameMode.TIME_ATTACK
+        val infiniteTransition = rememberInfiniteTransition(label = "TopBar")
 
         Column(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = if (state.compact) PokerTheme.spacing.medium else PokerTheme.spacing.large,
-                        vertical = if (state.compact) PokerTheme.spacing.extraSmall else PokerTheme.spacing.small,
-                    ),
-            verticalArrangement =
-                Arrangement.spacedBy(
-                    if (state.compact) PokerTheme.spacing.extraSmall else PokerTheme.spacing.small,
-                ),
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(if (state.compact) spacing.extraSmall else ROW_GAP_DP.dp),
         ) {
-            TopBarMainRow(
-                compact = state.compact,
-                score = state.bankedScore,
-                isAudioEnabled = state.isAudioEnabled,
-                onBackClick = onBackClick,
-                onRestartClick = onRestartClick,
-                onMuteClick = onMuteClick,
-                onScorePositioned = onScorePositioned,
-            )
+            // Bolt: Every child takes flat, stable parameters, so only the timer recomposes each second
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(spacing.small),
+            ) {
+                BackButton(onClick = onBackClick, compact = state.compact)
+
+                HudStats(
+                    state = state,
+                    infiniteTransition = infiniteTransition,
+                    onScorePositioned = onScorePositioned,
+                    modifier = Modifier.weight(1f),
+                )
+
+                MuteButton(
+                    isAudioEnabled = state.isAudioEnabled,
+                    onClick = onMuteClick,
+                    compact = state.compact,
+                )
+
+                RestartButton(onClick = onRestartClick, compact = state.compact)
+            }
 
             if (isTimeAttack && state.maxTime > 0) {
                 TimeProgressBar(
                     time = state.time,
                     maxTime = state.maxTime,
                     isLowTime = state.isLowTime,
-                    compact = state.compact,
+                    infiniteTransition = infiniteTransition,
                 )
             }
         }
     }
 }
 
-// Bolt: Flatten parameters to skip recomposition when GameTopBarState.time updates every second
 @Composable
-private fun TopBarMainRow(
-    compact: Boolean,
-    score: Int,
-    isAudioEnabled: Boolean,
-    onBackClick: () -> Unit,
-    onRestartClick: () -> Unit,
-    onMuteClick: () -> Unit,
+private fun HudStats(
+    state: GameTopBarState,
+    infiniteTransition: InfiniteTransition,
     onScorePositioned: (Offset) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Box(
-        modifier = Modifier.fillMaxWidth(),
+    BoxWithConstraints(modifier = modifier.padding(start = PokerTheme.spacing.extraSmall)) {
+        // On a phone the stats share about 200dp, so they sit closer and use the denser numeral.
+        val narrow = maxWidth < WIDE_STATS_MIN_WIDTH_DP.dp
+        HudStatsRow(
+            state = state,
+            infiniteTransition = infiniteTransition,
+            onScorePositioned = onScorePositioned,
+            dense = state.compact || state.isHeatMode || narrow,
+            // Four stats do not fit a phone; the combo pill below still shows the multiplier.
+            showHeat = state.isHeatMode && !narrow,
+        )
+    }
+}
+
+@Composable
+private fun HudStatsRow(
+    state: GameTopBarState,
+    infiniteTransition: InfiniteTransition,
+    onScorePositioned: (Offset) -> Unit,
+    dense: Boolean,
+    showHeat: Boolean,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(if (dense) STAT_GAP_DENSE_DP.dp else STAT_GAP_DP.dp),
     ) {
-        // Left: Back Button
-        BackButton(
-            onClick = onBackClick,
-            compact = compact,
-            modifier = Modifier.align(Alignment.CenterStart),
+        TimerDisplay(
+            infiniteTransition = infiniteTransition,
+            state =
+                TimerState(
+                    time = state.time,
+                    isLowTime = state.isLowTime,
+                    isCriticalTime = state.isCriticalTime,
+                ),
+            feedback =
+                TimerFeedback(
+                    showTimeGain = state.showTimeGain,
+                    timeGainAmount = state.timeGainAmount,
+                    showTimeLoss = state.showTimeLoss,
+                    timeLossAmount = state.timeLossAmount,
+                    isMegaBonus = state.isMegaBonus,
+                ),
+            layout = if (dense) TimerLayout.COMPACT else TimerLayout.STANDARD,
         )
 
-        // Center: Score
-        ScoringDisplay(
-            score = score,
-            compact = compact,
+        if (!dense) {
+            Box(
+                modifier =
+                    Modifier
+                        .width(1.dp)
+                        .height(DIVIDER_HEIGHT_DP.dp)
+                        .background(PokerTheme.colors.ivory.copy(alpha = TRACK_ALPHA)),
+            )
+        }
+
+        HudStat(
+            label = stringResource(Res.string.hud_pot_label),
+            value = state.currentPot.toString(),
+            dense = dense,
             modifier =
                 remember(onScorePositioned) {
                     // Bolt: Prevent recreating Modifier.onGloballyPositioned on every recomposition
-                    Modifier
-                        .align(Alignment.Center)
-                        .onGloballyPositioned { coords ->
-                            onScorePositioned(coords.positionInRoot())
-                        }
+                    Modifier.onGloballyPositioned { coords ->
+                        onScorePositioned(coords.positionInRoot())
+                    }
                 },
         )
 
-        // Right: Controls
-        ControlButtons(
-            isAudioEnabled = isAudioEnabled,
-            onMuteClick = onMuteClick,
-            onRestartClick = onRestartClick,
-            compact = compact,
-            showRestart = true,
-            modifier = Modifier.align(Alignment.CenterEnd),
-        )
-    }
-}
-
-@Composable
-private fun ControlButtons(
-    isAudioEnabled: Boolean,
-    onMuteClick: () -> Unit,
-    onRestartClick: () -> Unit,
-    compact: Boolean,
-    showRestart: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        MuteButton(
-            isAudioEnabled = isAudioEnabled,
-            onClick = onMuteClick,
-            compact = compact,
+        HudStat(
+            label = stringResource(Res.string.hud_score_label),
+            value = state.bankedScore.toString(),
+            dense = dense,
+            valueColor = PokerTheme.colors.ivory,
         )
 
-        if (showRestart) {
-            RestartButton(
-                onClick = onRestartClick,
-                compact = compact,
+        if (showHeat) {
+            HudStat(
+                label = stringResource(Res.string.hud_heat_label),
+                value = stringResource(Res.string.combo_badge_format, state.comboMultiplier),
+                dense = dense,
+                labelColor = PokerTheme.colors.goldenYellow,
             )
         }
     }
 }
 
 @Composable
-private fun ScoringDisplay(
-    score: Int,
-    compact: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    // Current Score Display
-    ValueBadge(
-        label = stringResource(Res.string.score_caps),
-        value = score,
-        color = PokerTheme.colors.goldenYellow,
-        compact = compact,
-        modifier = modifier,
-    )
-}
-
-@Composable
-private fun ValueBadge(
+private fun HudStat(
     label: String,
-    value: Int,
-    color: Color,
-    compact: Boolean,
+    value: String,
+    dense: Boolean,
     modifier: Modifier = Modifier,
+    labelColor: Color = PokerTheme.colors.sage,
+    valueColor: Color = PokerTheme.colors.goldenYellow,
 ) {
-    Surface(
-        shape =
-            RoundedCornerShape(
-                topStart = 0.dp,
-                topEnd = 0.dp,
-                bottomStart = 4.dp,
-                bottomEnd = 4.dp,
-            ),
-        color = color.copy(alpha = 0.15f),
-        border = BorderStroke(1.dp, color.copy(alpha = 0.3f)),
+    Column(
         modifier =
-            modifier
-                .offset(y = if (compact) 0.dp else (-4).dp)
-                .semantics(mergeDescendants = true) {
-                    contentDescription = "$label: $value"
-                },
+            modifier.semantics(mergeDescendants = true) {
+                contentDescription = "$label: $value"
+            },
+        verticalArrangement = Arrangement.spacedBy(1.dp),
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = if (compact) 8.dp else 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(if (compact) 4.dp else 6.dp),
-        ) {
-            Text(
-                text = label,
-                style =
-                    typography.labelSmall.copy(
-                        fontWeight = FontWeight.Black,
-                        fontSize = if (compact) 9.sp else 11.sp,
-                        letterSpacing = 0.5.sp,
-                        fontFamily =
-                            FontWeight.Bold.toString().lowercase().let {
-                                PokerTheme.fonts.display
-                            },
-                    ),
-                color = color.copy(alpha = 0.8f),
-            )
-
-            Text(
-                text = value.toString(),
-                style =
-                    typography.titleMedium.copy(
-                        fontSize = if (compact) 14.sp else 18.sp,
-                        fontWeight = FontWeight.Black,
-                        fontFamily = PokerTheme.fonts.display,
-                    ),
-                color = color,
-            )
-        }
+        HudStatLabel(text = label, color = labelColor)
+        Text(
+            text = value,
+            style = hudNumeralStyle(dense = dense),
+            color = valueColor,
+            maxLines = 1,
+            softWrap = false,
+        )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HudIconButton(
+    icon: ImageVector,
+    contentDesc: String,
+    tint: Color,
+    onClick: () -> Unit,
+    compact: Boolean,
+    modifier: Modifier = Modifier,
+    iconSize: Int = ICON_SIZE_DP,
+) {
+    TooltipBox(
+        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+        tooltip = { Text(contentDesc) },
+        state = rememberTooltipState(),
+    ) {
+        Box(
+            modifier =
+                modifier
+                    .size(if (compact) BUTTON_SIZE_COMPACT_DP.dp else BUTTON_SIZE_DP.dp)
+                    .clip(PokerTheme.shapes.medium)
+                    .pokerClickable(
+                        onClick = onClick,
+                        hapticType = HapticFeedbackType.LIGHT,
+                        soundEffect = AudioService.SoundEffect.CLICK,
+                    ).semantics { contentDescription = contentDesc },
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = tint,
+                modifier = Modifier.size(if (compact) ICON_SIZE_COMPACT_DP.dp else iconSize.dp),
+            )
+        }
+    }
+}
+
 @Composable
 private fun BackButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     compact: Boolean = false,
 ) {
-    val size = if (compact) 40.dp else 48.dp
-    val contentDesc = stringResource(Res.string.back_content_description)
-
-    TooltipBox(
-        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-        tooltip = { Text(contentDesc) },
-        state = rememberTooltipState(),
-    ) {
-        Surface(
-            shape = CircleShape,
-            color = PokerTheme.colors.tacticalRed,
-            shadowElevation = PokerTheme.spacing.small,
-            modifier =
-                modifier
-                    .size(size)
-                    .pokerClickable(
-                        onClick = onClick,
-                        hapticType = HapticFeedbackType.LIGHT,
-                        soundEffect = AudioService.SoundEffect.CLICK,
-                    ).semantics { contentDescription = contentDesc },
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                // Dashed border effect (simplified for icon button)
-                Canvas(modifier = Modifier.matchParentSize()) {
-                    val strokeWidth = size.toPx() * STROKE_WIDTH_FACTOR
-                    drawCircle(
-                        color = Color.White,
-                        style =
-                            Stroke(
-                                width = strokeWidth,
-                                pathEffect =
-                                    PathEffect
-                                        .dashPathEffect(floatArrayOf(DASH_ON, DASH_OFF), 0f),
-                            ),
-                        radius = this.size.minDimension / 2 * RADIUS_FACTOR,
-                    )
-                }
-
-                Icon(
-                    AppIcons.ChevronLeft,
-                    contentDescription = null,
-                    tint = PokerTheme.colors.goldenYellow,
-                    modifier = Modifier.size(if (compact) 20.dp else 24.dp),
-                )
-            }
-        }
-    }
+    HudIconButton(
+        icon = AppIcons.ChevronLeft,
+        contentDesc = stringResource(Res.string.back_content_description),
+        tint = PokerTheme.colors.ivory,
+        onClick = onClick,
+        compact = compact,
+        modifier = modifier,
+        iconSize = BACK_ICON_SIZE_DP,
+    )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun RestartButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     compact: Boolean = false,
 ) {
-    val contentDesc = stringResource(Res.string.restart_content_description)
-
-    TooltipBox(
-        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-        tooltip = { Text(contentDesc) },
-        state = rememberTooltipState(),
-    ) {
-        Surface(
-            shape = PokerTheme.shapes.medium,
-            color = PokerTheme.colors.oakWood,
-            shadowElevation = PokerTheme.spacing.extraSmall,
-            modifier =
-                modifier
-                    .size(if (compact) 40.dp else 48.dp)
-                    .pokerClickable(
-                        onClick = onClick,
-                        hapticType = HapticFeedbackType.LIGHT,
-                        soundEffect = AudioService.SoundEffect.CLICK,
-                    ).semantics { contentDescription = contentDesc },
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    AppIcons.Restart,
-                    contentDescription = null,
-                    tint = PokerTheme.colors.goldenYellow,
-                    modifier = Modifier.size(if (compact) 20.dp else 24.dp),
-                )
-            }
-        }
-    }
+    HudIconButton(
+        icon = AppIcons.Restart,
+        contentDesc = stringResource(Res.string.restart_content_description),
+        tint = PokerTheme.colors.goldenYellow,
+        onClick = onClick,
+        compact = compact,
+        modifier = modifier,
+    )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MuteButton(
     isAudioEnabled: Boolean,
@@ -373,43 +326,22 @@ private fun MuteButton(
     modifier: Modifier = Modifier,
     compact: Boolean = false,
 ) {
-    val contentDesc =
-        stringResource(
-            if (isAudioEnabled) {
-                Res.string.mute_content_description
-            } else {
-                Res.string.unmute_content_description
-            },
-        )
-
-    TooltipBox(
-        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-        tooltip = { Text(contentDesc) },
-        state = rememberTooltipState(),
-    ) {
-        Surface(
-            shape = PokerTheme.shapes.medium,
-            color = PokerTheme.colors.oakWood,
-            shadowElevation = PokerTheme.spacing.extraSmall,
-            modifier =
-                modifier
-                    .size(if (compact) 40.dp else 48.dp)
-                    .pokerClickable(
-                        onClick = onClick,
-                        hapticType = HapticFeedbackType.LIGHT,
-                        soundEffect = AudioService.SoundEffect.CLICK,
-                    ).semantics { contentDescription = contentDesc },
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    if (isAudioEnabled) AppIcons.VolumeUp else AppIcons.VolumeOff,
-                    contentDescription = null,
-                    tint = if (isAudioEnabled) PokerTheme.colors.goldenYellow else PokerTheme.colors.tacticalRed,
-                    modifier = Modifier.size(if (compact) 20.dp else 24.dp),
-                )
-            }
-        }
-    }
+    HudIconButton(
+        icon = if (isAudioEnabled) AppIcons.VolumeUp else AppIcons.VolumeOff,
+        contentDesc =
+            stringResource(
+                if (isAudioEnabled) {
+                    Res.string.mute_content_description
+                } else {
+                    Res.string.unmute_content_description
+                },
+            ),
+        // The crossed-out glyph carries the muted state; sage just quietens it.
+        tint = if (isAudioEnabled) PokerTheme.colors.goldenYellow else PokerTheme.colors.sage,
+        onClick = onClick,
+        compact = compact,
+        modifier = modifier,
+    )
 }
 
 @Composable
@@ -417,8 +349,8 @@ private fun TimeProgressBar(
     time: Long,
     maxTime: Long,
     isLowTime: Boolean,
+    infiniteTransition: InfiniteTransition,
     modifier: Modifier = Modifier,
-    compact: Boolean = false,
 ) {
     val progressState =
         animateFloatAsState(
@@ -426,7 +358,6 @@ private fun TimeProgressBar(
             animationSpec = spring(stiffness = Spring.StiffnessLow),
         )
 
-    val infiniteTransition = rememberInfiniteTransition(label = "TimePulse")
     val pulsingAlpha =
         infiniteTransition.animateFloat(
             initialValue = 1f,
@@ -443,9 +374,9 @@ private fun TimeProgressBar(
         modifier =
             modifier
                 .fillMaxWidth()
-                .height(if (compact) 4.dp else 8.dp)
+                .height(PROGRESS_HEIGHT_DP.dp)
                 .clip(CircleShape)
-                .background(Color.Black.copy(alpha = BG_ALPHA)),
+                .background(PokerTheme.colors.ivory.copy(alpha = TRACK_ALPHA)),
     ) {
         Box(
             modifier =
@@ -461,34 +392,22 @@ private fun TimeProgressBar(
                     }.fillMaxHeight()
                     .graphicsLayer {
                         alpha = if (isLowTime) pulsingAlpha.value else 1f
-                    }.shadow(
-                        elevation = if (isLowTime) PokerTheme.spacing.none else PokerTheme.spacing.medium,
-                        shape = CircleShape,
-                        ambientColor = PokerTheme.colors.goldenYellow,
-                        spotColor = PokerTheme.colors.goldenYellow,
-                        clip = false,
-                    ).clip(CircleShape)
-                    .background(
-                        if (isLowTime) {
-                            Brush.horizontalGradient(
-                                listOf(PokerTheme.colors.tacticalRed, PokerTheme.colors.tacticalRed.copy(alpha = 0.7f)),
-                            )
-                        } else {
-                            Brush.horizontalGradient(
-                                listOf(
-                                    PokerTheme.colors.goldenYellow,
-                                    PokerTheme.colors.goldenYellow.copy(alpha = 0.7f),
-                                ),
-                            )
-                        },
-                    ),
+                    }.clip(CircleShape)
+                    .background(if (isLowTime) PokerTheme.colors.tacticalRed else PokerTheme.colors.goldenYellow),
         )
     }
 }
 
-private const val STROKE_WIDTH_FACTOR = 0.1f
-private const val DASH_ON = 10f
-private const val DASH_OFF = 10f
-private const val RADIUS_FACTOR = 0.85f
-private const val BG_ALPHA = 0.4f
+private const val ROW_GAP_DP = 10
+private const val STAT_GAP_DP = 18
+private const val STAT_GAP_DENSE_DP = 12
+private const val WIDE_STATS_MIN_WIDTH_DP = 300
+private const val DIVIDER_HEIGHT_DP = 32
+private const val BUTTON_SIZE_DP = 44
+private const val BUTTON_SIZE_COMPACT_DP = 40
+private const val ICON_SIZE_DP = 22
+private const val BACK_ICON_SIZE_DP = 24
+private const val ICON_SIZE_COMPACT_DP = 20
+private const val PROGRESS_HEIGHT_DP = 4
+private const val TRACK_ALPHA = 0.16f
 private const val PULSE_DURATION = 800

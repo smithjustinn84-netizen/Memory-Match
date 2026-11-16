@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -62,6 +63,7 @@ internal fun GameGrid(
     settings: GridSettings,
     onCardClick: (Int) -> Unit,
     scorePositionInRoot: Offset = Offset.Zero,
+    bottomInset: Dp = 0.dp,
 ) {
     val cardLayouts = remember { mutableStateMapOf<Int, CardLayoutInfo>() }
     var gridPosition by remember { mutableStateOf(Offset.Zero) }
@@ -82,23 +84,23 @@ internal fun GameGrid(
                         gridPosition = layoutCoordinates.positionInRoot()
                     }
             }
-        GridBackground(
-            theme = settings.cardTheme.back,
-            modifier = gridBackgroundModifier,
-        )
+        GridBackground(modifier = gridBackgroundModifier)
 
         if (gridCardState.cards.isNotEmpty()) {
+            // The table area is what remains above the bottom HUD panel (bottomInset).
+            val tableHeight = (maxHeight - bottomInset).coerceAtLeast(0.dp)
             val layoutConfig =
                 rememberGridLayoutConfig(
                     screenWidth = maxWidth,
-                    screenHeight = maxHeight,
+                    screenHeight = tableHeight,
                     cardCount = gridCardState.cards.size,
                 )
 
             GridContent(
                 gridCardState = gridCardState,
                 layoutConfig = layoutConfig,
-                screenHeight = maxHeight,
+                screenHeight = tableHeight,
+                bottomInset = bottomInset,
                 gridPosition = gridPosition,
                 settings = settings,
                 onCardClick = onCardClick,
@@ -214,6 +216,7 @@ private fun GridContent(
     gridCardState: GridCardState,
     layoutConfig: GridLayoutConfig,
     screenHeight: Dp,
+    bottomInset: Dp,
     gridPosition: Offset,
     settings: GridSettings,
     onCardClick: (Int) -> Unit,
@@ -238,10 +241,12 @@ private fun GridContent(
                 end = layoutConfig.spacing.horizontalPadding,
                 bottom = layoutConfig.spacing.bottomPadding,
             ),
-        verticalArrangement = Arrangement.spacedBy(layoutConfig.spacing.verticalSpacing),
+        // Centred on the table when the cards do not need the full height
+        verticalArrangement = Arrangement.spacedBy(layoutConfig.spacing.verticalSpacing, Alignment.CenterVertically),
         horizontalArrangement = Arrangement.spacedBy(layoutConfig.spacing.horizontalSpacing),
         modifier =
             Modifier
+                .padding(bottom = bottomInset)
                 .fillMaxHeight()
                 .widthIn(max = layoutConfig.metrics.maxWidth),
     ) {
@@ -256,6 +261,7 @@ private fun GridContent(
                 cardTheme = settings.cardTheme,
                 areSuitsMultiColored = settings.areSuitsMultiColored,
                 isThirdEyeEnabled = settings.isThirdEyeEnabled,
+                isHeatMode = settings.isHeatMode,
                 gridContext = gridContext,
                 cardLayouts = cardLayouts,
                 onCardClick = onCardClick,
@@ -274,6 +280,7 @@ private fun GridItem(
     cardTheme: CardTheme,
     areSuitsMultiColored: Boolean,
     isThirdEyeEnabled: Boolean,
+    isHeatMode: Boolean,
     gridContext: GridContext,
     cardLayouts: SnapshotStateMap<Int, CardLayoutInfo>,
     onCardClick: (Int) -> Unit,
@@ -325,6 +332,7 @@ private fun GridItem(
         isThirdEyeEnabled = isThirdEyeEnabled,
         muckTargetOffset = cardMuckTarget.offset,
         muckTargetRotation = cardMuckTarget.rotation,
+        isHeatMode = isHeatMode,
         onClick = onClick,
         modifier = modifier,
     )

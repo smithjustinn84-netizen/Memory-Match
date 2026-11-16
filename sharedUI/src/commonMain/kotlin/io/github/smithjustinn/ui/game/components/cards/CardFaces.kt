@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +33,9 @@ import io.github.smithjustinn.domain.models.CardTheme
 import io.github.smithjustinn.domain.models.Rank
 import io.github.smithjustinn.domain.models.Suit
 import io.github.smithjustinn.theme.PokerTheme
+
+// Corner rank of the classic face, relative to BASE_CARD_WIDTH
+private const val CLASSIC_INDEX_FONT_SIZE = 18f
 
 // Helper to adjust font size for wider ranks (like "10") to prevent overlap
 private val Rank.fontScale: Float
@@ -171,10 +175,10 @@ object CardFaces {
     ) {
         Card(
             modifier = modifier.fillMaxSize(),
-            shape = PokerTheme.shapes.medium,
+            shape = RoundedCornerShape(CARD_CORNER_RADIUS_DP.dp),
             colors =
                 CardDefaults.cardColors(
-                    containerColor = Color.White,
+                    containerColor = PokerTheme.colors.cardStock,
                 ),
         ) {
             Box(modifier = Modifier.fillMaxSize().padding(PokerTheme.spacing.extraSmall)) {
@@ -566,7 +570,8 @@ internal fun CyberpunkCardFace(
     suitColor: Color,
     getFontSize: (Float) -> TextUnit,
 ) {
-    val glitchColor = if (suitColor == Color.Black) Color.DarkGray else Color.Magenta
+    val isInk = suitColor == Color.Black || suitColor == PokerTheme.colors.ink
+    val glitchColor = if (isInk) Color.DarkGray else Color.Magenta
 
     Box(modifier = Modifier.fillMaxSize().padding(PokerTheme.spacing.extraSmall)) {
         // Glitchy Center Rank
@@ -627,64 +632,62 @@ internal fun ClassicCardFace(
     suitColor: Color,
     getFontSize: (Float) -> TextUnit,
 ) {
-    // Top Left
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        ClassicCornerIndex(
+            rank = rank,
+            suit = suit,
+            suitColor = suitColor,
+            getFontSize = getFontSize,
+            modifier = Modifier.align(Alignment.TopStart),
+        )
+
+        // One large pip in the centre
+        Text(
+            text = suit.symbol,
+            color = suitColor,
+            style = MaterialTheme.typography.displayLarge.copy(fontSize = getFontSize(FONT_SIZE_DISPLAY)),
+            modifier = Modifier.align(Alignment.Center),
+        )
+
+        ClassicCornerIndex(
+            rank = rank,
+            suit = suit,
+            suitColor = suitColor,
+            getFontSize = getFontSize,
+            modifier = Modifier.align(Alignment.BottomEnd).graphicsLayer { rotationZ = FULL_ROTATION },
+        )
+    }
+}
+
+@Composable
+private fun ClassicCornerIndex(
+    rank: Rank,
+    suit: Suit,
+    suitColor: Color,
+    getFontSize: (Float) -> TextUnit,
+    modifier: Modifier = Modifier,
+) {
+    val rankSize = getFontSize(CLASSIC_INDEX_FONT_SIZE * rank.fontScale)
+    val suitSize = getFontSize(FONT_SIZE_SMALL)
+
+    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = rank.symbol,
             color = suitColor,
             style =
                 MaterialTheme.typography.labelLarge.copy(
+                    fontFamily = PokerTheme.fonts.display,
                     fontWeight = FontWeight.Bold,
-                    fontSize = getFontSize(FONT_SIZE_MEDIUM * rank.fontScale),
+                    fontSize = rankSize,
+                    lineHeight = rankSize,
+                    letterSpacing = 0.sp,
                 ),
         )
         Text(
             text = suit.symbol,
             color = suitColor,
-            style = MaterialTheme.typography.labelSmall.copy(fontSize = getFontSize(FONT_SIZE_SMALL)),
+            style = MaterialTheme.typography.labelSmall.copy(fontSize = suitSize, lineHeight = suitSize),
         )
-    }
-
-    // Center Suit
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(
-            text = suit.symbol,
-            color = suitColor.copy(alpha = VERY_LOW_ALPHA),
-            style = MaterialTheme.typography.displayLarge.copy(fontSize = getFontSize(FONT_SIZE_HUGE)),
-        )
-
-        Text(
-            text = rank.symbol,
-            color = suitColor,
-            style =
-                MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = getFontSize(FONT_SIZE_TITLE * rank.fontScale),
-                ),
-        )
-    }
-
-    // Bottom Right
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.graphicsLayer { rotationZ = FULL_ROTATION },
-        ) {
-            Text(
-                text = rank.symbol,
-                color = suitColor,
-                style =
-                    MaterialTheme.typography.labelLarge.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = getFontSize(FONT_SIZE_MEDIUM * rank.fontScale),
-                    ),
-            )
-            Text(
-                text = suit.symbol,
-                color = suitColor,
-                style = MaterialTheme.typography.labelSmall.copy(fontSize = getFontSize(FONT_SIZE_SMALL)),
-            )
-        }
     }
 }
 
@@ -702,7 +705,8 @@ internal fun MinimalCardFace(
             color = suitColor,
             style =
                 MaterialTheme.typography.displayLarge.copy(
-                    fontWeight = FontWeight.ExtraBold,
+                    fontFamily = PokerTheme.fonts.display,
+                    fontWeight = FontWeight.Bold,
                     fontSize = getFontSize(FONT_SIZE_DISPLAY * rank.fontScale),
                 ),
             modifier = Modifier.align(Alignment.Center),
@@ -743,7 +747,8 @@ internal fun TextOnlyCardFace(
             color = suitColor,
             style =
                 MaterialTheme.typography.displayLarge.copy(
-                    fontWeight = FontWeight.Black,
+                    fontFamily = PokerTheme.fonts.display,
+                    fontWeight = FontWeight.Bold,
                     fontSize = getFontSize(FONT_SIZE_HERO * rank.fontScale),
                 ),
             modifier = Modifier.align(Alignment.Center),

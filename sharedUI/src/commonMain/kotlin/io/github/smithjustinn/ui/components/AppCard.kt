@@ -12,39 +12,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import io.github.smithjustinn.theme.PokerTheme
-import io.github.smithjustinn.ui.assets.getPreferredColor
 
 @Composable
 fun AppCard(
     modifier: Modifier = Modifier,
     title: String? = null,
-    backgroundColor: Color = Color.Black.copy(alpha = 0.3f), // Recessed felt look
+    backgroundColor: Color = PokerTheme.colors.raisedSurface,
     border: BorderStroke? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = PokerTheme.colors
     val spacing = PokerTheme.spacing
     val shapes = PokerTheme.shapes
-    val cardTheme = PokerTheme.cardTheme
 
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = shapes.medium,
+        shape = shapes.large,
         color = backgroundColor,
         border =
-            border ?: BorderStroke(
-                width = 1.dp,
-                color = cardTheme.back.getPreferredColor().copy(alpha = 0.4f), // Brass-like inlay border
-            ),
+            border ?: BorderStroke(width = 1.dp, color = colors.goldenYellow.copy(alpha = CARD_BORDER_ALPHA)),
     ) {
         Column(modifier = Modifier.padding(spacing.medium)) {
             if (title != null) {
                 Text(
                     text = title.uppercase(),
-                    style = PokerTheme.typography.labelLarge,
+                    style = PokerTheme.typography.labelMedium.copy(letterSpacing = TITLE_LETTER_SPACING_EM.em),
                     color = colors.goldenYellow,
-                    fontWeight = FontWeight.ExtraBold,
+                    fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(bottom = spacing.medium),
                 )
             }
@@ -52,3 +48,6 @@ fun AppCard(
         }
     }
 }
+
+private const val CARD_BORDER_ALPHA = 0.22f
+private const val TITLE_LETTER_SPACING_EM = 0.08f

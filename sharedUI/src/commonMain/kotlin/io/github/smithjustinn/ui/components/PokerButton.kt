@@ -29,7 +29,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
@@ -51,9 +52,9 @@ private const val PULSE_ANIMATION_DURATION_MS = 1000
 private const val ICON_SIZE_DP = 20
 private const val ICON_SPACING_DP = 8
 private const val BUTTON_HEIGHT_DP = 56
-private const val PRIMARY_SHADOW_ELEVATION_DP = 8
-private const val PRIMARY_BORDER_WIDTH_DP = 2
-private const val PRIMARY_BORDER_ALPHA = 0.5f
+private const val PRIMARY_LIP_DP = 4
+private const val PRIMARY_RADIUS_DP = 14
+private const val SECONDARY_BORDER_ALPHA = 0.55f
 
 @Composable
 fun PokerButton(
@@ -63,7 +64,7 @@ fun PokerButton(
     enabled: Boolean = true,
     leadingIcon: ImageVector? = null,
     trailingIcon: ImageVector? = null,
-    containerColor: Color = PokerTheme.colors.oakWood,
+    containerColor: Color = PokerTheme.colors.raisedSurface,
     contentColor: Color = PokerTheme.colors.goldenYellow,
     isPrimary: Boolean = false,
     isPulsing: Boolean = false,
@@ -93,8 +94,9 @@ fun PokerButton(
         )
 
     val buttonColors = rememberPokerButtonColors(isPrimary, containerColor, contentColor, enabled)
-    val shadowElevation = if (isPrimary) PRIMARY_SHADOW_ELEVATION_DP.dp else PokerTheme.spacing.extraSmall
-    val border = rememberPokerButtonBorder(isPrimary)
+    val shape = PokerTheme.shapes.medium
+    val lipColor = PokerTheme.colors.goldDeep
+    val border = rememberPokerButtonBorder(isPrimary, buttonColors.content)
 
     Box(
         modifier =
@@ -104,9 +106,25 @@ fun PokerButton(
                     val scale = pulseScaleState.value * pressScaleState.value
                     scaleX = scale
                     scaleY = scale
-                }.shadow(if (enabled) shadowElevation else 0.dp, PokerTheme.shapes.medium)
-                .clip(PokerTheme.shapes.medium)
-                .then(if (border != null && enabled) Modifier.border(border, PokerTheme.shapes.medium) else Modifier)
+                }.then(
+                    if (isPrimary && enabled) {
+                        // A solid brass "lip" under the button, like the edge of a chip.
+                        Modifier
+                            .padding(bottom = PRIMARY_LIP_DP.dp)
+                            .drawBehind {
+                                val radius = CornerRadius(PRIMARY_RADIUS_DP.dp.toPx())
+                                drawRoundRect(
+                                    color = lipColor,
+                                    topLeft = Offset(0f, PRIMARY_LIP_DP.dp.toPx()),
+                                    size = size,
+                                    cornerRadius = radius,
+                                )
+                            }
+                    } else {
+                        Modifier
+                    },
+                ).clip(shape)
+                .then(if (border != null && enabled) Modifier.border(border, shape) else Modifier)
                 .background(buttonColors.container)
                 .pokerClickable(
                     enabled = enabled,
@@ -143,7 +161,7 @@ private fun rememberPokerButtonColors(
     enabled: Boolean,
 ): PokerButtonColors {
     val container = if (isPrimary) PokerTheme.colors.goldenYellow else containerColor
-    val content = if (isPrimary) PokerTheme.colors.feltGreenDark else contentColor
+    val content = if (isPrimary) PokerTheme.colors.onGold else contentColor
 
     return if (enabled) {
         PokerButtonColors(container, content)
@@ -153,11 +171,14 @@ private fun rememberPokerButtonColors(
 }
 
 @Composable
-private fun rememberPokerButtonBorder(isPrimary: Boolean): BorderStroke? =
+private fun rememberPokerButtonBorder(
+    isPrimary: Boolean,
+    contentColor: Color,
+): BorderStroke? =
     if (isPrimary) {
-        BorderStroke(PRIMARY_BORDER_WIDTH_DP.dp, PokerTheme.colors.goldenYellow.copy(alpha = PRIMARY_BORDER_ALPHA))
-    } else {
         null
+    } else {
+        BorderStroke(1.dp, contentColor.copy(alpha = SECONDARY_BORDER_ALPHA))
     }
 
 @Composable
@@ -184,7 +205,7 @@ private fun ButtonContent(
         }
 
         Text(
-            text = text.uppercase(),
+            text = text,
             style =
                 PokerTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold,

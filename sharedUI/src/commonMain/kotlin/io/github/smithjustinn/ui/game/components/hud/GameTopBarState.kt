@@ -19,6 +19,7 @@ data class GameTopBarState(
     val bankedScore: Int = 0,
     val currentPot: Int = 0,
     val isHeatMode: Boolean = false,
+    val comboMultiplier: Int = 0,
 ) {
     companion object {
         const val LOW_TIME_THRESHOLD_SEC = 10

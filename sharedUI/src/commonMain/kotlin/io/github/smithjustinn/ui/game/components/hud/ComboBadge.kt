@@ -14,33 +14,29 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Canvas
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.resources.Res
 import io.github.smithjustinn.resources.combo_badge_format
+import io.github.smithjustinn.resources.hud_combo_label
 import io.github.smithjustinn.theme.PokerTheme
 import org.jetbrains.compose.resources.stringResource
 
@@ -50,21 +46,15 @@ private const val PULSE_SCALE_HEAT = 1.15f
 private const val PULSE_SCALE_DEFAULT_COMPACT = 1.05f
 private const val PULSE_SCALE_DEFAULT = 1.1f
 
-private const val CHIP_SIZE_COMPACT = 32
-private const val CHIP_SIZE_NORMAL = 48
-private const val STACK_OFFSET_COMPACT = 2
-private const val STACK_OFFSET_NORMAL = 4
-private const val MAX_CHIPS_IN_STACK = 5
-private const val CHIP_RING_ALPHA = 0.9f
-private const val CHIP_RING_RADIUS_FACTOR = 0.85f
-private const val CHIP_RING_WIDTH_FACTOR = 0.15f
-private const val CHIP_INNER_ALPHA = 0.4f
-private const val CHIP_INNER_RADIUS_FACTOR = 0.6f
-private const val CHIP_SHADOW_ALPHA = 0.5f
-private const val CHIP_DASH_ON = 20f
-private const val CHIP_DASH_OFF = 20f
-private const val CHIP_FONT_SIZE_COMPACT = 10
-private const val CHIP_FONT_SIZE_NORMAL = 14
+private const val PILL_HEIGHT_COMPACT = 28
+private const val PILL_HEIGHT_NORMAL = 36
+private const val PILL_HORIZONTAL_PADDING = 12
+private const val PILL_BORDER_ALPHA = 0.4f
+private const val LABEL_FONT_SIZE_COMPACT = 10
+private const val LABEL_FONT_SIZE_NORMAL = 12
+private const val LABEL_TRACKING_EM = 0.06f
+private const val VALUE_FONT_SIZE_COMPACT = 14
+private const val VALUE_FONT_SIZE_NORMAL = 16
 
 @Composable
 fun ComboBadge(
@@ -134,116 +124,44 @@ private fun ComboBadgeContent(
     modifier: Modifier = Modifier,
 ) {
     val colors = PokerTheme.colors
-    val badgeColor =
-        when {
-            state.isHeatMode -> colors.tacticalRed
-            state.isMegaBonus -> colors.goldenYellow
-            else -> colors.goldenYellow
-        }
 
-    val chipSize = if (compact) CHIP_SIZE_COMPACT.dp else CHIP_SIZE_NORMAL.dp
-    val stackOffset = if (compact) STACK_OFFSET_COMPACT.dp else STACK_OFFSET_NORMAL.dp
-
-    // Show at most 5 chips in the stack, but at least 1 for the combo itself
-    val chipCount = (state.combo - 1).coerceIn(1, MAX_CHIPS_IN_STACK)
-
-    Box(
+    Row(
         modifier =
-            modifier.graphicsLayer {
-                // Bolt: Defer state read to graphicsLayer to skip recomposition on every animation frame
-                val scale = pulseScale.value * popScale.value
-                scaleX = scale
-                scaleY = scale
-            },
-        contentAlignment = Alignment.BottomCenter,
+            modifier
+                .graphicsLayer {
+                    // Bolt: Defer state read to graphicsLayer to skip recomposition on every animation frame
+                    val scale = pulseScale.value * popScale.value
+                    scaleX = scale
+                    scaleY = scale
+                }.height(if (compact) PILL_HEIGHT_COMPACT.dp else PILL_HEIGHT_NORMAL.dp)
+                .background(colors.raisedSurface, CircleShape)
+                .border(1.dp, colors.goldenYellow.copy(alpha = PILL_BORDER_ALPHA), CircleShape)
+                .padding(horizontal = PILL_HORIZONTAL_PADDING.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(PokerTheme.spacing.small),
     ) {
-        // Render the stack of chips
-        repeat(chipCount) { index ->
-            val yOffset = -stackOffset * index
-            ChipVisual(
-                color = badgeColor,
-                chipSize = chipSize,
-                modifier =
-                    Modifier
-                        .padding(bottom = yOffset.coerceAtLeast(0.dp))
-                        .shadow(
-                            elevation = (index + 1).dp,
-                            shape = CircleShape,
-                            ambientColor = Color.Black.copy(alpha = CHIP_SHADOW_ALPHA),
-                            spotColor = Color.Black.copy(alpha = CHIP_SHADOW_ALPHA),
-                        ),
-            )
-        }
-
-        // Top Chip with Text
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.padding(bottom = (stackOffset * (chipCount - 1)).coerceAtLeast(0.dp)),
-        ) {
-            ChipVisual(
-                color = badgeColor,
-                chipSize = chipSize,
-                modifier =
-                    Modifier.shadow(
-                        elevation = (chipCount + 1).dp,
-                        shape = CircleShape,
-                        ambientColor = Color.Black,
-                        spotColor = Color.Black,
-                    ),
-            )
-
-            Text(
-                text = stringResource(Res.string.combo_badge_format, state.combo),
-                style =
-                    PokerTheme.typography.labelLarge.copy(
-                        fontWeight = FontWeight.Black,
-                        fontSize = if (compact) CHIP_FONT_SIZE_COMPACT.sp else CHIP_FONT_SIZE_NORMAL.sp,
-                    ),
-                color = Color.White,
-            )
-        }
-    }
-}
-
-@Composable
-private fun ChipVisual(
-    color: Color,
-    chipSize: Dp,
-    modifier: Modifier = Modifier,
-) {
-    Canvas(modifier = modifier.size(chipSize)) {
-        val radius = size.minDimension / 2
-        val center = Offset(size.width / 2, size.height / 2)
-
-        // 1. Base Chip Color
-        drawCircle(
-            color = color,
-            center = center,
-            radius = radius,
-        )
-
-        // 2. Dashed Ring (White spots)
-        drawCircle(
-            color = Color.White.copy(alpha = CHIP_RING_ALPHA),
-            center = center,
-            radius = radius * CHIP_RING_RADIUS_FACTOR,
+        Text(
+            text = stringResource(Res.string.hud_combo_label),
             style =
-                Stroke(
-                    width = radius * CHIP_RING_WIDTH_FACTOR,
-                    pathEffect =
-                        PathEffect.dashPathEffect(
-                            intervals = floatArrayOf(CHIP_DASH_ON, CHIP_DASH_OFF),
-                            phase = 0f,
-                        ),
+                PokerTheme.typography.labelMedium.copy(
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = if (compact) LABEL_FONT_SIZE_COMPACT.sp else LABEL_FONT_SIZE_NORMAL.sp,
+                    letterSpacing = LABEL_TRACKING_EM.em,
                 ),
+            color = colors.sage,
+            maxLines = 1,
         )
 
-        // 3. Inner Circle border
-        drawCircle(
-            color = Color.White.copy(alpha = CHIP_INNER_ALPHA),
-            center = center,
-            radius = radius * CHIP_INNER_RADIUS_FACTOR,
-            style = Stroke(width = 1.dp.toPx()),
+        Text(
+            text = stringResource(Res.string.combo_badge_format, state.combo),
+            style =
+                PokerTheme.typography.labelLarge.copy(
+                    fontFamily = PokerTheme.fonts.mono,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = if (compact) VALUE_FONT_SIZE_COMPACT.sp else VALUE_FONT_SIZE_NORMAL.sp,
+                ),
+            color = colors.goldenYellow,
+            maxLines = 1,
         )
     }
 }

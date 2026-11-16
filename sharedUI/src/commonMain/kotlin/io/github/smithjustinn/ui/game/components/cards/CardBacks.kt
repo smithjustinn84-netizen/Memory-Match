@@ -10,7 +10,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -23,17 +22,21 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.domain.models.CardBackTheme
 import io.github.smithjustinn.domain.models.CardTheme
 import io.github.smithjustinn.theme.ModernGold
+import io.github.smithjustinn.theme.OxbloodBack
+import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.assets.getPreferredColor
 import io.github.smithjustinn.ui.assets.toColor
 import kotlin.math.abs
@@ -43,8 +46,24 @@ private const val SHIMMER_ANIMATION_DURATION_MS = 1500
 private const val SHIMMER_TRANSLATE_TARGET = 2000f
 private const val SHIMMER_OFFSET = 500f
 
-// Rotation angles (degrees)
-private const val DIAGONAL_ROTATION = 45f
+// Shared anatomy of every back: card-stock border, fine pattern, gold diamond emblem
+private const val HATCH_STEP_DP = 8
+private const val HATCH_ALPHA = 0.16f
+private const val HEAT_HATCH_ALPHA = 0.22f
+private const val CHECK_STEP_DP = 8
+private const val CHECK_ALPHA = 0.14f
+private const val DOT_STEP_DP = 12
+private const val DOT_RADIUS_DP = 1.5f
+private const val DOT_ALPHA = 0.7f
+private const val CELL_CENTER = 0.5f
+private const val STRIPE_WIDTH_DP = 8
+private const val STRIPE_SHADE = 0.25f
+private const val EMBLEM_WIDTH_FRACTION = 0.29f
+private const val EMBLEM_CORE_FRACTION = 0.25f
+private const val EMBLEM_STROKE_FRACTION = 0.085f
+private const val SQRT_2 = 1.4142135f
+
+private val CardBackShape = RoundedCornerShape(CARD_CORNER_RADIUS_DP.dp)
 
 object CardBacks {
     @Composable
@@ -60,8 +79,7 @@ object CardBacks {
         PreviewContainer(modifier) { GeometricCardBack(Color(0xFF1B5E20)) } // Forest Green
 
     @Composable
-    fun Classic(modifier: Modifier = Modifier) =
-        PreviewContainer(modifier) { ClassicCardBack(Color(0xFFB71C1C)) } // Deep Red
+    fun Classic(modifier: Modifier = Modifier) = PreviewContainer(modifier) { ClassicCardBack(OxbloodBack) }
 
     @Composable
     fun Pattern(modifier: Modifier = Modifier) =
@@ -97,14 +115,10 @@ object CardBacks {
             modifier =
                 modifier
                     .fillMaxSize()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color.White), // White border look
+                    .clip(CardBackShape)
+                    .background(PokerTheme.colors.cardStock),
         ) {
-            Box(
-                modifier = Modifier.padding(2.dp).fillMaxSize(),
-            ) {
-                content()
-            }
+            content()
         }
     }
 }
@@ -115,6 +129,7 @@ internal fun CardBack(
     theme: CardBackTheme,
     backColor: Color,
     rotation: State<Float>,
+    isHeatMode: Boolean = false,
 ) {
     val rimLightBrush =
         remember {
@@ -148,8 +163,8 @@ internal fun CardBack(
                 },
     ) {
         when (theme) {
-            CardBackTheme.GEOMETRIC -> GeometricCardBack(backColor)
-            CardBackTheme.CLASSIC -> ClassicCardBack(backColor)
+            CardBackTheme.GEOMETRIC -> GeometricCardBack(backColor, isHeatMode)
+            CardBackTheme.CLASSIC -> ClassicCardBack(backColor, isHeatMode)
             CardBackTheme.PATTERN -> PatternCardBack(backColor)
             CardBackTheme.POKER -> PokerCardBack(backColor)
         }
@@ -189,344 +204,232 @@ internal fun ShimmerEffect() {
     )
 }
 
+/** Colours every back shares; read once per composition so heat mode re-tints them for free. */
+private class CardBackPalette(
+    val border: Color,
+    val pattern: Color,
+    val emblem: Color,
+)
+
 @Composable
-internal fun GeometricCardBack(baseColor: Color) {
-    Spacer(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .clip(RoundedCornerShape(12.dp))
-                .drawWithCache {
-                    val patternColor = Color.White.copy(alpha = LOW_ALPHA)
-                    val borderColor = Color.White.copy(alpha = SUBTLE_ALPHA)
-                    val borderStroke = Stroke(width = 1.dp.toPx())
-                    val rectStroke = Stroke(width = 1.dp.toPx())
-
-                    val step = 16.dp.toPx()
-                    val width = size.width
-                    val height = size.height
-                    val stepInt = step.toInt()
-                    val xStart = -stepInt
-                    val xEnd = width.toInt() + stepInt
-                    val yStart = -stepInt
-                    val yEnd = height.toInt() + stepInt
-
-                    val rectSize = Size(step / HALF_DIVISOR, step / HALF_DIVISOR)
-                    val borderTopLeft = Offset(8.dp.toPx(), 8.dp.toPx())
-                    val borderSize = Size(width - 16.dp.toPx(), height - 16.dp.toPx())
-                    val cornerRadius = CornerRadius(8.dp.toPx())
-
-                    onDrawBehind {
-                        drawGeometricBackground(baseColor)
-                        drawGeometricPattern(
-                            patternColor = patternColor,
-                            rectStroke = rectStroke,
-                            rectSize = rectSize,
-                            stepInt = stepInt,
-                            xStart = xStart,
-                            xEnd = xEnd,
-                            yStart = yStart,
-                            yEnd = yEnd,
-                        )
-                        drawGeometricInnerBorder(
-                            borderColor = borderColor,
-                            borderTopLeft = borderTopLeft,
-                            borderSize = borderSize,
-                            cornerRadius = cornerRadius,
-                            borderStroke = borderStroke,
-                        )
-                    }
-                },
-    )
-}
-
-private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawGeometricBackground(baseColor: Color) {
-    drawRect(baseColor)
-}
-
-private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawGeometricPattern(
-    patternColor: Color,
-    rectStroke: Stroke,
-    rectSize: Size,
-    stepInt: Int,
-    xStart: Int,
-    xEnd: Int,
-    yStart: Int,
-    yEnd: Int,
-) {
-    for (x in xStart until xEnd step stepInt) {
-        for (y in yStart until yEnd step stepInt) {
-            rotate(DIAGONAL_ROTATION, Offset(x.toFloat(), y.toFloat())) {
-                drawRect(
-                    color = patternColor,
-                    topLeft = Offset(x.toFloat(), y.toFloat()),
-                    size = rectSize,
-                    style = rectStroke,
-                )
-            }
+private fun rememberCardBackPalette(
+    patternAlpha: Float,
+    isHeatMode: Boolean = false,
+): CardBackPalette {
+    val colors = PokerTheme.colors
+    val pattern =
+        if (isHeatMode) {
+            colors.goldenYellow.copy(alpha = HEAT_HATCH_ALPHA)
+        } else {
+            colors.cardStock.copy(alpha = patternAlpha)
         }
+    return remember(colors, pattern) {
+        CardBackPalette(border = colors.cardStock, pattern = pattern, emblem = colors.goldenYellow)
     }
 }
 
-private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawGeometricInnerBorder(
-    borderColor: Color,
-    borderTopLeft: Offset,
-    borderSize: Size,
-    cornerRadius: CornerRadius,
-    borderStroke: Stroke,
-) {
-    drawRoundRect(
-        color = borderColor,
-        topLeft = borderTopLeft,
-        size = borderSize,
-        cornerRadius = cornerRadius,
-        style = borderStroke,
+/** The small diamond-in-a-diamond mark at the centre of every back. */
+private class CardBackEmblem(
+    val outer: Path,
+    val core: Path,
+    val stroke: Stroke,
+)
+
+private fun createEmblem(size: Size): CardBackEmblem {
+    val side = size.width * EMBLEM_WIDTH_FRACTION
+    val outerRadius = side / SQRT_2
+    val coreRadius = side * EMBLEM_CORE_FRACTION / SQRT_2
+    val centerX = size.width / 2
+    val centerY = size.height / 2
+    return CardBackEmblem(
+        outer = createDiamondPath(centerX, centerY, outerRadius),
+        core = createDiamondPath(centerX, centerY, coreRadius),
+        stroke = Stroke(width = side * EMBLEM_STROKE_FRACTION),
     )
 }
 
-@Composable
-internal fun ClassicCardBack(baseColor: Color) {
-    Spacer(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .clip(RoundedCornerShape(12.dp))
-                .drawWithCache {
-                    val step = 12.dp.toPx()
-                    val color1 = Color.White.copy(alpha = VERY_LOW_ALPHA)
-                    val borderColor = Color.White
-                    val borderStroke = Stroke(width = 3.dp.toPx())
-                    val radius = 2.dp.toPx()
+private fun createDiamondPath(
+    centerX: Float,
+    centerY: Float,
+    radius: Float,
+): Path =
+    Path().apply {
+        moveTo(centerX, centerY - radius)
+        lineTo(centerX + radius, centerY)
+        lineTo(centerX, centerY + radius)
+        lineTo(centerX - radius, centerY)
+        close()
+    }
 
-                    val width = size.width
-                    val height = size.height
-                    val xEnd = (width / step).toInt() + 1
-                    val yEnd = (height / step).toInt() + 1
-
-                    val borderTopLeft = Offset(4.dp.toPx(), 4.dp.toPx())
-                    val borderSize = Size(width - 8.dp.toPx(), height - 8.dp.toPx())
-                    val cornerRadius = CornerRadius(6.dp.toPx())
-
-                    onDrawBehind {
-                        drawRect(baseColor)
-
-                        for (x in 0 until xEnd) {
-                            for (y in 0 until yEnd) {
-                                if ((x + y) % HALF_DIVISOR == 0) {
-                                    drawCircle(
-                                        color = color1,
-                                        radius = radius,
-                                        center = Offset(x * step, y * step),
-                                    )
-                                }
-                            }
-                        }
-
-                        drawRoundRect(
-                            color = borderColor,
-                            topLeft = borderTopLeft,
-                            size = borderSize,
-                            cornerRadius = cornerRadius,
-                            style = borderStroke,
-                        )
-                    }
-                },
-    )
-}
-
-@Composable
-internal fun PatternCardBack(baseColor: Color) {
-    Spacer(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .clip(RoundedCornerShape(12.dp))
-                .drawWithCache {
-                    val step = 20.dp.toPx()
-                    val width = size.width
-                    val height = size.height
-
-                    val path = createPatternPath(width, height, step)
-
-                    val patternColor = Color.White.copy(alpha = LOW_ALPHA)
-                    val strokeWidth = 2.dp.toPx()
-                    val borderColor = Color.White.copy(alpha = MEDIUM_ALPHA)
-                    val borderStrokeWidth = 1.5.dp.toPx()
-                    val borderOffset = 6.dp.toPx()
-                    val cornerRadius = 6.dp.toPx()
-
-                    onDrawBehind {
-                        drawRect(baseColor)
-                        drawPatternLines(path, patternColor, strokeWidth)
-                        drawPatternBorder(borderColor, borderOffset, cornerRadius, borderStrokeWidth)
-                    }
-                },
-    )
-}
-
-private fun createPatternPath(
-    width: Float,
-    height: Float,
+/**
+ * Parallel 45-degree lines [step] apart (measured across the lines), in one or both directions.
+ */
+private fun createDiagonalPath(
+    size: Size,
     step: Float,
+    crossed: Boolean,
 ): Path {
     val path = Path()
-    for (y in -1 until (height / step).toInt() + 2) {
-        val yPos = y * step
-        path.moveTo(0f, yPos)
-
-        for (x in 0 until (width / step).toInt() + 1) {
-            val xPos = x * step
-            path.quadraticTo(
-                xPos + step / 2,
-                yPos + if (x % HALF_DIVISOR == 0) step / HALF_DIVISOR else -step / HALF_DIVISOR,
-                xPos + step,
-                yPos,
-            )
+    val axisStep = step * SQRT_2
+    val count = ((size.width + size.height) / axisStep).toInt() + 1
+    for (i in 0..count) {
+        val offset = i * axisStep
+        path.moveTo(offset, 0f)
+        path.lineTo(offset - size.height, size.height)
+        if (crossed) {
+            path.moveTo(offset - size.height, 0f)
+            path.lineTo(offset, size.height)
         }
     }
     return path
 }
 
-private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawPatternLines(
-    path: Path,
-    patternColor: Color,
-    strokeWidth: Float,
+/** Emblem and card-stock border, drawn over the pattern. The clip trims the border's outer half. */
+private fun DrawScope.drawBackFrame(
+    palette: CardBackPalette,
+    emblem: CardBackEmblem,
+    coreColor: Color,
 ) {
-    drawPath(
-        path = path,
-        color = patternColor,
-        style = Stroke(width = strokeWidth),
-    )
-}
+    drawPath(emblem.outer, color = coreColor)
+    drawPath(emblem.outer, color = palette.emblem, style = emblem.stroke)
+    drawPath(emblem.core, color = palette.emblem)
 
-private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawPatternBorder(
-    borderColor: Color,
-    borderOffset: Float,
-    cornerRadius: Float,
-    borderStrokeWidth: Float,
-) {
     drawRoundRect(
-        color = borderColor,
-        topLeft = Offset(borderOffset, borderOffset),
-        size = Size(size.width - borderOffset * 2, size.height - borderOffset * 2),
-        cornerRadius = CornerRadius(cornerRadius),
-        style = Stroke(width = borderStrokeWidth),
+        color = palette.border,
+        cornerRadius = CornerRadius(CARD_CORNER_RADIUS_DP.dp.toPx()),
+        style = Stroke(width = CARD_BORDER_WIDTH_DP.dp.toPx() * 2),
     )
 }
 
+/** Classic: fine cross-hatch. The default back, and the one the heat deck uses. */
 @Composable
-internal fun PokerCardBack(baseColor: Color) {
+internal fun ClassicCardBack(
+    baseColor: Color,
+    isHeatMode: Boolean = false,
+) {
+    val palette = rememberCardBackPalette(HATCH_ALPHA, isHeatMode)
     Spacer(
         modifier =
             Modifier
                 .fillMaxSize()
-                .clip(RoundedCornerShape(12.dp))
+                .clip(CardBackShape)
                 .drawWithCache {
-                    val width = size.width
-                    val height = size.height
-
-                    val borderSize = 4.dp.toPx()
-                    val innerWidth = width - borderSize * 2
-                    val innerHeight = height - borderSize * 2
-                    val step = 10.dp.toPx()
-                    val strokeWidth = 1.dp.toPx()
-                    val cornerRadius = CornerRadius(8.dp.toPx())
-
-                    val centerX = width / 2
-                    val centerY = height / 2
-
-                    val gridPath = createPokerGridPath(innerWidth, innerHeight, step, borderSize)
-                    val diamondPath = createPokerDiamondPath(centerX, centerY, 20.dp.toPx(), 15.dp.toPx())
-
-                    val patternColor = Color.Black.copy(alpha = 0.15f)
-                    val emblemColor1 = Color.White.copy(alpha = 0.2f)
-                    val emblemColor2 = Color.White.copy(alpha = 0.5f)
-                    val gridStroke = Stroke(width = strokeWidth)
-                    val emblemStroke = Stroke(width = 2.dp.toPx())
+                    val hatch = createDiagonalPath(size, HATCH_STEP_DP.dp.toPx(), crossed = true)
+                    val hatchStroke = Stroke(width = 1.dp.toPx())
+                    val emblem = createEmblem(size)
 
                     onDrawBehind {
-                        drawPokerBackground(baseColor, borderSize, innerWidth, innerHeight, cornerRadius)
-                        drawPokerGrid(gridPath, patternColor, gridStroke)
-                        drawPokerEmblem(diamondPath, emblemColor1, emblemColor2, emblemStroke)
+                        drawRect(baseColor)
+                        drawPath(hatch, color = palette.pattern, style = hatchStroke)
+                        drawBackFrame(palette, emblem, coreColor = baseColor)
                     }
                 },
     )
 }
 
-private fun createPokerGridPath(
-    innerWidth: Float,
-    innerHeight: Float,
-    step: Float,
-    borderSize: Float,
-): Path {
-    val gridPath = Path()
-    val count = ((innerWidth + innerHeight) / step).toInt()
-
-    for (i in 0 until count) {
-        val offset = i * step
-        // Diagonal /
-        gridPath.moveTo(borderSize + offset, borderSize)
-        gridPath.lineTo(borderSize, borderSize + offset)
-
-        // Diagonal \
-        gridPath.moveTo(borderSize, innerHeight + borderSize - offset)
-        gridPath.lineTo(borderSize + offset, innerHeight + borderSize)
-    }
-    return gridPath
-}
-
-private fun createPokerDiamondPath(
-    centerX: Float,
-    centerY: Float,
-    verticalRadius: Float,
-    horizontalRadius: Float,
-): Path =
-    Path().apply {
-        moveTo(centerX, centerY - verticalRadius)
-        lineTo(centerX + horizontalRadius, centerY)
-        lineTo(centerX, centerY + verticalRadius)
-        lineTo(centerX - horizontalRadius, centerY)
-        close()
-    }
-
-private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawPokerBackground(
+/** Geometric: a soft checkerboard. */
+@Composable
+internal fun GeometricCardBack(
     baseColor: Color,
-    borderSize: Float,
-    innerWidth: Float,
-    innerHeight: Float,
-    cornerRadius: CornerRadius,
+    isHeatMode: Boolean = false,
 ) {
-    // White Border usually
-    drawRect(Color.White)
+    val palette = rememberCardBackPalette(CHECK_ALPHA, isHeatMode)
+    Spacer(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .clip(CardBackShape)
+                .drawWithCache {
+                    val checks = createCheckPath(size, CHECK_STEP_DP.dp.toPx())
+                    val emblem = createEmblem(size)
 
-    // Inner Color Area
-    drawRoundRect(
-        color = baseColor,
-        topLeft = Offset(borderSize, borderSize),
-        size = Size(innerWidth, innerHeight),
-        cornerRadius = cornerRadius,
+                    onDrawBehind {
+                        drawRect(baseColor)
+                        drawPath(checks, color = palette.pattern)
+                        drawBackFrame(palette, emblem, coreColor = baseColor)
+                    }
+                },
     )
 }
 
-private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawPokerGrid(
-    gridPath: Path,
-    patternColor: Color,
-    gridStroke: Stroke,
-) {
-    drawPath(
-        path = gridPath,
-        color = patternColor,
-        style = gridStroke,
+private fun createCheckPath(
+    size: Size,
+    step: Float,
+): Path {
+    val path = Path()
+    val columns = (size.width / step).toInt() + 1
+    val rows = (size.height / step).toInt() + 1
+    for (x in 0 until columns) {
+        for (y in 0 until rows) {
+            if ((x + y) % HALF_DIVISOR == 0) {
+                path.addRect(Rect(offset = Offset(x * step, y * step), size = Size(step, step)))
+            }
+        }
+    }
+    return path
+}
+
+/** Pattern: a grid of small gold dots. */
+@Composable
+internal fun PatternCardBack(baseColor: Color) {
+    val palette = rememberCardBackPalette(patternAlpha = 0f)
+    Spacer(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .clip(CardBackShape)
+                .drawWithCache {
+                    val dots = createDotPath(size, DOT_STEP_DP.dp.toPx(), DOT_RADIUS_DP.dp.toPx())
+                    val dotColor = palette.emblem.copy(alpha = DOT_ALPHA)
+                    val emblem = createEmblem(size)
+
+                    onDrawBehind {
+                        drawRect(baseColor)
+                        drawPath(dots, color = dotColor)
+                        drawBackFrame(palette, emblem, coreColor = baseColor)
+                    }
+                },
     )
 }
 
-private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawPokerEmblem(
-    diamondPath: Path,
-    emblemColor1: Color,
-    emblemColor2: Color,
-    emblemStroke: Stroke,
-) {
-    // Large Center Emblem (Diamond)
-    drawPath(diamondPath, emblemColor1)
-    drawPath(diamondPath, color = emblemColor2, style = emblemStroke)
+private fun createDotPath(
+    size: Size,
+    step: Float,
+    radius: Float,
+): Path {
+    val path = Path()
+    val columns = (size.width / step).toInt() + 1
+    val rows = (size.height / step).toInt() + 1
+    for (x in 0 until columns) {
+        for (y in 0 until rows) {
+            val center = Offset((x + CELL_CENTER) * step, (y + CELL_CENTER) * step)
+            path.addOval(Rect(center = center, radius = radius))
+        }
+    }
+    return path
+}
+
+/** Poker: bold diagonal stripes in two shades of the back colour. */
+@Composable
+internal fun PokerCardBack(baseColor: Color) {
+    val palette = rememberCardBackPalette(patternAlpha = 0f)
+    Spacer(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .clip(CardBackShape)
+                .drawWithCache {
+                    val stripeWidth = STRIPE_WIDTH_DP.dp.toPx()
+                    val stripes = createDiagonalPath(size, stripeWidth * 2, crossed = false)
+                    val stripeStroke = Stroke(width = stripeWidth)
+                    val shade = lerp(baseColor, Color.Black, STRIPE_SHADE)
+                    val emblem = createEmblem(size)
+
+                    onDrawBehind {
+                        drawRect(baseColor)
+                        drawPath(stripes, color = shade, style = stripeStroke)
+                        drawBackFrame(palette, emblem, coreColor = shade)
+                    }
+                },
+    )
 }

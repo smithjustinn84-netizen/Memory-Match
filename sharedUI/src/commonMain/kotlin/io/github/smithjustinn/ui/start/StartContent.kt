@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,8 +29,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -53,12 +50,10 @@ import io.github.smithjustinn.resources.wallet_label
 import io.github.smithjustinn.services.AudioService
 import io.github.smithjustinn.services.HapticFeedbackType
 import io.github.smithjustinn.theme.PokerTheme
-import io.github.smithjustinn.ui.components.AppCard
 import io.github.smithjustinn.ui.components.AppIcons
 import io.github.smithjustinn.ui.components.AuroraEffect
 import io.github.smithjustinn.ui.components.ShopIcons
 import io.github.smithjustinn.ui.components.pokerBackground
-import io.github.smithjustinn.ui.components.rememberGlimmerBrush
 import io.github.smithjustinn.ui.start.components.DifficultySelectionSection
 import io.github.smithjustinn.ui.start.components.StartHeader
 import kotlinx.coroutines.coroutineScope
@@ -125,13 +120,15 @@ fun StartContent(
     }
 }
 
-private const val MEDALLION_SIZE_DP = 48
-private const val MEDALLION_ICON_SIZE_DP = 24
+private const val MEDALLION_SIZE_DP = 44
+private const val MEDALLION_ICON_SIZE_DP = 22
 private const val MEDALLION_BORDER_WIDTH_DP = 1
-private const val MEDALLION_BORDER_ALPHA = 0.5f
-private const val MEDALLION_BG_ALPHA = 0.4f
+private const val MEDALLION_BORDER_ALPHA = 0.35f
+private const val MEDALLION_BG_ALPHA = 0.55f
+private const val PILL_START_PADDING_DP = 12
+private const val PILL_ICON_SIZE_DP = 20
 private const val START_HEADER_SPACER_HEIGHT_DP = 64
-private const val DEALER_TRAY_MAX_WIDTH_DP = 600
+private const val CONTENT_MAX_WIDTH_DP = 520
 private const val MAIN_CONTENT_BOTTOM_SPACER_WEIGHT = 0.5f
 private const val HEADER_ANIMATION_DURATION = 800
 private const val CONTENT_ANIMATION_DURATION = 600
@@ -212,13 +209,7 @@ private fun StartTopActions(
                     .align(Alignment.TopStart)
                     .padding(spacing.medium),
         ) {
-            MedallionIcon(
-                icon = ShopIcons.ShoppingCart,
-                onClick = onShopClick,
-                applyGlimmer = true,
-                tint = PokerTheme.colors.goldenYellow,
-                contentDescription = stringResource(Res.string.shop_title),
-            )
+            ShopPill(onClick = onShopClick)
 
             WalletBadge(
                 amount = totalBalance,
@@ -237,20 +228,16 @@ private fun StartTopActions(
             MedallionIcon(
                 icon = AppIcons.Trophy,
                 onClick = onStatsClick,
-                applyGlimmer = true,
-                tint = PokerTheme.colors.silver,
                 contentDescription = stringResource(Res.string.stats),
             )
             MedallionIcon(
                 icon = AppIcons.Settings,
                 onClick = onSettingsClick,
-                applyGlimmer = true,
                 contentDescription = stringResource(Res.string.settings),
             )
             MedallionIcon(
                 icon = AppIcons.VisibilityOff,
                 onClick = onDebugClick,
-                applyGlimmer = false,
                 tint = Color.Red,
                 contentDescription = stringResource(Res.string.debug),
             )
@@ -290,18 +277,14 @@ private fun StartMainContent(
 
         Spacer(modifier = Modifier.weight(MAIN_CONTENT_BOTTOM_SPACER_WEIGHT))
 
-        // Dealer's Tray Container
-        AppCard(
-            modifier = Modifier.widthIn(max = DEALER_TRAY_MAX_WIDTH_DP.dp),
-        ) {
-            DifficultySelectionSection(
-                state = state,
-                onDifficultySelected = onDifficultySelected,
-                onModeSelected = onModeSelected,
-                onStartGame = onStartGame,
-                onResumeGame = onResumeGame,
-            )
-        }
+        DifficultySelectionSection(
+            state = state,
+            onDifficultySelected = onDifficultySelected,
+            onModeSelected = onModeSelected,
+            onStartGame = onStartGame,
+            onResumeGame = onResumeGame,
+            modifier = Modifier.widthIn(max = CONTENT_MAX_WIDTH_DP.dp),
+        )
 
         Spacer(modifier = Modifier.height(spacing.medium))
 
@@ -316,14 +299,10 @@ private fun MedallionIcon(
     icon: ImageVector,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    backgroundColor: Color = Color.Black.copy(alpha = MEDALLION_BG_ALPHA),
     tint: Color = PokerTheme.colors.goldenYellow,
-    applyGlimmer: Boolean = false,
     contentDescription: String? = null,
 ) {
-    val colors = PokerTheme.colors
     val hapticsService = LocalAppGraph.current.hapticsService
-    val glimmerBrush = if (applyGlimmer) rememberGlimmerBrush() else null
 
     Surface(
         onClick = {
@@ -331,12 +310,8 @@ private fun MedallionIcon(
             onClick()
         },
         shape = CircleShape,
-        color = backgroundColor,
-        border =
-            BorderStroke(
-                MEDALLION_BORDER_WIDTH_DP.dp,
-                colors.goldenYellow.copy(alpha = MEDALLION_BORDER_ALPHA),
-            ),
+        color = PokerTheme.colors.oakWood.copy(alpha = MEDALLION_BG_ALPHA),
+        border = medallionBorder(),
         modifier =
             modifier
                 .size(MEDALLION_SIZE_DP.dp)
@@ -351,24 +326,52 @@ private fun MedallionIcon(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = if (applyGlimmer) Color.White else tint,
-                modifier =
-                    Modifier
-                        .size(MEDALLION_ICON_SIZE_DP.dp)
-                        .then(
-                            if (applyGlimmer && glimmerBrush != null) {
-                                Modifier
-                                    .graphicsLayer(alpha = 0.99f)
-                                    .drawWithCache {
-                                        onDrawWithContent {
-                                            drawContent()
-                                            drawRect(brush = glimmerBrush, blendMode = BlendMode.SrcIn)
-                                        }
-                                    }
-                            } else {
-                                Modifier
-                            },
-                        ),
+                tint = tint,
+                modifier = Modifier.size(MEDALLION_ICON_SIZE_DP.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun medallionBorder(): BorderStroke =
+    BorderStroke(
+        MEDALLION_BORDER_WIDTH_DP.dp,
+        PokerTheme.colors.goldenYellow.copy(alpha = MEDALLION_BORDER_ALPHA),
+    )
+
+@Composable
+private fun ShopPill(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val hapticsService = LocalAppGraph.current.hapticsService
+
+    Surface(
+        onClick = {
+            hapticsService.performHapticFeedback(HapticFeedbackType.LIGHT)
+            onClick()
+        },
+        shape = CircleShape,
+        color = PokerTheme.colors.oakWood.copy(alpha = MEDALLION_BG_ALPHA),
+        border = medallionBorder(),
+        modifier = modifier.height(MEDALLION_SIZE_DP.dp).semantics { role = Role.Button },
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(PokerTheme.spacing.small),
+            modifier = Modifier.padding(start = PILL_START_PADDING_DP.dp, end = PokerTheme.spacing.medium),
+        ) {
+            Icon(
+                imageVector = ShopIcons.ShoppingCart,
+                contentDescription = null,
+                tint = PokerTheme.colors.goldenYellow,
+                modifier = Modifier.size(PILL_ICON_SIZE_DP.dp),
+            )
+            Text(
+                text = stringResource(Res.string.shop_title),
+                style = PokerTheme.typography.labelLarge,
+                color = PokerTheme.colors.goldenYellow,
             )
         }
     }
@@ -384,12 +387,8 @@ private fun WalletBadge(
 
     Surface(
         shape = CircleShape,
-        color = Color.Black.copy(alpha = MEDALLION_BG_ALPHA),
-        border =
-            BorderStroke(
-                MEDALLION_BORDER_WIDTH_DP.dp,
-                PokerTheme.colors.goldenYellow.copy(alpha = MEDALLION_BORDER_ALPHA),
-            ),
+        color = PokerTheme.colors.oakWood.copy(alpha = MEDALLION_BG_ALPHA),
+        border = medallionBorder(),
         modifier =
             modifier
                 .height(MEDALLION_SIZE_DP.dp)
@@ -400,18 +399,18 @@ private fun WalletBadge(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(PokerTheme.spacing.small),
-            modifier = Modifier.padding(horizontal = PokerTheme.spacing.medium),
+            modifier = Modifier.padding(start = PILL_START_PADDING_DP.dp, end = PokerTheme.spacing.medium),
         ) {
             Icon(
                 imageVector = ShopIcons.CasinoChip,
                 contentDescription = null,
                 tint = PokerTheme.colors.goldenYellow,
-                modifier = Modifier.size(MEDALLION_ICON_SIZE_DP.dp),
+                modifier = Modifier.size(PILL_ICON_SIZE_DP.dp),
             )
 
             Text(
                 text = formattedAmount,
-                style = MaterialTheme.typography.titleMedium,
+                style = PokerTheme.typography.labelLarge.copy(fontFamily = PokerTheme.fonts.mono),
                 color = PokerTheme.colors.goldenYellow,
             )
         }

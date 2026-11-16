@@ -1,90 +1,84 @@
 package io.github.smithjustinn.ui.game.components.hud
 
-import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.theme.PokerTheme
 
-private const val GLASS_STROKE_WIDTH_DP = 1f
+private const val PANEL_BORDER_ALPHA = 0.22f
+private const val PANEL_BORDER_ALPHA_HEAT = 0.32f
+private const val STAT_LABEL_FONT_SIZE_SP = 11
+private const val STAT_LABEL_TRACKING_EM = 0.08f
+private const val STAT_NUMERAL_FONT_SIZE_SP = 22
+private const val STAT_NUMERAL_FONT_SIZE_DENSE_SP = 20
+private const val STAT_NUMERAL_LINE_HEIGHT_SP = 26
 
+/**
+ * The rounded glass panel shared by the game HUD: the top bar and the bottom progress panel.
+ * Outer margins are the caller's job; the panel only draws itself and pads its content.
+ */
 @Composable
 fun GlassDashboard(
     modifier: Modifier = Modifier,
     isHeatMode: Boolean = false,
     content: @Composable () -> Unit,
 ) {
-    val spacing = PokerTheme.spacing
+    val colors = PokerTheme.colors
+    val shape = PokerTheme.shapes.large
+    val borderAlpha = if (isHeatMode) PANEL_BORDER_ALPHA_HEAT else PANEL_BORDER_ALPHA
 
     Box(
         modifier =
             modifier
                 .fillMaxWidth()
-                .padding(vertical = spacing.small),
+                .background(colors.hudBackground, shape)
+                .border(1.dp, colors.goldenYellow.copy(alpha = borderAlpha), shape)
+                .padding(PokerTheme.spacing.small),
     ) {
-        // Glass Background with Border
-        GlassBackground(
-            isHeatMode = isHeatMode,
-            modifier = Modifier.matchParentSize(),
-        )
-
-        // Content Container
-        Box(modifier = Modifier.padding(spacing.small)) {
-            content()
-        }
+        content()
     }
 }
 
+/** Small uppercase caption above a HUD numeral ("TIME", "POT"). */
 @Composable
-private fun GlassBackground(
-    isHeatMode: Boolean,
+internal fun HudStatLabel(
+    text: String,
     modifier: Modifier = Modifier,
+    color: Color = PokerTheme.colors.sage,
 ) {
-    val colors = PokerTheme.colors
-    Canvas(modifier = modifier) {
-        val strokeWidth = GLASS_STROKE_WIDTH_DP.dp.toPx()
-
-        // 1. Semi-transparent dark background
-        drawRect(
-            color = colors.hudBackground,
-            size = size,
-        )
-
-        // 2. Glass Border Gradient (Top-Left White -> Bottom-Right Transparent)
-        drawRect(
-            brush =
-                Brush.linearGradient(
-                    colors =
-                        listOf(
-                            // Highlight (boosted slightly from base 10% for visibility)
-                            colors.glassWhite.copy(alpha = 0.4f),
-                            colors.glassWhite.copy(alpha = 0.05f), // Shadow
-                        ),
-                    start = Offset(0f, 0f),
-                    end = Offset(size.width, size.height),
-                ),
-            style = Stroke(width = strokeWidth),
-        )
-
-        // 3. Heat Mode Glow Overlay
-        if (isHeatMode) {
-            drawRect(
-                brush =
-                    Brush.verticalGradient(
-                        colors =
-                            listOf(
-                                colors.tacticalRed.copy(alpha = 0.2f),
-                                Color.Transparent,
-                            ),
-                    ),
-            )
-        }
-    }
+    Text(
+        text = text,
+        modifier = modifier,
+        color = color,
+        maxLines = 1,
+        softWrap = false,
+        style =
+            PokerTheme.typography.labelSmall.copy(
+                fontSize = STAT_LABEL_FONT_SIZE_SP.sp,
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = STAT_LABEL_TRACKING_EM.em,
+            ),
+    )
 }
+
+/** Mono numeral style for HUD stats; [dense] is for the three-stat heat row and compact layouts. */
+@Composable
+internal fun hudNumeralStyle(dense: Boolean = false): TextStyle =
+    PokerTheme.typography.titleLarge.copy(
+        fontFamily = PokerTheme.fonts.mono,
+        fontWeight = FontWeight.Bold,
+        fontSize = (if (dense) STAT_NUMERAL_FONT_SIZE_DENSE_SP else STAT_NUMERAL_FONT_SIZE_SP).sp,
+        lineHeight = STAT_NUMERAL_LINE_HEIGHT_SP.sp,
+        letterSpacing = 0.sp,
+    )

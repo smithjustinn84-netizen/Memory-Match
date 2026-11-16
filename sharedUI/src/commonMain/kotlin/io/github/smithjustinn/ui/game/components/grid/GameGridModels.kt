@@ -37,6 +37,7 @@ internal data class GridSettings(
     val areSuitsMultiColored: Boolean = false,
     val isThirdEyeEnabled: Boolean = false,
     val showComboExplosion: Boolean = false,
+    val isHeatMode: Boolean = false,
 )
 
 internal data class GridScreenConfig(

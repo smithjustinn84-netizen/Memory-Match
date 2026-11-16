@@ -23,7 +23,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
@@ -40,7 +39,7 @@ import io.github.smithjustinn.theme.PokerTheme
 private const val ELEVATION_PRESSED = 2
 private const val ELEVATION_SELECTED = 12
 private const val ELEVATION_DEFAULT = 4
-private const val GLOW_ALPHA_SELECTED = 0.5f
+private const val GLOW_ALPHA_SELECTED = 0f
 private const val GLOW_RADIUS_FACTOR = 0.8f
 
 @Composable
@@ -50,7 +49,7 @@ fun PokerChip(
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    chipSize: Dp = 64.dp,
+    chipSize: Dp = 60.dp,
     contentDescription: String? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -58,7 +57,6 @@ fun PokerChip(
     val elevation = chipAnimations.elevation
     val scale = chipAnimations.scale
     val glowAlpha = chipAnimations.glowAlpha
-    val glimmerBrush = if (isSelected) rememberGlimmerBrush() else null
 
     val glowColor = PokerTheme.colors.goldenYellow
 
@@ -77,7 +75,6 @@ fun PokerChip(
             contentColor = contentColor,
             text = text,
             isSelected = isSelected,
-            glimmerBrush = glimmerBrush,
             contentDescription = contentDescription,
         )
     }
@@ -95,7 +92,6 @@ private fun PokerChipContent(
     contentColor: Color,
     text: String,
     isSelected: Boolean,
-    glimmerBrush: Brush?,
     contentDescription: String?,
 ) {
     val hapticsService = LocalAppGraph.current.hapticsService
@@ -141,41 +137,25 @@ private fun PokerChipContent(
             modifier = Modifier.matchParentSize(),
         )
 
-        ChipValueText(
-            text = text,
-            isSelected = isSelected,
-            glimmerBrush = glimmerBrush,
-        )
+        ChipValueText(text = text)
     }
 }
 
 @Composable
-private fun ChipValueText(
-    text: String,
-    isSelected: Boolean,
-    glimmerBrush: Brush?,
-) {
+private fun ChipValueText(text: String) {
     Text(
         text = text,
         style =
             PokerTheme.typography.titleMedium.copy(
-                fontSize = if (isSelected) 20.sp else 16.sp,
-                fontWeight = FontWeight.Black,
-                shadow =
-                    if (glimmerBrush == null) {
-                        Shadow(
-                            color = Color.Black.copy(alpha = 0.5f),
-                            offset = Offset(1f, 1f),
-                            blurRadius = 2f,
-                        )
-                    } else {
-                        null
-                    },
-                brush = glimmerBrush,
+                fontFamily = PokerTheme.fonts.mono,
+                fontSize = CHIP_VALUE_FONT_SP.sp,
+                fontWeight = FontWeight.Bold,
             ),
-        color = Color.White,
+        color = PokerTheme.colors.cardStock,
     )
 }
+
+private const val CHIP_VALUE_FONT_SP = 17
 
 @Composable
 private fun rememberPokerChipAnimations(
@@ -220,49 +200,50 @@ private fun ChipFace(
     contentColor: Color,
     modifier: Modifier = Modifier,
 ) {
+    val stock = PokerTheme.colors.cardStock
     Canvas(modifier = modifier) {
         val radius = size.minDimension / 2
         val center = Offset(size.width / 2, size.height / 2)
 
-        // 1. Base Chip Color
-        drawCircle(
-            color = contentColor,
-            center = center,
-            radius = radius,
-        )
+        // 1. Striped edge: alternating card-stock and chip-colour wedges
+        drawCircle(color = contentColor, center = center, radius = radius)
+        val sweep = FULL_CIRCLE_DEGREES / EDGE_WEDGE_COUNT
+        repeat(EDGE_WEDGE_COUNT / 2) { index ->
+            drawArc(
+                color = stock,
+                startAngle = EDGE_START_DEGREES + index * sweep * 2,
+                sweepAngle = sweep,
+                useCenter = true,
+            )
+        }
 
-        // 2. Dashed Ring (White spots)
+        // 2. Inner disc
+        val innerRadius = radius * INNER_DISC_RADIUS_FACTOR
+        drawCircle(color = contentColor, center = center, radius = innerRadius)
+
+        // 3. Dashed inlay ring
+        val dash = INLAY_DASH_DP.dp.toPx()
         drawCircle(
-            color = Color.White,
+            color = stock.copy(alpha = INLAY_ALPHA),
             center = center,
-            radius = radius * DASH_RING_RADIUS_FACTOR,
+            radius = innerRadius - INLAY_INSET_DP.dp.toPx(),
             style =
                 Stroke(
-                    width = radius * DASH_RING_WIDTH_FACTOR,
-                    pathEffect =
-                        PathEffect.dashPathEffect(
-                            intervals = floatArrayOf(DASH_INTERVAL_ON, DASH_INTERVAL_OFF),
-                            phase = 0f,
-                        ),
+                    width = INLAY_WIDTH_DP.dp.toPx(),
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(dash, dash), 0f),
                 ),
-        )
-
-        // 3. Inner Circle border
-        drawCircle(
-            color = Color.White.copy(alpha = INNER_BORDER_ALPHA),
-            center = center,
-            radius = radius * INNER_BORDER_RADIUS_FACTOR,
-            style = Stroke(width = 2.dp.toPx()),
         )
     }
 }
 
-private const val DASH_RING_RADIUS_FACTOR = 0.85f
-private const val DASH_RING_WIDTH_FACTOR = 0.15f
-private const val DASH_INTERVAL_ON = 20f
-private const val DASH_INTERVAL_OFF = 20f
-private const val INNER_BORDER_RADIUS_FACTOR = 0.6f
-private const val INNER_BORDER_ALPHA = 0.8f
+private const val FULL_CIRCLE_DEGREES = 360f
+private const val EDGE_WEDGE_COUNT = 16
+private const val EDGE_START_DEGREES = -101.25f
+private const val INNER_DISC_RADIUS_FACTOR = 0.74f
+private const val INLAY_DASH_DP = 3f
+private const val INLAY_INSET_DP = 1.5f
+private const val INLAY_WIDTH_DP = 1.5f
+private const val INLAY_ALPHA = 0.7f
 
-private const val SCALE_SELECTED = 1.1f
+private const val SCALE_SELECTED = 1.0f
 private const val SCALE_DEFAULT = 1.0f

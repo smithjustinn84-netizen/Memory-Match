@@ -2,18 +2,17 @@ package io.github.smithjustinn.ui.stats.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.resources.Res
 import io.github.smithjustinn.resources.game_mode
 import io.github.smithjustinn.resources.mode_daily_challenge_caps
 import io.github.smithjustinn.resources.mode_time_attack_caps
+import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.components.PillSegmentedControl
 import org.jetbrains.compose.resources.stringResource
 
@@ -27,13 +26,12 @@ fun ModeSelector(
 
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(LABEL_GAP_DP.dp),
     ) {
         Text(
-            text = stringResource(Res.string.game_mode),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
+            text = stringResource(Res.string.game_mode).uppercase(),
+            style = PokerTheme.typography.labelMedium.copy(letterSpacing = LABEL_LETTER_SPACING_EM.em),
+            color = PokerTheme.colors.sage,
         )
 
         PillSegmentedControl(
@@ -49,3 +47,6 @@ fun ModeSelector(
         )
     }
 }
+
+private const val LABEL_GAP_DP = 12
+private const val LABEL_LETTER_SPACING_EM = 0.08f

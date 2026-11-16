@@ -3,29 +3,21 @@ package io.github.smithjustinn.ui.game.components.hud
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,23 +25,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import io.github.smithjustinn.di.LocalAppGraph
 import io.github.smithjustinn.domain.models.GameMode
 import io.github.smithjustinn.domain.models.ScoreBreakdown
 import io.github.smithjustinn.resources.Res
 import io.github.smithjustinn.resources.best_score_label
 import io.github.smithjustinn.resources.busted
+import io.github.smithjustinn.resources.buy_in_back_to_lobby
 import io.github.smithjustinn.resources.casino_header_title
 import io.github.smithjustinn.resources.clean_number_format
 import io.github.smithjustinn.resources.double_rewards
@@ -69,28 +62,33 @@ import io.github.smithjustinn.resources.share_receipt
 import io.github.smithjustinn.resources.time_label
 import io.github.smithjustinn.resources.times_up
 import io.github.smithjustinn.resources.total_payout
-import io.github.smithjustinn.services.HapticFeedbackType
 import io.github.smithjustinn.theme.PokerTheme
-import io.github.smithjustinn.ui.components.ShopIcons
+import io.github.smithjustinn.ui.components.AppIcons
+import io.github.smithjustinn.ui.components.PokerButton
+import io.github.smithjustinn.ui.extensions.pokerClickable
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
-import kotlin.random.Random
 
 private const val INITIAL_SCALE = 0.8f
-
-// Receipt Colors
-private val ReceiptPaperColor = Color(0xFFFDFBF7)
-private val ReceiptInkColor = Color(0xFF2B2B2B)
-private val ReceiptAccentColor = Color(0xFF8B0000) // Dark Red for key elements
-
 private const val COMPACT_HEIGHT_THRESHOLD_DP = 450
-private const val BARCODE_BAR_COUNT = 40
-private const val BARCODE_THICKNESS_MODULO = 3
-private const val BARCODE_THICKNESS_FACTOR_1 = 2
-private const val BARCODE_THICKNESS_FACTOR_2 = 2
-private const val BARCODE_SPACING_FACTOR = 2.5f
-private const val BARCODE_WIDTH_FRACTION = 0.8f
+
+private const val RECEIPT_MAX_WIDTH_DP = 400
+private const val RECEIPT_TILT_DEGREES = -1f
+private const val RECEIPT_CORNER_DP = 6
+private const val RECEIPT_ELEVATION_DP = 18
+private const val RECEIPT_TOP_PADDING_DP = 28
+private const val RECEIPT_SECTION_GAP_DP = 20
+private const val RECEIPT_ROW_GAP_DP = 12
+private const val HEADER_LINE_GAP_DP = 6
+private const val ACTION_GAP_DP = 12
+
+private val TitleFontSize = 44.sp
+private val TitleLineHeight = 48.sp
+private val TitleTracking = (-0.01).em
+private val TotalLabelFontSize = 14.sp
+private val TotalLabelTracking = 0.1.em
+private val TotalValueFontSize = 44.sp
 
 @Composable
 fun ResultsCard(
@@ -107,6 +105,7 @@ fun ResultsCard(
     modifier: Modifier = Modifier,
     mode: GameMode = GameMode.TIME_ATTACK,
     onScoreTick: () -> Unit = {},
+    onBackToLobby: (() -> Unit)? = null,
 ) {
     val isTimeAttack = mode == GameMode.TIME_ATTACK
     val titleRes =
@@ -125,74 +124,93 @@ fun ResultsCard(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center,
     ) {
-        val isCompactHeight = maxHeight < COMPACT_HEIGHT_THRESHOLD_DP.dp
+        // Pin the actions to the bottom when there is room; otherwise scroll everything together.
+        val pinActions = constraints.hasBoundedHeight && maxHeight >= COMPACT_HEIGHT_THRESHOLD_DP.dp
 
-        ResultsCardContent(
-            scale = scale,
-            isCompactHeight = isCompactHeight,
-            lastMatchedScore = animatedScore.value.roundToInt(),
-            highScore = highScore,
-            titleRes = titleRes,
-            isWon = isWon,
-            scoreBreakdown = scoreBreakdown,
-            moves = moves,
-            elapsedTimeSeconds = elapsedTimeSeconds,
-            onPlayAgain = onPlayAgain,
-            onShareReplay = onShareReplay,
-            onDoubleRewards = onDoubleRewards,
-            canDoubleRewards = canDoubleRewards,
+        ResultsLayout(
+            pinActions = pinActions,
+            receipt = {
+                Receipt(scale = scale) {
+                    CasinoHeader(titleRes, isWon)
+                    ReceiptDivider()
+                    PayoutSection(scoreBreakdown)
+                    GameStatsRow(moves, elapsedTimeSeconds)
+                    ReceiptDivider()
+                    TotalPayout(
+                        animatedScore = animatedScore.value.roundToInt(),
+                        highScore = highScore,
+                        isBust = isBusted || scoreBreakdown.earnedCurrency <= 0,
+                    )
+                }
+            },
+            actions = {
+                ResultsActions(onPlayAgain, onShareReplay, onDoubleRewards, canDoubleRewards, onBackToLobby)
+            },
         )
     }
 }
 
 @Composable
-private fun ResultsCardContent(
-    scale: Float,
-    isCompactHeight: Boolean,
-    lastMatchedScore: Int,
-    highScore: Int,
-    titleRes: StringResource,
-    isWon: Boolean,
-    scoreBreakdown: ScoreBreakdown,
-    moves: Int,
-    elapsedTimeSeconds: Long,
-    onPlayAgain: () -> Unit,
-    onShareReplay: () -> Unit,
-    onDoubleRewards: () -> Unit,
-    canDoubleRewards: Boolean,
+private fun ResultsLayout(
+    pinActions: Boolean,
+    receipt: @Composable () -> Unit,
+    actions: @Composable () -> Unit,
 ) {
-    Box(
+    val spacing = PokerTheme.spacing
+    val scrollState = rememberScrollState()
+
+    Column(
         modifier =
             Modifier
-                .scale(scale)
-                .widthIn(max = 400.dp) // Receipt width
-                .shadow(elevation = 16.dp, shape = RoundedCornerShape(2.dp))
-                .clip(RoundedCornerShape(2.dp))
-                .background(ReceiptPaperColor),
+                .widthIn(max = RECEIPT_MAX_WIDTH_DP.dp)
+                .then(if (pinActions) Modifier.fillMaxHeight() else Modifier.verticalScroll(scrollState))
+                .padding(horizontal = spacing.large),
     ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            ReceiptEdge(color = ReceiptPaperColor, isTop = true)
-
-            Column(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                        .padding(top = 8.dp, bottom = 24.dp)
-                        .then(if (isCompactHeight) Modifier.verticalScroll(rememberScrollState()) else Modifier),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                CasinoHeader(titleRes, isWon)
-                ReceiptDivider()
-                PayoutSection(scoreBreakdown, moves, elapsedTimeSeconds)
-                ReceiptDivider()
-                TotalPayout(lastMatchedScore, highScore)
-                ReceiptFooter(onPlayAgain, onShareReplay, onDoubleRewards, canDoubleRewards)
-            }
-
-            ReceiptEdge(color = ReceiptPaperColor, isTop = false)
+        // Vertical padding leaves room for the tilt, the torn edge and the drop shadow.
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .then(if (pinActions) Modifier.weight(1f).verticalScroll(scrollState) else Modifier)
+                    .padding(top = spacing.large, bottom = spacing.extraLarge),
+        ) {
+            receipt()
         }
+        actions()
+    }
+}
+
+/** Tilted slip of card-stock paper with rounded top corners and a torn bottom edge. */
+@Composable
+private fun Receipt(
+    scale: Float,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val paperColor = PokerTheme.colors.cardStock
+    val paperShape = RoundedCornerShape(topStart = RECEIPT_CORNER_DP.dp, topEnd = RECEIPT_CORNER_DP.dp)
+
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                    rotationZ = RECEIPT_TILT_DEGREES
+                },
+    ) {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .shadow(elevation = RECEIPT_ELEVATION_DP.dp, shape = paperShape)
+                    .background(paperColor)
+                    .padding(horizontal = PokerTheme.spacing.large)
+                    .padding(top = RECEIPT_TOP_PADDING_DP.dp, bottom = PokerTheme.spacing.small),
+            verticalArrangement = Arrangement.spacedBy(RECEIPT_SECTION_GAP_DP.dp),
+            content = content,
+        )
+        ReceiptEdge(color = paperColor)
     }
 }
 
@@ -201,59 +219,42 @@ private fun CasinoHeader(
     titleRes: StringResource,
     isWon: Boolean,
 ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(
-            imageVector = ShopIcons.CasinoChip,
-            contentDescription = null,
-            tint = ReceiptInkColor,
-            modifier = Modifier.size(32.dp),
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(HEADER_LINE_GAP_DP.dp),
+    ) {
+        ReceiptCaption(
             text = stringResource(Res.string.casino_header_title),
+            tracking = ReceiptHeaderTracking,
+        )
+        Text(
+            text = stringResource(if (isWon) Res.string.game_complete else titleRes),
             style =
-                MaterialTheme.typography.labelMedium.copy(
-                    fontFamily = PokerTheme.fonts.mono,
+                TextStyle(
+                    fontFamily = PokerTheme.fonts.display,
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = 2.sp,
+                    fontSize = TitleFontSize,
+                    lineHeight = TitleLineHeight,
+                    letterSpacing = TitleTracking,
                 ),
-            color = ReceiptInkColor.copy(alpha = 0.7f),
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text =
-                if (isWon) {
-                    stringResource(Res.string.game_complete).uppercase()
-                } else {
-                    stringResource(titleRes).uppercase()
-                },
-            style =
-                MaterialTheme.typography.headlineMedium.copy(
-                    fontFamily = PokerTheme.fonts.mono,
-                    fontWeight = FontWeight.Black,
-                ),
-            color = if (isWon) ReceiptAccentColor else ReceiptInkColor,
+            color = PokerTheme.colors.ink,
             textAlign = TextAlign.Center,
+            modifier = Modifier.semantics { heading() },
         )
-        Text(
+        ReceiptCaption(
             text = stringResource(Res.string.high_roller_suite),
-            style =
-                MaterialTheme.typography.labelSmall.copy(
-                    fontFamily = PokerTheme.fonts.mono,
-                    fontStyle = FontStyle.Italic,
-                ),
-            color = ReceiptInkColor.copy(alpha = 0.5f),
+            tracking = ReceiptHeaderTracking,
         )
     }
 }
 
 @Composable
-private fun PayoutSection(
-    scoreBreakdown: ScoreBreakdown,
-    moves: Int,
-    elapsedTimeSeconds: Long,
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+private fun PayoutSection(scoreBreakdown: ScoreBreakdown) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(RECEIPT_ROW_GAP_DP.dp),
+    ) {
         PayoutRow(stringResource(Res.string.score_match_points_label), scoreBreakdown.basePoints)
         if (scoreBreakdown.comboBonus > 0) {
             PayoutRow(stringResource(Res.string.score_combo_bonus_label), scoreBreakdown.comboBonus)
@@ -266,24 +267,20 @@ private fun PayoutSection(
         if (scoreBreakdown.dailyChallengeBonus > 0) {
             PayoutRow(stringResource(Res.string.score_daily_challenge_bonus), scoreBreakdown.dailyChallengeBonus)
         }
+    }
+}
 
-        ReceiptDottedLine()
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(
-                text = stringResource(Res.string.moves_label, moves).uppercase(),
-                style = MaterialTheme.typography.bodySmall.copy(fontFamily = PokerTheme.fonts.mono),
-                color = ReceiptInkColor.copy(alpha = 0.7f),
-            )
-            Text(
-                text = stringResource(Res.string.time_label, formatTime(elapsedTimeSeconds)).uppercase(),
-                style = MaterialTheme.typography.bodySmall.copy(fontFamily = PokerTheme.fonts.mono),
-                color = ReceiptInkColor.copy(alpha = 0.7f),
-            )
-        }
+@Composable
+private fun GameStatsRow(
+    moves: Int,
+    elapsedTimeSeconds: Long,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        ReceiptCaption(text = stringResource(Res.string.moves_label, moves))
+        ReceiptCaption(text = stringResource(Res.string.time_label, formatTime(elapsedTimeSeconds)))
     }
 }
 
@@ -291,92 +288,38 @@ private fun PayoutSection(
 private fun TotalPayout(
     animatedScore: Int,
     highScore: Int,
+    isBust: Boolean,
 ) {
+    val monoBold = TextStyle(fontFamily = PokerTheme.fonts.mono, fontWeight = FontWeight.Bold)
+
     Column(
         modifier =
             Modifier
                 .fillMaxWidth()
                 .semantics(mergeDescendants = true) {},
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.End,
+        verticalArrangement = Arrangement.spacedBy(PokerTheme.spacing.extraSmall),
     ) {
-        Text(
-            text = stringResource(Res.string.total_payout),
-            style =
-                MaterialTheme.typography.titleMedium.copy(
-                    fontFamily = PokerTheme.fonts.mono,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp,
-                ),
-            color = ReceiptInkColor,
-        )
-        Text(
-            text = stringResource(Res.string.clean_number_format, animatedScore),
-            style =
-                MaterialTheme.typography.displayMedium.copy(
-                    fontFamily = PokerTheme.fonts.mono,
-                    fontWeight = FontWeight.Black,
-                ),
-            color = ReceiptAccentColor,
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = stringResource(Res.string.best_score_label, highScore).uppercase(),
-            style =
-                MaterialTheme.typography.labelMedium.copy(
-                    fontFamily = PokerTheme.fonts.mono,
-                    fontWeight = FontWeight.Bold,
-                ),
-            color = ReceiptInkColor.copy(alpha = 0.6f),
-        )
-    }
-}
-
-@Composable
-private fun ReceiptFooter(
-    onPlayAgain: () -> Unit,
-    onShareReplay: () -> Unit,
-    onDoubleRewards: () -> Unit,
-    canDoubleRewards: Boolean,
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        BarcodeSimulation()
-        Spacer(modifier = Modifier.height(4.dp))
-        ResultsActions(onPlayAgain, onShareReplay, onDoubleRewards, canDoubleRewards)
-    }
-}
-
-@Composable
-private fun BarcodeSimulation() {
-    Box(
-        modifier =
-            Modifier
-                .height(30.dp)
-                .fillMaxWidth(BARCODE_WIDTH_FRACTION),
-    ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val barWidth = size.width / BARCODE_BAR_COUNT
-            var x = 0f
-            while (x < size.width) {
-                val thickness =
-                    if ((x / barWidth).toInt() % BARCODE_THICKNESS_MODULO == 0) {
-                        barWidth * BARCODE_THICKNESS_FACTOR_1
-                    } else {
-                        barWidth / BARCODE_THICKNESS_FACTOR_2
-                    }
-                if (Random.nextBoolean()) {
-                    drawRect(
-                        color = ReceiptInkColor,
-                        topLeft = Offset(x, 0f),
-                        size = Size(thickness, size.height),
-                    )
-                }
-                x += barWidth * BARCODE_SPACING_FACTOR
-            }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(RECEIPT_ROW_GAP_DP.dp),
+        ) {
+            Text(
+                text = stringResource(Res.string.total_payout).uppercase(),
+                style = monoBold.copy(fontSize = TotalLabelFontSize, letterSpacing = TotalLabelTracking),
+                color = PokerTheme.colors.ink,
+                modifier = Modifier.weight(1f).alignByBaseline(),
+            )
+            Text(
+                text = stringResource(Res.string.clean_number_format, animatedScore),
+                style = monoBold.copy(fontSize = TotalValueFontSize, lineHeight = TotalValueFontSize),
+                color = if (isBust) PokerTheme.colors.tacticalRed else PokerTheme.colors.ink,
+                maxLines = 1,
+                softWrap = false,
+                modifier = Modifier.alignByBaseline(),
+            )
         }
+        ReceiptCaption(text = stringResource(Res.string.best_score_label, highScore))
     }
 }
 
@@ -386,87 +329,72 @@ private fun ResultsActions(
     onShareReplay: () -> Unit,
     onDoubleRewards: () -> Unit,
     canDoubleRewards: Boolean,
+    onBackToLobby: (() -> Unit)?,
 ) {
-    val hapticsService = LocalAppGraph.current.hapticsService
-
-    if (canDoubleRewards) {
-        Button(
-            onClick = {
-                hapticsService.performHapticFeedback(HapticFeedbackType.LIGHT)
-                onDoubleRewards()
-            },
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(ACTION_GAP_DP.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        // PokerButton performs the haptic itself: heavy for primary, light otherwise.
+        PokerButton(
+            text = stringResource(Res.string.play_again),
+            onClick = onPlayAgain,
             modifier = Modifier.fillMaxWidth(),
-            colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = ReceiptAccentColor,
-                    contentColor = Color.White,
-                ),
-            shape = RoundedCornerShape(2.dp),
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            isPrimary = true,
+        )
+
+        if (canDoubleRewards) {
+            DoubleRewardsAction(onDoubleRewards)
+        }
+
+        PokerButton(
+            text = stringResource(Res.string.share_receipt),
+            onClick = onShareReplay,
+            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = AppIcons.Share,
+            containerColor = Color.Transparent,
+        )
+
+        if (onBackToLobby != null) {
+            Box(
+                modifier =
+                    Modifier
+                        .height(LOBBY_LINK_HEIGHT_DP.dp)
+                        .clip(PokerTheme.shapes.medium)
+                        .pokerClickable(onClick = onBackToLobby, role = Role.Button)
+                        .padding(horizontal = PokerTheme.spacing.medium),
+                contentAlignment = Alignment.Center,
+            ) {
                 Text(
-                    text = stringResource(Res.string.double_rewards).uppercase(),
-                    style =
-                        MaterialTheme.typography.labelLarge.copy(
-                            fontFamily = PokerTheme.fonts.mono,
-                            fontWeight = FontWeight.Black,
-                        ),
-                )
-                Text(
-                    text = stringResource(Res.string.double_rewards_ad_note),
-                    style =
-                        MaterialTheme.typography.labelSmall.copy(
-                            fontFamily = PokerTheme.fonts.mono,
-                            fontSize = 10.sp,
-                        ),
+                    text = stringResource(Res.string.buy_in_back_to_lobby),
+                    style = PokerTheme.typography.labelLarge,
+                    color = PokerTheme.colors.sageLight,
                 )
             }
         }
     }
+}
 
-    Button(
-        onClick = {
-            hapticsService.performHapticFeedback(HapticFeedbackType.HEAVY)
-            onPlayAgain()
-        },
+private const val LOBBY_LINK_HEIGHT_DP = 44
+
+@Composable
+private fun DoubleRewardsAction(onDoubleRewards: () -> Unit) {
+    Column(
         modifier = Modifier.fillMaxWidth(),
-        colors =
-            ButtonDefaults.buttonColors(
-                containerColor = ReceiptInkColor,
-                contentColor = Color.White,
-            ),
-        shape = RoundedCornerShape(2.dp),
+        verticalArrangement = Arrangement.spacedBy(PokerTheme.spacing.extraSmall),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            text = stringResource(Res.string.play_again).uppercase(),
-            style =
-                MaterialTheme.typography.labelLarge.copy(
-                    fontFamily = PokerTheme.fonts.mono,
-                    fontWeight = FontWeight.Bold,
-                ),
+        PokerButton(
+            text = stringResource(Res.string.double_rewards),
+            onClick = onDoubleRewards,
+            modifier = Modifier.fillMaxWidth(),
         )
-    }
-
-    OutlinedButton(
-        onClick = {
-            hapticsService.performHapticFeedback(HapticFeedbackType.LIGHT)
-            onShareReplay()
-        },
-        modifier = Modifier.fillMaxWidth(),
-        colors =
-            ButtonDefaults.outlinedButtonColors(
-                contentColor = ReceiptInkColor,
-            ),
-        border = BorderStroke(1.dp, ReceiptInkColor),
-        shape = RoundedCornerShape(2.dp),
-    ) {
         Text(
-            text = stringResource(Res.string.share_receipt),
-            style =
-                MaterialTheme.typography.labelLarge.copy(
-                    fontFamily = PokerTheme.fonts.mono,
-                    fontWeight = FontWeight.Bold,
-                ),
+            text = stringResource(Res.string.double_rewards_ad_note),
+            style = PokerTheme.typography.bodySmall,
+            color = PokerTheme.colors.sageLight,
+            textAlign = TextAlign.Center,
         )
     }
 }

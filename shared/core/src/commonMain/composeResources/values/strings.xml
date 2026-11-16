@@ -21,15 +21,15 @@
     <string name="theme">Theme</string>
     <string name="success_emoji">🎉</string>
     <string name="success_title">Congratulations!</string>
-    <string name="success_message">"You've matched all the cards!"</string>
+    <string name="success_message">You've matched all the cards!</string>
     <string name="play_again">Play Again</string>
     <string name="final_score">Final Score: %1$d</string>
     <string name="final_score_label">Final Score</string>
     <string name="time_label">Time: %1$s</string>
     <string name="moves_label">Moves: %1$d</string>
     <string name="game_over">Game Over</string>
-    <string name="busted">BUSTED!</string>
-    <string name="times_up">"Time's Up!"</string>
+    <string name="busted">Busted!</string>
+    <string name="times_up">Time's Up!</string>
 
     <string name="difficulty_tourist">The Tourist</string>
     <string name="difficulty_casual">Casual Player</string>
@@ -44,7 +44,7 @@
     <string name="comment_incredible">Incredible! x%1$d Combo! 🔥</string>
     <string name="comment_nice">Nice! x%1$d Combo! ✨</string>
     <string name="comment_first_match">First match! Off to a great start! 🚀</string>
-    <string name="comment_halfway">"Halfway there! You're doing great! 💪"</string>
+    <string name="comment_halfway">Halfway there! You're doing great! 💪</string>
     <string name="comment_photographic">Photographic memory? Amazing! 🧠</string>
     <string name="comment_one_more">Just one more! You got this! 🎯</string>
     <string name="comment_great_find">Great find! 🌟</string>
@@ -153,16 +153,20 @@
     <string name="high_roller_suite">HIGH ROLLER SUITE</string>
     <string name="score_double_down">Double Or Nothing</string>
     <string name="score_move_efficiency">Move Efficiency</string>
-    <string name="share_receipt">SHARE RECEIPT</string>
+    <string name="share_receipt">Share receipt</string>
     <string name="hud_pot_label">POT</string>
+    <string name="hud_score_label">SCORE</string>
+    <string name="hud_heat_label">HEAT</string>
+    <string name="hud_combo_label">COMBO</string>
+    <string name="hud_pairs_found_format">%1$d of %2$d pairs found</string>
     <string name="score_caps">SCORE</string>
     <string name="high_roller_circuit">HIGH ROLLER CIRCUIT</string>
     <string name="mode_high_roller">High Roller</string>
     <string name="total_payout">TOTAL PAYOUT</string>
     <string name="score_match_points_label">Base Match Pts</string>
     <string name="score_combo_bonus_label">Combo Bonus</string>
-    <string name="mode_time_attack_caps">TIME ATTACK</string>
-    <string name="mode_daily_challenge_caps">DAILY CHALLENGE</string>
+    <string name="mode_time_attack_caps">Time Attack</string>
+    <string name="mode_daily_challenge_caps">Daily Challenge</string>
     <string name="mode_high_roller_caps">HIGH ROLLER</string>
     <string name="buy_in_banked_label">BANKED</string>
     <string name="buy_in_circuit_title">THE HIGH ROLLER CIRCUIT</string>
@@ -171,7 +175,7 @@
     <string name="buy_in_payout_label">PAYOUT</string>
     <string name="buy_in_bust_penalty_label">BUST PENALTY</string>
     <string name="buy_in_start_round">START ROUND</string>
-    <string name="buy_in_back_to_lobby">BACK TO LOBBY</string>
+    <string name="buy_in_back_to_lobby">Back to lobby</string>
     <string name="game_double_or_nothing">DOUBLE OR NOTHING</string>
     <string name="mutator_blackout">BLACKOUT</string>
     <string name="mutator_mirage">MIRAGE</string>
@@ -193,7 +197,7 @@
     <string name="score_double_down_caps">DOUBLE OR NOTHING</string>
 
     <!-- Settings -->
-    <string name="settings_percentage_format">%1$d%%</string>
+    <string name="settings_percentage_format">%1$d%</string>
 
     <!-- Timer -->
     <string name="timer_plus_seconds_format">+%1$ss</string>
@@ -247,7 +251,7 @@
     <string name="suit_diamonds">Diamonds</string>
     <string name="suit_clubs">Clubs</string>
     <string name="suit_spades">Spades</string>
-    <string name="double_rewards">2X REWARDS</string>
+    <string name="double_rewards">2x rewards</string>
     <string name="double_rewards_ad_note">Watch ad to double</string>
     <string name="shop_ad_reward_title">Free Chips!</string>
     <string name="shop_ad_reward_description">Watch a short video to earn 200 chips</string>

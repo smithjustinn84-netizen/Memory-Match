@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -65,6 +66,7 @@ import io.github.smithjustinn.resources.suit_clubs
 import io.github.smithjustinn.resources.suit_diamonds
 import io.github.smithjustinn.resources.suit_hearts
 import io.github.smithjustinn.resources.suit_spades
+import io.github.smithjustinn.theme.CoalBack
 import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.components.AppIcons
 import io.github.smithjustinn.ui.extensions.pokerClickable
@@ -75,7 +77,6 @@ import org.jetbrains.compose.resources.stringResource
 // Animation durations (milliseconds)
 private const val SHAKE_ANIMATION_DURATION_MS = 50
 private const val GLOW_ANIMATION_DURATION_MS = 1000
-private const val FLIP_DURATION_MS = 400
 
 // Animation values
 private const val SHAKE_OFFSET_PX = 10f
@@ -88,8 +89,6 @@ internal const val FULL_ROTATION = 180f
 
 // Alpha values for transparency
 
-internal const val VERY_LOW_ALPHA = 0.15f
-internal const val LOW_ALPHA = 0.2f
 internal const val SUBTLE_ALPHA = 0.6f
 internal const val MEDIUM_ALPHA = 0.4f
 internal const val HALF_ALPHA = 0.5f
@@ -164,6 +163,7 @@ fun PlayingCard(
     muckTargetOffset: IntOffset = IntOffset(0, MUCK_TARGET_Y_FALLBACK), // Default to flying off bottom
     muckTargetRotation: Float = 15f,
     isMuckingEnabled: Boolean = true,
+    isHeatMode: Boolean = false,
     onClick: () -> Unit = {},
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -179,6 +179,8 @@ fun PlayingCard(
             isMuckingEnabled = isMuckingEnabled,
         )
     val suitColor = calculateSuitColor(content.suit, areSuitsMultiColored, theme.skin)
+    // Heat mode deals from a coal deck with ember accents, whichever back colour is equipped.
+    val effectiveBackColor = if (isHeatMode) CoalBack else backColor
 
     val contentDescription =
         if (content.visualState.isFaceUp || content.visualState.isMatched) {
@@ -214,18 +216,20 @@ fun PlayingCard(
         muckTranslationX = animations.muckTranslationX,
         muckTranslationY = animations.muckTranslationY,
         muckRotation = animations.muckRotation,
-        backColor = backColor,
+        backColor = effectiveBackColor,
         contentDescription = contentDescription,
         interactions = CardInteractions(interactionSource = interactionSource, onClick = onClick),
+        showEmptySlot = isMuckingEnabled && content.visualState.isMatched,
     ) {
         CardContentSelectors(
             content = content,
             rotation = animations.rotation,
             suitColor = suitColor,
             theme = theme,
-            backColor = backColor,
+            backColor = effectiveBackColor,
             wasSeen = wasSeen,
             isThirdEyeEnabled = isThirdEyeEnabled,
+            isHeatMode = isHeatMode,
         )
     }
 }
@@ -240,6 +244,7 @@ private fun CardContentSelectors(
     backColor: Color,
     wasSeen: Boolean,
     isThirdEyeEnabled: Boolean,
+    isHeatMode: Boolean,
 ) {
     val showFace by remember { derivedStateOf { rotation.value <= HALF_ROTATION } }
 
@@ -252,6 +257,7 @@ private fun CardContentSelectors(
                 theme = theme.back,
                 backColor = backColor,
                 rotation = rotation,
+                isHeatMode = isHeatMode,
             )
             // Show "Third Eye" indicator if card was seen and feature is enabled
             if (wasSeen && isThirdEyeEnabled && !content.visualState.isMatched) {
@@ -274,7 +280,6 @@ private const val MATCHED_SCALE = 0.4f
 private const val PULSE_SCALE = 1.15f
 private const val PRESSED_SCALE = 0.95f
 private const val DEFAULT_SCALE = 1f
-private const val FLIP_POP_SCALE = 1.1f
 private const val MUCK_DURATION_MS = 600
 private const val ELEVATION_RECENTLY_MATCHED = 12
 private const val ELEVATION_MATCHED = 0
@@ -503,6 +508,43 @@ private fun CardContainer(
     backColor: Color,
     contentDescription: String,
     interactions: CardInteractions,
+    showEmptySlot: Boolean,
+    content: @Composable () -> Unit,
+) {
+    // The slot stays put on the felt while the card itself is transformed (flip, shake, muck).
+    Box(
+        modifier =
+            modifier
+                .widthIn(min = 60.dp)
+                .aspectRatio(CARD_ASPECT_RATIO),
+    ) {
+        if (showEmptySlot) EmptyCardSlot()
+
+        CardBody(
+            visuals = visuals,
+            shakeOffset = shakeOffset,
+            muckTranslationX = muckTranslationX,
+            muckTranslationY = muckTranslationY,
+            muckRotation = muckRotation,
+            backColor = backColor,
+            contentDescription = contentDescription,
+            interactions = interactions,
+            content = content,
+        )
+    }
+}
+
+@Composable
+@Suppress("ktlint:compose:state-param-check")
+private fun CardBody(
+    visuals: CardContainerVisuals,
+    shakeOffset: State<Float>,
+    muckTranslationX: State<Float>,
+    muckTranslationY: State<Float>,
+    muckRotation: State<Float>,
+    backColor: Color,
+    contentDescription: String,
+    interactions: CardInteractions,
     content: @Composable () -> Unit,
 ) {
     val glowColor = PokerTheme.colors.goldenYellow
@@ -510,9 +552,8 @@ private fun CardContainer(
 
     Box(
         modifier =
-            modifier
-                .widthIn(min = 60.dp)
-                .aspectRatio(CARD_ASPECT_RATIO)
+            Modifier
+                .fillMaxSize()
                 .graphicsLayer {
                     translationX = muckTranslationX.value + shakeOffset.value
                     translationY = muckTranslationY.value
@@ -550,16 +591,20 @@ private fun CardContainer(
                     .semantics {
                         this.contentDescription = contentDescription
                     },
-            shape = PokerTheme.shapes.medium,
+            shape = RoundedCornerShape(CARD_CORNER_RADIUS_DP.dp),
             colors =
                 CardDefaults.cardColors(
-                    containerColor = if (isFaceUpVisual) Color.White else backColor,
+                    containerColor = if (isFaceUpVisual) PokerTheme.colors.cardStock else backColor,
                 ),
             border = null,
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 content()
             }
+        }
+
+        if (visuals.visualState.isRecentlyMatched && isFaceUpVisual) {
+            MatchedBadge(modifier = Modifier.align(Alignment.TopEnd))
         }
     }
 }

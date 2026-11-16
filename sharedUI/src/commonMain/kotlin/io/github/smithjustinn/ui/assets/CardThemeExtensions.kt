@@ -2,6 +2,8 @@ package io.github.smithjustinn.ui.assets
 
 import androidx.compose.ui.graphics.Color
 import io.github.smithjustinn.domain.models.CardBackTheme
+import io.github.smithjustinn.theme.Ink
+import io.github.smithjustinn.theme.OxbloodBack
 import io.github.smithjustinn.ui.game.components.cards.CardBacks
 
 /**
@@ -10,10 +12,10 @@ import io.github.smithjustinn.ui.game.components.cards.CardBacks
  */
 fun CardBackTheme.getPreferredColor(): Color =
     when (this) {
-        CardBackTheme.GEOMETRIC -> Color(0xFF1A237E) // Deep Blue (Standard / Geometric)
-        CardBackTheme.CLASSIC -> Color(0xFFB71C1C) // Deep Red
-        CardBackTheme.PATTERN -> Color(0xFF4527A0) // Deep Purple
-        CardBackTheme.POKER -> Color(0xFF004D40) // Deep Teal
+        CardBackTheme.GEOMETRIC -> GeometricBlue
+        CardBackTheme.CLASSIC -> OxbloodBack
+        CardBackTheme.PATTERN -> Ink
+        CardBackTheme.POKER -> OxbloodBack
     }
 
 /**
@@ -32,3 +34,5 @@ fun String.toColor(): Color {
         Color.Gray
     }
 }
+
+private val GeometricBlue = Color(0xFF1C3F6E)
