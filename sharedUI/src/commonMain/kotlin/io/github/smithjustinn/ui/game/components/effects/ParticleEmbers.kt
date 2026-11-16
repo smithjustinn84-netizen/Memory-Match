@@ -10,6 +10,7 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import io.github.smithjustinn.theme.PokerTheme
 import kotlin.random.Random
 
@@ -86,13 +87,16 @@ fun ParticleEmbers(
     modifier: Modifier = Modifier,
     particleCount: Int = 80,
 ) {
+    val themeColors = PokerTheme.colors
     val colors =
-        listOf(
-            PokerTheme.colors.tacticalRed,
-            PokerTheme.colors.goldenYellow,
-            Color(EMBER_COLOR_ORANGE),
-            Color(EMBER_COLOR_AMBER),
-        )
+        remember(themeColors) {
+            listOf(
+                themeColors.tacticalRed,
+                themeColors.goldenYellow,
+                Color(EMBER_COLOR_ORANGE),
+                Color(EMBER_COLOR_AMBER),
+            )
+        }
 
     val particles =
         remember {
@@ -117,7 +121,8 @@ fun ParticleEmbers(
         }
     }
 
-    Canvas(modifier = modifier.fillMaxSize()) {
+    // Own layer: this redraws every frame and must not make the table underneath redraw with it.
+    Canvas(modifier = modifier.fillMaxSize().graphicsLayer()) {
         // Trigger update on frame
         if (isHeatMode) {
             // Access frameState to trigger recomposition

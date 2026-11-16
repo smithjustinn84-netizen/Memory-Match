@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -162,8 +163,9 @@ private fun GameMainScreenWrapper(
 ) {
     val currentColors = PokerTheme.colors
     val targetColors = if (state.isHeatMode) HeatAppColors else currentColors
+    val tableOrigin = remember { TableOrigin() }
 
-    CompositionLocalProvider(LocalAppColors provides targetColors) {
+    CompositionLocalProvider(LocalAppColors provides targetColors, LocalTableOrigin provides tableOrigin) {
         BoxWithConstraints(
             modifier =
                 modifier
@@ -174,7 +176,8 @@ private fun GameMainScreenWrapper(
             val isCompactHeight = maxHeight < LayoutConstants.COMPACT_HEIGHT_THRESHOLD_DP.dp
             val useCompactUI = isLandscape && isCompactHeight
 
-            Box(modifier = Modifier.fillMaxSize()) {
+            // Inside the shake layer: positions measured against this node ignore the shake.
+            Box(modifier = Modifier.fillMaxSize().onPlaced { tableOrigin.coordinates = it }) {
                 GameBackground(
                     isHeatMode = state.isHeatMode,
                     comboMultiplier = state.game.comboMultiplier,
@@ -391,7 +394,7 @@ private fun GameMainContent(
             gridCardState = gridCardState,
             settings = gridSettings,
             onCardClick = onCardClick,
-            scorePositionInRoot = scorePosition,
+            scorePositionInTable = scorePosition,
             bottomInset = if (showBottomPanel) bottomPanelHeight else 0.dp,
         )
 

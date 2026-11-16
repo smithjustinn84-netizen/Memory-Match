@@ -12,6 +12,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.graphicsLayer
 import io.github.smithjustinn.theme.BonusGreen
 import io.github.smithjustinn.theme.ModernGold
 import io.github.smithjustinn.theme.SoftBlue
@@ -104,7 +105,8 @@ fun ConfettiEffect(
         }
     }
 
-    Canvas(modifier = modifier.fillMaxSize()) {
+    // Own layer: this redraws every frame and must not make the table underneath redraw with it.
+    Canvas(modifier = modifier.fillMaxSize().graphicsLayer()) {
         // Reading frameState here triggers redraw of the Canvas on every frame
         // without recomposing the entire ConfettiEffect composable.
         frameState.longValue

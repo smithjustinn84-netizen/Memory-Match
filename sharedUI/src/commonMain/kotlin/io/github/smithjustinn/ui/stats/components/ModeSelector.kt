@@ -22,8 +22,6 @@ fun ModeSelector(
     onModeSelected: (GameMode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val modes = listOf(GameMode.TIME_ATTACK, GameMode.DAILY_CHALLENGE)
-
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(LABEL_GAP_DP.dp),
@@ -35,7 +33,7 @@ fun ModeSelector(
         )
 
         PillSegmentedControl(
-            items = modes,
+            items = Modes,
             selectedItem = selectedMode,
             onItemSelected = onModeSelected,
             labelProvider = { mode ->
@@ -47,6 +45,9 @@ fun ModeSelector(
         )
     }
 }
+
+// One shared list, so the segmented control receives the same instance and can skip.
+private val Modes = listOf(GameMode.TIME_ATTACK, GameMode.DAILY_CHALLENGE)
 
 private const val LABEL_GAP_DP = 12
 private const val LABEL_LETTER_SPACING_EM = 0.08f

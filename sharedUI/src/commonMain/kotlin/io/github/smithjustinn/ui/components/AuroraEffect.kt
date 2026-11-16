@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.theme.EmeraldGreen
@@ -72,6 +73,9 @@ fun AuroraEffect(
             modifier
                 .fillMaxWidth()
                 .height(height)
+                // Own layer: the waves redraw every frame and must not make the screen
+                // background behind them redraw too.
+                .graphicsLayer()
                 .drawWithCache {
                     val width = size.width
                     val heightPx = size.height

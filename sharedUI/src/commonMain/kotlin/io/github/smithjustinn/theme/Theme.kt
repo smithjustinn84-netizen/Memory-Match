@@ -39,7 +39,9 @@ private val DarkColorScheme =
 
 internal val LocalThemeIsDark = compositionLocalOf { mutableStateOf(true) }
 internal val LocalAppColors = staticCompositionLocalOf { LightAppColors }
-internal val LocalCardTheme = staticCompositionLocalOf { CardTheme() }
+
+// Dynamic, not static: only the readers recompose when a cosmetic is equipped, not the whole app.
+internal val LocalCardTheme = compositionLocalOf { CardTheme() }
 
 object PokerTheme {
     val colors: AppColors

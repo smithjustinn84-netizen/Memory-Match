@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateMapOf
@@ -23,12 +24,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateMap
+import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -44,11 +45,13 @@ import io.github.smithjustinn.resources.splash_dealing_cards
 import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.assets.getPreferredColor
 import io.github.smithjustinn.ui.assets.toColor
+import io.github.smithjustinn.ui.game.LocalTableOrigin
 import io.github.smithjustinn.ui.game.components.cards.CardContent
 import io.github.smithjustinn.ui.game.components.cards.CardVisualState
 import io.github.smithjustinn.ui.game.components.cards.PlayingCard
 import io.github.smithjustinn.ui.game.components.effects.ExplosionEffect
 import io.github.smithjustinn.ui.game.components.effects.ScoreFlyingEffect
+import io.github.smithjustinn.ui.game.positionInTable
 import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.stringResource
 
@@ -62,7 +65,7 @@ internal fun GameGrid(
     gridCardState: GridCardState,
     settings: GridSettings,
     onCardClick: (Int) -> Unit,
-    scorePositionInRoot: Offset = Offset.Zero,
+    scorePositionInTable: Offset = Offset.Zero,
     bottomInset: Dp = 0.dp,
 ) {
     val cardLayouts = remember { mutableStateMapOf<Int, CardLayoutInfo>() }
@@ -75,13 +78,14 @@ internal fun GameGrid(
         contentAlignment = Alignment.Center,
     ) {
         val insets = WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
+        val tableOrigin = LocalTableOrigin.current
         val gridBackgroundModifier =
-            remember(insets) {
+            remember(insets, tableOrigin) {
                 Modifier
                     .fillMaxSize()
                     .windowInsetsPadding(insets)
                     .onGloballyPositioned { layoutCoordinates ->
-                        gridPosition = layoutCoordinates.positionInRoot()
+                        gridPosition = layoutCoordinates.positionInTable(tableOrigin)
                     }
             }
         GridBackground(modifier = gridBackgroundModifier)
@@ -112,7 +116,7 @@ internal fun GameGrid(
                 settings = settings,
                 cardLayouts = cardLayouts,
                 gridPosition = gridPosition,
-                scorePositionInRoot = scorePositionInRoot,
+                scorePositionInTable = scorePositionInTable,
             )
         } else {
             val loadingDescription = stringResource(Res.string.splash_dealing_cards)
@@ -158,7 +162,7 @@ private fun GridEffects(
     settings: GridSettings,
     cardLayouts: Map<Int, CardLayoutInfo>,
     gridPosition: Offset,
-    scorePositionInRoot: Offset,
+    scorePositionInTable: Offset,
 ) {
     GridExplosionEffect(
         show = settings.showComboExplosion,
@@ -171,7 +175,7 @@ private fun GridEffects(
         lastMatchedIds = gridCardState.lastMatchedIds,
         cardLayouts = cardLayouts,
         gridPosition = gridPosition,
-        scorePositionInRoot = scorePositionInRoot,
+        scorePositionInTable = scorePositionInTable,
     )
 }
 
@@ -190,18 +194,23 @@ private fun ScoreFlyingGridEffect(
     lastMatchedIds: ImmutableList<Int>,
     cardLayouts: Map<Int, CardLayoutInfo>,
     gridPosition: Offset,
-    scorePositionInRoot: Offset,
+    scorePositionInTable: Offset,
 ) {
-    if (lastMatchedIds.isNotEmpty() && scorePositionInRoot != Offset.Zero) {
-        val matchPositions =
-            lastMatchedIds.mapNotNull { id ->
-                cardLayouts[id]?.let { info ->
-                    info.position - gridPosition + Offset(info.size.width / 2, info.size.height / 2)
+    if (lastMatchedIds.isNotEmpty() && scorePositionInTable != Offset.Zero) {
+        // Hands the effect the same list until a position really changes, so it can skip.
+        val matchPositions by
+            remember(lastMatchedIds, gridPosition, cardLayouts) {
+                derivedStateOf(structuralEqualityPolicy()) {
+                    lastMatchedIds.mapNotNull { id ->
+                        cardLayouts[id]?.let { info ->
+                            info.position - gridPosition + Offset(info.size.width / 2, info.size.height / 2)
+                        }
+                    }
                 }
             }
 
         if (matchPositions.isNotEmpty()) {
-            val relativeTarget = scorePositionInRoot - gridPosition
+            val relativeTarget = scorePositionInTable - gridPosition
             ScoreFlyingEffect(
                 matchPositions = matchPositions,
                 targetPosition = relativeTarget,
@@ -301,16 +310,20 @@ private fun GridItem(
         )
 
     val onClick = remember(card.id, onCardClick) { { onCardClick(card.id) } }
+    val tableOrigin = LocalTableOrigin.current
     val modifier =
-        remember(card.id) {
+        remember(card.id, tableOrigin) {
             Modifier.onGloballyPositioned { layoutCoordinates ->
-                cardLayouts[card.id] =
+                val info =
                     CardLayoutInfo(
-                        position = layoutCoordinates.positionInRoot(),
+                        position = layoutCoordinates.positionInTable(tableOrigin),
                         size = layoutCoordinates.size.toSize(),
                     )
+                // Write only real changes: an equal value would still invalidate every reader.
+                if (cardLayouts[card.id] != info) cardLayouts[card.id] = info
             }
         }
+    val customBackColor = remember(cardTheme.backColorHex) { cardTheme.backColorHex?.toColor() }
 
     PlayingCard(
         content =
@@ -326,7 +339,7 @@ private fun GridItem(
                     ),
             ),
         theme = cardTheme,
-        backColor = cardTheme.backColorHex?.toColor() ?: cardTheme.back.getPreferredColor(),
+        backColor = customBackColor ?: cardTheme.back.getPreferredColor(),
         areSuitsMultiColored = areSuitsMultiColored,
         wasSeen = card.wasSeen,
         isThirdEyeEnabled = isThirdEyeEnabled,

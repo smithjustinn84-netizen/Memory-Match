@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.unit.dp
@@ -171,36 +172,49 @@ internal fun CardBack(
     }
 }
 
+/**
+ * A diagonal gold sheen sweeping across a card back. The gradient is built once per size and the
+ * animation is read only while drawing, on its own layer, so a sweep never recomposes anything
+ * and never makes the card underneath redraw.
+ */
 @Composable
 internal fun ShimmerEffect() {
     val infiniteTransition = rememberInfiniteTransition()
-    val translateAnim by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = SHIMMER_TRANSLATE_TARGET,
-        animationSpec =
-            infiniteRepeatable(
-                animation = tween(SHIMMER_ANIMATION_DURATION_MS, easing = LinearEasing),
-                repeatMode = RepeatMode.Restart,
-            ),
-    )
-
-    val brush =
-        Brush.linearGradient(
-            colors =
-                listOf(
-                    Color.White.copy(alpha = 0.0f),
-                    ModernGold.copy(alpha = MEDIUM_ALPHA),
-                    Color.White.copy(alpha = 0.0f),
+    val translateState =
+        infiniteTransition.animateFloat(
+            initialValue = 0f,
+            targetValue = SHIMMER_TRANSLATE_TARGET,
+            animationSpec =
+                infiniteRepeatable(
+                    animation = tween(SHIMMER_ANIMATION_DURATION_MS, easing = LinearEasing),
+                    repeatMode = RepeatMode.Restart,
                 ),
-            start = Offset(translateAnim - SHIMMER_OFFSET, translateAnim - SHIMMER_OFFSET),
-            end = Offset(translateAnim, translateAnim),
         )
 
     Box(
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(brush),
+                .graphicsLayer()
+                .drawWithCache {
+                    val brush =
+                        Brush.linearGradient(
+                            colors =
+                                listOf(
+                                    Color.White.copy(alpha = 0.0f),
+                                    ModernGold.copy(alpha = MEDIUM_ALPHA),
+                                    Color.White.copy(alpha = 0.0f),
+                                ),
+                            start = Offset(-SHIMMER_OFFSET, -SHIMMER_OFFSET),
+                            end = Offset.Zero,
+                        )
+                    onDrawBehind {
+                        val shift = translateState.value
+                        translate(left = shift, top = shift) {
+                            drawRect(brush = brush, topLeft = Offset(-shift, -shift), size = size)
+                        }
+                    }
+                },
     )
 }
 

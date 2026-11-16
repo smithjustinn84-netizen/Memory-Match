@@ -10,6 +10,7 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import kotlin.random.Random
 
 private const val INITIAL_Y_OFFSET = 100f
@@ -83,7 +84,8 @@ fun SteamEffect(
         }
     }
 
-    Canvas(modifier = modifier.fillMaxSize()) {
+    // Own layer: this redraws every frame and must not make the table underneath redraw with it.
+    Canvas(modifier = modifier.fillMaxSize().graphicsLayer()) {
         frameState.longValue // Trigger redraw
 
         // Bolt: Use index-based loop instead of forEach to prevent Iterator allocation in hot Canvas draw loop

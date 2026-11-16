@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -71,18 +72,8 @@ fun PokerButton(
     applyGlimmer: Boolean = false,
     contentDescription: String? = null,
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = "pokerButtonPulse")
-    val pulseScaleState =
-        infiniteTransition.animateFloat(
-            initialValue = 1f,
-            targetValue = if (isPulsing && enabled) PULSE_SCALE_TARGET else 1f,
-            animationSpec =
-                infiniteRepeatable(
-                    animation = tween(PULSE_ANIMATION_DURATION_MS, easing = LinearEasing),
-                    repeatMode = RepeatMode.Reverse,
-                ),
-            label = "pulseScale",
-        )
+    // Only a pulsing button runs the infinite animation; the rest schedule no frames at all.
+    val pulseScaleState = if (isPulsing && enabled) rememberPulseScale() else null
 
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -103,7 +94,7 @@ fun PokerButton(
             modifier
                 .height(BUTTON_HEIGHT_DP.dp)
                 .graphicsLayer {
-                    val scale = pulseScaleState.value * pressScaleState.value
+                    val scale = (pulseScaleState?.value ?: 1f) * pressScaleState.value
                     scaleX = scale
                     scaleY = scale
                 }.then(
@@ -238,3 +229,16 @@ private fun ButtonContent(
         }
     }
 }
+
+@Composable
+private fun rememberPulseScale(): State<Float> =
+    rememberInfiniteTransition(label = "pokerButtonPulse").animateFloat(
+        initialValue = 1f,
+        targetValue = PULSE_SCALE_TARGET,
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(PULSE_ANIMATION_DURATION_MS, easing = LinearEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
+        label = "pulseScale",
+    )

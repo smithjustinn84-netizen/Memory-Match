@@ -49,6 +49,7 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -556,10 +557,12 @@ private fun SettingsToggle(
 @Composable
 private fun SettingsSwitch(checked: Boolean) {
     val colors = PokerTheme.colors
-    val thumbOffset by animateDpAsState(
-        targetValue = if (checked) SWITCH_THUMB_TRAVEL_DP.dp else 0.dp,
-        label = "switchThumbOffset",
-    )
+    // Kept as a State and read during placement, so the slide never recomposes the switch.
+    val thumbOffset =
+        animateDpAsState(
+            targetValue = if (checked) SWITCH_THUMB_TRAVEL_DP.dp else 0.dp,
+            label = "switchThumbOffset",
+        )
 
     Box(
         modifier =
@@ -579,7 +582,7 @@ private fun SettingsSwitch(checked: Boolean) {
         Box(
             modifier =
                 Modifier
-                    .offset(x = thumbOffset)
+                    .offset { IntOffset(thumbOffset.value.roundToPx(), 0) }
                     .size(SWITCH_THUMB_SIZE_DP.dp)
                     .background(if (checked) colors.onGold else colors.sage, CircleShape),
         )

@@ -21,11 +21,12 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.CacheDrawScope
+import androidx.compose.ui.draw.DrawResult
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
@@ -77,7 +78,8 @@ fun GameBackground(
         modifier =
             Modifier
                 .fillMaxSize()
-                .drawBehind { drawFelt(centerColor, feltColor, edgeColor) },
+                // The gradient is rebuilt only when the size or a felt colour changes.
+                .drawWithCache { drawFelt(centerColor, feltColor, edgeColor) },
     ) {
         if (isHeatMode) {
             AuroraEffect(
@@ -92,30 +94,28 @@ fun GameBackground(
 }
 
 /** An elliptical radial gradient: a circular one, stretched horizontally around its focus. */
-private fun DrawScope.drawFelt(
+private fun CacheDrawScope.drawFelt(
     centerColor: Color,
     feltColor: Color,
     edgeColor: Color,
-) {
-    drawRect(edgeColor)
-
+): DrawResult {
     val radius = size.height * FELT_RADIUS_HEIGHT_FRACTION
-    if (radius > 0f) {
-        val focus = Offset(size.width * FELT_FOCUS_X, size.height * FELT_FOCUS_Y)
-        val stretch = size.width * FELT_RADIUS_WIDTH_FRACTION / radius
+    if (radius <= 0f) return onDrawBehind { drawRect(edgeColor) }
+
+    val focus = Offset(size.width * FELT_FOCUS_X, size.height * FELT_FOCUS_Y)
+    val stretch = size.width * FELT_RADIUS_WIDTH_FRACTION / radius
+    val brush =
+        Brush.radialGradient(
+            0f to centerColor,
+            FELT_MID_STOP to feltColor,
+            1f to edgeColor,
+            center = focus,
+            radius = radius,
+        )
+    return onDrawBehind {
+        drawRect(edgeColor)
         scale(scaleX = stretch, scaleY = 1f, pivot = focus) {
-            drawCircle(
-                brush =
-                    Brush.radialGradient(
-                        0f to centerColor,
-                        FELT_MID_STOP to feltColor,
-                        1f to edgeColor,
-                        center = focus,
-                        radius = radius,
-                    ),
-                radius = radius,
-                center = focus,
-            )
+            drawCircle(brush = brush, radius = radius, center = focus)
         }
     }
 }

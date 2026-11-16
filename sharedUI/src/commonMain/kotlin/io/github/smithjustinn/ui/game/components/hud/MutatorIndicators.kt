@@ -16,11 +16,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -57,7 +57,9 @@ private fun MutatorBadge(
     compact: Boolean,
 ) {
     val config = getMutatorConfig(mutator)
-    val alpha by rememberPulsingAlpha()
+    // Read only inside the layer blocks below, so the pulse redraws the badge without recomposing it.
+    val alpha = rememberPulsingAlpha()
+    val pulse = Modifier.graphicsLayer { this.alpha = alpha.value }
 
     Row(
         modifier =
@@ -78,8 +80,8 @@ private fun MutatorBadge(
         Icon(
             imageVector = config.icon,
             contentDescription = null,
-            tint = config.color.copy(alpha = alpha),
-            modifier = Modifier.size(if (compact) 16.dp else 20.dp),
+            tint = config.color,
+            modifier = pulse.size(if (compact) 16.dp else 20.dp),
         )
 
         Text(
@@ -90,7 +92,8 @@ private fun MutatorBadge(
                     fontWeight = FontWeight.SemiBold,
                     letterSpacing = 0.06.em,
                 ),
-            color = PokerTheme.colors.ivory.copy(alpha = alpha),
+            color = PokerTheme.colors.ivory,
+            modifier = pulse,
         )
     }
 }

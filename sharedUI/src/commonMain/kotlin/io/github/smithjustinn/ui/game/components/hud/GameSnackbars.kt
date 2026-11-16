@@ -18,12 +18,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.resources.Res
@@ -36,16 +36,20 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun NewHighScoreSnackbar(modifier: Modifier = Modifier) {
     val infiniteTransition = rememberInfiniteTransition(label = "HighScorePulse")
-    val scale by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.05f,
-        animationSpec =
-            infiniteRepeatable(
-                animation = tween(durationMillis = 800, easing = FastOutSlowInEasing),
-                repeatMode = RepeatMode.Reverse,
-            ),
-        label = "Scale",
-    )
+    // Kept as a State and read only in the layer block, so the pulse never recomposes the card.
+    val scaleState =
+        infiniteTransition.animateFloat(
+            initialValue = 1f,
+            targetValue = 1.05f,
+            animationSpec =
+                infiniteRepeatable(
+                    animation = tween(durationMillis = 800, easing = FastOutSlowInEasing),
+                    repeatMode = RepeatMode.Reverse,
+                ),
+            label = "Scale",
+        )
+    val borderBrush =
+        remember { Brush.linearGradient(listOf(ModernGold, ModernGold.copy(alpha = 0.5f), ModernGold)) }
 
     Card(
         shape = RoundedCornerShape(12.dp),
@@ -57,13 +61,13 @@ fun NewHighScoreSnackbar(modifier: Modifier = Modifier) {
         elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
         modifier =
             modifier
-                .scale(scale)
-                .border(
+                .graphicsLayer {
+                    val scale = scaleState.value
+                    scaleX = scale
+                    scaleY = scale
+                }.border(
                     width = 2.dp,
-                    brush =
-                        Brush.linearGradient(
-                            listOf(ModernGold, ModernGold.copy(alpha = 0.5f), ModernGold),
-                        ),
+                    brush = borderBrush,
                     shape = RoundedCornerShape(12.dp),
                 ),
     ) {

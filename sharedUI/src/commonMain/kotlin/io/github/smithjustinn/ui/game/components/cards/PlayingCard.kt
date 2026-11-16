@@ -441,17 +441,29 @@ private fun rememberShakeAnimation(isError: Boolean): State<Float> {
     return remember(shakeOffset) { shakeOffset.asState() }
 }
 
+/**
+ * Pulses while the card is recently matched and stops for good afterwards. An infinite spec on
+ * animateFloatAsState never settles, so it kept every matched card animating until the game ended.
+ */
 @Composable
-private fun rememberMatchedGlowAnimation(isRecentlyMatched: Boolean) =
-    animateFloatAsState(
-        targetValue = if (isRecentlyMatched) SUBTLE_ALPHA else 0f,
-        animationSpec =
-            infiniteRepeatable(
-                animation = tween(GLOW_ANIMATION_DURATION_MS),
-                repeatMode = RepeatMode.Reverse,
-            ),
-        label = "matchedGlow",
-    )
+private fun rememberMatchedGlowAnimation(isRecentlyMatched: Boolean): State<Float> {
+    val glow = remember { Animatable(0f) }
+    LaunchedEffect(isRecentlyMatched) {
+        if (isRecentlyMatched) {
+            glow.animateTo(
+                targetValue = SUBTLE_ALPHA,
+                animationSpec =
+                    infiniteRepeatable(
+                        animation = tween(GLOW_ANIMATION_DURATION_MS),
+                        repeatMode = RepeatMode.Reverse,
+                    ),
+            )
+        } else {
+            glow.snapTo(0f)
+        }
+    }
+    return remember(glow) { glow.asState() }
+}
 
 @Composable
 private fun rememberMuckAnimation(

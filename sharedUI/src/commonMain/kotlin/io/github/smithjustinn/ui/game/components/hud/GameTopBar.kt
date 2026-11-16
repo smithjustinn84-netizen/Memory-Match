@@ -41,7 +41,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -60,10 +59,12 @@ import io.github.smithjustinn.services.HapticFeedbackType
 import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.components.AppIcons
 import io.github.smithjustinn.ui.extensions.pokerClickable
+import io.github.smithjustinn.ui.game.LocalTableOrigin
 import io.github.smithjustinn.ui.game.components.timer.TimerDisplay
 import io.github.smithjustinn.ui.game.components.timer.TimerFeedback
 import io.github.smithjustinn.ui.game.components.timer.TimerLayout
 import io.github.smithjustinn.ui.game.components.timer.TimerState
+import io.github.smithjustinn.ui.game.positionInTable
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
 
@@ -157,6 +158,7 @@ private fun HudStatsRow(
     dense: Boolean,
     showHeat: Boolean,
 ) {
+    val tableOrigin = LocalTableOrigin.current
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(if (dense) STAT_GAP_DENSE_DP.dp else STAT_GAP_DP.dp),
@@ -195,10 +197,10 @@ private fun HudStatsRow(
             value = state.currentPot.toString(),
             dense = dense,
             modifier =
-                remember(onScorePositioned) {
+                remember(onScorePositioned, tableOrigin) {
                     // Bolt: Prevent recreating Modifier.onGloballyPositioned on every recomposition
                     Modifier.onGloballyPositioned { coords ->
-                        onScorePositioned(coords.positionInRoot())
+                        onScorePositioned(coords.positionInTable(tableOrigin))
                     }
                 },
         )

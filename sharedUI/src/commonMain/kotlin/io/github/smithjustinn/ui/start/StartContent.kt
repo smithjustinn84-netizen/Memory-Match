@@ -162,8 +162,8 @@ private fun StartScreenLayout(
                 .fillMaxSize()
                 .statusBarsPadding(),
     ) {
-        val headerAlphaValue = headerAlpha.value
-        val headerModifier = Modifier.graphicsLayer { alpha = headerAlphaValue }
+        // Read inside the layer block so the entrance fade never recomposes the layout.
+        val headerModifier = Modifier.graphicsLayer { alpha = headerAlpha.value }
 
         StartTopActions(
             onStatsClick = onStatsClick,

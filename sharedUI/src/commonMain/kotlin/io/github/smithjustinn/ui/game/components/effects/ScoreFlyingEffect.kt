@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import kotlin.math.PI
 import kotlin.math.sin
@@ -59,33 +60,25 @@ fun ScoreFlyingEffect(
                     generateParticles(pos, targetPosition, now)
                 }
             points.addAll(newPoints)
-            // Trigger a redraw in case the frame loop is suspended
-            frameTick = timeSource.markNow().elapsedNow().inWholeNanoseconds
         }
-    }
-
-    if (points.isNotEmpty()) {
-        LaunchedEffect(Unit) {
-            while (points.isNotEmpty()) {
-                withFrameNanos { tick ->
-                    var hasRemovals = false
-                    // Bolt: Iterate backwards when removing items to prevent O(N^2) shifting
-                    for (i in points.lastIndex downTo 0) {
-                        val point = points[i]
-                        if (point.startTime.elapsedNow() >= point.duration + point.delay) {
-                            points.removeAt(i)
-                            hasRemovals = true
-                        }
+        // The same effect drives the frames, so the particles never depend on an unrelated
+        // recomposition to start moving.
+        while (points.isNotEmpty()) {
+            withFrameNanos { tick ->
+                // Bolt: Iterate backwards when removing items to prevent O(N^2) shifting
+                for (i in points.lastIndex downTo 0) {
+                    val point = points[i]
+                    if (point.startTime.elapsedNow() >= point.duration + point.delay) {
+                        points.removeAt(i)
                     }
-                    frameTick = tick
                 }
+                frameTick = tick
             }
         }
     }
 
-    if (points.isEmpty()) return
-
-    Canvas(modifier = modifier.fillMaxSize()) {
+    // Own layer: this redraws every frame and must not make the table underneath redraw with it.
+    Canvas(modifier = modifier.fillMaxSize().graphicsLayer()) {
         frameTick // trigger redraw
 
         for (i in 0 until points.size) {

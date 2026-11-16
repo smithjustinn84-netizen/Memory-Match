@@ -2,7 +2,6 @@ package io.github.smithjustinn.ui.assets
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -125,15 +124,13 @@ object AssetProvider {
         modifier: Modifier = Modifier,
     ) {
         val backColor = hexColor?.toColor() ?: theme.getPreferredColor()
-        BoxWithConstraints(modifier = modifier) {
-            Box {
-                CardBack(
-                    theme = theme,
-                    backColor = backColor,
-                    rotation = rememberUpdatedState(0f),
-                )
-                ShimmerEffect()
-            }
+        Box(modifier = modifier) {
+            CardBack(
+                theme = theme,
+                backColor = backColor,
+                rotation = rememberUpdatedState(0f),
+            )
+            ShimmerEffect()
         }
     }
 
@@ -144,7 +141,7 @@ object AssetProvider {
     ) {
         val suitColor = Color.Black // Spades is black
 
-        BoxWithConstraints(modifier = modifier) {
+        Box(modifier = modifier) {
             CardFace(
                 rank = Rank.Ace,
                 suit = Suit.Spades,

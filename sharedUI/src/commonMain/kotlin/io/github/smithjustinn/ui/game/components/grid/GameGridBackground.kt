@@ -15,6 +15,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.graphicsLayer
 import io.github.smithjustinn.theme.PokerTheme
 import kotlin.random.Random
 
@@ -57,39 +59,34 @@ internal fun GridBackground(modifier: Modifier = Modifier) {
 
     Box(
         modifier =
-            modifier.drawWithCache {
-                // Bolt: Generate noise points only when size changes, avoiding allocation on every frame
-                val random = Random(FELT_TEXTURE_SEED)
-                val points =
-                    List(FELT_TEXTURE_POINT_COUNT) {
-                        Offset(random.nextFloat() * size.width, random.nextFloat() * size.height)
+            modifier
+                // Own layer: the spotlight redraws every frame, and without this it would make
+                // the screen-wide felt and every sibling redraw with it.
+                .graphicsLayer()
+                .drawWithCache {
+                    // Bolt: Generate noise points only when size changes, avoiding allocation on every frame
+                    val random = Random(FELT_TEXTURE_SEED)
+                    val points =
+                        List(FELT_TEXTURE_POINT_COUNT) {
+                            Offset(random.nextFloat() * size.width, random.nextFloat() * size.height)
+                        }
+                    // Built once per size around x = 0 and slid sideways while drawing.
+                    val spotlight =
+                        Brush.radialGradient(
+                            colors = listOf(spotlightColor.copy(alpha = SPOTLIGHT_ALPHA), Color.Transparent),
+                            center = Offset(0f, size.height * SPOTLIGHT_Y_OFFSET_FRACTION),
+                            radius = size.maxDimension * SPOTLIGHT_RADIUS_MULTIPLIER,
+                        )
+
+                    onDrawBehind {
+                        // Bolt: Read state inside draw phase to skip recomposition
+                        val shift = size.width * spotlightXState.value
+                        translate(left = shift) {
+                            drawRect(brush = spotlight, topLeft = Offset(-shift, 0f), size = size)
+                        }
+                        drawNoiseTexture(points)
                     }
-
-                onDrawBehind {
-                    // Bolt: Read state inside draw phase to skip recomposition
-                    drawSpotlight(spotlightXState.value, spotlightColor)
-                    drawNoiseTexture(points)
-                }
-            },
-    )
-}
-
-private fun DrawScope.drawSpotlight(
-    spotlightX: Float,
-    centerColor: Color,
-) {
-    val spotlightCenter = Offset(size.width * spotlightX, size.height * SPOTLIGHT_Y_OFFSET_FRACTION)
-    drawRect(
-        brush =
-            Brush.radialGradient(
-                colors =
-                    listOf(
-                        centerColor.copy(alpha = SPOTLIGHT_ALPHA),
-                        Color.Transparent,
-                    ),
-                center = spotlightCenter,
-                radius = size.maxDimension * SPOTLIGHT_RADIUS_MULTIPLIER,
-            ),
+                },
     )
 }
 

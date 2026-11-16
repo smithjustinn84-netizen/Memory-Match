@@ -176,14 +176,20 @@ private fun PhysicsEngine(
     var startTimeNanos by remember { mutableLongStateOf(0L) }
     LaunchedEffect(celebrationCards.size) {
         if (celebrationCards.isNotEmpty()) {
-            while (true) {
+            // Stops once every card has faded out, instead of ticking for as long as the
+            // results screen stays open.
+            var anyVisible = true
+            while (anyVisible) {
                 withFrameNanos { frameTime ->
                     if (startTimeNanos == 0L) startTimeNanos = frameTime
                     val elapsedSeconds = (frameTime - startTimeNanos) / NANOS_PER_SECOND
+                    anyVisible = false
                     // Bolt: Use index-based loop instead of forEach to avoid
                     // Iterator allocation inside withFrameNanos loop
                     for (i in 0 until celebrationCards.size) {
-                        celebrationCards[i].update(GRAVITY, FRICTION, elapsedSeconds, heightPx)
+                        val card = celebrationCards[i]
+                        card.update(GRAVITY, FRICTION, elapsedSeconds, heightPx)
+                        if (card.alpha > 0f) anyVisible = true
                     }
                 }
             }

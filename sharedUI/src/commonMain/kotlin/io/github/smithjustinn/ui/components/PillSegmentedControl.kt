@@ -17,7 +17,6 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import io.github.smithjustinn.di.LocalAppGraph
 import io.github.smithjustinn.services.HapticFeedbackType
@@ -55,14 +55,16 @@ fun <T> PillSegmentedControl(
     ) {
         val itemWidth = maxWidth / items.size
 
-        val indicatorOffset by animateDpAsState(
-            targetValue = itemWidth * selectedIndex,
-            label = "indicatorOffset",
-        )
+        // Kept as a State and read during placement, so the slide never recomposes the control.
+        val indicatorOffset =
+            animateDpAsState(
+                targetValue = itemWidth * selectedIndex,
+                label = "indicatorOffset",
+            )
 
         SegmentIndicator(
             itemWidth = itemWidth,
-            offset = indicatorOffset,
+            offset = { indicatorOffset.value },
             shape = indicatorShape,
             color = colors.pillSelected,
         )
@@ -80,7 +82,7 @@ fun <T> PillSegmentedControl(
 @Composable
 private fun SegmentIndicator(
     itemWidth: androidx.compose.ui.unit.Dp,
-    offset: androidx.compose.ui.unit.Dp,
+    offset: () -> androidx.compose.ui.unit.Dp,
     shape: RoundedCornerShape,
     color: Color,
 ) {
@@ -89,7 +91,7 @@ private fun SegmentIndicator(
             Modifier
                 .width(itemWidth)
                 .fillMaxHeight()
-                .offset(x = offset)
+                .offset { IntOffset(offset().roundToPx(), 0) }
                 .clip(shape)
                 .background(color),
     )

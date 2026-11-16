@@ -13,6 +13,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.graphicsLayer
 import io.github.smithjustinn.theme.ModernGold
 import io.github.smithjustinn.theme.TacticalRed
 import kotlin.math.PI
@@ -67,7 +68,8 @@ fun ExplosionEffect(
             }
         }
 
-    Canvas(modifier = modifier.fillMaxSize()) {
+    // Own layer: this redraws every frame and must not make the table underneath redraw with it.
+    Canvas(modifier = modifier.fillMaxSize().graphicsLayer()) {
         val center = centerOverride ?: Offset(size.width / 2, size.height / 2)
 
         // Bolt: Use index-based loop to prevent Iterator allocation in hot Canvas draw pass

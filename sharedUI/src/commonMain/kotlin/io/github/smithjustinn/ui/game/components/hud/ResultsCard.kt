@@ -21,6 +21,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -119,6 +121,7 @@ fun ResultsCard(
 
     val animatedScore = rememberAnimatedScore(scoreBreakdown.earnedCurrency, onScoreTick)
     val scale = rememberResultsScale()
+    val roundedScore = remember(animatedScore) { derivedStateOf { animatedScore.value.roundToInt() } }
 
     BoxWithConstraints(
         modifier = modifier.fillMaxWidth(),
@@ -130,14 +133,14 @@ fun ResultsCard(
         ResultsLayout(
             pinActions = pinActions,
             receipt = {
-                Receipt(scale = scale) {
+                Receipt(scale = { scale.value }) {
                     CasinoHeader(titleRes, isWon)
                     ReceiptDivider()
                     PayoutSection(scoreBreakdown)
                     GameStatsRow(moves, elapsedTimeSeconds)
                     ReceiptDivider()
                     TotalPayout(
-                        animatedScore = animatedScore.value.roundToInt(),
+                        animatedScore = { roundedScore.value },
                         highScore = highScore,
                         isBust = isBusted || scoreBreakdown.earnedCurrency <= 0,
                     )
@@ -183,7 +186,7 @@ private fun ResultsLayout(
 /** Tilted slip of card-stock paper with rounded top corners and a torn bottom edge. */
 @Composable
 private fun Receipt(
-    scale: Float,
+    scale: () -> Float,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val paperColor = PokerTheme.colors.cardStock
@@ -194,8 +197,9 @@ private fun Receipt(
             Modifier
                 .fillMaxWidth()
                 .graphicsLayer {
-                    scaleX = scale
-                    scaleY = scale
+                    val entranceScale = scale()
+                    scaleX = entranceScale
+                    scaleY = entranceScale
                     rotationZ = RECEIPT_TILT_DEGREES
                 },
     ) {
@@ -286,7 +290,7 @@ private fun GameStatsRow(
 
 @Composable
 private fun TotalPayout(
-    animatedScore: Int,
+    animatedScore: () -> Int,
     highScore: Int,
     isBust: Boolean,
 ) {
@@ -311,7 +315,7 @@ private fun TotalPayout(
                 modifier = Modifier.weight(1f).alignByBaseline(),
             )
             Text(
-                text = stringResource(Res.string.clean_number_format, animatedScore),
+                text = stringResource(Res.string.clean_number_format, animatedScore()),
                 style = monoBold.copy(fontSize = TotalValueFontSize, lineHeight = TotalValueFontSize),
                 color = if (isBust) PokerTheme.colors.tacticalRed else PokerTheme.colors.ink,
                 maxLines = 1,
@@ -400,7 +404,7 @@ private fun DoubleRewardsAction(onDoubleRewards: () -> Unit) {
 }
 
 @Composable
-private fun rememberResultsScale(): Float {
+private fun rememberResultsScale(): State<Float> {
     val scale = remember { Animatable(INITIAL_SCALE) }
     LaunchedEffect(Unit) {
         scale.animateTo(
@@ -412,5 +416,6 @@ private fun rememberResultsScale(): Float {
                 ),
         )
     }
-    return scale.value
+    // Returned as a State so the spring is read in the receipt's layer block, not in composition.
+    return remember(scale) { scale.asState() }
 }
