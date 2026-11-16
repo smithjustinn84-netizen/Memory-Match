@@ -12,8 +12,7 @@ interface IosAppGraph :
     AppGraph,
     CoreProviders,
     DataProviders,
-    IosUiModule,
-    IosBindings
+    IosUiModule
 
 /**
  * Creates the iOS dependency graph using Metro's compile-time graph creator.

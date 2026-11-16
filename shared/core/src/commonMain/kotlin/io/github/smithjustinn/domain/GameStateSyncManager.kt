@@ -11,7 +11,9 @@ import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlin.time.Clock
+import kotlin.concurrent.atomics.AtomicLong
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
+import kotlin.concurrent.atomics.incrementAndFetch
 
 /**
  * Manages the persistence of game state with an optimized strategy:
@@ -19,6 +21,7 @@ import kotlin.time.Clock
  * - Normal priority updates (e.g., timer ticks) are debounced to reduce I/O.
  * - Ensures the latest state is always saved on flush or session end.
  */
+@OptIn(ExperimentalAtomicApi::class)
 class GameStateSyncManager(
     private val scope: CoroutineScope,
     private val dispatchers: CoroutineDispatchers,
@@ -28,7 +31,13 @@ class GameStateSyncManager(
     private val mutex = Mutex()
     private var lastSavedState: MemoryGameState? = null
     private var lastSavedTime: Long? = null
-    private var lastProcessedRequestTime: Long = 0L
+    private var lastProcessedSequence: Long = 0L
+
+    // Strictly increasing request order. Wall-clock millis can tie (e.g. a sample queued in the
+    // same millisecond as a flush), which let a stale sampled state overwrite a newer flush.
+    private val sequence = AtomicLong(0L)
+
+    private fun nextSequence(): Long = sequence.incrementAndFetch()
 
     init {
         scope.launch(dispatchers.default) {
@@ -38,7 +47,7 @@ class GameStateSyncManager(
                 .sample(DEBOUNCE_DELAY_MS)
                 .collect { request ->
                     mutex.withLock {
-                        performSave(request.state, request.time, request.queuedAt)
+                        performSave(request.state, request.time, request.sequence)
                     }
                 }
         }
@@ -55,25 +64,25 @@ class GameStateSyncManager(
     ) {
         if (priority == Priority.HIGH) {
             // Immediate save for high priority
-            val now = Clock.System.now().toEpochMilliseconds()
+            val seq = nextSequence()
             scope.launch(dispatchers.mainImmediate) {
                 mutex.withLock {
-                    performSave(state, time, now)
+                    performSave(state, time, seq)
                 }
             }
         } else {
             // Conflated channel ensures we only keep the latest normal priority request
-            syncChannel.trySend(SyncRequest(state, time))
+            syncChannel.trySend(SyncRequest(state, time, nextSequence()))
         }
     }
 
     private fun performSave(
         state: MemoryGameState,
         time: Long,
-        requestTimestamp: Long,
+        requestSequence: Long,
     ) {
-        if (requestTimestamp < lastProcessedRequestTime) return
-        lastProcessedRequestTime = requestTimestamp
+        if (requestSequence < lastProcessedSequence) return
+        lastProcessedSequence = requestSequence
 
         if (state == lastSavedState && time == lastSavedTime) return
 
@@ -89,9 +98,9 @@ class GameStateSyncManager(
         state: MemoryGameState,
         time: Long,
     ) {
-        val now = Clock.System.now().toEpochMilliseconds()
+        val seq = nextSequence()
         mutex.withLock {
-            performSave(state, time, now)
+            performSave(state, time, seq)
         }
     }
 
@@ -103,7 +112,7 @@ class GameStateSyncManager(
     private data class SyncRequest(
         val state: MemoryGameState,
         val time: Long,
-        val queuedAt: Long = Clock.System.now().toEpochMilliseconds(),
+        val sequence: Long,
     )
 
     companion object {

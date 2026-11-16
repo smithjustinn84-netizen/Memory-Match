@@ -110,20 +110,15 @@ kover {
 detekt {
     toolVersion = libs.versions.detekt.get()
 
-    // Dynamic source configuration for KMP modules
+    // Root-level detekt task that covers all KMP modules and platform-specific sources
     source.setFrom(
-        files(
-            subprojects.flatMap { subproject ->
-                listOf(
-                    "src/commonMain/kotlin",
-                    "src/commonTest/kotlin",
-                    "src/androidMain/kotlin",
-                    "src/iosMain/kotlin",
-                    "src/jvmMain/kotlin",
-                    "src/main/kotlin" // For androidApp and desktopApp
-                ).map { subproject.file(it) }
-            }.filter { it.exists() }
-        )
+        project.layout.projectDirectory.asFileTree.matching {
+            include("**/*.kt")
+            exclude("**/.*/**") // Exclude all hidden directories (like .agent, .gradle, .jj)
+            exclude("**/build/**")
+            exclude("**/resources/**")
+            exclude("**/generated/**")
+        }
     )
 
     config.setFrom("config/detekt/detekt.yml")
@@ -133,10 +128,31 @@ detekt {
     allRules = true
 }
 
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        sarif.required.set(true)
+    }
+}
+
 
 subprojects {
     apply(plugin = "com.diffplug.spotless")
+    apply(plugin = "io.gitlab.arturbosch.detekt")
     
+    dependencies {
+        detektPlugins(rootProject.libs.detekt.compose.rules)
+    }
+    
+    detekt {
+        config.setFrom(rootProject.file("config/detekt/detekt.yml"))
+        baseline = rootProject.file("config/detekt/baseline.xml")
+        buildUponDefaultConfig = true
+        parallel = true
+        allRules = true
+    }
+
     configure<com.diffplug.gradle.spotless.SpotlessExtension> {
         kotlin {
             target("**/*.kt")

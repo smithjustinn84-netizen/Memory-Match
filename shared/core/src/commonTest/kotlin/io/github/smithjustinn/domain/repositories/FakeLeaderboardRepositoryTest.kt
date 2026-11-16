@@ -117,7 +117,8 @@ class FakeLeaderboardRepositoryTest {
                 assertEquals(listOf(entry2, entry1), awaitItem()) // score 200 > 100
 
                 repository.addEntry(entry3)
-                // We just added entry3 but it doesn't match pairCount=8, so the flow might emit the SAME list, or not emit.
+                // We just added entry3 but it doesn't match pairCount=8, so the flow might emit
+                // the SAME list, or not emit.
                 // Actually map over MutableStateFlow will emit again if not distinctUntilChanged.
                 // Let's assert we just get the same list if map isn't deduping, but map does NOT dedupe by default!
                 // Wait, we need to expect an emission of the same list because MutableStateFlow emitted.

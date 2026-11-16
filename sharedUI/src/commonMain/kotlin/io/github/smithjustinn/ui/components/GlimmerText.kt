@@ -24,6 +24,7 @@ fun GlimmerText(
     text: String,
     modifier: Modifier = Modifier,
     fontSize: TextUnit = 40.sp,
+    letterSpacing: TextUnit = TextUnit.Unspecified,
 ) {
     val brush = rememberGlimmerBrush()
 
@@ -35,6 +36,7 @@ fun GlimmerText(
                 TextStyle(
                     fontSize = fontSize,
                     fontWeight = FontWeight.Black,
+                    letterSpacing = letterSpacing,
                     color = Color.Black.copy(alpha = 0.5f),
                 ),
             modifier = Modifier.offset(x = 2.dp, y = 2.dp).clearAndSetSemantics { },
@@ -46,6 +48,7 @@ fun GlimmerText(
                 TextStyle(
                     fontSize = fontSize,
                     fontWeight = FontWeight.Black,
+                    letterSpacing = letterSpacing,
                     brush = brush,
                     shadow =
                         Shadow(

@@ -17,7 +17,6 @@ interface AndroidAppGraph :
     CoreProviders,
     DataProviders,
     AndroidUiModule {
-    
     val activityProvider: ActivityProvider
 
     /**

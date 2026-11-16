@@ -39,4 +39,7 @@ internal val DeepFeltGreen = Color(0xFF004D26)
 internal val DeepFeltGreenDark = Color(0xFF001A0D)
 internal val GlassWhite = Color(0x26FFFFFF) // 15% White for better glass visibility
 internal val GlassBlack = Color(0xB3000000) // 70% Black for glass backgrounds
+
+// Splash curtain: must match splash_background_green in androidApp/src/main/res/values/colors.xml
+internal val SplashCurtainGreen = Color(0xFF073B24)
 internal val TableShadow = Color(0x4D000000) // 30% Black for shadows

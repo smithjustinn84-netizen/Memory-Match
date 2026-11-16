@@ -190,7 +190,7 @@ private fun applyFlip(
     index: Int,
     card: CardState,
 ): MemoryGameState {
-    val newCards = state.cards.set(index, card.copy(isFaceUp = true))
+    val newCards = state.cards.replacingAt(index, card.copy(isFaceUp = true))
     val faceUpCountBefore = state.cards.count { it.isFaceUp && !it.isMatched }
     return state.copy(
         cards = newCards,

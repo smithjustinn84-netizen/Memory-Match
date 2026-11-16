@@ -49,7 +49,8 @@ interface AndroidUiModule {
 
     @SingleIn(AppScope::class)
     @Provides
-    fun provideAdService(activityProvider: ActivityProvider): AdService = AndroidAdService(activityProvider = activityProvider)
+    fun provideAdService(activityProvider: ActivityProvider): AdService =
+        AndroidAdService(activityProvider = activityProvider)
 
     @SingleIn(AppScope::class)
     @Provides

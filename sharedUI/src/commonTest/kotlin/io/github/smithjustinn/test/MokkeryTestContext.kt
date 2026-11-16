@@ -131,6 +131,7 @@ class MokkeryTestContext(
             MutableStateFlow(null)
         every { gameStatsRepository.getAllStats() } returns MutableStateFlow(emptyList())
 
+        every { adService.isAdLoaded } returns MutableStateFlow(false)
         everySuspend { adService.loadRewardedAd(any()) } returns Unit
         everySuspend { adService.showRewardedAd(any()) } returns Unit
 

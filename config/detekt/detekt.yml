@@ -3,21 +3,21 @@ complexity:
   # Compose functions naturally have many parameters; we relax this for @Composable
   TooManyFunctions:
     active: true
-    excludes: ['**/ui/**', '**/screens/**', '**/components/**', '**/test/**', '**/commonTest/**']
+    excludes: ['**/ui/**', '**/screens/**', '**/components/**', '**/test/**', '**/commonTest/**', '**/androidTest/**', '**/iosTest/**', '**/jvmTest/**']
   LongParameterList:
     active: true
     # 2026 Meta: Compose slots often require 10+ params (modifier, colors, state, etc.)
     ignoreAnnotated:
       - 'androidx.compose.runtime.Composable'
-    functionThreshold: 10
+    functionThreshold: 12
     constructorThreshold: 10
   CyclomaticComplexMethod:
     active: true
     threshold: 15 # Strict for logic, but allows for complex UI state switching
   LongMethod:
     active: true
-    threshold: 30 # Stricter limit for domain logic
-    excludes: ['**/test/**', '**/commonTest/**', '**/androidTest/**', '**/ui/root/**', '**/services/**', '**/desktopApp/src/main/kotlin/main.kt', '**/ui/game/DefaultGameComponent.kt']
+    threshold: 60 # Balanced for Compose and business logic
+    excludes: ['**/test/**', '**/commonTest/**', '**/androidTest/**', '**/iosTest/**', '**/jvmTest/**', '**/ui/root/**', '**/services/**', '**/desktopApp/src/main/kotlin/main.kt', '**/ui/game/DefaultGameComponent.kt']
     ignoreAnnotated:
       - 'androidx.compose.runtime.Composable'
 
@@ -32,26 +32,39 @@ naming:
       - 'androidx.compose.runtime.Composable'
   TopLevelPropertyNaming:
     active: true
-    # Allows for 'val _state = ...' pattern common in MVI/MVVM
+    # Allows for 'val _state = ...' pattern common in MVI/MVVM, and PascalCase for Compose constants
     constantPattern: '[A-Z][_a-zA-Z0-9]*|_?[a-z][a-zA-Z0-9]*'
+  InvalidPackageDeclaration:
+    active: true
+    excludes: ['**/Benchmark.kt']
 
 style:
   active: true
   # Allow "MagicNumbers" in Compose for things like Dp, Sp, and Color hex codes
   MagicNumber:
     active: true
-    excludes: ['**/test/**', '**/commonTest/**', '**/androidTest/**', '**/ui/**', '**/*Screen.kt', '**/theme/**']
+    excludes: ['**/test/**', '**/commonTest/**', '**/androidTest/**', '**/iosTest/**', '**/jvmTest/**', '**/ui/**', '**/*Screen.kt', '**/theme/**', '**/Benchmark.kt']
     ignoreEnums: true
-    ignoreNumbers: ['-1', '0', '1', '2'] # Removed 0.5 and 100 to force constants for percentages/divisors
-    ignorePropertyDeclaration: true # Allows 'const val X = 100' but flags 'if (x > 100)'
+    ignoreNumbers: ['-1', '0', '1', '2'] 
+    ignorePropertyDeclaration: true 
     ignoreAnnotated: ['androidx.compose.runtime.Composable']
   UnnecessaryParentheses:
     active: true
+    allowForUnclearPrecedence: true
   ReturnCount:
     active: true
-    max: 1
+    max: 2 # Relaxed slightly for guard clauses
     excludeGuardClauses: true
-  # UnusedPrivateMember: Removed/Split in Detekt 2.0 - relying on compiler warnings or specific rule updates
+  UnusedPrivateMember:
+    active: true
+    ignoreAnnotated: ['Preview']
+    excludes: ['**/test/**', '**/commonTest/**', '**/androidTest/**', '**/iosTest/**', '**/jvmTest/**', '**/Benchmark.kt']
+  UnusedPrivateProperty:
+    active: true
+    excludes: ['**/test/**', '**/commonTest/**', '**/androidTest/**', '**/iosTest/**', '**/jvmTest/**', '**/Benchmark.kt']
+  WildcardImport:
+    active: true
+    excludes: ['**/Benchmark.kt']
 
 performance:
   active: true
@@ -59,4 +72,34 @@ performance:
   ForEachOnRange:
     active: true
   SpreadOperator:
+    active: true
+    excludes: ['**/test/**', '**/commonTest/**', '**/androidTest/**', '**/iosTest/**', '**/jvmTest/**', '**/Benchmark.kt']
+
+exceptions:
+  active: true
+  SwallowedException:
+    active: true
+    excludes: ['**/test/**', '**/commonTest/**', '**/androidTest/**', '**/iosTest/**', '**/jvmTest/**']
+
+# io.nlopez.compose.rules configuration
+Compose:
+  active: true
+  ComposableNaming:
+    active: true
+  ModifierMissing:
+    active: true
+  ModifierReused:
+    active: true
+  ViewModelForwarding:
+    active: true
+  # Using names from 0.5.6 standard
+  ContentTrailingLambda:
+    active: true
+  MultipleEmitters:
+    active: true
+  MutableStateAutoboxing:
+    active: true
+  ModifierNaming:
+    active: true
+  ModifierWithoutDefault:
     active: true

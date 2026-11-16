@@ -147,6 +147,7 @@
     <string name="audio_nuts">nuts</string>
     <string name="splash_title">MEMORY MATCH</string>
     <string name="splash_dealing_cards">Dealing Cards...</string>
+    <string name="splash_skip">Skip intro</string>
     <string name="casino_header_title">MEMORY MATCH CASINO</string>
     <string name="circuit_completed">CIRCUIT COMPLETED</string>
     <string name="high_roller_suite">HIGH ROLLER SUITE</string>

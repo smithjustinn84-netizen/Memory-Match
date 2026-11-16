@@ -28,6 +28,7 @@ abstract class BaseComponentTest {
     }
 
     /** A helper to run component tests using the class-level [testDispatcher]. */
-    protected fun runTest(block: suspend TestScope.(LifecycleRegistry) -> Unit) =
+    protected fun runTest(block: suspend TestScope.(LifecycleRegistry) -> Unit) {
         runComponentTest(testDispatcher, block = block)
+    }
 }

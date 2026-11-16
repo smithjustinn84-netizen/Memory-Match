@@ -180,7 +180,8 @@ private fun PhysicsEngine(
                 withFrameNanos { frameTime ->
                     if (startTimeNanos == 0L) startTimeNanos = frameTime
                     val elapsedSeconds = (frameTime - startTimeNanos) / NANOS_PER_SECOND
-                    // Bolt: Use index-based loop instead of forEach to avoid Iterator allocation inside withFrameNanos loop
+                    // Bolt: Use index-based loop instead of forEach to avoid
+                    // Iterator allocation inside withFrameNanos loop
                     for (i in 0 until celebrationCards.size) {
                         celebrationCards[i].update(GRAVITY, FRICTION, elapsedSeconds, heightPx)
                     }

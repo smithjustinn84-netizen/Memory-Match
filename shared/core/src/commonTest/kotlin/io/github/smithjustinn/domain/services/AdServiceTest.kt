@@ -1,5 +1,7 @@
 package io.github.smithjustinn.domain.services
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -7,6 +9,7 @@ import kotlin.test.assertTrue
 
 class AdServiceTest {
     private class FakeAdService : AdService {
+        override val isAdLoaded: StateFlow<Boolean> = MutableStateFlow(false)
         var loadedAdUnitId: String? = null
         var isShowRequested: Boolean = false
         var rewardAmountToGive: Int = 0

@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.kmp.library)
     alias(libs.plugins.kotlinx.serialization)
+    // Packs :shared:core composeResources (e.g. shop_items.json) into iOS test binaries
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.room)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kover)
@@ -16,7 +19,7 @@ val buildIos = project.findProperty("target") == "ios" || project.findProperty("
 kotlin {
 
     if (buildAndroid) {
-        androidLibrary {
+        android {
             namespace = "io.github.smithjustinn.data"
             compileSdk =
                 libs.versions.android.compileSdk
@@ -35,7 +38,6 @@ kotlin {
     }
 
     if (buildIos) {
-        iosX64()
         iosArm64()
         iosSimulatorArm64()
     }
@@ -46,6 +48,7 @@ kotlin {
             implementation(libs.bundles.ktor.common)
             api(libs.bundles.room)
             implementation(libs.kermit)
+            implementation(libs.compose.runtime)
             implementation(libs.compose.resources)
         }
 
@@ -83,9 +86,13 @@ dependencies {
         if (buildAndroid) add("kspAndroid", this)
         if (buildJvm) add("kspJvm", this)
         if (buildIos) {
-            add("kspIosX64", this)
             add("kspIosArm64", this)
             add("kspIosSimulatorArm64", this)
         }
     }
+}
+
+compose.resources {
+    // This module has no resources of its own; it only reads :shared:core's.
+    generateResClass = never
 }

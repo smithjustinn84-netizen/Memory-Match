@@ -6,10 +6,10 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
+import io.github.smithjustinn.domain.services.AdService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import io.github.smithjustinn.domain.services.AdService
 
 /**
  * Android implementation of AdService using Google Mobile Ads SDK.

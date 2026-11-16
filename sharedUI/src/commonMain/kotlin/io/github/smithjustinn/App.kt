@@ -23,7 +23,7 @@ import io.github.smithjustinn.ui.root.RootContent
 import io.github.smithjustinn.ui.splash.SplashScreen
 import kotlinx.coroutines.flow.combine
 
-private const val SPLASH_ANIMATION_DURATION = 1000
+private const val SPLASH_ANIMATION_DURATION = 500
 
 @Composable
 fun App(
@@ -53,7 +53,7 @@ fun App(
             label = "SplashTransition",
         ) { show ->
             if (show) {
-                SplashScreen(onDataLoaded = { showSplash = false })
+                SplashScreen(onFinished = { showSplash = false })
             } else {
                 RootContent(component = root)
             }

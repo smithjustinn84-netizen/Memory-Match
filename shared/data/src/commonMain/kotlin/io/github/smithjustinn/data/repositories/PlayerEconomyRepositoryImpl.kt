@@ -225,5 +225,8 @@ class PlayerEconomyRepositoryImpl(
             logger.d { "Selected power up: $powerUpId" }
         }
 
-    private suspend fun getOrCreateEntity(): PlayerEconomyEntity = economyFlow.firstOrNull() ?: PlayerEconomyEntity()
+    // Read straight from the DAO, not the shared cache: callers hold [writeMutex] and the cache can lag
+    // behind the previous write, which would make back-to-back writes overwrite each other.
+    private suspend fun getOrCreateEntity(): PlayerEconomyEntity =
+        dao.getPlayerEconomy().firstOrNull() ?: PlayerEconomyEntity()
 }
