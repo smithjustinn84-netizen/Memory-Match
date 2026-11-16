@@ -186,9 +186,9 @@
     <string name="shop_title">The Shop</string>
     <string name="shop_back_description">Back</string>
     <string name="shop_bankroll_description">Bankroll</string>
-    <string name="shop_item_active">ACTIVE</string>
-    <string name="shop_item_equip">EQUIP</string>
-    <string name="shop_item_unlocked">UNLOCKED</string>
+    <string name="shop_item_active">Active</string>
+    <string name="shop_item_equip">Equip</string>
+    <string name="shop_item_unlocked">Unlocked</string>
     <string name="shop_item_price_format">$%1$d</string>
     <string name="shop_balance_format">$%1$d</string>
 
@@ -255,6 +255,6 @@
     <string name="double_rewards_ad_note">Watch ad to double</string>
     <string name="shop_ad_reward_title">Free Chips!</string>
     <string name="shop_ad_reward_description">Watch a short video to earn 200 chips</string>
-    <string name="shop_ad_reward_button">Watch &amp; Earn</string>
+    <string name="shop_ad_reward_button">Watch ad</string>
     <string name="shop_ad_reward_cooldown">Available soon</string>
 </resources>

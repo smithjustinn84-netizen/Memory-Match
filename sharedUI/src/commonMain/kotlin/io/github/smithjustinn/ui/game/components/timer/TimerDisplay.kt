@@ -47,7 +47,10 @@ import io.github.smithjustinn.utils.formatTime
 import org.jetbrains.compose.resources.stringResource
 
 private const val COLOR_TRANSITION_DURATION_MS = 500
-private const val PULSE_SCALE_TARGET = 1.15f
+
+// Kept small: the numeral scales from its left edge and must not run into the next HUD stat.
+private const val PULSE_SCALE_TARGET = 1.06f
+private const val LOSS_SCALE_TARGET = 1.08f
 private const val PIVOT_CENTER = 0.5f
 
 @Composable
@@ -138,10 +141,10 @@ private fun calculateTimerScale(
 
     val lossPulseScaleState =
         animateFloatAsState(
-            targetValue = if (showTimeLoss) 1.2f else 1f,
+            targetValue = if (showTimeLoss) LOSS_SCALE_TARGET else 1f,
             animationSpec =
                 if (showTimeLoss) {
-                    spring(dampingRatio = Spring.DampingRatioHighBouncy, stiffness = Spring.StiffnessMedium)
+                    spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium)
                 } else {
                     spring(stiffness = Spring.StiffnessLow)
                 },

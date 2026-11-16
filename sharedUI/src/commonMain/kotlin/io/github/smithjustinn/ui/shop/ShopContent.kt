@@ -349,11 +349,12 @@ private fun ShopItemInfo(
     ) {
         Text(
             text = name,
-            style = MaterialTheme.typography.titleLarge,
-            color = PokerTheme.colors.goldenYellow,
-            fontWeight = FontWeight.ExtraBold,
-            maxLines = 1,
+            style = PokerTheme.typography.titleMedium,
+            color = PokerTheme.colors.ivory,
+            minLines = 2,
+            maxLines = 2,
             overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center,
         )
 
         if (description.isNotEmpty()) {
@@ -361,7 +362,7 @@ private fun ShopItemInfo(
             Text(
                 text = description,
                 style = MaterialTheme.typography.labelMedium,
-                color = PokerTheme.colors.onSurface.copy(alpha = 0.6f),
+                color = PokerTheme.colors.sage,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center,
@@ -468,9 +469,9 @@ private fun ShopAdRewardCard(
 
             Text(
                 text = stringResource(Res.string.shop_ad_reward_title),
-                style = MaterialTheme.typography.titleLarge,
-                color = PokerTheme.colors.goldenYellow,
-                fontWeight = FontWeight.ExtraBold,
+                style = PokerTheme.typography.titleMedium,
+                color = PokerTheme.colors.ivory,
+                textAlign = TextAlign.Center,
             )
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -478,7 +479,7 @@ private fun ShopAdRewardCard(
             Text(
                 text = stringResource(Res.string.shop_ad_reward_description),
                 style = MaterialTheme.typography.labelMedium,
-                color = PokerTheme.colors.onSurface.copy(alpha = 0.6f),
+                color = PokerTheme.colors.sage,
                 textAlign = TextAlign.Center,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
@@ -498,14 +499,7 @@ private fun ShopAdRewardCard(
                 onClick = onWatchAd,
                 enabled = isAvailable,
                 modifier = Modifier.fillMaxWidth(),
-                containerColor =
-                    if (isAvailable) {
-                        PokerTheme.colors.bonusGreen
-                    } else {
-                        PokerTheme.colors.onSurface.copy(
-                            alpha = 0.12f,
-                        )
-                    },
+                isPrimary = isAvailable,
             )
         }
     }
