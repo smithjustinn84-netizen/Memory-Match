@@ -4,8 +4,8 @@
 
 # 🧩 Memory-Match: Blackjack Edition
 
-[![Kotlin 2.3.0](https://img.shields.io/badge/Kotlin-2.3.0-purple?logo=kotlin)](https://kotlinlang.org/)
-[![Compose Multiplatform 1.10.0](https://img.shields.io/badge/Compose_Multiplatform-1.10.0-blue?logo=jetpackcompose)](https://www.jetbrains.com/lp/compose-multiplatform/)
+[![Kotlin 2.4.21](https://img.shields.io/badge/Kotlin-2.4.21-purple?logo=kotlin)](https://kotlinlang.org/)
+[![Compose Multiplatform 1.12.2](https://img.shields.io/badge/Compose_Multiplatform-1.12.2-blue?logo=jetpackcompose)](https://www.jetbrains.com/lp/compose-multiplatform/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
 **A high-performance, cross-platform memory game built with Kotlin Multiplatform, showcasing modern 2026 development standards.**
@@ -27,16 +27,18 @@ Memory-Match is not just a game; it's a reference implementation for **Clean Arc
 
 ## 📸 Experience the UI
 
+The "Card Room" look: deep felt, brass gold and ivory card stock, set in Fraunces, Inter and JetBrains Mono.
+
 <p align="center">
-  <img src="screenshots/Screenshot_20260130_210034.png" width="180" alt="Screen 1">
-  <img src="screenshots/Screenshot_20260130_210054.png" width="180" alt="Screen 2">
-  <img src="screenshots/Screenshot_20260130_210112.png" width="180" alt="Screen 3">
-  <img src="screenshots/Screenshot_20260130_210326.png" width="180" alt="Screen 4">
+  <img src="screenshots/start.png" width="180" alt="Start screen with difficulty chips and game mode selector">
+  <img src="screenshots/game.png" width="180" alt="Game table with face-down cards and the time, pot and score bar">
+  <img src="screenshots/match.png" width="180" alt="Game table mid-round with a card face up and matched pairs cleared">
+  <img src="screenshots/results.png" width="180" alt="Results shown as a paper receipt with the total payout">
 </p>
 <p align="center">
-  <img src="screenshots/Screenshot_20260130_210358.png" width="180" alt="Screen 5">
-  <img src="screenshots/Screenshot_20260130_210417.png" width="180" alt="Screen 6">
-  <img src="screenshots/Screenshot_20260130_210449.png" width="180" alt="Screen 7">
+  <img src="screenshots/settings.png" width="180" alt="Settings with card back and symbol style pickers">
+  <img src="screenshots/high-scores.png" width="180" alt="High scores with difficulty tabs">
+  <img src="screenshots/shop.png" width="180" alt="The Shop with card backs and skins">
 </p>
 
 ---
@@ -52,7 +54,7 @@ Memory-Match goes beyond a simple card game by introducing high-stakes mechanics
 ### 🔥 Combo-Driven "Heat" System
 Success breeds intensity. By matching multiple pairs in quick succession, you build a **Combo Multiplier**.
 *   **Activation**: Reach a `Combo x4` or higher to trigger **Heat Mode**.
-*   **Visual Transformation**: The UI shifts to an electric neon color palette with smooth animated background transitions.
+*   **Visual Transformation**: The felt cross-fades from green to ember red, with amber accents and coal-black card backs.
 *   **Tactile Feedback**: Haptics become significantly more pronounced, making every match feel explosive.
 *   **Rewards**: High combos in Time Attack grant massive "Mega Bonus" time gains, essential for high-score runs.
 *   **All-In Double Down**: Activate specific "Doubling" mode to gamble your entire game.
@@ -61,7 +63,7 @@ Success breeds intensity. By matching multiple pairs in quick succession, you bu
     *   **Constraint**: Requires 3+ pairs to activate.
 
 ### ✨ Key Features
-*   **The Shop**: Spend your hard-earned chips on exclusive Card Backs and Skins to customize your deck.
+*   **The Shop**: Spend your hard-earned chips on exclusive Card Backs and Skins to customize your deck, then switch between the ones you own in Settings.
 *   **Onboarding**: Interactive walkthrough to guide new players through the mechanics.
 *   **Peek Mode**: Get a quick glimpse of the cards before the game starts (if enabled).
 *   **Poker-Style Commentary**: A dynamic Dealer personality providing context-aware commentary ("River Magic!", "Pot Odds!", "All In!") based on your gameplay.
@@ -162,13 +164,13 @@ We use a **Component-Based MVI** pattern powered by **Decompose**, ensuring stri
 
 | Layer           | Technology                | Version     | Key Benefit                                         |
 | :-------------- | :------------------------ | :---------- | :-------------------------------------------------- |
-| **Language**    | **Kotlin**                | 2.3.0       | K2 Mode, Context Parameters, Multi-dollar strings   |
-| **UI**          | **Compose Multiplatform** | 1.10.0      | Adaptive layouts, Shared Resources, Skiko Rendering |
-| **Collections** | **Immutable Collections** | 0.4.0       | Optimized Strong Skipping support for Compose       |
-| **DI**          | **Koin**                  | 4.1.1       | Pragmatic, stable, KMP-native                       |
-| **Navigation**  | **Decompose**             | 3.4.0       | Lifecycle-aware, platform-agnostic navigation       |
-| **Persistence** | **Room (KMP)**            | 2.8.4       | Type-safe SQLite, Bundled Drivers                   |
-| **Animations**  | **Compottie**             | 2.0.2       | Lottie for KMP                                      |
+| **Language**    | **Kotlin**                | 2.4.21      | K2 Mode, Context Parameters, Multi-dollar strings   |
+| **UI**          | **Compose Multiplatform** | 1.12.2      | Adaptive layouts, Shared Resources, Skiko Rendering |
+| **Collections** | **Immutable Collections** | 0.5.2       | Optimized Strong Skipping support for Compose       |
+| **DI**          | **Metro**                 | 1.5.2       | Compile-time dependency graph, KMP-native           |
+| **Navigation**  | **Decompose**             | 3.6.2       | Lifecycle-aware, platform-agnostic navigation       |
+| **Persistence** | **Room (KMP)**            | 2.8.5       | Type-safe SQLite, Bundled Drivers                   |
+| **Animations**  | **Compottie**             | 2.3.3       | Lottie for KMP                                      |
 | **Testing**     | **Turbine + Mokkery**     | 1.2.1 / 3.x | Flow-first testing, KSP-based mocking               |
 
 ---
@@ -197,7 +199,7 @@ Quality is baked into the foundation. We use a multi-layered testing approach to
 ### 🚀 Running Tests
 You can run all tests across the entire project with a single command:
 ```bash
-./run_tests.sh
+./mm.py test
 ```
 
 Alternatively, run specific module tests:
@@ -281,13 +283,23 @@ git clone https://github.com/smithjustinn/Memory-Match.git
 
 # Run the Desktop app
 ./gradlew :desktopApp:run
+
+# Run the Desktop app with Compose Hot Reload (UI edits apply live)
+./mm.py build desktop --hot
+
+# Build for Android or the iOS simulator
+./mm.py build android
+./mm.py build ios
 ```
+
+### Fonts
+The app bundles [Fraunces](https://fonts.google.com/specimen/Fraunces), [Inter](https://fonts.google.com/specimen/Inter) and [JetBrains Mono](https://fonts.google.com/specimen/JetBrains+Mono), each under the SIL Open Font License 1.1.
 
 ---
 
 ## 🤝 Contribution Guidelines
 
-We adhere to the **Kotlin 2.3+ Clean Architecture** guidelines.
+We adhere to the **Kotlin 2.4+ Clean Architecture** guidelines.
 1. **Consistency**: Check `AGENTS.md` for the latest coding standards.
 2. **UI First**: All UI components must reside in `sharedUI/commonMain` unless platform-specific interop (e.g., Apple HealthKit) is required.
 3. **State Management**: Maintain Unidirectional Data Flow using Decompose Components.
