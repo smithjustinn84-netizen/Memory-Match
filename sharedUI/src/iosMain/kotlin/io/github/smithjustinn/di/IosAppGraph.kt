@@ -1,6 +1,7 @@
 package io.github.smithjustinn.di
 
 import dev.zacsweers.metro.DependencyGraph
+import dev.zacsweers.metro.createGraph
 
 /**
  * iOS-specific concrete dependency graph.
@@ -11,9 +12,11 @@ interface IosAppGraph :
     AppGraph,
     CoreProviders,
     DataProviders,
-    IosUiModule
+    IosUiModule,
+    IosBindings
 
 /**
- * Creates the iOS dependency graph using Metro's compile-time graph factory.
+ * Creates the iOS dependency graph using Metro's compile-time graph creator.
+ * The graph takes no runtime inputs, so no @DependencyGraph.Factory is needed.
  */
-fun createIosGraph(): AppGraph = createGraphFactory<IosAppGraph>().create()
+fun createIosGraph(): AppGraph = createGraph<IosAppGraph>()
