@@ -15,11 +15,13 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,13 +33,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -66,10 +71,11 @@ import io.github.smithjustinn.resources.score_time_bonus
 import io.github.smithjustinn.resources.share_receipt
 import io.github.smithjustinn.resources.time_label
 import io.github.smithjustinn.resources.times_up
-import io.github.smithjustinn.resources.total_payout
+import io.github.smithjustinn.resources.total_payout_chips
 import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.components.AppIcons
 import io.github.smithjustinn.ui.components.PokerButton
+import io.github.smithjustinn.ui.components.ShopIcons
 import io.github.smithjustinn.ui.extensions.pokerClickable
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -90,6 +96,7 @@ private const val ACTION_GAP_DP = 12
 
 private val TitleFontSize = 44.sp
 private val TitleMinFontSize = 28.sp
+private const val TOTAL_CHIP_ICON_DP = 28
 private val StampFontSize = 13.sp
 private const val STAMP_TILT_DEGREES = -3f
 private const val STAMP_BORDER_DP = 1.5f
@@ -183,14 +190,38 @@ private fun ResultsLayout(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .then(if (pinActions) Modifier.weight(1f).verticalScroll(scrollState) else Modifier)
+                    .then(if (pinActions) Modifier.weight(1f) else Modifier)
                     .padding(top = spacing.large, bottom = spacing.extraLarge),
         ) {
-            receipt()
+            if (pinActions) ScaleToFitHeight(content = receipt) else receipt()
         }
         actions()
     }
 }
+
+/**
+ * Shrinks [content] uniformly when it is taller than the space left above the pinned actions
+ * (more line items, or an extra action button), so the whole receipt stays visible.
+ */
+@Composable
+private fun ScaleToFitHeight(content: @Composable () -> Unit) {
+    Layout(content = content, modifier = Modifier.fillMaxWidth()) { measurables, constraints ->
+        val placeable = measurables.first().measure(constraints.copy(minHeight = 0, maxHeight = Constraints.Infinity))
+        val available = constraints.maxHeight
+        val overflows = constraints.hasBoundedHeight && placeable.height > available
+        val fitScale = if (overflows) (available.toFloat() / placeable.height).coerceAtLeast(MIN_FIT_SCALE) else 1f
+
+        layout(placeable.width, if (overflows) available else placeable.height) {
+            placeable.placeWithLayer(0, 0) {
+                scaleX = fitScale
+                scaleY = fitScale
+                transformOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 0f)
+            }
+        }
+    }
+}
+
+private const val MIN_FIT_SCALE = 0.6f
 
 /** Tilted slip of card-stock paper with rounded top corners and a torn bottom edge. */
 @Composable
@@ -323,15 +354,23 @@ private fun TotalPayout(
             horizontalArrangement = Arrangement.spacedBy(RECEIPT_ROW_GAP_DP.dp),
         ) {
             Text(
-                text = stringResource(Res.string.total_payout).uppercase(),
+                text = stringResource(Res.string.total_payout_chips).uppercase(),
                 style = monoBold.copy(fontSize = TotalLabelFontSize, letterSpacing = TotalLabelTracking),
                 color = PokerTheme.colors.ink,
                 modifier = Modifier.weight(1f).alignByBaseline(),
             )
+            val totalColor = if (isBust) PokerTheme.colors.tacticalRed else PokerTheme.colors.ink
+            // The chip marks the total as currency; the line items above it are score points.
+            Icon(
+                imageVector = ShopIcons.CasinoChip,
+                contentDescription = null,
+                tint = totalColor,
+                modifier = Modifier.size(TOTAL_CHIP_ICON_DP.dp).align(Alignment.CenterVertically),
+            )
             Text(
                 text = stringResource(Res.string.clean_number_format, animatedScore()),
                 style = monoBold.copy(fontSize = TotalValueFontSize, lineHeight = TotalValueFontSize),
-                color = if (isBust) PokerTheme.colors.tacticalRed else PokerTheme.colors.ink,
+                color = totalColor,
                 maxLines = 1,
                 softWrap = false,
                 modifier = Modifier.alignByBaseline(),

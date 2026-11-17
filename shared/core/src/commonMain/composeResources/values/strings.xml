@@ -163,7 +163,7 @@
     <string name="score_caps">SCORE</string>
     <string name="high_roller_circuit">HIGH ROLLER CIRCUIT</string>
     <string name="mode_high_roller">High Roller</string>
-    <string name="total_payout">TOTAL PAYOUT</string>
+    <string name="total_payout_chips">Payout in chips</string>
     <string name="score_match_points_label">Base Match Pts</string>
     <string name="score_combo_bonus_label">Combo Bonus</string>
     <string name="mode_time_attack_caps">Time Attack</string>
