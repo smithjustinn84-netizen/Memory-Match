@@ -188,8 +188,8 @@ private fun GameMainScreenWrapper(
                     useCompactUI = useCompactUI,
                 )
 
-                // Embers overlay - Foreground
-                ParticleEmbers(isHeatMode = state.isHeatMode)
+                // Embers overlay - Foreground. Off once the round ends, so they don't drift over the receipt.
+                ParticleEmbers(isHeatMode = state.isHeatMode && !state.game.isGameOver)
 
                 // Steam Cool Down Effect
                 SteamEffect(isVisible = showSteam)
