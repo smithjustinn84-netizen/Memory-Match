@@ -56,4 +56,18 @@ The look is defined in `sharedUI/src/commonMain/kotlin/io/github/smithjustinn/th
 -   **Strings**: Compose resources do not unescape Android-style values, so write `%` and `'` literally (no `%%`, no surrounding quotes).
 
 ---
+
+## 🌿 6. Version Control (Jujutsu)
+
+This is a colocated **jj** repo. Use `jj` for version control, not `git` commands that change state (`commit`, `switch`, `branch`, `rebase`, `stash`). Read-only git commands are fine.
+
+-   **Survey first**: `jj log` and `jj bookmark list -a`. Anonymous jj changes do not appear in `git branch`, so a git-only survey misses work.
+-   **Commit**: `jj describe -m "type: summary"` names the working-copy change (`@`); `jj new` starts the next one. `jj commit -m` does both.
+-   **Bookmarks**: branches are bookmarks (`jj bookmark set|delete <name>`). They do not follow new changes, so move one before pushing: `jj bookmark set main -r @-`.
+-   **Push**: `jj git fetch`, then `jj git push --bookmark <name>`.
+-   **Drop work**: `jj abandon <change>`; `jj undo` reverses the last operation.
+-   **Detached HEAD**: git reporting a detached HEAD is normal here. Do not `git switch` to fix it.
+-   **`mm.py`**: `task` and `done` still call git (worktrees, branches, a suggested `git commit`). Take the suggested message and commit it with `jj describe` instead.
+
+---
 *Immutable Source of Truth | Last Updated: November 2026*
