@@ -12,9 +12,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -121,6 +124,14 @@ fun AuroraEffect(
                     // Reuse a single Path object for all waves to avoid allocation
                     val path = Path()
 
+                    // The waves change shape every frame. Anti-aliased, a concave path like this is
+                    // rasterised on the CPU and uploaded as a screen-wide texture, three times a frame;
+                    // without anti-aliasing the GPU fills it directly. Each gradient starts transparent
+                    // at the crest, so the edge shows no stair-stepping.
+                    val l1Paint = waveWithoutAntiAlias(l1Brush, size)
+                    val l2Paint = waveWithoutAntiAlias(l2Brush, size)
+                    val l3Paint = waveWithoutAntiAlias(l3Brush, size)
+
                     onDrawBehind {
                         // Read state inside draw scope to trigger only redraws
                         val p1 = phase1State.value
@@ -131,21 +142,30 @@ fun AuroraEffect(
                         // Layer 1
                         path.reset()
                         buildWavePath(path, width, heightPx, p1, 1.0f, l1Amp, l1Y)
-                        drawPath(path, l1Brush)
+                        drawIntoCanvas { it.drawPath(path, l1Paint) }
 
                         // Layer 2
                         path.reset()
                         buildWavePath(path, width, heightPx, p2, 1.5f, l2Amp, l2Y)
-                        drawPath(path, l2Brush)
+                        drawIntoCanvas { it.drawPath(path, l2Paint) }
 
                         // Layer 3
                         path.reset()
                         buildWavePath(path, width, heightPx, p1 + p2, 2.0f, l3Amp, l3Y)
-                        drawPath(path, l3Brush)
+                        drawIntoCanvas { it.drawPath(path, l3Paint) }
                     }
                 },
     )
 }
+
+private fun waveWithoutAntiAlias(
+    brush: Brush,
+    size: Size,
+): Paint =
+    Paint().apply {
+        isAntiAlias = false
+        brush.applyTo(size, this, alpha = 1f)
+    }
 
 private fun buildWavePath(
     path: Path,

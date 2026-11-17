@@ -246,6 +246,7 @@ private fun PreviewCard(
             ),
         theme = CardTheme(back = backTheme, skin = symbolTheme),
         areSuitsMultiColored = areSuitsMultiColored,
+        isBodyLayerCached = true,
         modifier =
             Modifier
                 .width(CARD_WIDTH.dp)

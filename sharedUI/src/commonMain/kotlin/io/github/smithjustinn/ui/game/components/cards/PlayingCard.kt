@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -131,6 +132,7 @@ data class CardContainerVisuals(
     val matchedGlowAlpha: State<Float>,
     val shadowElevation: State<Dp>,
     val shadowYOffset: State<Dp>,
+    val isBodyLayerCached: Boolean = false,
 )
 
 data class CardInteractions(
@@ -165,6 +167,10 @@ fun PlayingCard(
     isMuckingEnabled: Boolean = true,
     isHeatMode: Boolean = false,
     cardWidth: Dp = Dp.Unspecified,
+    // For a card that moves every frame (the start screen's turning preview): draws its body once
+    // into an offscreen layer, so large glyphs such as the centre pip are not re-rasterised on the
+    // CPU at every new angle. Costs a card-sized texture, so the game grid leaves it off.
+    isBodyLayerCached: Boolean = false,
     onClick: () -> Unit = {},
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -199,7 +205,7 @@ fun PlayingCard(
 
     // Bolt: Memoize visuals to prevent unnecessary CardContainer recompositions on parent layout changes
     val visuals =
-        remember(content.visualState, animations) {
+        remember(content.visualState, animations, isBodyLayerCached) {
             CardContainerVisuals(
                 visualState = content.visualState,
                 rotation = animations.rotation,
@@ -207,6 +213,7 @@ fun PlayingCard(
                 matchedGlowAlpha = animations.matchedGlowAlpha,
                 shadowElevation = animations.shadowElevation,
                 shadowYOffset = animations.shadowYOffset,
+                isBodyLayerCached = isBodyLayerCached,
             )
         }
 
@@ -578,9 +585,15 @@ private fun CardBody(
                 .graphicsLayer {
                     translationX = muckTranslationX.value + shakeOffset.value
                     translationY = muckTranslationY.value
+                    val rotation = visuals.rotation.value
                     rotationZ = muckRotation.value
-                    rotationY = visuals.rotation.value
-                    scaleX = visuals.scale.value
+                    // A card resting face down is turned exactly 180 degrees, which looks the same as
+                    // a mirror. Mirror it instead: rotationY makes a perspective transform, and under
+                    // one Skia rasterises every path on the back on the CPU, every frame, per card.
+                    // (Only without muck rotation, which a mirror would turn the other way.)
+                    val restingFaceDown = rotation == FULL_ROTATION && rotationZ == 0f
+                    rotationY = if (restingFaceDown) 0f else rotation
+                    scaleX = if (restingFaceDown) -visuals.scale.value else visuals.scale.value
                     scaleY = visuals.scale.value
                     cameraDistance = CAMERA_DISTANCE_MULTIPLIER * density
                     alpha = 1f
@@ -608,7 +621,13 @@ private fun CardBody(
                         interactionSource = interactions.interactionSource,
                         role = Role.Button,
                     ).fillMaxSize()
-                    .cardBorder(visuals.rotation, visuals.visualState)
+                    .then(
+                        if (visuals.isBodyLayerCached) {
+                            Modifier.graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                        } else {
+                            Modifier
+                        },
+                    ).cardBorder(visuals.rotation, visuals.visualState)
                     .semantics {
                         this.contentDescription = contentDescription
                     },

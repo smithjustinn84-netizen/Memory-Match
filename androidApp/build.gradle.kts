@@ -36,6 +36,14 @@ android {
                 "proguard-rules.pro",
             )
         }
+        // Release code, debug-signed and profileable, for on-device tracing.
+        create("benchmark") {
+            initWith(getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
+            applicationIdSuffix = ".benchmark"
+            isShrinkResources = false
+        }
     }
 
     compileOptions {

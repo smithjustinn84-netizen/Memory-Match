@@ -148,7 +148,10 @@ internal fun CardBack(
         modifier =
             Modifier
                 .fillMaxSize()
-                .graphicsLayer { rotationY = FULL_ROTATION }
+                // Un-mirror the back, which faces away on a card turned 180 degrees. A mirror, not
+                // rotationY = 180: that is a perspective transform, and Skia rasterises paths drawn
+                // under one on the CPU every frame.
+                .graphicsLayer { scaleX = -1f }
                 .drawWithContent {
                     drawContent()
 
