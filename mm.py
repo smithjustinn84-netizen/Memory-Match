@@ -349,7 +349,8 @@ def handle_task(args):
             error("Cannot remove the current workspace.")
         
         log(f"Removing workspace {name}...")
-        registered = any(ws["name"] == name and not ws["current"] for ws in list_workspaces())
+        workspace = next((ws for ws in list_workspaces() if ws["name"] == name and not ws["current"]), None)
+        registered = workspace is not None
         if target_dir.exists():
             if registered:
                 # Any jj command snapshots the directory, so unsaved edits become a change before it goes.
@@ -363,6 +364,10 @@ def handle_task(args):
         for b in sorted(set(jj_lines("bookmark", "list", "-T", 'name ++ "\\n"'))):
             if b.endswith(f"/{name}"):
                 jj("bookmark", "delete", b)
+        if registered:
+            # An untouched task leaves an empty, undescribed change behind; real work is kept.
+            leftover = f'{workspace["change"]} & empty() & description(exact:"")'
+            jj("abandon", "-r", leftover, capture_output=True)
         success(f"Workspace '{name}' and its bookmark removed.")
         print("Its changes are still in `jj log`; drop any you don't want with `jj abandon`.")
 
@@ -638,6 +643,9 @@ def main():
         sys.exit(0)
         
     args = parser.parse_args()
+
+    # Keep our output in order with jj's and Gradle's when stdout is a pipe.
+    sys.stdout.reconfigure(line_buffering=True)
     
     if not args.no_banner and args.command != "locate":
         print(ASCII_ART)

@@ -44,7 +44,7 @@ fun main() {
             onCloseRequest = ::exitApplication,
         ) {
             window.minimumSize = Dimension(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
-            appGraph.logger.i { "Logging initialized via Koin" }
+            appGraph.logger.i { "Logging initialized via Metro" }
             App(
                 root = root,
                 appGraph = appGraph,

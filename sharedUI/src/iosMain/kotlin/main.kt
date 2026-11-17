@@ -25,7 +25,7 @@ fun MainViewController(): UIViewController =
                 )
             }
 
-        appGraph.logger.i { "Logging initialized via Koin" }
+        appGraph.logger.i { "Logging initialized via Metro" }
 
         App(
             root = root,
