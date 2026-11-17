@@ -10,7 +10,6 @@ import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -19,7 +18,7 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
 import platform.AVFAudio.AVAudioPlayer
 import platform.AVFAudio.AVAudioSession
-import platform.AVFAudio.AVAudioSessionCategoryPlayback
+import platform.AVFAudio.AVAudioSessionCategoryAmbient
 import platform.AVFAudio.setActive
 import platform.Foundation.NSData
 import platform.Foundation.create
@@ -39,9 +38,7 @@ class IosAudioServiceImpl(
     private var isMusicEnabled = true
     private var isMusicRequested = false
     private var soundVolume = 1.0f
-    private var musicVolume = 1.0f
-    private var musicPlayer: AVAudioPlayer? = null
-    private var musicLoadingJob: Job? = null
+    private val musicFader = MusicFader(scope) { createMusicTrack() }
 
     init {
         setupAudioSession()
@@ -63,10 +60,8 @@ class IosAudioServiceImpl(
             }.launchIn(scope)
 
         settingsRepository.musicVolume
-            .onEach { volume ->
-                musicVolume = volume
-                musicPlayer?.volume = volume
-            }.launchIn(scope)
+            .onEach { musicFader.targetVolume = it }
+            .launchIn(scope)
 
         preloadSounds()
     }
@@ -74,7 +69,8 @@ class IosAudioServiceImpl(
     private fun setupAudioSession() {
         try {
             val session = AVAudioSession.sharedInstance()
-            session.setCategory(AVAudioSessionCategoryPlayback, error = null)
+            // Ambient: respects the silent switch and mixes with whatever the player is listening to.
+            session.setCategory(AVAudioSessionCategoryAmbient, error = null)
             session.setActive(true, error = null)
         } catch (
             @Suppress("TooGenericExceptionCaught") e: Exception,
@@ -107,6 +103,7 @@ class IosAudioServiceImpl(
                             repeat(PLAYER_POOL_SIZE) {
                                 val player = AVAudioPlayer(data = data, error = null)
                                 player.volume = soundVolume
+                                player.enableRate = true // must be set before prepareToPlay
                                 player.prepareToPlay()
                                 localPool.add(player)
                             }
@@ -126,7 +123,10 @@ class IosAudioServiceImpl(
         }
     }
 
-    private fun playSound(resource: StringResource) {
+    private fun playSound(
+        resource: StringResource,
+        rate: Float,
+    ) {
         if (!isSoundEnabled) return
 
         val pool = playerPools[resource]
@@ -145,14 +145,18 @@ class IosAudioServiceImpl(
             player.currentTime = 0.0
         }
 
+        player.rate = rate
         player.play()
 
         // Update index for next call
         poolIndices[resource] = (currentIndex + 1) % pool.size
     }
 
-    override fun playEffect(effect: AudioService.SoundEffect) {
-        playSound(effect.toResource())
+    override fun playEffect(
+        effect: AudioService.SoundEffect,
+        rate: Float,
+    ) {
+        playSound(effect.toResource(), rate.coerceIn(MIN_RATE, MAX_RATE))
     }
 
     override fun startMusic() {
@@ -166,64 +170,51 @@ class IosAudioServiceImpl(
     }
 
     private fun updateMusicPlayback() {
-        if (isMusicRequested && isMusicEnabled) {
-            actuallyStartMusic()
-        } else {
-            actuallyStopMusic()
-        }
+        musicFader.setPlaying(isMusicRequested && isMusicEnabled)
     }
 
-    private fun actuallyStartMusic() {
-        if (musicPlayer?.playing == true) return
-        if (musicLoadingJob?.isActive == true) return
-
-        musicLoadingJob =
-            scope.launch {
-                try {
-                    if (musicPlayer == null) {
-                        musicPlayer = createMusicPlayer()
-                    }
-
-                    if (isMusicRequested && isMusicEnabled) {
-                        musicPlayer?.play()
-                    }
-                } catch (
-                    @Suppress("TooGenericExceptionCaught") e: Exception,
-                ) {
-                    logger.e(e) { "Error starting music" }
-                } finally {
-                    musicLoadingJob = null
-                }
-            }
-    }
-
-    private suspend fun createMusicPlayer(): AVAudioPlayer? =
-        withContext(Dispatchers.Default) {
-            val name = getString(AudioService.MUSIC)
-            val path = "$name.m4a"
-            val bytes = Res.readBytes("files/$path")
-            if (bytes.isNotEmpty()) {
+    private suspend fun createMusicTrack(): MusicTrack? =
+        try {
+            withContext(Dispatchers.Default) {
+                val name = getString(AudioService.MUSIC)
+                val bytes = Res.readBytes("files/$name.m4a")
+                if (bytes.isEmpty()) return@withContext null
                 val data =
                     bytes.usePinned { pinned ->
                         NSData.create(bytes = pinned.addressOf(0), length = bytes.size.toULong())
                     }
                 AVAudioPlayer(data = data, error = null).apply {
                     numberOfLoops = -1
-                    volume = musicVolume
+                    volume = 0f
                     prepareToPlay()
                 }
-            } else {
-                null
-            }
+            }?.let(::IosMusicTrack)
+        } catch (
+            @Suppress("TooGenericExceptionCaught") e: Exception,
+        ) {
+            logger.e(e) { "Error starting music" }
+            null
         }
 
-    private fun actuallyStopMusic() {
-        musicLoadingJob?.cancel()
-        musicLoadingJob = null
-        musicPlayer?.stop()
+    private class IosMusicTrack(
+        private val player: AVAudioPlayer,
+    ) : MusicTrack {
+        override fun play() {
+            if (!player.playing) player.play()
+        }
+
+        override fun setVolume(volume: Float) {
+            player.volume = volume
+        }
+
+        override fun release() {
+            player.stop()
+        }
     }
 
     companion object {
-        private const val PLAYER_POOL_SIZE = 3
+        private const val PLAYER_POOL_SIZE = 4
+        private const val MIN_RATE = 0.5f
+        private const val MAX_RATE = 2f
     }
 }

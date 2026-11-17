@@ -6,6 +6,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import io.github.smithjustinn.di.LocalAppGraph
+import io.github.smithjustinn.services.AudioPitch
 import io.github.smithjustinn.services.AudioService
 import io.github.smithjustinn.services.HapticsService
 
@@ -40,9 +41,9 @@ private fun handleGameEvent(
     onTheNuts: () -> Unit,
 ) {
     when (event) {
-        GameUiEvent.PlayFlip -> audioService.playEffect(AudioService.SoundEffect.FLIP)
-        GameUiEvent.PlayMatch -> {
-            audioService.playEffect(AudioService.SoundEffect.MATCH)
+        GameUiEvent.PlayFlip -> audioService.playEffect(AudioService.SoundEffect.FLIP, AudioPitch.jitter())
+        is GameUiEvent.PlayMatch -> {
+            audioService.playEffect(AudioService.SoundEffect.MATCH, AudioPitch.comboRate(event.combo))
             hapticsService.vibrateMatch()
         }
         GameUiEvent.PlayMismatch -> {
@@ -62,7 +63,7 @@ private fun handleGameEvent(
             audioService.playEffect(AudioService.SoundEffect.LOSE)
         }
         GameUiEvent.PlayHighScore -> audioService.playEffect(AudioService.SoundEffect.HIGH_SCORE)
-        GameUiEvent.PlayDeal -> audioService.playEffect(AudioService.SoundEffect.DEAL)
+        GameUiEvent.PlayDeal -> audioService.playEffect(AudioService.SoundEffect.DEAL, AudioPitch.jitter())
         GameUiEvent.VibrateMatch -> hapticsService.vibrateMatch()
         GameUiEvent.VibrateMismatch -> hapticsService.vibrateMismatch()
         GameUiEvent.VibrateTick -> hapticsService.vibrateTick()

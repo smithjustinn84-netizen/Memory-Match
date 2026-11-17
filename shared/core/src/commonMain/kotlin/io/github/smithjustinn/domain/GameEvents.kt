@@ -57,7 +57,9 @@ sealed class GameEffect {
         val amount: Int,
     ) : GameEffect()
 
-    data object PlayMatchSound : GameEffect()
+    data class PlayMatchSound(
+        val combo: Int,
+    ) : GameEffect()
 
     data object VibrateMismatch : GameEffect()
 

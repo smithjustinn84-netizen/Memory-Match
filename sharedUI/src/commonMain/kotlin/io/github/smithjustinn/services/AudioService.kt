@@ -15,7 +15,14 @@ import io.github.smithjustinn.resources.audio_win
 import org.jetbrains.compose.resources.StringResource
 
 interface AudioService {
-    fun playEffect(effect: SoundEffect)
+    /**
+     * Plays [effect]. [rate] scales playback speed and pitch together (1 = as recorded);
+     * platforms clamp it to what they support (0.5 to 2).
+     */
+    fun playEffect(
+        effect: SoundEffect,
+        rate: Float = 1f,
+    )
 
     fun startMusic()
 
@@ -45,7 +52,6 @@ interface AudioService {
 
                 SoundEffect.THE_NUTS -> Res.string.audio_nuts
 
-                // Placeholder until custom sound added
                 SoundEffect.WIN -> Res.string.audio_win
 
                 SoundEffect.LOSE -> Res.string.audio_lose

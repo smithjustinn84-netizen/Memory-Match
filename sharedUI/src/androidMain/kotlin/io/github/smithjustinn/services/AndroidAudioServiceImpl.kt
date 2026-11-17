@@ -53,8 +53,8 @@ class AndroidAudioServiceImpl(
     private var isMusicEnabled = true
     private var isMusicRequested = false
     private var soundVolume = 1.0f
-    private var musicVolume = 1.0f
-    private var musicPlayer: MediaPlayer? = null
+    private var musicFileWritten = false
+    private val musicFader = MusicFader(scope) { createMusicTrack() }
 
     init {
         settingsRepository.isSoundEnabled
@@ -72,10 +72,8 @@ class AndroidAudioServiceImpl(
             }.launchIn(scope)
 
         settingsRepository.musicVolume
-            .onEach { volume ->
-                musicVolume = volume
-                musicPlayer?.setVolume(volume, volume)
-            }.launchIn(scope)
+            .onEach { musicFader.targetVolume = it }
+            .launchIn(scope)
 
         soundPool.setOnLoadCompleteListener { _, sampleId, status ->
             if (status == 0) {
@@ -115,12 +113,15 @@ class AndroidAudioServiceImpl(
             null
         }
 
-    private fun playSound(resource: StringResource) {
+    private fun playSound(
+        resource: StringResource,
+        rate: Float,
+    ) {
         if (!isSoundEnabled) return
 
         val soundId = soundMap[resource]
         if (soundId != null && loadedSounds.contains(soundId)) {
-            val streamId = soundPool.play(soundId, soundVolume, soundVolume, 1, 0, 1f)
+            val streamId = soundPool.play(soundId, soundVolume, soundVolume, 1, 0, rate)
             if (streamId == 0) {
                 logger.w { "SoundPool play failed, using fallback for: $resource" }
                 playFallback(resource)
@@ -131,7 +132,7 @@ class AndroidAudioServiceImpl(
                 delay(SOUNDPOOL_RETRY_DELAY_MS)
                 val retrySoundId = soundMap[resource]
                 if (retrySoundId != null && loadedSounds.contains(retrySoundId)) {
-                    soundPool.play(retrySoundId, soundVolume, soundVolume, 1, 0, 1f)
+                    soundPool.play(retrySoundId, soundVolume, soundVolume, 1, 0, rate)
                 } else {
                     logger.w { "SoundPool not ready after retry, using fallback for: $resource" }
                     playFallback(resource)
@@ -195,8 +196,11 @@ class AndroidAudioServiceImpl(
         }
     }
 
-    override fun playEffect(effect: AudioService.SoundEffect) {
-        playSound(effect.toResource())
+    override fun playEffect(
+        effect: AudioService.SoundEffect,
+        rate: Float,
+    ) {
+        playSound(effect.toResource(), rate.coerceIn(MIN_RATE, MAX_RATE))
     }
 
     override fun startMusic() {
@@ -210,60 +214,74 @@ class AndroidAudioServiceImpl(
     }
 
     private fun updateMusicPlayback() {
-        if (isMusicRequested && isMusicEnabled) {
-            if (musicPlayer?.isPlaying != true) {
-                actuallyStartMusic()
-            }
-        } else {
-            // stop() is not called to avoid IllegalStateException if player is preparing.
-            // release() is sufficient to stop playback and free resources.
-            musicPlayer?.release()
-            musicPlayer = null
-        }
+        musicFader.setPlaying(isMusicRequested && isMusicEnabled)
     }
 
     @OptIn(ExperimentalResourceApi::class)
-    private fun actuallyStartMusic() {
-        scope.launch {
-            try {
-                val name = getString(AudioService.MUSIC)
-                val fileName = "$name.m4a"
-                val tempFile = File(context.cacheDir, fileName)
-
-                withContext(Dispatchers.IO) {
-                    if (!tempFile.exists()) {
-                        val bytes = Res.readBytes("files/$fileName")
-                        FileOutputStream(tempFile).use { it.write(bytes) }
-                    }
+    private suspend fun createMusicTrack(): MusicTrack? =
+        try {
+            val name = getString(AudioService.MUSIC)
+            val fileName = "$name.m4a"
+            val tempFile = File(context.cacheDir, fileName)
+            withContext(Dispatchers.IO) {
+                // Rewrite once per process so an app update's new music replaces the cached copy.
+                if (!musicFileWritten || !tempFile.exists()) {
+                    val bytes = Res.readBytes("files/$fileName")
+                    FileOutputStream(tempFile).use { it.write(bytes) }
+                    musicFileWritten = true
                 }
-
-                if (!isMusicRequested || !isMusicEnabled || musicPlayer?.isPlaying == true) return@launch
-
-                musicPlayer?.release()
-                musicPlayer =
-                    MediaPlayer().apply {
-                        setDataSource(tempFile.absolutePath)
-                        isLooping = true
-                        setVolume(musicVolume, musicVolume)
-                        setOnPreparedListener { mp ->
-                            if (musicPlayer == mp && isMusicRequested && isMusicEnabled) {
-                                mp.start()
-                            }
-                        }
-                        prepareAsync()
-                    }
-            } catch (e: IOException) {
-                logger.e(e) { "IO Error starting music" }
-            } catch (
-                @Suppress("TooGenericExceptionCaught") e: Exception,
-            ) {
-                logger.e(e) { "Unexpected error starting music" }
             }
+            AndroidMusicTrack(tempFile)
+        } catch (e: IOException) {
+            logger.e(e) { "IO Error starting music" }
+            null
+        } catch (
+            @Suppress("TooGenericExceptionCaught") e: Exception,
+        ) {
+            logger.e(e) { "Unexpected error starting music" }
+            null
+        }
+
+    /** Looping MediaPlayer that defers play() until async preparation finishes. Main thread only. */
+    private inner class AndroidMusicTrack(
+        file: File,
+    ) : MusicTrack {
+        private var isPrepared = false
+        private var wantsPlay = false
+        private var level = 0f
+        private val player =
+            MediaPlayer().apply {
+                setDataSource(file.absolutePath)
+                isLooping = true
+                setVolume(0f, 0f)
+                setOnPreparedListener { mp ->
+                    isPrepared = true
+                    mp.setVolume(level, level)
+                    if (wantsPlay) mp.start()
+                }
+                prepareAsync()
+            }
+
+        override fun play() {
+            wantsPlay = true
+            if (isPrepared && !player.isPlaying) player.start()
+        }
+
+        override fun setVolume(volume: Float) {
+            level = volume
+            if (isPrepared) player.setVolume(volume, volume)
+        }
+
+        override fun release() {
+            // stop() is skipped: it throws while preparing, and release() stops playback anyway.
+            player.release()
         }
     }
 
     companion object {
         private const val MAX_STREAMS = 10
         private const val SOUNDPOOL_RETRY_DELAY_MS = 100L
+        private const val MIN_RATE = 0.5f
+        private const val MAX_RATE = 2f
     }
 }

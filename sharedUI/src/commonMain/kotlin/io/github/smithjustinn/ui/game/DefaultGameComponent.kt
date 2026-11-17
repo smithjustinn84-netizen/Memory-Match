@@ -370,7 +370,7 @@ class DefaultGameComponent(
             is GameEffect.TimerUpdate -> handleTimerUpdate(effect)
             is GameEffect.TimeGain -> handleTimeGain(effect)
             is GameEffect.TimeLoss -> handleTimeLoss(effect)
-            GameEffect.PlayMatchSound -> handleMatchSound()
+            is GameEffect.PlayMatchSound -> handleMatchSound(effect.combo)
             GameEffect.GameOver -> handleGameLost()
             is GameEffect.GameWon -> handleGameWon(effect.finalState)
             is GameEffect.EarnCurrency -> handleEarnCurrency(effect)
@@ -428,9 +428,9 @@ class DefaultGameComponent(
         }
     }
 
-    private fun handleMatchSound() {
-        _events.tryEmit(GameUiEvent.PlayMatch)
-        if (_state.value.game.comboMultiplier > GameConstants.COMBO_EXPLOSION_THRESHOLD) {
+    private fun handleMatchSound(combo: Int) {
+        _events.tryEmit(GameUiEvent.PlayMatch(combo))
+        if (combo > GameConstants.COMBO_EXPLOSION_THRESHOLD) {
             scope.launch {
                 _state.update { it.copy(showComboExplosion = true) }
                 delay(GameConstants.COMBO_EXPLOSION_DURATION_MS)

@@ -54,7 +54,9 @@ data class GameUIState(
 sealed class GameUiEvent {
     data object PlayFlip : GameUiEvent()
 
-    data object PlayMatch : GameUiEvent()
+    data class PlayMatch(
+        val combo: Int,
+    ) : GameUiEvent()
 
     data object PlayMismatch : GameUiEvent()
 

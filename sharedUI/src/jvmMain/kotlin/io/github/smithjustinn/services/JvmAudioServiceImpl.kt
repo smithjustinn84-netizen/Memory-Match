@@ -5,11 +5,12 @@ import io.github.smithjustinn.domain.repositories.SettingsRepository
 import io.github.smithjustinn.resources.Res
 import io.github.smithjustinn.services.AudioService.Companion.toResource
 import javafx.application.Platform
+import javafx.scene.media.AudioClip
 import javafx.scene.media.Media
 import javafx.scene.media.MediaPlayer
-import javafx.util.Duration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -17,21 +18,26 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
 import java.io.File
-import java.io.FileOutputStream
 import java.util.concurrent.ConcurrentHashMap
 
 class JvmAudioServiceImpl(
     private val logger: Logger,
     settingsRepository: SettingsRepository,
 ) : AudioService {
-    private val scope = CoroutineScope(Dispatchers.IO)
-    private val players = ConcurrentHashMap<StringResource, MediaPlayer>()
-    private var isSoundEnabled = true
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    // All music state lives on this single-threaded dispatcher, as MusicFader requires.
+    private val musicScope = CoroutineScope(SupervisorJob() + Dispatchers.Default.limitedParallelism(1))
+
+    // AudioClip is low-latency and polyphonic: overlapping flips don't cut each other off.
+    private val clips = ConcurrentHashMap<StringResource, AudioClip>()
+
+    @Volatile private var isSoundEnabled = true
+
+    @Volatile private var soundVolume = 1.0f
     private var isMusicEnabled = true
     private var isMusicRequested = false
-    private var soundVolume = 1.0f
-    private var musicVolume = 1.0f
-    private var musicPlayer: MediaPlayer? = null
+    private val musicFader = MusicFader(musicScope) { createMusicTrack() }
 
     private val tempCacheDir =
         File(System.getProperty("java.io.tmpdir"), "memory_match_audio").apply {
@@ -57,124 +63,122 @@ class JvmAudioServiceImpl(
             .launchIn(scope)
 
         settingsRepository.soundVolume
-            .onEach { volume ->
-                soundVolume = volume
-            }.launchIn(scope)
+            .onEach { soundVolume = it }
+            .launchIn(scope)
 
         settingsRepository.isMusicEnabled
             .onEach { enabled ->
                 isMusicEnabled = enabled
                 updateMusicPlayback()
-            }.launchIn(scope)
+            }.launchIn(musicScope)
 
         settingsRepository.musicVolume
-            .onEach { volume ->
-                musicVolume = volume
-                musicPlayer?.let { it.volume = volume.toDouble() }
-            }.launchIn(scope)
+            .onEach { musicFader.targetVolume = it }
+            .launchIn(musicScope)
 
         scope.launch {
             AudioService.SoundEffect.entries.forEach { effect ->
-                loadSound(effect.toResource())
+                loadClip(effect.toResource())
             }
         }
     }
 
+    /**
+     * Copies a bundled sound to the temp cache (JavaFX needs a URI). The name carries a content
+     * hash, so an update that changes a sound never plays a stale cached copy.
+     */
     private suspend fun getAudioFile(resource: StringResource): File {
         val name = getString(resource)
-        val fileName = "$name.m4a"
-        val tempFile = File(tempCacheDir, fileName)
-
+        val bytes = Res.readBytes("files/$name.m4a")
+        val tag = "${bytes.size.toString(HEX)}-${bytes.contentHashCode().toUInt().toString(HEX)}"
+        val tempFile = File(tempCacheDir, "$name-$tag.m4a")
         if (!tempFile.exists()) {
-            val bytes = Res.readBytes("files/$fileName")
-            FileOutputStream(tempFile).use { it.write(bytes) }
+            tempFile.writeBytes(bytes)
         }
-
         return tempFile
     }
 
-    private suspend fun loadSound(resource: StringResource): MediaPlayer? =
+    private suspend fun loadClip(resource: StringResource) {
         withContext(Dispatchers.IO) {
             try {
-                val tempFile = getAudioFile(resource)
-                val media = Media(tempFile.toURI().toString())
-                val player = MediaPlayer(media)
-                player.setOnReady {
-                    player.volume = soundVolume.toDouble()
-                }
-                players[resource] = player
-                player
+                clips[resource] = AudioClip(getAudioFile(resource).toURI().toString())
             } catch (
                 @Suppress("TooGenericExceptionCaught") e: Exception,
             ) {
                 logger.e(e) { "Error pre-loading sound resource: $resource" }
-                null
             }
         }
-
-    private fun playSound(resource: StringResource) {
-        if (!isSoundEnabled) return
-
-        val player = players[resource] ?: return
-        player.stop()
-        player.seek(Duration.ZERO)
-        player.volume = soundVolume.toDouble()
-        player.play()
     }
 
-    override fun playEffect(effect: AudioService.SoundEffect) {
-        playSound(effect.toResource())
+    override fun playEffect(
+        effect: AudioService.SoundEffect,
+        rate: Float,
+    ) {
+        if (!isSoundEnabled) return
+        val clip = clips[effect.toResource()] ?: return
+        clip.play(
+            soundVolume.toDouble(),
+            0.0,
+            rate.coerceIn(MIN_RATE, MAX_RATE).toDouble(),
+            0.0,
+            0,
+        )
     }
 
     override fun startMusic() {
-        isMusicRequested = true
-        updateMusicPlayback()
+        musicScope.launch {
+            isMusicRequested = true
+            updateMusicPlayback()
+        }
     }
 
     override fun stopMusic() {
-        isMusicRequested = false
-        updateMusicPlayback()
+        musicScope.launch {
+            isMusicRequested = false
+            updateMusicPlayback()
+        }
     }
 
     private fun updateMusicPlayback() {
-        if (isMusicRequested && isMusicEnabled) {
-            if (musicPlayer?.status != MediaPlayer.Status.PLAYING) {
-                actuallyStartMusic()
-            }
-        } else {
-            actuallyStopMusic()
+        musicFader.setPlaying(isMusicRequested && isMusicEnabled)
+    }
+
+    private suspend fun createMusicTrack(): MusicTrack? =
+        try {
+            val file = withContext(Dispatchers.IO) { getAudioFile(AudioService.MUSIC) }
+            JvmMusicTrack(MediaPlayer(Media(file.toURI().toString())))
+        } catch (
+            @Suppress("TooGenericExceptionCaught") e: Exception,
+        ) {
+            logger.e(e) { "Error starting music" }
+            null
+        }
+
+    private class JvmMusicTrack(
+        private val player: MediaPlayer,
+    ) : MusicTrack {
+        init {
+            player.cycleCount = MediaPlayer.INDEFINITE
+            player.volume = 0.0
+        }
+
+        override fun play() {
+            if (player.status != MediaPlayer.Status.PLAYING) player.play()
+        }
+
+        override fun setVolume(volume: Float) {
+            player.volume = volume.toDouble()
+        }
+
+        override fun release() {
+            player.stop()
+            player.dispose()
         }
     }
 
-    private fun actuallyStartMusic() {
-        scope.launch {
-            try {
-                if (musicPlayer == null) {
-                    val tempFile = getAudioFile(AudioService.MUSIC)
-                    val media = Media(tempFile.toURI().toString())
-                    musicPlayer =
-                        MediaPlayer(media).apply {
-                            cycleCount = MediaPlayer.INDEFINITE
-                            setOnReady {
-                                volume = musicVolume.toDouble()
-                            }
-                        }
-                }
-
-                if (isMusicRequested && isMusicEnabled) {
-                    musicPlayer?.play()
-                }
-            } catch (
-                @Suppress("TooGenericExceptionCaught") e: Exception,
-            ) {
-                logger.e(e) { "Error starting music" }
-            }
-        }
-    }
-
-    private fun actuallyStopMusic() {
-        musicPlayer?.stop()
-        musicPlayer?.dispose()
-        musicPlayer = null
+    private companion object {
+        const val MIN_RATE = 0.5f
+        const val MAX_RATE = 2f
+        const val HEX = 16
     }
 }

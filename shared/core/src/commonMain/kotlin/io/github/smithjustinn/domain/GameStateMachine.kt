@@ -137,7 +137,7 @@ class GameStateMachine(
     private fun StateMachineBuilder.handleGameWon(flippedState: MemoryGameState) {
         +GameEffect.PlayFlipSound
         +GameEffect.VibrateMatch
-        +GameEffect.PlayMatchSound
+        +GameEffect.PlayMatchSound(flippedState.comboMultiplier)
         stopTimer()
         val finalState = ScoreKeeper.applyFinalBonuses(flippedState, internalTimeSeconds)
         transition { finalState }
@@ -160,7 +160,7 @@ class GameStateMachine(
     ) {
         +GameEffect.PlayFlipSound
         +GameEffect.VibrateMatch
-        +GameEffect.PlayMatchSound
+        +GameEffect.PlayMatchSound(flippedState.comboMultiplier)
 
         if (event == GameDomainEvent.TheNutsAchieved) {
             +GameEffect.PlayTheNutsSound
