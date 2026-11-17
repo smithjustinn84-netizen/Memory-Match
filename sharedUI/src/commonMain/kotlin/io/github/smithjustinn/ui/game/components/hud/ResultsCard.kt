@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -54,6 +56,7 @@ import io.github.smithjustinn.resources.game_over
 import io.github.smithjustinn.resources.high_roller_suite
 import io.github.smithjustinn.resources.moves_label
 import io.github.smithjustinn.resources.play_again
+import io.github.smithjustinn.resources.receipt_new_high_score
 import io.github.smithjustinn.resources.score_combo_bonus_label
 import io.github.smithjustinn.resources.score_daily_challenge_bonus
 import io.github.smithjustinn.resources.score_double_down
@@ -86,6 +89,10 @@ private const val HEADER_LINE_GAP_DP = 6
 private const val ACTION_GAP_DP = 12
 
 private val TitleFontSize = 44.sp
+private val TitleMinFontSize = 28.sp
+private val StampFontSize = 13.sp
+private const val STAMP_TILT_DEGREES = -3f
+private const val STAMP_BORDER_DP = 1.5f
 private val TitleLineHeight = 48.sp
 private val TitleTracking = (-0.01).em
 private val TotalLabelFontSize = 14.sp
@@ -108,6 +115,7 @@ fun ResultsCard(
     mode: GameMode = GameMode.TIME_ATTACK,
     onScoreTick: () -> Unit = {},
     onBackToLobby: (() -> Unit)? = null,
+    isNewHighScore: Boolean = false,
 ) {
     val isTimeAttack = mode == GameMode.TIME_ATTACK
     val titleRes =
@@ -143,6 +151,7 @@ fun ResultsCard(
                         animatedScore = { roundedScore.value },
                         highScore = highScore,
                         isBust = isBusted || scoreBreakdown.earnedCurrency <= 0,
+                        isNewHighScore = isNewHighScore,
                     )
                 }
             },
@@ -244,7 +253,11 @@ private fun CasinoHeader(
                 ),
             color = PokerTheme.colors.ink,
             textAlign = TextAlign.Center,
-            modifier = Modifier.semantics { heading() },
+            // Long titles shrink to stay on one line, so the receipt keeps its height on phones.
+            maxLines = 1,
+            softWrap = false,
+            autoSize = TextAutoSize.StepBased(minFontSize = TitleMinFontSize, maxFontSize = TitleFontSize),
+            modifier = Modifier.fillMaxWidth().semantics { heading() },
         )
         ReceiptCaption(
             text = stringResource(Res.string.high_roller_suite),
@@ -293,6 +306,7 @@ private fun TotalPayout(
     animatedScore: () -> Int,
     highScore: Int,
     isBust: Boolean,
+    isNewHighScore: Boolean,
 ) {
     val monoBold = TextStyle(fontFamily = PokerTheme.fonts.mono, fontWeight = FontWeight.Bold)
 
@@ -323,8 +337,37 @@ private fun TotalPayout(
                 modifier = Modifier.alignByBaseline(),
             )
         }
-        ReceiptCaption(text = stringResource(Res.string.best_score_label, highScore))
+        if (isNewHighScore) {
+            NewHighScoreStamp()
+        } else {
+            ReceiptCaption(text = stringResource(Res.string.best_score_label, highScore))
+        }
     }
+}
+
+/** A rubber-stamp mark on the receipt, in place of the "Best" line, when this round set the record. */
+@Composable
+private fun NewHighScoreStamp() {
+    val stampColor = PokerTheme.colors.tacticalRed
+    val shape = PokerTheme.shapes.small
+
+    Text(
+        text = stringResource(Res.string.receipt_new_high_score).uppercase(),
+        style =
+            TextStyle(
+                fontFamily = PokerTheme.fonts.mono,
+                fontWeight = FontWeight.Bold,
+                fontSize = StampFontSize,
+                letterSpacing = TotalLabelTracking,
+            ),
+        color = stampColor,
+        maxLines = 1,
+        modifier =
+            Modifier
+                .graphicsLayer { rotationZ = STAMP_TILT_DEGREES }
+                .border(STAMP_BORDER_DP.dp, stampColor, shape)
+                .padding(horizontal = PokerTheme.spacing.small, vertical = PokerTheme.spacing.extraSmall),
+    )
 }
 
 @Composable

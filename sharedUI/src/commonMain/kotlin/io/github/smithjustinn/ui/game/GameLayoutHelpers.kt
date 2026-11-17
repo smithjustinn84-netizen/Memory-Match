@@ -41,7 +41,6 @@ import io.github.smithjustinn.theme.PokerTheme
 import io.github.smithjustinn.ui.components.AuroraEffect
 import io.github.smithjustinn.ui.game.components.effects.CardFountainOverlay
 import io.github.smithjustinn.ui.game.components.effects.ConfettiEffect
-import io.github.smithjustinn.ui.game.components.hud.NewHighScoreSnackbar
 import io.github.smithjustinn.ui.game.components.hud.ResultsCard
 import io.github.smithjustinn.utils.Constants
 import kotlinx.coroutines.launch
@@ -53,9 +52,6 @@ private const val FELT_FOCUS_X = 0.5f
 private const val FELT_FOCUS_Y = 0.45f
 private const val FELT_MID_STOP = 0.5f
 private const val RESULTS_SCRIM_ALPHA = 0.86f
-private const val SNACKBAR_TOP_PADDING = 16
-private const val SNACKBAR_HORIZONTAL_PADDING = 16
-private const val SNACKBAR_MAX_WIDTH = 500
 private const val RESULTS_MAX_WIDTH = 550
 
 /**
@@ -148,19 +144,6 @@ fun GameGameOverOverlay(
             )
 
             ConfettiEffect()
-
-            if (state.isNewHighScore) {
-                NewHighScoreSnackbar(
-                    modifier =
-                        Modifier
-                            .align(Alignment.TopCenter)
-                            .padding(
-                                top = SNACKBAR_TOP_PADDING.dp,
-                                start = SNACKBAR_HORIZONTAL_PADDING.dp,
-                                end = SNACKBAR_HORIZONTAL_PADDING.dp,
-                            ).widthIn(max = SNACKBAR_MAX_WIDTH.dp),
-                )
-            }
         }
     }
 }
@@ -204,6 +187,7 @@ private fun BoxScope.GameResultsOverlay(
             hapticsService.vibrateMatch()
         },
         onScoreTick = { hapticsService.vibrateTick() },
+        isNewHighScore = state.isNewHighScore,
         onBackToLobby = {
             audioService.playEffect(AudioService.SoundEffect.CLICK)
             component.onBack()
