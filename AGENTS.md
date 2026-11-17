@@ -67,7 +67,7 @@ This is a colocated **jj** repo. Use `jj` for version control, not `git` command
 -   **Push**: `jj git fetch`, then `jj git push --bookmark <name>`.
 -   **Drop work**: `jj abandon <change>`; `jj undo` reverses the last operation.
 -   **Detached HEAD**: git reporting a detached HEAD is normal here. Do not `git switch` to fix it.
--   **`mm.py`**: `task` and `done` still call git (worktrees, branches, a suggested `git commit`). Take the suggested message and commit it with `jj describe` instead.
+-   **`mm.py`**: built on jj. `task new` creates a jj workspace in `../worktrees/<name>` with a `<type>/<name>` bookmark, `task remove` forgets it (its changes stay in `jj log`), and `done` suggests a `jj commit` message.
 
 ---
 *Immutable Source of Truth | Last Updated: November 2026*

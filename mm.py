@@ -11,7 +11,7 @@ from pathlib import Path
 from datetime import datetime
 
 # --- Configuration ---
-APP_VERSION = "1.3.0"
+APP_VERSION = "1.4.0"
 CONFIG_FILES = ["local.properties", ".env", "google-services.json"]
 ANDROID_PACKAGE = "io.github.smithjustinn.androidApp"
 ANDROID_ACTIVITY = ".AppActivity"
@@ -115,15 +115,63 @@ def run_gradle(tasks, params=None, show_spinner=True, msg="Gradle executing...")
         cmd.extend(params)
     return run_command(cmd, show_spinner=show_spinner, spinner_msg=msg)
 
+def jj(*args, capture_output=False, cwd=None):
+    """Runs a Jujutsu command. Version control here goes through jj, not git."""
+    return run_command(["jj", "--no-pager", *args], cwd=cwd, capture_output=capture_output)
+
+def jj_lines(*args, cwd=None):
+    """Runs a jj command and returns its non-empty output lines (empty if it failed)."""
+    res = jj(*args, capture_output=True, cwd=cwd)
+    if res.returncode != 0:
+        return []
+    return [line for line in (res.stdout or "").splitlines() if line.strip()]
+
 def get_project_root():
     try:
-        res = run_command(["git", "rev-parse", "--show-toplevel"], capture_output=True)
-        return Path(res.stdout.strip())
+        res = run_command(["jj", "--no-pager", "workspace", "root"], capture_output=True)
+        if res.returncode == 0 and res.stdout.strip():
+            return Path(res.stdout.strip())
     except Exception:
-        return Path(os.getcwd())
+        pass
+    return Path(os.getcwd())
 
 PROJECT_ROOT = get_project_root()
-WORKTREES_DIR = PROJECT_ROOT.parent / "worktrees"
+WORKSPACES_DIR = PROJECT_ROOT.parent / "worktrees"
+
+WORKSPACE_TEMPLATE = (
+    'name ++ "\\t" ++ if(current_workspace, "1", "0") ++ "\\t" ++ root ++ "\\t" ++ '
+    'target.change_id().shortest(8) ++ "\\t" ++ target.description().first_line() ++ "\\n"'
+)
+
+def list_workspaces():
+    """Returns every jj workspace as a dict of name, current, path, change and description."""
+    workspaces = []
+    for line in jj_lines("workspace", "list", "-T", WORKSPACE_TEMPLATE):
+        name, current, root, change, desc = (line.split("\t") + [""] * 5)[:5]
+        is_current = current == "1"
+        # jj's recorded root goes stale if the folder is moved, so trust the live one for this workspace.
+        path = PROJECT_ROOT if is_current else Path(root)
+        workspaces.append({"name": name, "current": is_current, "path": path, "change": change, "desc": desc})
+    return workspaces
+
+def other_workspaces():
+    return [ws for ws in list_workspaces() if not ws["current"]]
+
+def prune_git_worktrees():
+    """jj backs each colocated workspace with a Git worktree but has no command to drop a stale record."""
+    if check_command("git"):
+        run_command(["git", "worktree", "prune"], cwd=PROJECT_ROOT, capture_output=True)
+
+def nearest_bookmarks():
+    """Bookmarks on the working-copy change or its closest bookmarked ancestors."""
+    return jj_lines(
+        "log", "--no-graph", "-r", "heads(::@ & bookmarks())",
+        "-T", 'local_bookmarks.map(|b| b.name()).join("\\n") ++ "\\n"',
+    )
+
+def working_copy_changes():
+    """Files changed in the working-copy change, as (mode, path) pairs."""
+    return [(line[0], line[2:]) for line in jj_lines("diff", "--summary", "-r", "@")]
 
 def safe_path_join(base, *paths):
     try:
@@ -232,14 +280,18 @@ def handle_task(args):
         task_type = args.type
         name = validate_task_name(args.name)
         branch = f"{task_type}/{name}"
-        target_dir = safe_path_join(WORKTREES_DIR, name)
+        target_dir = safe_path_join(WORKSPACES_DIR, name)
         
         if target_dir.exists():
-            error(f"Worktree directory already exists: {target_dir}")
+            error(f"Workspace directory already exists: {target_dir}")
+        if any(ws["name"] == name for ws in list_workspaces()):
+            error(f"A jj workspace named '{name}' already exists. Run: ./mm.py task remove {name}")
         
-        log(f"Creating worktree for '{branch}'...")
-        WORKTREES_DIR.mkdir(exist_ok=True)
-        run_command(["git", "worktree", "add", str(target_dir), "-b", branch])
+        log(f"Creating workspace for '{branch}'...")
+        WORKSPACES_DIR.mkdir(exist_ok=True)
+        jj("workspace", "add", str(target_dir), "--name", name)
+        # The bookmark labels the task; `mm done` reads it to suggest a commit message.
+        jj("bookmark", "create", branch, "-r", "@", cwd=target_dir)
         
         # Sync configs
         for f in CONFIG_FILES:
@@ -247,46 +299,39 @@ def handle_task(args):
             if src.exists():
                 shutil.copy(src, target_dir / f)
         
-        success(f"Worktree ready: {target_dir}")
+        success(f"Workspace ready: {target_dir}")
         print(f"Tip: cd {target_dir}")
         
     elif sub == "list":
-        run_command(["git", "worktree", "list"])
+        jj("workspace", "list")
 
     elif sub == "locate":
         name = args.name
-        res = subprocess.run(["git", "worktree", "list", "--porcelain"], capture_output=True, text=True)
-        path = None
-        for line in res.stdout.splitlines():
-            if line.startswith("worktree") and line.endswith(f"/{name}"):
-                path = line.split()[1]
-                break
+        path = next((ws["path"] for ws in list_workspaces() if ws["name"] == name), None)
         if path:
             print(path)
         else:
             error(f"Workspace '{name}' not found.")
 
     elif sub == "clean":
-        log("Pruning orphaned worktree metadata...")
-        run_command(["git", "worktree", "prune"])
+        log("Forgetting workspaces whose directory is gone...")
+        for ws in other_workspaces():
+            if not ws["path"].exists():
+                log(f"Forgetting {ws['name']}...")
+                jj("workspace", "forget", ws["name"])
+        prune_git_worktrees()
         success("Cleanup complete.")
         
     elif sub == "remove":
         name = args.name
         if not name:
-            res = run_command(["git", "worktree", "list", "--porcelain"], capture_output=True)
-            worktrees = []
-            for line in res.stdout.splitlines():
-                if line.startswith("worktree"):
-                    path = Path(line.split()[1])
-                    if path != PROJECT_ROOT:
-                        worktrees.append(path.name)
+            worktrees = [ws["name"] for ws in other_workspaces()]
             
             if not worktrees:
-                log("No additional worktrees found.")
+                log("No additional workspaces found.")
                 return
                 
-            print(f"\n{Colors.BOLD}Select worktree to remove:{Colors.NC}")
+            print(f"\n{Colors.BOLD}Select workspace to remove:{Colors.NC}")
             for i, wt in enumerate(worktrees):
                 print(f"  {i+1}) {wt}")
             
@@ -299,52 +344,53 @@ def handle_task(args):
                 error("Invalid selection.")
 
         validate_task_name(name)
-        target_dir = safe_path_join(WORKTREES_DIR, name)
+        target_dir = safe_path_join(WORKSPACES_DIR, name)
         if str(target_dir) in os.getcwd():
-            error("Cannot remove the current worktree.")
+            error("Cannot remove the current workspace.")
         
-        log(f"Removing worktree {name}...")
+        log(f"Removing workspace {name}...")
+        registered = any(ws["name"] == name and not ws["current"] for ws in list_workspaces())
         if target_dir.exists():
-            run_command(["git", "worktree", "remove", str(target_dir), "--force"])
-        else:
-            # Try removing by name if dir is gone
-            run_command(["git", "worktree", "prune"])
+            if registered:
+                # Any jj command snapshots the directory, so unsaved edits become a change before it goes.
+                jj("status", capture_output=True, cwd=target_dir)
+            shutil.rmtree(target_dir)
+        if registered:
+            jj("workspace", "forget", name)
+        prune_git_worktrees()
         
-        # Find and remove branch
-        res = run_command(["git", "branch", "--list", f"*{name}"], capture_output=True)
-        branches = res.stdout.split()
-        for b in branches:
-            if b != "*" and b.endswith(name):
-                run_command(["git", "branch", "-D", b])
-        success(f"Worktree '{name}' and associated branches removed.")
+        # Find and remove the task bookmark (the listing repeats a name once per remote)
+        for b in sorted(set(jj_lines("bookmark", "list", "-T", 'name ++ "\\n"'))):
+            if b.endswith(f"/{name}"):
+                jj("bookmark", "delete", b)
+        success(f"Workspace '{name}' and its bookmark removed.")
+        print("Its changes are still in `jj log`; drop any you don't want with `jj abandon`.")
 
 def handle_sync(args):
     log("Syncing config files...")
-    res = run_command(["git", "worktree", "list", "--porcelain"], capture_output=True)
-    paths = [line.split()[1] for line in res.stdout.splitlines() if line.startswith("worktree")]
-    
-    for p in paths:
-        path = Path(p)
-        if path == PROJECT_ROOT:
+    for ws in other_workspaces():
+        path = ws["path"]
+        if not path.exists():
+            warn(f"Skipping {ws['name']}: {path} is missing (run: ./mm.py task clean)")
             continue
         log(f"Syncing to {path.name}...")
         for f in CONFIG_FILES:
             src = PROJECT_ROOT / f
             if src.exists():
                 shutil.copy(src, path / f)
-    success("All worktrees synchronized.")
+    success("All workspaces synchronized.")
 
 def handle_context(args):
     log("Generating AI Context Summary...")
-    branch_res = run_command(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True)
-    branch = branch_res.stdout.strip()
-    status_res = run_command(["git", "status", "--porcelain"], capture_output=True)
-    status = status_res.stdout
-    modified_files = [line.split()[-1] for line in status.splitlines()]
+    change = "".join(jj_lines("log", "--no-graph", "-r", "@", "-T", 'change_id.shortest(8) ++ "\\n"'))
+    bookmarks = ", ".join(nearest_bookmarks()) or "none"
+    changes = working_copy_changes()
+    modified_files = [file for _, file in changes]
     
     print(f"\n{Colors.CYAN}{Colors.BOLD}--- AI CONTEXT SUMMARY ---{Colors.NC}")
-    print(f"{Colors.BOLD}Current Branch:{Colors.NC} {Colors.PURPLE}{branch}{Colors.NC}")
-    print(f"{Colors.BOLD}Status:{Colors.NC} {Colors.YELLOW}{len(modified_files)}{Colors.NC} files modified/untracked")
+    print(f"{Colors.BOLD}Current Change:{Colors.NC} {Colors.PURPLE}{change}{Colors.NC}")
+    print(f"{Colors.BOLD}Nearest Bookmark:{Colors.NC} {Colors.PURPLE}{bookmarks}{Colors.NC}")
+    print(f"{Colors.BOLD}Status:{Colors.NC} {Colors.YELLOW}{len(modified_files)}{Colors.NC} files changed in the working copy")
     
     # Coverage Info
     report_path = PROJECT_ROOT / "docs/KOVER_COVERAGE_SUMMARY.md"
@@ -375,19 +421,21 @@ def handle_context(args):
         print(f" {Colors.GRAY}•{Colors.NC} {label}")
             
     print(f"\n{Colors.CYAN}{Colors.BOLD}Recent Changes:{Colors.NC}")
-    if status:
-        for line in status.splitlines():
-            mode, file = line[:2], line[3:]
-            color = Colors.GREEN if 'A' in mode or '?' in mode else Colors.YELLOW
+    if changes:
+        for mode, file in changes:
+            color = Colors.GREEN if mode == 'A' else Colors.YELLOW
             print(f" {color}{mode}{Colors.NC} {file}")
     else:
-        print(f" {Colors.GRAY}No uncommitted changes.{Colors.NC}")
+        print(f" {Colors.GRAY}The working-copy change is empty.{Colors.NC}")
     
-    print(f"\n{Colors.CYAN}{Colors.BOLD}Recent History (Last 3 Commits):{Colors.NC}")
-    hist_res = run_command(["git", "log", "--oneline", "-n", "3"], capture_output=True)
-    for line in hist_res.stdout.splitlines():
-        sha, msg = line.split(' ', 1)
-        print(f" {Colors.YELLOW}{sha}{Colors.NC} {msg}")
+    print(f"\n{Colors.CYAN}{Colors.BOLD}Recent History (Last 3 Changes):{Colors.NC}")
+    history = jj_lines(
+        "log", "--no-graph", "-n", "3", "-r", "::@-",
+        "-T", 'change_id.shortest(8) ++ " " ++ description.first_line() ++ "\\n"',
+    )
+    for line in history:
+        change_id, _, msg = line.partition(' ')
+        print(f" {Colors.YELLOW}{change_id}{Colors.NC} {msg or '(no description set)'}")
     print(f"{Colors.CYAN}--------------------------{Colors.NC}\n")
 
 def handle_done(args):
@@ -395,22 +443,23 @@ def handle_done(args):
     log("Running verification...")
     run_gradle(["spotlessApply", "detekt"], msg="Verifying and formatting...")
     
-    branch_res = run_command(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True)
-    branch = branch_res.stdout.strip()
     print(f"\n{Colors.BOLD}Final Status:{Colors.NC}")
-    run_command(["git", "status", "--short"])
+    jj("status")
     
-    if "/" in branch:
+    # A task bookmark looks like "feat/scoreboard"; plain ones such as "main" carry no task.
+    branch = next((b for b in nearest_bookmarks() if "/" in b), "")
+    if branch:
         task_type, desc = branch.split("/", 1)
         desc = desc.replace("-", " ")
-        success(f"Suggested command: git commit -m \"{task_type}: {desc}\"")
+        success(f"Suggested command: jj commit -m \"{task_type}: {desc}\"")
     else:
-        success("Suggested command: git commit -m \"feat: description\"")
+        success("Suggested command: jj commit -m \"feat: description\"")
 
 def handle_doctor(args):
     log("Checking environment health...")
     checks = [
         ("JDK", ["java", "-version"]),
+        ("jj", ["jj", "--version"]),
         ("Git", ["git", "--version"]),
         ("ADB", ["adb", "version"]),
         ("Gradle", ["./gradlew", "--version"]),
@@ -488,24 +537,20 @@ def handle_coverage(args):
 
 def handle_status(args):
     log("Project Status Overview")
-    print(f"\n{Colors.CYAN}{Colors.BOLD}--- GIT STATUS ---{Colors.NC}")
-    status_res = run_command(["git", "status", "--short"], capture_output=True)
-    if status_res.stdout:
-        for line in status_res.stdout.splitlines():
-            mode, file = line[:2], line[3:]
-            color = Colors.GREEN if 'A' in mode or '?' in mode else Colors.YELLOW
+    print(f"\n{Colors.CYAN}{Colors.BOLD}--- JJ STATUS ---{Colors.NC}")
+    changes = working_copy_changes()
+    if changes:
+        for mode, file in changes:
+            color = Colors.GREEN if mode == 'A' else Colors.YELLOW
             print(f" {color}{mode}{Colors.NC} {file}")
     else:
-        print(f" {Colors.GREEN}Clean (nothing to commit){Colors.NC}")
+        print(f" {Colors.GREEN}Clean (the working-copy change is empty){Colors.NC}")
     
-    print(f"\n{Colors.CYAN}{Colors.BOLD}--- ACTIVE WORKTREES ---{Colors.NC}")
-    wt_res = run_command(["git", "worktree", "list"], capture_output=True)
-    for line in wt_res.stdout.splitlines():
-        parts = line.split()
-        path = parts[0]
-        sha = parts[1]
-        branch = parts[2] if len(parts) > 2 else ""
-        print(f" {Colors.BLUE}{path:40}{Colors.NC} {Colors.YELLOW}{sha}{Colors.NC} {Colors.PURPLE}{branch}{Colors.NC}")
+    print(f"\n{Colors.CYAN}{Colors.BOLD}--- ACTIVE WORKSPACES ---{Colors.NC}")
+    for ws in list_workspaces():
+        marker = "*" if ws["current"] else " "
+        desc = ws["desc"] or "(no description set)"
+        print(f" {marker} {Colors.BLUE}{str(ws['path']):40}{Colors.NC} {Colors.YELLOW}{ws['change']}{Colors.NC} {Colors.PURPLE}{ws['name']}{Colors.NC} {Colors.GRAY}{desc}{Colors.NC}")
 
 # --- Main ---
 
@@ -540,22 +585,22 @@ def main():
     test_p.add_argument("module", choices=["all", "shared", "android", "desktop"], default="all", nargs="?", 
                         help="Module to test (default: all)")
     
-    # Task (Worktree)
-    task_p = subparsers.add_parser("task", help="Manage development tasks using Git Worktrees")
+    # Task (jj workspace)
+    task_p = subparsers.add_parser("task", help="Manage development tasks using jj workspaces")
     task_sub = task_p.add_subparsers(dest="subcommand", required=True)
     
     new_p = task_sub.add_parser("new", help="Create a new workspace for a feature or fix")
     new_p.add_argument("type", choices=["feat", "fix", "refactor", "chore"], help="Task category")
-    new_p.add_argument("name", help="Task name (used for branch and directory)")
+    new_p.add_argument("name", help="Task name (used for the bookmark, workspace and directory)")
     
     task_sub.add_parser("list", help="List all active task workspaces")
     
     locate_p = task_sub.add_parser("locate", help="Find the absolute path of a workspace")
     locate_p.add_argument("name", help="Task name to locate")
     
-    task_sub.add_parser("clean", help="Remove metadata for orphaned worktrees")
+    task_sub.add_parser("clean", help="Forget workspaces whose directory is gone")
     
-    remove_p = task_sub.add_parser("remove", help="Safely delete a workspace and its branch")
+    remove_p = task_sub.add_parser("remove", help="Delete a workspace and its bookmark (its changes stay in jj log)")
     remove_p.add_argument("name", nargs="?", help="Task name to remove (interactive if omitted)")
     
     # Sync
@@ -586,7 +631,7 @@ def main():
     cov_p.add_argument("--open", action="store_true", help="Open HTML report in browser")
 
     # Status
-    subparsers.add_parser("status", help="Show unified project and worktree status")
+    subparsers.add_parser("status", help="Show unified project and workspace status")
 
     if len(sys.argv) == 1:
         parser.print_help()
