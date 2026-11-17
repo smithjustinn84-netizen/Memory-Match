@@ -1,5 +1,7 @@
 package io.github.smithjustinn.ui.game.components.effects
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -12,11 +14,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import io.github.smithjustinn.theme.PokerTheme
+import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 /**
  * A particle representing a single ember.
  */
+private const val FADE_DURATION_MS = 700
 private const val INITIAL_X = 0f
 private const val INITIAL_Y = 0f
 private const val OFF_SCREEN_THRESHOLD = -50f
@@ -111,20 +115,23 @@ fun ParticleEmbers(
 
     val frameState = remember { mutableLongStateOf(0L) }
 
+    // 0 = hidden, 1 = fully visible. Read only in the layer and draw blocks, so fading never recomposes.
+    val visibility = remember { Animatable(0f) }
+
     LaunchedEffect(isHeatMode) {
-        if (isHeatMode) {
-            while (true) {
-                withFrameNanos { time ->
-                    frameState.longValue = time
-                }
+        launch { visibility.animateTo(if (isHeatMode) 1f else 0f, tween(FADE_DURATION_MS)) }
+        // Keep the particles moving while heat is on, and until they have finished fading out.
+        while (isHeatMode || visibility.value > 0f || visibility.isRunning) {
+            withFrameNanos { time ->
+                frameState.longValue = time
             }
         }
     }
 
     // Own layer: this redraws every frame and must not make the table underneath redraw with it.
-    Canvas(modifier = modifier.fillMaxSize().graphicsLayer()) {
+    Canvas(modifier = modifier.fillMaxSize().graphicsLayer { alpha = visibility.value }) {
         // Trigger update on frame
-        if (isHeatMode) {
+        if (visibility.value > 0f) {
             // Access frameState to trigger recomposition
             frameState.longValue
 
