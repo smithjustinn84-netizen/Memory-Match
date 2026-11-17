@@ -7,6 +7,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
@@ -57,37 +58,50 @@ internal fun GridBackground(modifier: Modifier = Modifier) {
             label = "spotlightX",
         )
 
-    Box(
-        modifier =
-            modifier
-                // Own layer: the spotlight redraws every frame, and without this it would make
-                // the screen-wide felt and every sibling redraw with it.
-                .graphicsLayer()
-                .drawWithCache {
-                    // Bolt: Generate noise points only when size changes, avoiding allocation on every frame
-                    val random = Random(FELT_TEXTURE_SEED)
-                    val points =
-                        List(FELT_TEXTURE_POINT_COUNT) {
-                            Offset(random.nextFloat() * size.width, random.nextFloat() * size.height)
-                        }
-                    // Built once per size around x = 0 and slid sideways while drawing.
-                    val spotlight =
-                        Brush.radialGradient(
-                            colors = listOf(spotlightColor.copy(alpha = SPOTLIGHT_ALPHA), Color.Transparent),
-                            center = Offset(0f, size.height * SPOTLIGHT_Y_OFFSET_FRACTION),
-                            radius = size.maxDimension * SPOTLIGHT_RADIUS_MULTIPLIER,
-                        )
+    Box(modifier = modifier) {
+        // Own layer, and nothing else in it: the spotlight redraws every frame, so it must not
+        // re-record the grain or make the screen-wide felt and its siblings redraw with it.
+        Spacer(
+            modifier =
+                Modifier
+                    .matchParentSize()
+                    .graphicsLayer()
+                    .drawWithCache {
+                        // Built once per size around x = 0 and slid sideways while drawing.
+                        val spotlight =
+                            Brush.radialGradient(
+                                colors = listOf(spotlightColor.copy(alpha = SPOTLIGHT_ALPHA), Color.Transparent),
+                                center = Offset(0f, size.height * SPOTLIGHT_Y_OFFSET_FRACTION),
+                                radius = size.maxDimension * SPOTLIGHT_RADIUS_MULTIPLIER,
+                            )
 
-                    onDrawBehind {
-                        // Bolt: Read state inside draw phase to skip recomposition
-                        val shift = size.width * spotlightXState.value
-                        translate(left = shift) {
-                            drawRect(brush = spotlight, topLeft = Offset(-shift, 0f), size = size)
+                        onDrawBehind {
+                            // Bolt: Read state inside draw phase to skip recomposition
+                            val shift = size.width * spotlightXState.value
+                            translate(left = shift) {
+                                drawRect(brush = spotlight, topLeft = Offset(-shift, 0f), size = size)
+                            }
                         }
-                        drawNoiseTexture(points)
-                    }
-                },
-    )
+                    },
+        )
+
+        // The grain is static: its layer is recorded once per size, not once per spotlight frame.
+        Spacer(
+            modifier =
+                Modifier
+                    .matchParentSize()
+                    .graphicsLayer()
+                    .drawWithCache {
+                        // Bolt: Generate noise points only when size changes, avoiding allocation on every frame
+                        val random = Random(FELT_TEXTURE_SEED)
+                        val points =
+                            List(FELT_TEXTURE_POINT_COUNT) {
+                                Offset(random.nextFloat() * size.width, random.nextFloat() * size.height)
+                            }
+                        onDrawBehind { drawNoiseTexture(points) }
+                    },
+        )
+    }
 }
 
 private fun DrawScope.drawNoiseTexture(points: List<Offset>) {

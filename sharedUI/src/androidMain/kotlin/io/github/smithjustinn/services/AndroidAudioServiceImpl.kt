@@ -10,6 +10,7 @@ import io.github.smithjustinn.resources.Res
 import io.github.smithjustinn.services.AudioService.Companion.toResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -28,7 +29,9 @@ class AndroidAudioServiceImpl(
     private val logger: Logger,
     settingsRepository: SettingsRepository,
 ) : AudioService {
-    private val scope = CoroutineScope(Dispatchers.IO)
+    // MediaPlayer is not thread-safe: every player call and every field below is touched only on
+    // the main thread. File and resource work hops to IO explicitly.
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
     private val soundPool =
         SoundPool
@@ -93,12 +96,13 @@ class AndroidAudioServiceImpl(
             val name = getString(resource)
             resourceToName[resource] = name
             val fileName = "$name.m4a"
-            val bytes = Res.readBytes("files/$fileName")
-            val tempFile = File(context.cacheDir, fileName)
-            withContext(Dispatchers.IO) {
-                FileOutputStream(tempFile).use { it.write(bytes) }
-            }
-            val id = soundPool.load(tempFile.absolutePath, 1)
+            val id =
+                withContext(Dispatchers.IO) {
+                    val bytes = Res.readBytes("files/$fileName")
+                    val tempFile = File(context.cacheDir, fileName)
+                    FileOutputStream(tempFile).use { it.write(bytes) }
+                    soundPool.load(tempFile.absolutePath, 1)
+                }
             soundMap[resource] = id
             id
         } catch (e: IOException) {
@@ -142,18 +146,16 @@ class AndroidAudioServiceImpl(
         scope.launch {
             try {
                 val tempFile = File(context.cacheDir, fileName)
-                if (tempFile.exists()) {
-                    withContext(Dispatchers.Main) {
-                        val player = fallbackPlayers[resource]
-                        if (player != null) {
-                            try {
-                                if (player.isPlaying) player.seekTo(0) else player.start()
-                            } catch (e: IllegalStateException) {
-                                logger.w(e) { "Fallback player not ready or in bad state: $name" }
-                            }
-                        } else {
-                            createNewFallbackPlayer(resource, tempFile, name)
+                if (withContext(Dispatchers.IO) { tempFile.exists() }) {
+                    val player = fallbackPlayers[resource]
+                    if (player != null) {
+                        try {
+                            if (player.isPlaying) player.seekTo(0) else player.start()
+                        } catch (e: IllegalStateException) {
+                            logger.w(e) { "Fallback player not ready or in bad state: $name" }
                         }
+                    } else {
+                        createNewFallbackPlayer(resource, tempFile, name)
                     }
                 }
             } catch (
@@ -228,30 +230,28 @@ class AndroidAudioServiceImpl(
                 val fileName = "$name.m4a"
                 val tempFile = File(context.cacheDir, fileName)
 
-                if (!tempFile.exists()) {
-                    val bytes = Res.readBytes("files/$fileName")
-                    withContext(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
+                    if (!tempFile.exists()) {
+                        val bytes = Res.readBytes("files/$fileName")
                         FileOutputStream(tempFile).use { it.write(bytes) }
                     }
                 }
 
-                withContext(Dispatchers.Main) {
-                    if (!isMusicRequested || !isMusicEnabled || musicPlayer?.isPlaying == true) return@withContext
+                if (!isMusicRequested || !isMusicEnabled || musicPlayer?.isPlaying == true) return@launch
 
-                    musicPlayer?.release()
-                    musicPlayer =
-                        MediaPlayer().apply {
-                            setDataSource(tempFile.absolutePath)
-                            isLooping = true
-                            setVolume(musicVolume, musicVolume)
-                            setOnPreparedListener { mp ->
-                                if (musicPlayer == mp && isMusicRequested && isMusicEnabled) {
-                                    mp.start()
-                                }
+                musicPlayer?.release()
+                musicPlayer =
+                    MediaPlayer().apply {
+                        setDataSource(tempFile.absolutePath)
+                        isLooping = true
+                        setVolume(musicVolume, musicVolume)
+                        setOnPreparedListener { mp ->
+                            if (musicPlayer == mp && isMusicRequested && isMusicEnabled) {
+                                mp.start()
                             }
-                            prepareAsync()
                         }
-                }
+                        prepareAsync()
+                    }
             } catch (e: IOException) {
                 logger.e(e) { "IO Error starting music" }
             } catch (

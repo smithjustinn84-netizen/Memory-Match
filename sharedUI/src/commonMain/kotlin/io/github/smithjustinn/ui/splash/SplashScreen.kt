@@ -272,7 +272,13 @@ private fun SplashCard(
                 }.background(if (showFace) Color.White else backColor),
     ) {
         if (showFace) {
-            CardFace(rank = Rank.Ace, suit = spec.suit, suitColor = suitColor, theme = cardTheme.skin)
+            CardFace(
+                rank = Rank.Ace,
+                suit = spec.suit,
+                suitColor = suitColor,
+                theme = cardTheme.skin,
+                cardWidth = cardWidth,
+            )
         } else {
             CardBack(theme = cardTheme.back, backColor = backColor, rotation = flipRotation)
         }

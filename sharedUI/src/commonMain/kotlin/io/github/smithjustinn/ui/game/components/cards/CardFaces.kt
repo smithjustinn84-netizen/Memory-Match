@@ -25,8 +25,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.sp
 import io.github.smithjustinn.domain.models.CardSymbolTheme
 import io.github.smithjustinn.domain.models.CardTheme
@@ -196,28 +198,47 @@ internal fun CardFace(
     suit: Suit,
     suitColor: Color,
     theme: CardSymbolTheme,
+    cardWidth: Dp = Dp.Unspecified,
 ) {
-    val density = LocalDensity.current
-    BoxWithConstraints(modifier = Modifier.fillMaxSize().padding(6.dp)) {
-        // Base scaling on the card width (maxWidth is a Dp value)
-        val baseSize = maxWidth
-        val fontScale = density.fontScale
-
-        // Helper to get size that ignores system font scaling
-        fun getFontSize(size: Float) = (size * (baseSize.value / BASE_CARD_WIDTH) / fontScale).sp
-
-        when (theme) {
-            CardSymbolTheme.CLASSIC -> ClassicCardFace(rank, suit, suitColor, ::getFontSize)
-            CardSymbolTheme.MINIMAL -> MinimalCardFace(rank, suit, suitColor, ::getFontSize)
-            CardSymbolTheme.TEXT_ONLY -> TextOnlyCardFace(rank, suit, suitColor, ::getFontSize)
-            CardSymbolTheme.POKER -> PokerCardFace(rank, suit, suitColor, ::getFontSize)
-            CardSymbolTheme.NEON -> NeonCardFace(rank, suit, ::getFontSize)
-            CardSymbolTheme.RETRO -> RetroCardFace(rank, suit, suitColor, ::getFontSize)
-            CardSymbolTheme.ELEGANT -> ElegantCardFace(rank, suit, suitColor, ::getFontSize)
-            CardSymbolTheme.CYBERPUNK -> CyberpunkCardFace(rank, suit, suitColor, ::getFontSize)
-            CardSymbolTheme.PIXEL -> PixelCardFace(rank, suit, suitColor, ::getFontSize)
-            CardSymbolTheme.FUTURISTIC -> FuturisticCardFace(rank, suit, ::getFontSize)
+    val modifier = Modifier.fillMaxSize().padding(CARD_FACE_PADDING)
+    if (cardWidth.isSpecified) {
+        // The caller knows the width, so the face skips a subcomposition when it first appears mid-flip.
+        Box(modifier = modifier) {
+            CardFaceSymbols(rank, suit, suitColor, theme, baseSize = cardWidth - CARD_FACE_PADDING * 2)
         }
+    } else {
+        BoxWithConstraints(modifier = modifier) {
+            CardFaceSymbols(rank, suit, suitColor, theme, baseSize = maxWidth)
+        }
+    }
+}
+
+private val CARD_FACE_PADDING = 6.dp
+
+@Composable
+private fun CardFaceSymbols(
+    rank: Rank,
+    suit: Suit,
+    suitColor: Color,
+    theme: CardSymbolTheme,
+    baseSize: Dp,
+) {
+    val fontScale = LocalDensity.current.fontScale
+
+    // Helper to get size that ignores system font scaling
+    fun getFontSize(size: Float) = (size * (baseSize.value / BASE_CARD_WIDTH) / fontScale).sp
+
+    when (theme) {
+        CardSymbolTheme.CLASSIC -> ClassicCardFace(rank, suit, suitColor, ::getFontSize)
+        CardSymbolTheme.MINIMAL -> MinimalCardFace(rank, suit, suitColor, ::getFontSize)
+        CardSymbolTheme.TEXT_ONLY -> TextOnlyCardFace(rank, suit, suitColor, ::getFontSize)
+        CardSymbolTheme.POKER -> PokerCardFace(rank, suit, suitColor, ::getFontSize)
+        CardSymbolTheme.NEON -> NeonCardFace(rank, suit, ::getFontSize)
+        CardSymbolTheme.RETRO -> RetroCardFace(rank, suit, suitColor, ::getFontSize)
+        CardSymbolTheme.ELEGANT -> ElegantCardFace(rank, suit, suitColor, ::getFontSize)
+        CardSymbolTheme.CYBERPUNK -> CyberpunkCardFace(rank, suit, suitColor, ::getFontSize)
+        CardSymbolTheme.PIXEL -> PixelCardFace(rank, suit, suitColor, ::getFontSize)
+        CardSymbolTheme.FUTURISTIC -> FuturisticCardFace(rank, suit, ::getFontSize)
     }
 }
 

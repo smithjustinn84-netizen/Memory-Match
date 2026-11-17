@@ -9,9 +9,11 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 internal data class GridMetrics(
-    val cells: GridCells,
+    val columns: Int,
     val maxWidth: Dp,
-)
+) {
+    val cells: GridCells = GridCells.Fixed(columns)
+}
 
 internal data class GridSpacing(
     val horizontalPadding: Dp,

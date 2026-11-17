@@ -1,6 +1,5 @@
 package io.github.smithjustinn.ui.game.components.grid
 
-import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlin.math.ceil
@@ -78,7 +77,7 @@ private fun calculateCompactLandscapeMetrics(
             cardCount <= LARGE_GRID_THRESHOLD -> COMPACT_COLS_LARGE
             else -> COMPACT_COLS_DEFAULT
         }
-    return GridMetrics(GridCells.Fixed(cols), screenWidth)
+    return GridMetrics(cols, screenWidth)
 }
 
 private fun calculateWideMetrics(
@@ -111,7 +110,7 @@ private fun calculateWideMetrics(
 
     val finalCardWidth = maxCardHeight * CARD_ASPECT_RATIO
     val calculatedWidth = finalCardWidth * bestCols + spacing * (bestCols - 1) + hPadding
-    return GridMetrics(GridCells.Fixed(bestCols), calculatedWidth.coerceAtMost(screenWidth))
+    return GridMetrics(bestCols, calculatedWidth.coerceAtMost(screenWidth))
 }
 
 private fun calculatePortraitMetrics(
@@ -143,7 +142,7 @@ private fun calculatePortraitMetrics(
     val finalCardWidth = minOf(maxW, wFromH).coerceAtLeast(MIN_CARD_WIDTH_DP.dp)
     val calculatedWidth = finalCardWidth * cols + spacing * (cols - 1) + hPadding * 2
 
-    return GridMetrics(GridCells.Fixed(cols), calculatedWidth.coerceAtMost(screenWidth))
+    return GridMetrics(cols, calculatedWidth.coerceAtMost(screenWidth))
 }
 
 internal fun calculateGridSpacing(

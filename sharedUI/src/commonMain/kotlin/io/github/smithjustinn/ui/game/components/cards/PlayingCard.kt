@@ -164,6 +164,7 @@ fun PlayingCard(
     muckTargetRotation: Float = 15f,
     isMuckingEnabled: Boolean = true,
     isHeatMode: Boolean = false,
+    cardWidth: Dp = Dp.Unspecified,
     onClick: () -> Unit = {},
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -230,6 +231,7 @@ fun PlayingCard(
             wasSeen = wasSeen,
             isThirdEyeEnabled = isThirdEyeEnabled,
             isHeatMode = isHeatMode,
+            cardWidth = cardWidth,
         )
     }
 }
@@ -245,12 +247,19 @@ private fun CardContentSelectors(
     wasSeen: Boolean,
     isThirdEyeEnabled: Boolean,
     isHeatMode: Boolean,
+    cardWidth: Dp,
 ) {
     val showFace by remember { derivedStateOf { rotation.value <= HALF_ROTATION } }
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (showFace) {
-            CardFace(rank = content.rank, suit = content.suit, suitColor = suitColor, theme = theme.skin)
+            CardFace(
+                rank = content.rank,
+                suit = content.suit,
+                suitColor = suitColor,
+                theme = theme.skin,
+                cardWidth = cardWidth,
+            )
             if (content.visualState.isRecentlyMatched) ShimmerEffect()
         } else {
             CardBack(

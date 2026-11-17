@@ -103,6 +103,7 @@ internal fun GameGrid(
             GridContent(
                 gridCardState = gridCardState,
                 layoutConfig = layoutConfig,
+                availableWidth = maxWidth,
                 screenHeight = tableHeight,
                 bottomInset = bottomInset,
                 gridPosition = gridPosition,
@@ -224,6 +225,7 @@ private fun ScoreFlyingGridEffect(
 private fun GridContent(
     gridCardState: GridCardState,
     layoutConfig: GridLayoutConfig,
+    availableWidth: Dp,
     screenHeight: Dp,
     bottomInset: Dp,
     gridPosition: Offset,
@@ -239,6 +241,17 @@ private fun GridContent(
     val gridContext =
         remember(layoutConfig.metrics.maxWidth, screenHeight, gridPosition) {
             GridContext(layoutConfig.metrics.maxWidth, screenHeight, gridPosition)
+        }
+
+    // Each cell's width, worked out the way the fixed-column grid splits it, so card faces can size
+    // their type without measuring themselves (a BoxWithConstraints per face built mid-flip).
+    val cardWidth =
+        remember(layoutConfig, availableWidth) {
+            val spacing = layoutConfig.spacing
+            val columns = layoutConfig.metrics.columns
+            val gridWidth = minOf(availableWidth, layoutConfig.metrics.maxWidth)
+            val content = gridWidth - spacing.horizontalPadding * 2 - spacing.horizontalSpacing * (columns - 1)
+            (content / columns).coerceAtLeast(0.dp)
         }
 
     LazyVerticalGrid(
@@ -273,6 +286,7 @@ private fun GridContent(
                 isHeatMode = settings.isHeatMode,
                 gridContext = gridContext,
                 cardLayouts = cardLayouts,
+                cardWidth = cardWidth,
                 onCardClick = onCardClick,
             )
         }
@@ -292,6 +306,7 @@ private fun GridItem(
     isHeatMode: Boolean,
     gridContext: GridContext,
     cardLayouts: SnapshotStateMap<Int, CardLayoutInfo>,
+    cardWidth: Dp,
     onCardClick: (Int) -> Unit,
 ) {
     val density = LocalDensity.current
@@ -346,6 +361,7 @@ private fun GridItem(
         muckTargetOffset = cardMuckTarget.offset,
         muckTargetRotation = cardMuckTarget.rotation,
         isHeatMode = isHeatMode,
+        cardWidth = cardWidth,
         onClick = onClick,
         modifier = modifier,
     )
