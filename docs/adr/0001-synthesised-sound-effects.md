@@ -160,8 +160,8 @@ player would hear.
   binary even when the sounds did not change.
 
 **To revisit**
-- On Android, the `MediaPlayer` fallback (`playFallback`) ignores `rate`. When SoundPool is not
-  ready, combo pitch and jitter are lost.
+- ~~On Android, the `MediaPlayer` fallback ignored `rate`.~~ Fixed: it now applies `rate`
+  through `PlaybackParams`.
 - On iOS, an effect requested before its pool has loaded is skipped silently. Android retries
   first.
 - The loudness targets were set offline. Check them on real phone speakers and headphones.
@@ -170,7 +170,7 @@ player would hear.
 
 1. [x] Generate and commit the effects and the re-levelled music (`b74d2415`).
 2. [x] Add `AudioPitch` and `MusicFader` with tests.
-3. [ ] Pass `rate` through the Android `MediaPlayer` fallback (`PlaybackParams`, API 23+).
+3. [x] Pass `rate` through the Android `MediaPlayer` fallback (`PlaybackParams`; minSdk is 26).
 4. [ ] Decide on iOS behaviour for effects that are not loaded yet: retry like Android, or keep
        skipping.
 5. [ ] Listening pass on Android and iOS hardware, then adjust the targets in `SOUNDS`.

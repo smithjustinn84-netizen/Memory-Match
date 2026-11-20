@@ -3,6 +3,7 @@ package io.github.smithjustinn.services
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.MediaPlayer
+import android.media.PlaybackParams
 import android.media.SoundPool
 import co.touchlab.kermit.Logger
 import io.github.smithjustinn.domain.repositories.SettingsRepository
@@ -124,7 +125,7 @@ class AndroidAudioServiceImpl(
             val streamId = soundPool.play(soundId, soundVolume, soundVolume, 1, 0, rate)
             if (streamId == 0) {
                 logger.w { "SoundPool play failed, using fallback for: $resource" }
-                playFallback(resource)
+                playFallback(resource, rate)
             }
         } else {
             // Sound not loaded yet - wait briefly and retry before falling back
@@ -135,13 +136,16 @@ class AndroidAudioServiceImpl(
                     soundPool.play(retrySoundId, soundVolume, soundVolume, 1, 0, rate)
                 } else {
                     logger.w { "SoundPool not ready after retry, using fallback for: $resource" }
-                    playFallback(resource)
+                    playFallback(resource, rate)
                 }
             }
         }
     }
 
-    private fun playFallback(resource: StringResource) {
+    private fun playFallback(
+        resource: StringResource,
+        rate: Float,
+    ) {
         val name = resourceToName[resource] ?: return
         val fileName = "$name.m4a"
         scope.launch {
@@ -151,12 +155,13 @@ class AndroidAudioServiceImpl(
                     val player = fallbackPlayers[resource]
                     if (player != null) {
                         try {
-                            if (player.isPlaying) player.seekTo(0) else player.start()
+                            if (player.isPlaying) player.seekTo(0)
+                            player.startAt(rate)
                         } catch (e: IllegalStateException) {
                             logger.w(e) { "Fallback player not ready or in bad state: $name" }
                         }
                     } else {
-                        createNewFallbackPlayer(resource, tempFile, name)
+                        createNewFallbackPlayer(resource, tempFile, name, rate)
                     }
                 }
             } catch (
@@ -172,6 +177,7 @@ class AndroidAudioServiceImpl(
         resource: StringResource,
         tempFile: File,
         name: String,
+        rate: Float,
     ) {
         var newPlayer: MediaPlayer? = null
         try {
@@ -180,7 +186,7 @@ class AndroidAudioServiceImpl(
                 setDataSource(tempFile.absolutePath)
                 setVolume(soundVolume, soundVolume)
                 setOnCompletionListener { mp -> mp.seekTo(0) }
-                setOnPreparedListener { mp -> mp.start() }
+                setOnPreparedListener { mp -> mp.startAt(rate) }
                 prepareAsync()
             }
             fallbackPlayers[resource] = newPlayer
@@ -194,6 +200,15 @@ class AndroidAudioServiceImpl(
             newPlayer?.release()
             fallbackPlayers.remove(resource)?.release()
         }
+    }
+
+    /**
+     * Plays from the current position at [rate], changing speed and pitch together as SoundPool
+     * does. Must be called once the player is prepared.
+     */
+    private fun MediaPlayer.startAt(rate: Float) {
+        playbackParams = PlaybackParams().setSpeed(rate).setPitch(rate)
+        if (!isPlaying) start()
     }
 
     override fun playEffect(
