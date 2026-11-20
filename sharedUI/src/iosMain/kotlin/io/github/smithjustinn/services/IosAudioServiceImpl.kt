@@ -8,12 +8,14 @@ import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
 import platform.AVFAudio.AVAudioPlayer
@@ -33,6 +35,10 @@ class IosAudioServiceImpl(
     // Pool of players for each sound effect to support polyphony
     private val playerPools = mutableMapOf<StringResource, MutableList<AVAudioPlayer>>()
     private val poolIndices = mutableMapOf<StringResource, Int>()
+
+    // Completes once each effect's preload has finished, whether or not it succeeded.
+    private val preloadDone =
+        AudioService.SoundEffect.entries.associate { it.toResource() to CompletableDeferred<Unit>() }
 
     private var isSoundEnabled = true
     private var isMusicEnabled = true
@@ -82,8 +88,8 @@ class IosAudioServiceImpl(
     private fun preloadSounds() {
         scope.launch {
             AudioService.SoundEffect.entries.forEach { effect ->
+                val resource = effect.toResource()
                 try {
-                    val resource = effect.toResource()
                     val pool =
                         withContext(Dispatchers.Default) {
                             val name = getString(resource)
@@ -118,6 +124,8 @@ class IosAudioServiceImpl(
                     @Suppress("TooGenericExceptionCaught") e: Exception,
                 ) {
                     logger.e(e) { "Error pre-loading sound effect: $effect" }
+                } finally {
+                    preloadDone[resource]?.complete(Unit)
                 }
             }
         }
@@ -130,11 +138,39 @@ class IosAudioServiceImpl(
         if (!isSoundEnabled) return
 
         val pool = playerPools[resource]
-        if (pool == null || pool.isEmpty()) {
-            logger.w { "Sound not loaded yet: $resource" }
-            return
+        if (pool.isNullOrEmpty()) {
+            playWhenLoaded(resource, rate)
+        } else {
+            playFromPool(pool, resource, rate)
         }
+    }
 
+    /**
+     * Plays an effect requested before its preload finished, if the preload finishes within
+     * [LOAD_WAIT_MS]. Any later and the sound would land too far from what triggered it, so it is
+     * dropped with a warning.
+     */
+    private fun playWhenLoaded(
+        resource: StringResource,
+        rate: Float,
+    ) {
+        val done = preloadDone[resource] ?: return
+        scope.launch {
+            val finished = withTimeoutOrNull(LOAD_WAIT_MS) { done.await() } != null
+            val pool = playerPools[resource]
+            when {
+                !pool.isNullOrEmpty() -> if (isSoundEnabled) playFromPool(pool, resource, rate)
+                finished -> logger.w { "Sound failed to load, not played: $resource" }
+                else -> logger.w { "Sound not loaded within $LOAD_WAIT_MS ms, not played: $resource" }
+            }
+        }
+    }
+
+    private fun playFromPool(
+        pool: List<AVAudioPlayer>,
+        resource: StringResource,
+        rate: Float,
+    ) {
         // Round-robin player selection for polyphony
         val currentIndex = poolIndices[resource] ?: 0
         val player = pool[currentIndex]
@@ -214,6 +250,7 @@ class IosAudioServiceImpl(
 
     companion object {
         private const val PLAYER_POOL_SIZE = 4
+        private const val LOAD_WAIT_MS = 250L
         private const val MIN_RATE = 0.5f
         private const val MAX_RATE = 2f
     }

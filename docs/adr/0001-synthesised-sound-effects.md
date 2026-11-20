@@ -162,8 +162,8 @@ player would hear.
 **To revisit**
 - ~~On Android, the `MediaPlayer` fallback ignored `rate`.~~ Fixed: it now applies `rate`
   through `PlaybackParams`.
-- On iOS, an effect requested before its pool has loaded is skipped silently. Android retries
-  first.
+- ~~On iOS, an effect requested before its pool had loaded was skipped silently.~~ Fixed: it
+  waits up to 250 ms for that effect's preload, then plays it or logs why not.
 - The loudness targets were set offline. Check them on real phone speakers and headphones.
 
 ## Action items
@@ -171,8 +171,7 @@ player would hear.
 1. [x] Generate and commit the effects and the re-levelled music (`b74d2415`).
 2. [x] Add `AudioPitch` and `MusicFader` with tests.
 3. [x] Pass `rate` through the Android `MediaPlayer` fallback (`PlaybackParams`; minSdk is 26).
-4. [ ] Decide on iOS behaviour for effects that are not loaded yet: retry like Android, or keep
-       skipping.
+4. [x] iOS waits up to 250 ms for an effect that has not loaded yet, then logs if it drops it.
 5. [ ] Listening pass on Android and iOS hardware, then adjust the targets in `SOUNDS`.
 6. [ ] Optional: record the script version or a hash of each sound alongside the committed files,
        so drift is visible in review.
